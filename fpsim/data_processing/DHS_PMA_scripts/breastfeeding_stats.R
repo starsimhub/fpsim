@@ -78,7 +78,37 @@ fit_tnorm <- fitdist(ages_rep, "norm", start = list(mean = mean(ages_rep), sd = 
 summary(fit_tnorm)
 
 # -------------------------------
-# 5. Save Output to Country Directory
+# 5. Validate Fit Results
+# -------------------------------
+
+# Check if fitting was successful and produced valid results
+if (is.null(fit_tnorm) || is.null(fit_tnorm$estimate) || any(is.na(fit_tnorm$estimate)) || any(is.infinite(fit_tnorm$estimate))) {
+  cat("\n=== WARNING: BREASTFEEDING DATA VALIDATION ===\n")
+  cat("ERROR: Distribution fitting failed or produced invalid results!\n")
+  cat("Potential causes:\n")
+  cat("- Insufficient breastfeeding data in survey (fewer than ~10 observations)\n")
+  cat("- Missing m4_* variables (breastfeeding status) in DHS data\n") 
+  cat("- Missing b19_* variables (child age in months) in DHS data\n")
+  cat("- All children in survey are still breastfeeding (no variation in cessation)\n")
+  cat("- Survey weights resulted in zero or negative stopping probabilities\n")
+  cat("- Data quality issues (e.g., unrealistic ages or breastfeeding durations)\n")
+  cat(sprintf("Data summary: %d total records, %d after filtering, %d age groups with data\n", 
+              nrow(dhs_data), nrow(dat_nonmiss), nrow(summary_table)))
+  if (exists("ages_rep")) {
+    cat(sprintf("Distribution fitting attempted on %d data points\n", length(ages_rep)))
+  }
+  cat("No bf_stats.csv file will be created.\n")
+  cat("=== END WARNING ===\n\n")
+  
+  # Exit script early
+  stop("Script terminated due to distribution fitting failure")
+} else {
+  cat("✓ Breastfeeding distribution fitting successful\n")
+}
+
+
+# -------------------------------
+# 6. Save Output to Country Directory
 # -------------------------------
 # Create country-based output directory if it doesn't exist
 if (exists("region") && exists("region_code")) {
