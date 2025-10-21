@@ -113,7 +113,77 @@ standard.function <- function(svychoice) {
 }
 
 # -------------------------------
-# 5. Run and Save Models
+# 5. Validate Model Results Functions
+# -------------------------------
+
+validate_simple_coef_structure <- function(coef_df, model_name) {
+  # Extract age group coefficients (not interactions)
+  age_grp_coefs <- coef_df %>%
+    filter(str_detect(rhs, "^age_grp") & !str_detect(rhs, ":"))
+  
+  # Extract age group x prior_user interaction coefficients
+  interaction_coefs <- coef_df %>%
+    filter(str_detect(rhs, "age_grp.*:.*prior_userTRUE"))
+  
+  n_age_grps <- nrow(age_grp_coefs)
+  n_interactions <- nrow(interaction_coefs)
+  
+  if (n_age_grps != n_interactions) {
+    cat(sprintf("\n=== WARNING: %s COEFFICIENT VALIDATION ===\n", toupper(model_name)))
+    cat("WARNING: Inconsistent age group coefficient structure!\n")
+    cat(sprintf("Age group coefficients: %d\n", n_age_grps))
+    cat(sprintf("Age group x prior_user interactions: %d\n", n_interactions))
+    cat("\nAge group coefficients found:\n")
+    cat(paste("- ", age_grp_coefs$rhs, collapse = "\n"), "\n")
+    cat("\nInteraction coefficients found:\n")
+    cat(paste("- ", interaction_coefs$rhs, collapse = "\n"), "\n")
+    cat("\nThis could indicate:\n")
+    cat("- Missing age groups in the data\n")
+    cat("- Model convergence issues for specific age x prior_user combinations\n")
+    cat("- Insufficient data for some age group x prior_user interactions\n")
+    cat("- Data filtering removed observations from certain age groups\n")
+    cat("=== END WARNING ===\n\n")
+  } else {
+    cat(sprintf("✓ %s coefficient structure valid: %d age groups, %d interactions\n", 
+                model_name, n_age_grps, n_interactions))
+  }
+}
+
+validate_standard_coef_structure <- function(coef_df, model_name) {
+  # Extract spline basis coefficients (not interactions)
+  spline_coefs <- coef_df %>%
+    filter(str_detect(rhs, "^ns\\(age") & !str_detect(rhs, ":"))
+  
+  # Extract spline x prior_user interaction coefficients
+  interaction_coefs <- coef_df %>%
+    filter(str_detect(rhs, "ns\\(age.*:.*prior_userTRUE"))
+  
+  n_splines <- nrow(spline_coefs)
+  n_interactions <- nrow(interaction_coefs)
+  
+  if (n_splines != n_interactions) {
+    cat(sprintf("\n=== WARNING: %s COEFFICIENT VALIDATION ===\n", toupper(model_name)))
+    cat("WARNING: Inconsistent spline coefficient structure!\n")
+    cat(sprintf("Spline basis coefficients: %d\n", n_splines))
+    cat(sprintf("Spline x prior_user interactions: %d\n", n_interactions))
+    cat("\nSpline coefficients found:\n")
+    cat(paste("- ", spline_coefs$rhs, collapse = "\n"), "\n")
+    cat("\nInteraction coefficients found:\n")
+    cat(paste("- ", interaction_coefs$rhs, collapse = "\n"), "\n")
+    cat("\nThis could indicate:\n")
+    cat("- Model convergence issues for spline x prior_user interactions\n")
+    cat("- Insufficient data for some spline basis x prior_user combinations\n")
+    cat("- Numerical instability in spline fitting\n")
+    cat("- Prior user variable has insufficient variation across age range\n")
+    cat("=== END WARNING ===\n\n")
+  } else {
+    cat(sprintf("✓ %s coefficient structure valid: %d spline basis terms, %d interactions\n", 
+                model_name, n_splines, n_interactions))
+  }
+}
+
+# -------------------------------
+# 6. Run and Save Models
 # -------------------------------
 # Create country-based output directory if it doesn't exist
 if (exists("region") && exists("region_code")) {
@@ -127,15 +197,35 @@ if (!dir.exists(output_dir)) {
 }
 
 if (model_type %in% c("simple", "both")) {
-  write_csv(simple.function(svydes), file.path(output_dir, "contra_coef_simple.csv"))
-  write_csv(simple.function(svydes.pp1), file.path(output_dir, "contra_coef_simple_pp1.csv"))
-  write_csv(simple.function(svydes.pp6), file.path(output_dir, "contra_coef_simple_pp6.csv"))
+  simple_coef <- simple.function(svydes)
+  simple_coef_pp1 <- simple.function(svydes.pp1)
+  simple_coef_pp6 <- simple.function(svydes.pp6)
+  
+  # Validate coefficient structures
+  validate_simple_coef_structure(simple_coef, "contra_coef_simple")
+  validate_simple_coef_structure(simple_coef_pp1, "contra_coef_simple_pp1")
+  validate_simple_coef_structure(simple_coef_pp6, "contra_coef_simple_pp6")
+  
+  # Save results
+  write_csv(simple_coef, file.path(output_dir, "contra_coef_simple.csv"))
+  write_csv(simple_coef_pp1, file.path(output_dir, "contra_coef_simple_pp1.csv"))
+  write_csv(simple_coef_pp6, file.path(output_dir, "contra_coef_simple_pp6.csv"))
 }
 
 if (model_type %in% c("standard", "both")) {
-  write_csv(standard.function(svydes), file.path(output_dir, "contra_coef_mid.csv"))
-  write_csv(standard.function(svydes.pp1), file.path(output_dir, "contra_coef_mid_pp1.csv"))
-  write_csv(standard.function(svydes.pp6), file.path(output_dir, "contra_coef_mid_pp6.csv"))
+  standard_coef <- standard.function(svydes)
+  standard_coef_pp1 <- standard.function(svydes.pp1)
+  standard_coef_pp6 <- standard.function(svydes.pp6)
+  
+  # Validate coefficient structures
+  validate_standard_coef_structure(standard_coef, "contra_coef_mid")
+  validate_standard_coef_structure(standard_coef_pp1, "contra_coef_mid_pp1")
+  validate_standard_coef_structure(standard_coef_pp6, "contra_coef_mid_pp6")
+  
+  # Save results
+  write_csv(standard_coef, file.path(output_dir, "contra_coef_mid.csv"))
+  write_csv(standard_coef_pp1, file.path(output_dir, "contra_coef_mid_pp1.csv"))
+  write_csv(standard_coef_pp6, file.path(output_dir, "contra_coef_mid_pp6.csv"))
 
   # Create and save natural spline basis for ages 15 to 49 with internal knots at 25 and 40
   age_range <- 15:49
