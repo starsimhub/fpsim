@@ -114,7 +114,99 @@ matrices_switch <- data %>%
 
 
 # -------------------------------
-# 5. Prepare and Save Output
+# 5. Validation: Check Self-Consistent Age Groups
+# -------------------------------
+
+# Discover expected values from the data itself
+all_age_groups <- unique(matrices_switch$age_grp)
+all_postpartum <- unique(matrices_switch$postpartum)
+all_from_methods <- unique(matrices_switch$From)
+
+cat("\n=== VALIDATION: Self-Consistency Check ===\n")
+cat("Discovered from data:\n")
+cat("- Age groups:", paste(sort(all_age_groups), collapse = ", "), "\n")
+cat("- Postpartum values:", paste(sort(all_postpartum), collapse = ", "), "\n")
+cat("- From methods:", paste(sort(all_from_methods), collapse = ", "), "\n\n")
+
+# Create validation matrix - what combinations should exist vs what do exist
+expected_combinations <- expand.grid(
+  postpartum = all_postpartum,
+  From = all_from_methods,
+  stringsAsFactors = FALSE
+)
+
+actual_combinations <- matrices_switch %>%
+  select(postpartum, From, age_grp) %>%
+  group_by(postpartum, From) %>%
+  summarise(
+    present_age_groups = list(sort(unique(age_grp))),
+    n_present = length(unique(age_grp)),
+    .groups = 'drop'
+  )
+
+# Join to find gaps
+validation_results <- expected_combinations %>%
+  left_join(actual_combinations, by = c("postpartum", "From")) %>%
+  mutate(
+    # Find missing age groups for this combination
+    missing_age_groups = map(present_age_groups, ~setdiff(all_age_groups, .x %||% character(0))),
+    n_missing = map_int(missing_age_groups, length),
+    n_present = replace_na(n_present, 0),
+    is_complete = n_missing == 0,
+    # Check if combination exists at all
+    exists = !is.na(n_present) & n_present > 0
+  )
+
+# Report missing combinations entirely
+missing_combinations <- validation_results %>% 
+  filter(!exists)
+
+if (nrow(missing_combinations) > 0) {
+  cat("INFO: Some From/postpartum combinations have no data:\n")
+  for (i in 1:nrow(missing_combinations)) {
+    row <- missing_combinations[i, ]
+    cat(sprintf("- Postpartum=%s, From=%s: No data present\n", 
+                row$postpartum, row$From))
+  }
+  cat("\n")
+}
+
+# Report incomplete combinations (missing some age groups)
+incomplete_combinations <- validation_results %>% 
+  filter(exists & !is_complete)
+
+if (nrow(incomplete_combinations) > 0) {
+  cat("WARNING: Incomplete age group coverage detected!\n")
+  
+  for (i in 1:nrow(incomplete_combinations)) {
+    row <- incomplete_combinations[i, ]
+    cat(sprintf("Postpartum=%s, From=%s: Has %d/%d age groups, missing: %s\n", 
+                row$postpartum, 
+                row$From,
+                row$n_present,
+                length(all_age_groups),
+                paste(row$missing_age_groups[[1]], collapse = ", ")))
+  }
+  
+  cat("\n")
+  
+} else {
+  complete_combinations <- validation_results %>% filter(exists)
+  cat(sprintf("✓ All %d existing From/postpartum combinations have complete age group coverage\n", 
+              nrow(complete_combinations)))
+}
+
+# Summary statistics
+cat(sprintf("\nSummary:\n"))
+cat(sprintf("- Total possible combinations: %d\n", nrow(expected_combinations)))
+cat(sprintf("- Combinations with data: %d\n", sum(validation_results$exists)))
+cat(sprintf("- Complete combinations: %d\n", sum(validation_results$exists & validation_results$is_complete)))
+cat(sprintf("- Incomplete combinations: %d\n", sum(validation_results$exists & !validation_results$is_complete)))
+
+cat("\n=== END VALIDATION ===\n\n")
+
+# -------------------------------
+# 6. Prepare and Save Output
 # -------------------------------
 
 # Create country-based output directory if it doesn't exist
