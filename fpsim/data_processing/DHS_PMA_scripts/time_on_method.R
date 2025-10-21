@@ -184,7 +184,75 @@ coef_fpsim <- coef_res %>%
   dplyr::select(estimate = est, coef, se, method, functionform)
 
 # -------------------------------
-# 5. Prepare and Save Output
+# 5. Validate Results Consistency
+# -------------------------------
+
+# Check if we have any results
+if (length(results) == 0 || nrow(coef_fpsim) == 0) {
+  cat("\n=== WARNING: TIME ON METHOD VALIDATION ===\n")
+  cat("ERROR: No survival models were successfully fitted!\n")
+  cat("Potential causes:\n")
+  cat("- Insufficient calendar data (missing vcal_1 variable) in DHS data\n")
+  cat("- No method switching events observed in the data\n")
+  cat("- All contraceptive method episodes are censored\n")
+  cat("- Data quality issues preventing model convergence\n")
+  cat("- Missing required variables (v005, v021, v022, etc.)\n")
+  original_methods <- c("None", "Pill", "IUD", "Injectable", "Condom", "Withdrawal", "Implant", "Other.trad", "Other.mod")
+  fitted_methods <- names(results)
+  missing_methods <- setdiff(original_methods, fitted_methods)
+  if (length(missing_methods) > 0) {
+    cat(sprintf("- Methods with no data: %s\n", paste(missing_methods, collapse = ", ")))
+  }
+  cat("=== END WARNING ===\n\n")
+}
+
+# Check for consistent row counts per method (only if we have results)
+if (length(results) > 0 && nrow(coef_fpsim) > 0) {
+  method_row_counts <- coef_fpsim %>%
+    group_by(method) %>%
+    summarise(n_rows = n(), .groups = 'drop') %>%
+    arrange(method)
+
+  expected_row_count <- max(method_row_counts$n_rows)
+  inconsistent_methods <- method_row_counts %>%
+    filter(n_rows != expected_row_count)
+
+  if (nrow(inconsistent_methods) > 0) {
+    cat("\n=== WARNING: TIME ON METHOD VALIDATION ===\n")
+    cat("WARNING: Inconsistent coefficient counts across methods!\n")
+    cat("Expected coefficients per method:", expected_row_count, "\n\n")
+    
+    for (i in 1:nrow(inconsistent_methods)) {
+      row <- inconsistent_methods[i, ]
+      cat(sprintf("Method '%s': %d coefficients (missing %d)\n", 
+                  row$method, row$n_rows, expected_row_count - row$n_rows))
+    }
+    
+    cat("\nThis could indicate:\n")
+    cat("- Insufficient data for some methods to fit age group coefficients\n")
+    cat("- Model convergence issues for specific methods\n")
+    cat("- Different optimal distributions requiring different parameter sets\n")
+    cat("- Missing age groups in the data for certain methods\n\n")
+    
+    # Show which coefficients are present for each method
+    cat("Coefficient summary by method:\n")
+    coef_summary <- coef_fpsim %>%
+      group_by(method, functionform) %>%
+      summarise(coefficients = paste(coef, collapse = ", "), .groups = 'drop')
+    
+    for (i in 1:nrow(coef_summary)) {
+      cat(sprintf("%s (%s): %s\n", coef_summary$method[i], coef_summary$functionform[i], coef_summary$coefficients[i]))
+    }
+    
+    cat("=== END WARNING ===\n\n")
+  }
+
+  cat(sprintf("✓ Time on method validation: %d methods with coefficients, %d total coefficients\n", 
+              nrow(method_row_counts), nrow(coef_fpsim)))
+}
+
+# -------------------------------
+# 6. Prepare and Save Output
 # -------------------------------
 
 # Create country-based output directory if it doesn't exist
