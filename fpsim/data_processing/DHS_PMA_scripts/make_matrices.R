@@ -11,7 +11,9 @@
 # 1. Setup
 # -------------------------------
 
-rm(list = ls())
+# Clear environment (preserve run control variables)
+run_vars <- ls(pattern = "^run_")
+rm(list = setdiff(ls(), run_vars))
 
 # Load user configuration
 source("./config.R")
@@ -136,7 +138,7 @@ expected_combinations <- expand.grid(
 )
 
 actual_combinations <- matrices_switch %>%
-  select(postpartum, From, age_grp) %>%
+  dplyr::select(postpartum, From, age_grp) %>%
   group_by(postpartum, From) %>%
   summarise(
     present_age_groups = list(sort(unique(age_grp))),

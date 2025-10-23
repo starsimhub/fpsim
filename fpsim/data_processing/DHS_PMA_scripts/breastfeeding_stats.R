@@ -9,14 +9,15 @@
 # 1. Setup
 # -------------------------------
 
-# Clear environment
-rm(list = ls())
+# Clear environment (preserve run control variables)
+run_vars <- ls(pattern = "^run_")
+rm(list = setdiff(ls(), run_vars))
 
 # Load user configuration
 source("./config.R")
 
 # Install and load required packages
-required_packages <- c("tidyverse", "withr", "survey", "fitdistrplus", "truncdist", "readstata13")
+required_packages <- c("tidyverse", "withr", "survey", "fitdistrplus", "truncdist", "readstata13", "haven")
 installed_packages <- rownames(installed.packages())
 
 for (pkg in required_packages) {
