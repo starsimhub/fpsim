@@ -9,10 +9,17 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :depth: 1
 
 
-Version 3.4.1 (2025-09-22)
+Version 3.4.0 (2025-10-23)
 ---------------------------
+Refactors data storage within FPsim, so that new locations can reside in external directories. The existing syntax `sim = fp.Sim(location='kenya')` still works, but now it is additionally possible to add a new setting from any folder via:
+```
+import fpsim as fp
+my_data = fp.DataLoader(data_path='path-to-my-data')
+sim = fp.Sim(dataloader=my_data)
+```
+In addition to allowing extra flexibility for users creating new locations, this change also supported the ongoing modularization of FPsim into distinct modules. The `DataLoader` class processes all data in the folder provided and sorts it into the module that requires it: death rates for the `Deaths` module, contraceptive choice parameters for the `Contraception` module, etc.
 
-  This release adds several priority regions with preliminary calibrations to FPsim Version 3.3.0. These countries/regions are: Cote d'Ivore, Niger, Pakistan Sindh region, Nigeria with regions Kano, Kaduna, and Lagos.
+This release adds several priority regions with preliminary calibrations to FPsim Version 3.3.0. These countries/regions are: Cote d'Ivore, Niger, Pakistan Sindh region, Nigeria with regions Kano, Kaduna, and Lagos.
 
 * **DHS data processing scripts**
   * Changed DHS and PMA data processing R scripts to filter to region level is specified in config.R file inputs region_variable (either “v024” or for Nigeria specifically, “sstate”), region name (e.g. “kaduna”), region_code (integer, e.g. 110 for Nigeria Kaduna), and country_region folder name (e.g. nigeria_kaduna). Script path:  fpsim/fpsim/data_processing/DHS_PMA_scripts/*.R.
@@ -26,17 +33,7 @@ Version 3.4.1 (2025-09-22)
   * Added the following countries and country/regions to defaults.py valid_country_locs = ['senegal', 'kenya', 'ethiopia', 'cotedivoire', 'niger', 'nigeria_kano', 'nigeria_kaduna', ‘nigeria_lagos’, 'pakistan_sindh']
   * Added country/region imports to the fpsim/locations/__init__.py
 
-
-Version 3.4.0 (2025-09-11)
----------------------------
-Refactors data storage within FPsim, so that new locations can reside in external directories. The existing syntax `sim = fp.Sim(location='kenya')` still works, but now it is additionally possible to add a new setting from any folder via:
-```
-import fpsim as fp
-my_data = fp.DataLoader(data_path='path-to-my-data')
-sim = fp.Sim(dataloader=my_data)
-```
-In addition to allowing extra flexibility for users creating new locations, this change also supported the ongoing modularization of FPsim into distinct modules. The `DataLoader` class processes all data in the folder provided and sorts it into the module that requires it: death rates for the `Deaths` module, contraceptive choice parameters for the `Contraception` module, etc.
-
+The R data processing scripts have been updated with additional validation for missing data, and run_all.R now works as intended.
 
 Version 3.3.2 (2025-09-05)
 ---------------------------
