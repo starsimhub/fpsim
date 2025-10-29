@@ -46,7 +46,6 @@ def get_location(location, printmsg=False):
 
     # Define valid locations
     if location not in valid_country_locs and not any(location in v for v in valid_region_locs.values()):
-    if location not in valid_country_locs and not any(location in v for v in valid_region_locs.values()):
         errormsg = f'Location "{location}" is not currently supported'
         raise NotImplementedError(errormsg)
 
