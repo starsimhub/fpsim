@@ -68,7 +68,6 @@ def register_location(name, location_ref):
 # Defaults states and values of any new(born) agent unless initialized with data or other strategy
 # or updated during the course of a simulation.
 fpmod_states = [
-fpmod_states = [
     # Contraception
     ss.BoolState('on_contra', default=False),  # whether she's on contraception
     ss.IntArr('method', default=0),  # Which method to use. 0 used for those on no method
@@ -246,8 +245,6 @@ method_youth_age_map = {
 
 # Counts - we compute number of new events each timestep, plus number of cumulative events
 event_counts = sc.autolist(
-# Counts - we compute number of new events each timestep, plus number of cumulative events
-event_counts = sc.autolist(
     'births',
     'stillbirths',
     'miscarriages',
@@ -262,12 +259,10 @@ event_counts = sc.autolist(
 )
 
 people_counts = sc.autolist(
-people_counts = sc.autolist(
     'contra_access',
     'new_users',
     'ever_used_contra',
     'switchers',
-    'n_fecund',
     'n_fecund',
     'pp0to5',
     'pp6to11',
