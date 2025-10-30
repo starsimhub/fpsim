@@ -7,39 +7,59 @@ This folder stores the location-specific files for FPsim models (both the `<mode
 ### To add a country model:
 
 1. Create a new folder with the (lowercase) location name `<name>`.
-2. Create a folder `<name>/data` and add the source data files there (see the 'Model Parameters' section below for the specific files required for an FPsim model to run). Many of the data files have corresponding R processing scripts to format the data, and some are from specific studies and need to be formatted manually. For the proper format of each file, refer to the files in `locations/kenya/data`. **Note that the filenames MUST match the naming conventions defined in the table(s) below.
-3. Copy the template model file `locations/template_loc/template.py` to the new location folder and change its name to `<name>.py`. Modify any lines designated with 'USER-EDITABLE' to your specifications. This file is used to configure a specific FPsim model and generate its location parameter values.
+2. Create a folder `<name>/data` and add the source data files there (see the 'Model Parameters' section below for the specific files required for an FPsim model to run). Many of the data files have corresponding R processing scripts to format the data, and some are from specific studies and need to be formatted manually. For the proper format of each file, refer to the files in `locations/kenya/data`. **Note that the filenames MUST match the naming conventions defined in the table(s) below.**
+3. Create a location file `<name>/<name>.py` following the standard pattern with two required functions:
+   - `make_calib_pars()`: Returns a dictionary of calibration parameters specific to this location
+   - `dataloader(location='<name>')`: Returns `fpld.DataLoader(location=location)`
+   
+   Reference existing locations like `locations/cotedivoire/cotedivoire.py` or `locations/senegal/senegal.py` for the exact pattern.
 4. Add `from . import <name>` to `locations/__init__.py`.
 5. At the top of `defaults.py` in the Global Defaults section, add the (lowercase) location name to the `valid_country_locs` array.
 
 ### To add regional model(s):
 1. Create a new folder with the (lowercase) country name `<country>`, and a subdirectory called `regions`.
-2. Create a folder `<country>/regions/data`; this is where any available region-specific data will be stored for use in the model. (See the Model 
-Parameters table below for a list of all required files for the FPsim model to run.) The model depends on having all listed data files, but 
-**if regional data for a given parameter is not available, you may substitute country-level data instead.** In such cases, be sure to include this country data in `locations/<country>/data` and follow the guidance 
-provided in the comments in template.py in Step 3 below to use it accordingly. Many data files have accompanying R scripts for preprocessing, while others—especially those 
-derived from specific studies—may require manual formatting. Each region-level file should be stored in `locations/<country>/regions/data` and follow the schema found in `locations/kenya/data` **with the addition of a `region` column
-to regionally disaggregate the data** (see `locations/ethiopia/regions/data` for examples). Both country- and region-level filenames must match the naming conventions specified in the table(s) below.
-3. For each region, copy the template model file `locations/template_loc/template.py` to the `locations/{country}/regions` folder and change its name to `<region>.py`. Modify any lines designated with 'USER-EDITABLE' to your specifications. This file is used to configure a specific FPsim model and generate its location parameter values.
+2. Create a folder `<country>/regions/data`; this is where any available region-specific data will be stored for use in the model. (See the Model Parameters table below for a list of all required files for the FPsim model to run.) The model depends on having all listed data files, but **if regional data for a given parameter is not available, you may substitute country-level data instead.** In such cases, be sure to include this country data in `locations/<country>/data`. Many data files have accompanying R scripts for preprocessing, while others—especially those derived from specific studies—may require manual formatting. Each region-level file should be stored in `locations/<country>/regions/data` and follow the schema found in `locations/kenya/data` **with the addition of a `region` column to regionally disaggregate the data** (see `locations/ethiopia/regions/data` for examples). Both country- and region-level filenames must match the naming conventions specified in the table(s) below.
+3. For each region, create a region file `<country>/regions/<region>.py` following the standard pattern with:
+   - `make_calib_pars()`: Returns region-specific calibration parameters
+   - `dataloader(location='<region>')`: Returns `fpld.DataLoader(location=location)`
+   
+   Reference `locations/ethiopia/regions/addis_ababa.py` for the exact pattern.
 4. Add `from .{country}.regions import {region}` to `locations/__init__.py`.
-5. At the top of `defaults.py` in the Global Defaults section, add the country name as a key to the `valid_region_locs` dictionary with the region names listed in 
-an array as its corresponding value (see `defaults.py` ethiopia regions as an example).
+5. At the top of `defaults.py` in the Global Defaults section, add the country name as a key to the `valid_region_locs` dictionary with the region names listed in an array as its corresponding value (see `defaults.py` ethiopia regions as an example).
 
-> Note: The experiment and calibration class have not been updated to run with regional models as of yet; however, the plotting class 
-> can be used to plot model output vs available data. 
+> Note: The experiment and calibration class have not been updated to run with regional models as of yet; however, the plotting class can be used to plot model output vs available data. 
+
+## Running Pre-calibrated Simulations
+
+To run a simulation with pre-calibrated parameters for any location, use the generic run script:
+
+```bash
+# Basic usage
+python fpsim/locations/run_calibrated_location.py <location_name>
+
+# Examples
+python fpsim/locations/run_calibrated_location.py cotedivoire
+python fpsim/locations/run_calibrated_location.py nigeria_lagos
+
+# With custom parameters
+python fpsim/locations/run_calibrated_location.py senegal --n-agents 1000 --end-year 2015
+
+# Load existing results instead of running
+python fpsim/locations/run_calibrated_location.py niger --load
+
+# Quick run without saving or generating plots
+python fpsim/locations/run_calibrated_location.py kenya --no-save --no-plots
+```
+
+This script works with any valid FPsim location and provides command-line options for customization.
 
 ## Adding a Location in an (external) Analysis Repo
 
-To add a new location in an analysis repo:
-1. Create a `locations` directory in your analysis repo, and copy into it the following from `fpsim/locations`:
-   2. `locations/template_loc` subdirectory
-   4. `data_utils.py`
-5. In your analysis repo, create a folder `locations/template_loc/data` and add your model data files there (see the 'Model Parameters' section below for the specific files required for an FPsim model to run). Many of the data files have corresponding R processing scripts to format the data, and some are from specific studies and need to be formatted manually. For the proper format of each file, refer to the files in `locations/kenya/data`. **Note that the filenames MUST match the naming conventions defined in the table(s) below.
-6. Change the `template_loc` directory name and `template_loc/template.py` filename to your model location name (must match), and update `template.py` by modifying any lines designated with 'USER-EDITABLE' to your specifications. This file is used to configure a specific FPsim model and generate its location parameter values.
-7. In your analysis repository, you can now use your custom location by adding the following to the top of a script:
-   8. `from locations import <name>`
-   10. `fp.defaults.register_location('<name>', <name>)`
-8. To run fpsim with your location, ensure you also have fpsim installed (either via pip or locally) so that the core model code can be used.
+To add a new location in an analysis repo follow the pattern in this repository: https://github.com/fpsim/fpsim_senegal
+1. Create a `data` directory containing all of the .csv data files generated by the data processing scripts in the `fpsim/data_processing/` directory.
+2. Create a Python file that contains the `make_pars()` function and overrides the `read_data()` function of the DataLoader class to read in the data from your `data` directory. See `run_senegal.py` in the fpsim_senegal repo for an example.
+3. In your analysis script, import your location file and create a DataLoader instance using your location name.
+4. When constructing the Sim, first create a DataLoader instance and set the sim's `dataloader` argument to the DataLoader instance.
 
 ## Model Data
 ### Model Parameters
@@ -118,9 +138,9 @@ analyses, policy experiments, or to reflect plausible variation across contexts.
 
 | Parameter | Metric                                | Source | Filename and location                                                                                                                |
 |:---|:--------------------------------------|:---|:-------------------------------------------------------------------------------------------------------------------------------------|
-| Age-based conception exposure | exposure_correction_age               | Calibration parameter | Manually input, model file                                                                                                           |
-| Parity-based conception exposure | exposure_correction_parity            | Calibration parameter | Manually input, model file                                                                                                           |
+| Age-based conception exposure | exposure_age               | Calibration parameter | Manually input, model file                                                                                                           |
+| Parity-based conception exposure | exposure_parity            | Calibration parameter | Manually input, model file                                                                                                           |
 | Birth spacing preference | spacing_pref                          | Calibration parameter | birth_spacing_pref.csv; if this file is not created with assumed weights, the model will use weights of `1` for all month intervals. |
-| Personal fecundity variation range | fecundity_var_low, fecundity_var_high | Calibration parameter | parameters.py, can be manually changed via pars[]                                                                                    |
+| Personal fecundity variation range | fecundity_low, fecundity_high | Calibration parameter | parameters.py, can be manually changed via pars[]                                                                                    |
 | Overall exposure correction factor | exposure_factor                       | Calibration parameter | parameters.py, can be manually changed via pars[]                                                                                    |
 | Primary infertility | primary_infertility                   | Calibration parameter | parameters.py, can be manually changed via pars[]                                                                                    |

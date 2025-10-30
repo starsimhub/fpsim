@@ -24,19 +24,19 @@ first_birth_age = 25  # age to start assessing first birth age in model
 
 # Flags for what to run
 default_flags = sc.objdict(
-    popsize       = 1, # Population size and growth over time on whole years, adjusted for n number of agents; 'pop_size'
+    popsize     = 1, # Population size and growth over time on whole years, adjusted for n number of agents; 'pop_size'
     ageparity   = 1, # Population distribution of agents in each age/parity bin (age-parity plot); 'ageparity'
-    first_birth   = 1, # Age at first birth mean with standard deviation; 'age_first_birth'
-    birth_space   = 0, # Birth spacing both in bins and mean with standard deviation; 'spacing'
-    mcpr          = 1, # Modern contraceptive prevalence; 'mcpr'
-    methods       = 1, # Overall percentage of method use and method use among users; 'methods'
-    mmr           = 1, # Maternal mortality ratio at end of sim in model vs data; 'maternal_mortality_ratio'
-    infant_m      = 1, # Infant mortality rate at end of sim in model vs data; 'infant_mortality_rate'
-    cdr           = 1, # Crude death rate at end of sim in model vs data; 'crude_death_rate'
-    cbr           = 1, # Crude birth rate (per 1000 inhabitants); 'crude_birth_rate'
-    tfr           = 1, # Total fertility rate
-    asfr          = 1, # Age-specific fertility rate
-    education     = 0, # Education metrics
+    first_birth = 1, # Age at first birth mean with standard deviation; 'age_first_birth'
+    birth_space = 0, # Birth spacing both in bins and mean with standard deviation; 'spacing'
+    mcpr        = 1, # Modern contraceptive prevalence; 'mcpr'
+    methods     = 1, # Overall percentage of method use and method use among users; 'methods'
+    mmr         = 1, # Maternal mortality ratio at end of sim in model vs data; 'maternal_mortality_ratio'
+    infant_m    = 1, # Infant mortality rate at end of sim in model vs data; 'infant_mortality_rate'
+    cdr         = 1, # Crude death rate at end of sim in model vs data; 'crude_death_rate'
+    cbr         = 1, # Crude birth rate (per 1000 inhabitants); 'crude_birth_rate'
+    tfr         = 1, # Total fertility rate
+    asfr        = 1, # Age-specific fertility rate
+    education   = 0, # Education metrics
 )
 
 
@@ -45,15 +45,19 @@ class Experiment(sc.prettyobj):
     Class for running a single sim and comparing it to data.
 
     Args:
-        pars (dict): dictionary of parameters
+        sim (Sim): the sim to run; if None, will be created when run_model is called
+        pars (dict): dictionary of parameters passed to Sim
         flags (dict): which analyses to run; see ``fp.experiment.default_flags`` for options
         label (str): label of experiment
         kwargs (dict): passed into pars
     """
 
-    def __init__(self, pars=None, flags=None, label=None, **kwargs):
+    def __init__(self, sim=None, pars=None, dataloader=None, data_kwargs=None, flags=None, label=None, **kwargs):
         self.flags = sc.mergedicts(default_flags, flags, _copy=True)  # Set flags for what gets run
+        self.sim = sim
         self.pars = pars
+        self.dataloader = dataloader
+        self.data_kwargs = data_kwargs if data_kwargs is not None else {}  # Passed to dataloader
 
         if len(kwargs):
             for k, v in kwargs.items():
@@ -67,80 +71,39 @@ class Experiment(sc.prettyobj):
         self.label = label
         return
 
-    def load_data(self, key, **kwargs):
-        """ Load data from various formats """
-        files = self.sim.pars.fp['filenames']
-        path = Path(files['base']) / files[key]
-        if path.suffix == '.obj':
-            data = sc.load(path, **kwargs)
-        elif path.suffix == '.json':
-            data = sc.loadjson(path, **kwargs)
-        elif path.suffix == '.csv':
-            data = pd.read_csv(path, **kwargs)
-        elif path.suffix == '.yaml':
-            with open(path) as f:
-                data = yaml.safe_load(f, **kwargs)
-        else:
-            errormsg = f'Unrecognized file format for: {path}'
-            raise ValueError(errormsg)
-        return data
-
-    def extract_data(self):
-        """ Load data """
-
-        json = self.load_data('basic_wb')
-        self.data.update(json)
-        # Extract population size over time
-        n = self.sim.pars.n_agents
-
-        pop_size = self.load_data('popsize')
-        self.data['pop_years'] = pop_size.year.to_numpy()
-        self.data['pop_size']  = pop_size.population.to_numpy() / (pop_size.population[0] / n)  # Corrected for # of agents, needs manual adjustment for # agents
-
-        # Extract population growth rate
-        data_growth_rate = np.diff(self.data['pop_size']) / self.data['pop_size'][:-1] * 100  # Percent change
-        self.data['pop_growth_rate'] = data_growth_rate
-
-        # Extract mcpr over time
-        mcpr = self.load_data('mcpr')
-        self.data['mcpr_years'] = mcpr.iloc[:,0].to_numpy()
-        self.data['mcpr'] = mcpr.iloc[:,2].to_numpy()
-
-        self.initialized = True
-
-        return
-
     def run_model(self, pars=None, **kwargs):
         """ Create the sim and run the model """
-
         if pars is None:
             pars = self.pars
-
         self.sim = fps.Sim(pars=pars, **kwargs)
-        self.sim.init()
-
-        if not self.initialized:
-            self.extract_data()
-
         self.sim.run()
-
+        if self.dataloader is None:
+            self.dataloader = self.sim.dataloader
         return
 
-    def extract_model(self):
+    def load_data(self, key):
+        return self.dataloader.load_calib_data(key=key, **self.data_kwargs)
+
+    def extract_results(self):
         sres = self.sim.results
         sim_df = sres.to_df(resample='year', use_years=True, sep='_')
         fp_df = sres.fp.to_df(resample='year', use_years=True, sep='_')
-        if self.flags.popsize:  self.model_pop_size(sres)
-        if self.flags.mcpr:     self.model_mcpr(sres)
-        if self.flags.mmr:      self.model_mmr(fp_df)
-        if self.flags.infant_m: self.model_imr(fp_df)
-        if self.flags.cdr:      self.model_crude_death_rate(fp_df, sim_df)
-        if self.flags.cbr:      self.model_crude_birth_rate(fp_df, sim_df)
-        if self.flags.tfr:      self.model_data_tfr(fp_df)
-        if self.flags.asfr:     self.model_data_asfr()
+        if self.flags.popsize:  self.get_pop_size(sres)
+        if self.flags.mcpr:     self.get_mcpr(sres)
+        if self.flags.mmr:      self.get_mmr(fp_df)
+        if self.flags.infant_m: self.get_imr(fp_df)
+        if self.flags.cdr:      self.get_crude_death_rate(fp_df, sim_df)
+        if self.flags.cbr:      self.get_crude_birth_rate(fp_df, sim_df)
+        if self.flags.tfr:      self.get_tfr(fp_df)
+        if self.flags.asfr:     self.get_asfr()
+        if self.flags.ageparity:    self.get_ageparity()
+        if self.flags.birth_space:  self.get_birth_spacing()
+        if self.flags.methods:      self.get_methods()
+        if self.flags.education:    self.get_education()
         return
 
-    def model_pop_size(self, sres=None):
+    def get_pop_size(self, sres=None):
+        # Model
         df = sres.to_df(resample='year', use_years=True, sep='_')
         pop = df['n_alive']
         self.model['pop_size'] = pop
@@ -148,12 +111,26 @@ class Experiment(sc.prettyobj):
         model_growth_rate = np.diff(pop) / pop[:-1] * 100  # Percent change
         self.model['pop_growth_rate'] = model_growth_rate
 
+        # Data
+        pop_size = self.load_data('popsize')
+        n = self.sim.pars.n_agents
+        self.data['pop_years'] = pop_size.year.to_numpy()
+        self.data['pop_size']  = pop_size.population.to_numpy() / (pop_size.population[0] / n)  # Corrected for # of agents, needs manual adjustment for # agents
+        data_growth_rate = np.diff(self.data['pop_size']) / self.data['pop_size'][:-1] * 100  # Percent change
+        self.data['pop_growth_rate'] = data_growth_rate
+
         return
 
-    def model_mcpr(self, sres=None):
+    def get_mcpr(self, sres=None):
+        # Model
         df = sres.contraception.to_df(resample='year', use_years=True)
         model = {'years': df.index, 'mcpr': df['mcpr']}
         model_frame = pd.DataFrame(model)
+
+        # Data
+        mcpr = self.load_data('mcpr')
+        self.data['mcpr_years'] = mcpr.iloc[:,0].to_numpy()
+        self.data['mcpr'] = mcpr.iloc[:,2].to_numpy()  # Already in percent
 
         # Filter to matching years
         data_years = self.data['mcpr_years'].tolist()
@@ -166,39 +143,48 @@ class Experiment(sc.prettyobj):
 
         return
 
-    def model_mmr(self, df=None):
+    def get_mmr(self, df=None):
+        dd = self.load_data('basic_wb')
+        self.data['maternal_mortality_ratio'] = dd['maternal_mortality_ratio']
         self.model['maternal_mortality_ratio'] = df['mmr'].values[-3:].sum()
         return
 
-    def model_imr(self, df=None):
+    def get_imr(self, df=None):
+        dd = self.load_data('basic_wb')
+        self.data['infant_mortality_rate'] = dd['infant_mortality_rate']
         self.model['infant_mortality_rate'] = df['imr'].values[-3:].sum()
         return
 
-    def model_crude_death_rate(self, fp_df=None, sim_df=None):
+    def get_crude_death_rate(self, fp_df=None, sim_df=None):
         """ Calculate the crude death rate from the model results. """
+        dd = self.load_data('basic_wb')
+        self.data['crude_death_rate'] = dd['crude_death_rate']
+
         total_deaths = sim_df['new_deaths'].values[-2] + \
                        fp_df['infant_deaths'].values[-2] + \
                        fp_df['maternal_deaths'].values[-2]
         self.model['crude_death_rate'] = sc.safedivide(total_deaths, sim_df['n_alive'].values[-1]) * 1000
         return
 
-    def model_crude_birth_rate(self, fp_df=None, sim_df=None):
+    def get_crude_birth_rate(self, fp_df=None, sim_df=None):
+        dd = self.load_data('basic_wb')
+        self.data['crude_birth_rate'] = dd['crude_birth_rate']
         births_last_year = fp_df['births'].values[-1]
         self.model['crude_birth_rate'] = sc.safedivide(births_last_year, sim_df['n_alive'].values[-1]) * 1000
         return
 
-    def model_data_tfr(self, fp_df=None):
+    def get_tfr(self, fp_df=None):
         # Extract tfr over time in data - keep here to ignore dhs data if not using tfr for calibration
-        tfr = self.load_data('tfr')  # From DHS
+        tfr = self.load_data('tfr')
         self.data['tfr_years'] = tfr['year'].to_numpy()
         self.data['total_fertility_rate'] = tfr['tfr'].to_numpy()
         self.model['tfr_years'] = fp_df.index
         self.model['total_fertility_rate'] = fp_df['tfr']
         return
 
-    def model_data_asfr(self, ind=-1):
+    def get_asfr(self, ind=-1):
         # Extract ASFR for different age bins
-        asfr = self.load_data('asfr')  # From DHS
+        asfr = self.load_data('asfr')
         age_bins = list(asfr.columns)
         age_bins.remove('year')
 
@@ -217,7 +203,7 @@ class Experiment(sc.prettyobj):
 
         return
 
-    def extract_ageparity(self):
+    def get_ageparity(self):
         # Set up
         age_keys = list(fpd.age_bin_map.keys())[1:]
         age_bins = pl.arange(min_age, max_age, bin_size)
@@ -251,7 +237,7 @@ class Experiment(sc.prettyobj):
 
         return
 
-    def extract_birth_spacing(self):
+    def get_birth_spacing(self):
 
         # Set up
         data_afb = self.load_data('afb')
@@ -340,7 +326,7 @@ class Experiment(sc.prettyobj):
 
         return
 
-    def extract_methods(self):
+    def get_methods(self):
         data_method_counts = sc.odict()
 
         # Extract from data
@@ -386,7 +372,7 @@ class Experiment(sc.prettyobj):
 
         return
 
-    def extract_education(self):
+    def get_education(self):
         # Extract education from data
         dhs_data_education = self.load_data('education')
         data_edu = dhs_data_education[['age', 'edu']].sort_values(by='age')
@@ -435,11 +421,7 @@ class Experiment(sc.prettyobj):
 
     def post_process_results(self, compute_fit=True, **kwargs):
         ''' Compare the model and the data '''
-        self.extract_model()
-        if self.flags.ageparity:    self.extract_ageparity()
-        if self.flags.birth_space:  self.extract_birth_spacing()
-        if self.flags.methods:      self.extract_methods()
-        if self.flags.education:    self.extract_education()
+        self.extract_results()
 
         # Compute comparison
         self.df = self.compare()
@@ -461,7 +443,7 @@ class Experiment(sc.prettyobj):
         # Check that keys match
         data_keys = self.data.keys()
         model_keys = self.model.keys()
-        assert set(data_keys) == set(model_keys), 'Data and model keys do not match'
+        assert set(data_keys) == set(model_keys), 'Data and model keys do not match! Data: %s, Model: %s' % (data_keys, model_keys)
 
         # Compare the two
         comparison = []

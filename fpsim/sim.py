@@ -13,10 +13,6 @@ import fpsim as fp
 from .settings import options as fpo
 from . import utils as fpu
 from . import defaults as fpd
-from . import parameters as fpp
-from . import people as fpppl
-from . import methods as fpm
-from . import education as fped
 
 # Specify all externally visible things this file defines
 __all__ = ['Sim']
@@ -77,11 +73,24 @@ class Sim(ss.Sim):
     to creating, initializing, and updating people can be found in the People class.
 
     Args:
-        pars     (dict):   parameters to modify from their default values
-        location (str):    name of the location (country) to look for data file to load
-        label    (str):    the name of the simulation (useful to distinguish in batch runs)
-        track_children (bool): whether to track links between mothers and their children (slow, so disabled by default)
-        kwargs   (dict):   additional parameters; passed to ``fp.make_pars()``
+        pars     (dict):   parameters; accepts parameters for all constituent modules of FPsim
+        sim_pars (dict):   simulation-specific parameters; see SimPars within parameters.py for details
+        fp_pars  (dict):   FP-specific parameters; FPPars within parameters.py for details
+        contra_pars (dict): parameters for the contraception module; see make_contra_pars() in parameters.py for details
+        edu_pars (dict):   parameters for the education module; see make_edu_pars() in parameters.py for details
+        fp_module (FPmod): the family planning module; defaults to ``fp.FPmod()``
+        contraception_module (ContraceptiveChoice): the contraception choice module; defaults to ``fp.StandardChoice()``
+        education_module (Education): the education module; defaults to ``fp.Education()``
+        people   (People):  the people object; defaults to ``fp.People()``
+        demographics (list): list of demographics modules; defaults to ``[ss.Deaths()]``
+        diseases (list):    list of disease modules (default None)
+        networks (list):   list of network modules (default None)
+        interventions (list): list of intervention modules (default None)
+        analyzers (list):  list of analyzer modules (default None)
+        connectors (list): list of connector modules (default None, can add empowerment or other examples)
+        dataloader (Dataloader): data loader to use; defaults to the one associated with the location; see data_utils.py
+        copy_inputs (bool): whether to copy input dicts (default True, recommended)
+        kwargs   (dict):   additional parameters belonging to any constituent module
 
     **Examples**::
 
@@ -89,22 +98,26 @@ class Sim(ss.Sim):
         sim = fp.Sim(n_agents=10e3, location='senegal', label='My small Senegal sim')
     """
 
-    def __init__(self, pars=None, sim_pars=None, fp_pars=None, contra_pars=None, edu_pars=None,
-                 fp_module=None, contraception_module=None, empowerment_module=None, education_module=None,
+    def __init__(self, pars=None, sim_pars=None, people_pars=None, fp_pars=None, contra_pars=None, edu_pars=None, death_pars=None,
+                 fp_module=None, contraception_module=None, education_module=None,
                  label=None, people=None, demographics=None, diseases=None, networks=None,
-                 interventions=None, analyzers=None, connectors=None, copy_inputs=True, **kwargs):
+                 interventions=None, analyzers=None, connectors=None, dataloader=None, copy_inputs=True, **kwargs):
 
         # Inputs and defaults
         self.contra_pars = None    # Parameters for the contraception module - processed later
         self.edu_pars = None     # Parameters for the education module - processed later
         self.fp_pars = None       # Parameters for the family planning module - processed later
+        self.deaths_pars = None
+        self.people_pars = None
         self.pars = None        # Parameters for the simulation - processed later
+        self.data = None         # Data dictionary, loaded later
+        self.dataloader = dataloader  # Data loader, if provided
 
         # Call the constructor of the parent class WITHOUT pars or module args, the make defaults
         super().__init__(pars=None, label=label)
-        self.pars = fpp.make_sim_pars()  # Make default parameters using values from parameters.py
+        self.pars = fp.make_sim_pars()  # Make default parameters using values from parameters.py
 
-        # Separate the parameters, storing sim pars and fp_pars now and saving module pars to process in init
+        # Separate the parameters
         # Four sources of par values in decreasing order of priority:
         # 1-2. kwargs == args (if multiple definitions, raise exception)
         # 3. pars
@@ -115,38 +128,29 @@ class Sim(ss.Sim):
         sim_kwargs = dict(label=label, people=people, demographics=demographics, diseases=diseases, networks=networks,
                     interventions=interventions, analyzers=analyzers, connectors=connectors)
         sim_kwargs = {key: val for key, val in sim_kwargs.items() if val is not None}
-        all_sim_pars = self.separate_pars(pars, sim_pars, fp_pars, contra_pars, edu_pars, sim_kwargs, **kwargs)
+        all_sim_pars = self.process_pars(pars, sim_pars, people_pars, fp_pars, contra_pars, edu_pars, death_pars, sim_kwargs, **kwargs)
         self.pars.update(all_sim_pars)
 
-        # Set the location
-        self.pars.location = fpd.get_location(self.pars.location, printmsg=True)  # Handle location
-
         # Process modules by adding them as Starsim connectors
-        default_contra = fpm.StandardChoice(location=self.pars.location, pars=self.contra_pars)
-        default_edu = fped.Education(location=self.pars.location, pars=self.edu_pars)
-        default_fp = fp.FPmod(location=self.pars.location, pars=self.fp_pars)
+        default_contra = fp.StandardChoice(pars=self.contra_pars)
+        default_edu = fp.Education(pars=self.edu_pars)
+        default_fp = fp.FPmod(pars=self.fp_pars)
         contraception_module = contraception_module or sc.dcp(default_contra)
         education_module = education_module or sc.dcp(default_edu)
         fp_module = fp_module or sc.dcp(default_fp)
         connectors = sc.tolist(connectors) + [contraception_module, education_module, fp_module]
-        if empowerment_module is not None:
-            connectors += sc.tolist(empowerment_module)
-        self.pars['connectors'] = connectors  # TODO, check this
+        self.pars['connectors'] = connectors
+
+        # Process demographics
+        if demographics is None and not len(self.pars['demographics']):
+            deaths = fp.Deaths(pars=self.deaths_pars)
+            self.pars['demographics'] = deaths
 
         # Metadata and settings
         fpu.set_metadata(self)  # Set version, date, and git info
         self.summary = None
 
         return
-
-    # Basic properties
-    @property
-    def ty(self):
-        return self.t.tvec[self.ti]  # years elapsed since beginning of sim (ie, 25.75... )
-
-    @property
-    def y(self):
-        return self.t.yearvec[self.ti]
 
     @staticmethod
     def remap_pars(pars):
@@ -164,12 +168,12 @@ class Sim(ss.Sim):
             pars['test'] = True
         return pars
 
-    def separate_pars(self, pars=None, sim_pars=None, fp_pars=None, contra_pars=None, edu_pars=None, sim_kwargs=None, **kwargs):
+    def process_pars(self, pars=None, sim_pars=None, people_pars=None, fp_pars=None, contra_pars=None, edu_pars=None, death_pars=None, sim_kwargs=None, **kwargs):
         """
         Separate the parameters into simulation and fp-specific parameters.
         """
         # Marge in pars and kwargs
-        all_pars = fpp.mergepars(pars, sim_pars, fp_pars, contra_pars, edu_pars, sim_kwargs, kwargs)
+        all_pars = fp.mergepars(pars, sim_pars, people_pars, fp_pars, contra_pars, edu_pars, death_pars, sim_kwargs, kwargs)
         all_pars = self.remap_pars(all_pars)  # Remap any v2 parameters to v3 names
 
         # Deal with sim pars
@@ -177,41 +181,72 @@ class Sim(ss.Sim):
         for k in user_sim_pars: all_pars.pop(k)
         sim_pars = sc.mergedicts(user_sim_pars, sim_pars, _copy=True)
 
-        # Deal with fp pars
-        default_fp_pars = fpp.make_fp_pars()
-        user_fp_pars = {k: v for k, v in all_pars.items() if k in default_fp_pars.keys()}
-        for k in user_fp_pars: all_pars.pop(k)
-        fp_pars = sc.mergedicts(user_fp_pars, fp_pars, _copy=True)
+        # Pull out test
+        if kwargs.get('test') or (pars is not None and pars.get('test')) or (sim_pars is not None and sim_pars.get('test')):
+            defaults = fpd.get_test_defaults()
 
-        # Deal with contraception module pars
-        default_contra_pars = fpm.make_contra_pars()
-        user_contra_pars = {k: v for k, v in all_pars.items() if k in default_contra_pars.keys()}
-        for k in user_contra_pars: all_pars.pop(k)
-        contra_pars = sc.mergedicts(user_contra_pars, contra_pars, _copy=True)
+            # Only apply test defaults for parameters not explicitly provided by user
+            user_provided_keys = set()
+            if pars: user_provided_keys.update(pars.keys())
+            if sim_pars: user_provided_keys.update(sim_pars.keys())
+            if kwargs: user_provided_keys.update(kwargs.keys())
 
-        # Deal with education pars
-        default_edu_pars = fped.make_edu_pars()
-        user_edu_pars = {k: v for k, v in all_pars.items() if k in default_edu_pars.keys()}
-        for k in user_edu_pars: all_pars.pop(k)
-        edu_pars = sc.mergedicts(user_edu_pars, edu_pars, _copy=True)
+            # Remove user-provided keys from defaults to avoid overriding them
+            filtered_defaults = {k: v for k, v in defaults.items() if k not in user_provided_keys}
+
+            sim_pars = sc.mergedicts(sim_pars, filtered_defaults, _copy=True)
+
+        # Get location
+        verbose = sim_pars.get('verbose', self.pars.verbose)
+        veps = 0
+        location = sim_pars.get('location', self.pars.location)
+        is_test = sim_pars.get('test', self.pars.test)
+        if location is None:
+            sc.printv(f'No location specified, checking for dataloader... ', veps)
+
+        # Load data
+        if self.dataloader is None:
+            self.dataloader = fpd.get_dataloader(location, printwarn=not is_test)
+        if self.pars.verbose > 0:
+            print(f'Loading data from files in {self.dataloader.data_path}... ')
+        data_dict = self.dataloader.load()  # Load all data and sort by module
+
+        # Load calibration parameters
+        calib_pars = fpd.get_calib_pars(location, verbose=verbose)
+        if calib_pars is not None:
+            sc.printv(f'Applying calibration parameters for {location}...', veps)
+            all_pars = fp.mergepars(all_pars, calib_pars)  # Use smart merging for calibration parameters
+
+        # Deal with all module pars in a loop
+        module_par_map = {
+            'fp': (fp.make_fp_pars(), fp_pars),
+            'contra': (fp.make_contra_pars(), contra_pars),
+            'edu': (fp.make_edu_pars(), edu_pars),
+            'deaths': (fp.make_death_pars(), death_pars),
+            'people': (fp.make_people_pars(), people_pars)
+        }
+
+        for module, (module_default_pars, direct_user_pars) in module_par_map.items():
+            indirect_module_pars = {k: v for k, v in all_pars.items() if k in module_default_pars.keys()}  # From pars or kwargs
+            for k in indirect_module_pars: all_pars.pop(k)
+            data_module_pars = data_dict.get(module, {})
+            merged_pars = fp.mergepars(data_module_pars, indirect_module_pars, direct_user_pars, _copy=True)
+            setattr(self, f'{module}_pars', merged_pars)
 
         # Raise an exception if there are any leftover pars
         if all_pars:
             raise ValueError(f'Unrecognized parameters: {all_pars.keys()}. Refer to parameters.py for parameters.')
 
-        # Store the parameters for the modules - thse will be fed into the modules during init
-        self.fp_pars = fp_pars    # Parameters for the family planning module
-        self.contra_pars = contra_pars    # Parameters for contraceptive choice
-        self.edu_pars = edu_pars      # Parameters for the education module
         return sim_pars
 
     def init(self, force=False):
         """ Fully initialize the Sim with modules, people and result storage"""
+
+        # Load age data and create people
+        people = fp.People(self.pars.n_agents, pars=self.people_pars)
+        self.pars['people'] = people
+
         if force or not self.initialized:
-            # fpu.set_seed(self.pars['rand_seed']) # shouldn't be needed anymore
-            if self.pars.people is None:
-                ap = self.pars['connectors'][-1].pars['age_pyramid']  # TODO TEMP
-                self.pars.people = fpppl.People(n_agents=self.pars.n_agents, age_pyramid=ap)
             super().init(force=force)
 
         return self
@@ -224,32 +259,6 @@ class Sim(ss.Sim):
         scaling_kw = dict(shape=self.t.npts, timevec=self.t.timevec, dtype=int, scale=True)
         for key in fpd.sim_results:
             self.results += ss.Result(key, label=key, **scaling_kw)
-        return
-
-    def update_mortality(self):
-        """
-        Update infant and maternal mortality for the sim's current year.
-        Update general mortality trend as this uses a spline interpolation instead of an array.
-        """
-
-        mapping = {
-            'age_mortality': 'gen_trend',
-            'infant_mortality': 'infant',
-            'maternal_mortality': 'maternal',
-            'stillbirth_rate': 'stillbirth',
-        }
-
-        self.fp_pars['mortality_probs'] = {}
-        for key1, key2 in mapping.items():
-            ind = sc.findnearest(self.pars.fp[key1]['year'], self.y)
-            val = self.pars.fp[key1]['probs'][ind]
-            self.pars.fp['mortality_probs'][key2] = val
-
-        return
-
-    def start_step(self):
-        super().start_step()
-        self.update_mortality()
         return
 
     # Function to scale all y-axes in fig based on input channel
@@ -300,8 +309,6 @@ class Sim(ss.Sim):
                 nrows, ncols = 2, 3
 
             res = self.results  # Shorten since heavily used
-            agelim = ('-'.join([str(self.pars.fp['low_age_short_int']), str(
-                self.pars.fp['high_age_short_int'])]))  ## age limit to be added to the title of short birth interval plot
 
             if isinstance(to_plot, dict):
                 pass
@@ -338,10 +345,6 @@ class Sim(ss.Sim):
                 elif to_plot == 'method':
                     to_plot = {
                         'method_mix':                 'Method mix'
-                    }
-                elif to_plot == 'short-interval':
-                    to_plot = {
-                        'proportion_short_interval_by_year':     f"Proportion of short birth interval [{age_group})" for age_group in agelim.split()
                     }
                 elif to_plot is not None:
                     errormsg = f"Your to_plot value: {to_plot} is not a valid option"

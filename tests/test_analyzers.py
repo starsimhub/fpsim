@@ -109,7 +109,7 @@ def test_method_mix_by_age():
 
     # Create a sim with the method mix by age analyzer
     mmba = fp.method_mix_by_age()
-    sim = fp.Sim(analyzers=[mmba])
+    sim = fp.Sim(test=True, analyzers=[mmba])
     sim.init()
     sim.run()
 

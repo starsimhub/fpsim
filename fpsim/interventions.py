@@ -107,7 +107,7 @@ class change_par(ss.Intervention):
                 sim.pars.fp[self.par] = val  # Update the parameter value -- that's it!
                 if self.verbose:
                     label = f'Sim "{sim.label}": ' if sim.label else ''
-                    print(f'{label}On {sim.y}, change {self.counter+1}/{len(self.inds)} applied: "{self.par}" from {curr_val} to {sim.pars.fp[self.par]}')
+                    print(f'{label}On {sim.t.year}, change {self.counter+1}/{len(self.inds)} applied: "{self.par}" from {curr_val} to {sim.pars.fp[self.par]}')
                 self.counter += 1
         return
 
@@ -218,7 +218,7 @@ class change_people_state(ss.Intervention):
         return ss.uids(eligible_uids)
 
     def step(self):
-        if self.pars.years[0] <= self.sim.y <= self.pars.years[1]:  # Inclusive range
+        if self.pars.years[0] <= self.sim.t.year <= self.pars.years[1]:  # Inclusive range
             eligible_uids = self.check_eligibility()
             if self.module_name is not None:
                 self.sim.people[self.module_name][self.pars.state_name][eligible_uids] = self.pars.new_val
@@ -301,7 +301,7 @@ class update_methods(ss.Intervention):
         """
         sim = self.sim
         cm = sim.connectors.contraception
-        if not self.applied and sim.y >= self.pars.year:
+        if not self.applied and sim.t.year >= self.pars.year:
             self.applied = True # Ensure we don't apply this more than once
 
             # Implement efficacy
@@ -325,7 +325,7 @@ class update_methods(ss.Intervention):
             
             # Change in switching matrix
             if self.pars.method_choice_pars is not None:
-                print(f'Changed contraceptive switching matrix in year {sim.y}')
+                print(f'Changed contraceptive switching matrix in year {sim.t.year}')
                 cm.method_choice_pars = self.pars.method_choice_pars
                 
         return
@@ -371,7 +371,7 @@ class change_initiation_prob(ss.Intervention):
         based on scenario specifications.
         """
         sim = self.sim
-        if not self.applied and sim.y >= self.year:
+        if not self.applied and sim.t.year >= self.year:
             self.applied = True # Ensure we don't apply this more than once
             sim.people.contraception_module.pars[self.par_name] = self.prob_use_intercept
 
@@ -477,12 +477,12 @@ class change_initiation(ss.Intervention):
         sim = self.sim
         ti = sim.ti
         # Save theoretical number based on the value of women on contraception at start of intervention
-        if self.years[0] == sim.y:
+        if self.years[0] == sim.t.year:
             self.expected_women_oncontra = (sim.people.alive & sim.people.on_contra).sum()
             self.init_women_oncontra = self.expected_women_oncontra
 
         # Apply intervention within this time range
-        if self.years[0] <= sim.y <= self.years[1]:  # Inclusive range
+        if self.years[0] <= sim.t.year <= self.years[1]:  # Inclusive range
             self.current_women_oncontra = (sim.people.alive & sim.people.on_contra).sum()
 
             # Save theoretical number based on the value of women on contraception at start of intervention

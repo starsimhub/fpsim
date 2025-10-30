@@ -25,7 +25,7 @@ def make_exp(n_agents=10000, seed=1, do_run=False, do_plot=False):
     find a seed for a small pop (e.g. 1k) which produces results closest to the
     large-pop values.
     '''
-    pars = dict(n_agents=n_agents, seed=seed, verbose=0)
+    pars = dict(n_agents=n_agents, seed=seed, verbose=0, test=True)
     exp = fp.Experiment(pars=pars)
 
     if do_run or do_plot:
@@ -112,7 +112,6 @@ def test_benchmark(do_save=do_save, repeats=1):
 
         # Time initialization
         t0 = sc.tic()
-        exp.extract_data()
         t_init = sc.toc(t0, output=True)
 
         # Time postprocessing

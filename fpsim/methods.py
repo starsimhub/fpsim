@@ -128,7 +128,6 @@ class Method:
             self.dur_use.age_factors = age_factors
 
 
-
 # Helper function for setting lognormals - now returns Starsim distribution  
 def ln(a, b): return ss.lognorm_ex(mean=a, std=b)
 
@@ -169,6 +168,7 @@ class Fisk(ss.Dist):
         super().__init__(distname='fisk', dist=fisk, c=c, scale=scale, **kwargs)
         return
 
+
 # %% Define parameters
 class ContraPars(ss.Pars):
     def __init__(self, **kwargs):
@@ -187,6 +187,13 @@ class ContraPars(ss.Pars):
         self.prob_use_year = 2000
         self.prob_use_intercept = 0.0
         self.prob_use_trend_par = 0.0
+
+        # Data pars, all None by default and populated with data
+        self.age_spline = None
+        self.init_dist = None
+        self.dur_use_df = None
+        self.contra_use_pars = None
+        self.method_choice_pars = None
 
         # Settings and other misc
         self.max_dur = ss.years(100)  # Maximum duration of use in years
@@ -225,6 +232,7 @@ class ContraceptiveChoice(ss.Connector):
             self.pars.method_weights = np.ones(self.n_methods)
 
         self.init_dist = None
+        self.data = {}
         
         # Initialize choice distributions for method selection
         self._method_choice_dist = ss.choice(a=self.n_methods, p=np.ones(self.n_methods)/self.n_methods)
@@ -509,36 +517,109 @@ class RandomChoice(ContraceptiveChoice):
 
 
 class SimpleChoice(RandomChoice):
-    def __init__(self, pars=None, location=None, method_choice_df=None, method_time_df=None, **kwargs):
-        """ Args: coefficients """
+    """
+    Simple choice model where method choice depends on age and previous method.
+    Uses location-specific data to set parameters, and needs to be initialized with
+    either a location string or a data dictionary.
+    """
+    def __init__(self, pars=None, location=None, data=None, contra_mod='simple', **kwargs):
+        """
+        This module can be initialized in several different ways. The pars dictionary includes
+        all the parameters needed to run the model, some of which are location-specific and created
+        from uploaded csv files. The following options are all valid:
+        1. Provide a location string, in which case the relevant data will be loaded automatically
+        2. Provide a data dict, which will be used to update the pars dict with the data-derived pars
+        3. Provide all parameters directly in the pars dict, including the data-derived ones
+        Args:
+            pars: ContraPars object or dictionary of parameters
+            location: Location string (e.g., 'senegal') to load data from
+            data: Data dictionary, if not using location
+            contra_mod: Which contraception model to use. Default is 'simple'.
+            kwargs: Additional keyword arguments passed to the parent class
+
+        Examples:
+            # Initialize with location string
+            mod = SimpleChoice(location='senegal')
+
+            # Initialize with data dictionary
+            dataloader = fpd.get_dataloader('senegal')
+            data = dataloader.load_contra_data('simple')
+            mod = SimpleChoice(data=data)
+
+            # Initialize with all parameters directly
+            dataloader = fpd.get_dataloader('senegal')
+            data = dataloader.load_contra_data('simple')
+            pars = fp.ContraPars()
+            pars.update(data)
+            mod = SimpleChoice(pars=pars)
+
+            # Initialize implicitly within a Sim
+            sim = fp.Sim(location='senegal', contra_pars=dict(contra_mod='simple'))
+            sim.init()
+            mod = sim.connectors.contraception
+        """
+
         super().__init__(pars=pars, **kwargs)
-        # Handle location
-        location = fpd.get_location(location)
-        self.init_method_pars(location, method_choice_df=method_choice_df, method_time_df=method_time_df)
+
+        # Get data if not provided
+        if data is None and location is not None:
+            dataloader = fpd.get_dataloader(location)
+            data = dataloader.load_contra_data(contra_mod, return_data=True)
+        self.update_pars(data)
+        if self.pars.dur_use_df is not None: self.process_durations()
+
+        self.age_bins = np.sort([fpd.method_age_map[k][1] for k in self.pars.method_choice_pars[0].keys() if k != 'method_idx'])
 
         return
 
-    def init_method_pars(self, location, method_choice_df=None, method_time_df=None):
-        # Get the correct module, from either registry or built-in
-        if location in fpd.location_registry:
-            location_module = fpd.location_registry[location]
-        else:
-            location_module = fplocs  # fallback to built-in only if not registered
+    def process_durations(self):
+        df = self.pars.dur_use_df
+        for method in self.methods.values():
+            if method.name == 'btl':
+                method.dur_use = ss.uniform(low=1000, high=1200)
+            else:
+                mlabel = method.csv_name
 
-        self.contra_use_pars = location_module.data_utils.process_contra_use('simple', location)  # Set probability of use
-        method_choice_pars, init_dist = location_module.data_utils.process_markovian_method_choice(self.methods, location, df=method_choice_df)  # Method choice
-        self.method_choice_pars = method_choice_pars
-        self.init_dist = init_dist
-        self._method_mix.set(p=init_dist)  # TODO check
-        self.methods = location_module.data_utils.process_dur_use(self.methods, location, df=method_time_df)  # Reset duration of use
+                thisdf = df.loc[df.method == mlabel]
+                dist = thisdf.functionform.iloc[0]
+                age_ind = sc.findfirst(thisdf.coef.values, 'age_grp_fact(0,18]')
 
-        # Handle age bins -- find a more robust way to do this
-        self.age_bins = np.sort([fpd.method_age_map[k][1] for k in self.method_choice_pars[0].keys() if k != 'method_idx'])
+                # Get age factors if they exist for this distribution
+                age_factors = None
+                if age_ind is not None and age_ind < len(thisdf.estimate.values):
+                    age_factors = thisdf.estimate.values[age_ind:]
+
+                if dist in ['lognormal', 'lnorm']:
+                    par1 = thisdf.estimate[thisdf.coef == 'meanlog'].values[0]
+                    par2 = thisdf.estimate[thisdf.coef == 'sdlog'].values[0]
+
+                elif dist in ['gamma']:
+                    par1 = thisdf.estimate[thisdf.coef == 'shape'].values[0]  # shape parameter (log space)
+                    par2 = thisdf.estimate[thisdf.coef == 'rate'].values[0]   # rate parameter (log space)
+
+                elif dist == 'llogis':
+                    par1 = thisdf.estimate[thisdf.coef == 'shape'].values[0]  # shape parameter (log space)
+                    par2 = thisdf.estimate[thisdf.coef == 'scale'].values[0]  # scale parameter (log space)
+
+                elif dist == 'weibull':
+                    par1 = thisdf.estimate[thisdf.coef == 'shape'].values[0]  # shape parameter (log space)
+                    par2 = thisdf.estimate[thisdf.coef == 'scale'].values[0]  # scale parameter (log space)
+
+                elif dist == 'exponential':
+                    par1 = thisdf.estimate[thisdf.coef == 'rate'].values[0]   # rate parameter (log space)
+
+                else:
+                    errormsg = f"Duration of use distribution {dist} not recognized"
+                    raise ValueError(errormsg)
+
+                method.set_dur_use(dist_type=dist,
+                                   par1=par1, par2=par2,
+                                   age_factors=age_factors)
         return
 
     def init_method_dist(self, uids):
         ppl = self.sim.people
-        if self.init_dist is not None:
+        if self.pars.init_dist is not None:
             choice_array = np.zeros(len(uids))
 
             # Loop over age groups and methods
@@ -546,13 +627,13 @@ class SimpleChoice(RandomChoice):
                 this_age_bools = (ppl.age[uids] >= age_low) & (ppl.age[uids] < age_high)
                 ppl_this_age = this_age_bools.nonzero()[-1]
                 if len(ppl_this_age) > 0:
-                    these_probs = self.init_dist[key]
+                    these_probs = self.pars.init_dist[key]
                     these_probs = np.array(these_probs) * self.pars['method_weights']  # Scale by weights
                     these_probs = these_probs/np.sum(these_probs)  # Renormalize
                     self._method_choice_dist.set(a=len(these_probs), p=these_probs)
                     these_choices = self._method_choice_dist.rvs(len(ppl_this_age))  # Choose
                     # Adjust method indexing to correspond to datafile (removing None: Marita to confirm)
-                    choice_array[this_age_bools] = np.array(list(self.init_dist.method_idx))[these_choices]
+                    choice_array[this_age_bools] = np.array(list(self.pars.init_dist.method_idx))[these_choices]
             return choice_array.astype(int)
         else:
             errormsg = f'Distribution of contraceptive choices has not been provided.'
@@ -566,9 +647,9 @@ class SimpleChoice(RandomChoice):
         year = self.t.year
 
         # Figure out which coefficients to use
-        if event is None : p = self.contra_use_pars[0]
-        if event == 'pp1': p = self.contra_use_pars[1]
-        if event == 'pp6': p = self.contra_use_pars[2]
+        if event is None : p = self.pars.contra_use_pars[0]
+        if event == 'pp1': p = self.pars.contra_use_pars[1]
+        if event == 'pp6': p = self.pars.contra_use_pars[2]
 
         # Initialize probability of use
         rhs = np.full_like(ppl.age[uids], fill_value=p.intercept)
@@ -588,7 +669,6 @@ class SimpleChoice(RandomChoice):
         # Set
         self.pars.p_use.set(p=prob_use)  # Set the probability of use parameter
         return
-
 
     def set_dur_method(self, uids, method_used=None):
         """ Time on method depends on age and method """
@@ -623,8 +703,8 @@ class SimpleChoice(RandomChoice):
         if event == 'pp1': return self.choose_method_post_birth(uids)
 
         else:
-            if event is None:  mcp = self.method_choice_pars[0]
-            if event == 'pp6': mcp = self.method_choice_pars[6]
+            if event is None:  mcp = self.pars.method_choice_pars[0]
+            if event == 'pp6': mcp = self.pars.method_choice_pars[6]
 
             # Initialize arrays and get parameters
             choice_array = np.zeros(len(uids))
@@ -663,7 +743,7 @@ class SimpleChoice(RandomChoice):
 
     def choose_method_post_birth(self, uids, jitter=1e-4):
         ppl = self.sim.people
-        mcp = self.method_choice_pars[1]
+        mcp = self.pars.method_choice_pars[1]
         choice_array = np.zeros(len(uids))
 
         # Loop over age groups and methods
@@ -689,23 +769,8 @@ class StandardChoice(SimpleChoice):
     Default contraceptive choice module.
     Contraceptive choice is based on age, education, wealth, parity, and prior use.
     """
-    def __init__(self, pars=None, location=None, **kwargs):
-        # Initialize base class - this adds parameters and default data
-        super().__init__(pars=pars, location=location, **kwargs)
-
-        # Get the correct module, from either registry or built-in
-        if location in fpd.location_registry:
-            location_module = fpd.location_registry[location]
-        else:
-            location_module = fplocs  # fallback to built-in only if not registered
-
-        # Now overwrite the default prob_use parameters with the mid-choice coefficients
-        location = fpd.get_location(location)
-        self.contra_use_pars = location_module.data_utils.process_contra_use('mid', location)  # Process the coefficients
-
-        # Store the age spline
-        self.age_spline = location_module.data_utils.age_spline('25_40')
-
+    def __init__(self, pars=None, location=None, data=None, contra_mod='mid', **kwargs):
+        super().__init__(pars=pars, location=location, data=data, contra_mod=contra_mod, **kwargs)
         return
 
     def get_prob_use(self, uids, event=None):
@@ -716,9 +781,9 @@ class StandardChoice(SimpleChoice):
         year = self.t.year
 
         # Figure out which coefficients to use
-        if event is None : p = self.contra_use_pars[0]
-        if event == 'pp1': p = self.contra_use_pars[1]
-        if event == 'pp6': p = self.contra_use_pars[2]
+        if event is None : p = self.pars.contra_use_pars[0]
+        if event == 'pp1': p = self.pars.contra_use_pars[1]
+        if event == 'pp6': p = self.pars.contra_use_pars[2]
 
         # Initialize with intercept
         rhs = np.full_like(ppl.age[uids], fill_value=p.intercept)
@@ -731,7 +796,7 @@ class StandardChoice(SimpleChoice):
         int_age = ppl.int_age(uids)
         int_age[int_age < fpd.min_age] = fpd.min_age
         int_age[int_age >= fpd.max_age_preg] = fpd.max_age_preg-1
-        dfa = self.age_spline.loc[int_age]
+        dfa = self.pars.age_spline.loc[int_age]
         rhs += p.age_factors[0] * dfa['knot_1'].values + p.age_factors[1] * dfa['knot_2'].values + p.age_factors[2] * dfa['knot_3'].values
         rhs += (p.age_ever_user_factors[0] * dfa['knot_1'].values * ppl.ever_used_contra[uids]
                 + p.age_ever_user_factors[1] * dfa['knot_2'].values * ppl.ever_used_contra[uids]

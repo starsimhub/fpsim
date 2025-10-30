@@ -55,8 +55,8 @@ def run_sim():
 
         # Free parameters for calibration
         freepars = dict(
-                fecundity_var_low = [0.95, 0.925, 0.975],       # [best, low, high]
-                fecundity_var_high = [1.05, 1.025, 1.075],
+                fecundity_low = [0.95, 0.925, 0.975],       # [best, low, high]
+                fecundity_high = [1.05, 1.025, 1.075],
                 exposure_factor = [1.0, 0.95, 1.0],
         )
 

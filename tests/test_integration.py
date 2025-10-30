@@ -55,6 +55,7 @@ def test_pregnant_women():
         'start_year': 2000,
         'end_year': 2001,
         'n_agents': 1000,
+        'test': True,
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
         'primary_infertility': 0,
@@ -139,6 +140,7 @@ def test_contraception():
         'start_year': 2000,
         'end_year': 2005,
         'n_agents': 1000,
+        'location': 'senegal',
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
         'primary_infertility': 0,
@@ -225,7 +227,7 @@ def test_education_preg():
     sc.heading('Testing that lower fertility rate leads to more education...')
 
     def make_sim(pregnant=False):
-        pars = dict(start=2000, stop=2010, n_agents=1000)
+        pars = dict(start=2000, stop=2010, n_agents=1000, test=True)
         sim = fp.Sim(pars=pars)
         sim.init()
         sim.people.age[:] = 15

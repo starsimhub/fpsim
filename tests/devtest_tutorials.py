@@ -3,6 +3,57 @@ Test running tutorials
 """
 
 
+def run_t1():
+    import fpsim as fp
+
+    sim = fp.Sim(location=location)
+    sim.run()
+    fig = sim.plot()
+    pars = dict(
+            n_agents   = 10_000,
+            location   = 'kenya',
+            start_year = 2000,
+            end_year   = 2020,
+        )
+
+    sim = fp.Sim(pars)
+    sim.run()
+    sim.results.fp['pregnancies']
+    sim.list_available_results()
+    sim = fp.Sim(n_agents=10e3, location='kenya', start_year=2000, end_year=2020)
+    sim.run()
+
+    sim = fp.Sim(pars, n_agents=100) # Use parameters defined above, but overrides the value `n_agents` in pars, and uses instead 100 agents, not 10,000
+    sim.run()
+
+    sim.plot() # the default
+    sim.plot('cpr')
+
+
+def run_t2():
+    # Import FPsim and define the baseline parameters
+    import fpsim as fp
+    location = 'kenya'
+    pars = dict(location=location, n_agents=500, start_year=1980, end_year=2020, seed=1)
+
+    # Define the contraceptive choice module and the education module.
+    choice = fp.StandardChoice(location=location)
+    edu = fp.Education(location=location)
+
+    # Make and run sim
+    s = fp.Sim(pars, contraception_module=choice, education_module=edu)
+    s.run()
+
+    method_choice = fp.SimpleChoice(location=location)
+    sim = fp.Sim(pars=pars, contraception_module=method_choice, analyzers=fp.lifeof_recorder())
+    sim.run()
+
+    _ = sim.plot(to_plot='cpr');
+    _ = sim.analyzers[0].plot(index=1); # plot the life events of one woman
+
+    return
+
+
 def run_t3():
 
     import fpsim as fp
@@ -52,9 +103,11 @@ def run_t4():
     import sciris as sc     # For utilities
     import starsim as ss    # For running multiple sims in parallel
     import matplotlib.pyplot as plt  # For plotting
+
+    location = 'kenya'
     pars = dict(
         n_agents   = 1_000,
-        location   = 'kenya',
+        location   = location,
         start_year = 2000,
         end_year   = 2012,
         exposure_factor = 1.0  # Overall scale factor on probability of becoming pregnant
@@ -70,7 +123,7 @@ def run_t4():
                        (sim.people.edu.objective > 0))
         return is_eligible
 
-    edu = fp.Education()
+    edu = fp.Education(location=location)
     s0 = fp.Sim(pars=pars, education_module=edu, label='Baseline')
 
     change_education = fp.change_people_state(
@@ -79,7 +132,7 @@ def run_t4():
                                 years=2010.0,
                                 new_val=15,  # Give all selected women 15 years of education
                             )
-    edu = fp.Education()
+    edu = fp.Education(location=location)
     s1 = fp.Sim(pars=pars,
                 education_module=edu,
                 interventions=change_education,
@@ -128,12 +181,9 @@ def run_t6():
     import numpy as np
 
     country = 'kenya'
-    pars = fp.make_fp_pars()
-    pars.update_location(country)
+    pars = fp.all_pars(location=country)  # For default pars
 
     # Initial free parameters for calibration
-    pars['fecundity_var_low'] = 1
-    pars['fecundity_var_high'] = 1
     pars['exposure_factor'] = 1
 
     # Postpartum sexual activity correction or 'birth spacing preference'. Pulls values from {location}/data/birth_spacing_pref.csv by default
@@ -157,15 +207,13 @@ def run_t6():
     sim = fp.Sim(pars=pars, contraception_module=method_choice)
     sim.run()
 
-    # Plot sim
-    sim.plot()
-
-    # Plotting class function which plots the primary calibration targets (method mix, method use, cpr, total fertility rate, birth spacing, age at first birth, and age-specific fertility rate)
-    plt.plot_calib(sim)
+    # # Plot sim
+    # sim.plot()
+    #
+    # # Plotting class function which plots the primary calibration targets (method mix, method use, cpr, total fertility rate, birth spacing, age at first birth, and age-specific fertility rate)
+    # plt.plot_calib(sim)
 
     # Initial free parameters for calibration
-    pars['fecundity_var_low'] = 1
-    pars['fecundity_var_high'] = 1
     pars['exposure_factor'] = 2
 
     # Last free parameter, postpartum sexual activity correction or 'birth spacing preference'. Pulls values from {location}/data/birth_spacing_pref.csv by default
@@ -179,11 +227,9 @@ def run_t6():
     method_choice = fp.SimpleChoice(pars=cm_pars, location=country)
     sim = fp.Sim(pars=pars, contraception_module=method_choice)
     sim.run()
-    plt.plot_calib(sim)
+    # plt.plot_calib(sim)
 
     # Initial free parameters for calibration
-    pars['fecundity_var_low'] = 1
-    pars['fecundity_var_high'] = 1
     pars['exposure_factor'] = 2.5
 
     # Last free parameter, postpartum sexual activity correction or 'birth spacing preference'. Pulls values from {location}/data/birth_spacing_pref.csv by default
@@ -204,9 +250,8 @@ def run_t6():
 
     # Re-run the sim
     sim = fp.Sim(pars=pars, contraception_module=method_choice)
-    sim.run()
-    plt.plot_calib(sim)
-
+    # sim.run()
+    # plt.plot_calib(sim)
 
     pars = dict(location = country,
                 n_agents = 1000,  # Population size; set very small here only for the purpose of runtime
@@ -215,23 +260,24 @@ def run_t6():
 
     # Free parameters for calibration
     freepars = dict(
-            fecundity_var_low = [0.95, 0.925, 0.975],       # [best, low, high]
-            fecundity_var_high = [1.05, 1.0, 1.3],
+            exposure_factor = [1, 0.5, 2],       # [best, low, high]
     )
     calibration = fp.Calibration(pars, calib_pars=freepars, n_trials=2)
     calibration.calibrate()
     calibration.summarize()
 
-    fig = calibration.plot_trend()
-    fig = calibration.plot_best()
+    # fig = calibration.plot_trend()
+    # fig = calibration.plot_best()
     return
 
 
 if __name__ == '__main__':
 
-    run_t3()
-    run_t4()
-    run_t5()
+    # run_t1()
+    # run_t2()
+    # run_t3()
+    # run_t4()
+    # run_t5()
     run_t6()
 
     print('Done.')

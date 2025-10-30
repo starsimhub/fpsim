@@ -43,8 +43,8 @@ def run_sim():
         pars['end_year'] = 2020  # 1960 - 2020 is the normal date range
 
         # Free parameters for calibration
-        pars['fecundity_var_low'] = .8
-        pars['fecundity_var_high'] = 3.25
+        pars['fecundity_low'] = .8
+        pars['fecundity_high'] = 3.25
         pars['exposure_factor'] = 3.5
 
         # Last free parameter, postpartum sexual activity correction or 'birth spacing preference'. Pulls values from {location}/data/birth_spacing_pref.csv by default
@@ -67,7 +67,7 @@ def run_sim():
 
         # Print out free params being used
         print("FREE PARAMETERS BEING USED:")
-        print(f"Fecundity range: {pars['fecundity_var_low']}-{pars['fecundity_var_high']}")
+        print(f"Fecundity range: {pars['fecundity_low']}-{pars['fecundity_high']}")
         print(f"Exposure factor: {pars['exposure_factor']}")
         print(f"Birth spacing preference: {pars['spacing_pref']['preference']}")
         print(f"Age-based exposure and parity-based exposure can be adjusted manually in {country}.py")

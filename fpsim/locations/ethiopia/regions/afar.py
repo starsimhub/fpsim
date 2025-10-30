@@ -3,8 +3,8 @@ Set the parameters for FPsim, specifically for Ethiopia.
 '''
 
 import numpy as np
-import starsim as ss
 import fpsim as fp
+import starsim as ss
 from fpsim import defaults as fpd
 import fpsim.locations.data_utils as fpld
 
@@ -12,8 +12,8 @@ import fpsim.locations.data_utils as fpld
 def make_calib_pars():
     pars = {}
 
-    pars['fecundity_low'] = 0.94
-    pars['fecundity_high'] = 1.0
+    pars['fecundity_low'] = 0.95
+    pars['fecundity_high'] = 1.75
 
     pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
                                         [1, 1, 1, 1, 1, 1, 1, 0.8, 0.8, 0.8, 1, 1, 1]])

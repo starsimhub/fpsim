@@ -56,8 +56,7 @@ class Config:
     @classmethod
     def load_validation_data(cls, location, val_data_mapping=None, keys=None):
         """
-        Load validation data for the specified country or region.
-        Falls back to country-level data if region-specific file is not found.
+        Load validation data for the specified country or region using DataLoader.
 
         Args:
             location (str): The name of the location folder (region or country).
@@ -79,22 +78,15 @@ class Config:
         if keys is not None:
             val_data_mapping = {k: v for k, v in val_data_mapping.items() if k in keys}
 
-        loc_mod = getattr(fp.locations, location)
-        file_paths = loc_mod.filenames()
+        # Use DataLoader to load the calibration data
+        dataloader = fp.locations.data_utils.DataLoader(location=location)
         val_data = sc.objdict()
+
         for key, filename in val_data_mapping.items():
-            file_path = file_paths.get(key, None)
-            if file_path is None:
-                raise ValueError(f"No path defined for key '{key}' in filenames() for location '{location}'.")
-            if not Path(file_path).exists():
-                raise FileNotFoundError(f"File not found: {file_path}")
-
-            val_data[key] = pd.read_csv(file_path)
-
-            # Filter to region if 'region' column exists
-            if 'region' in val_data[key].columns:
-                val_data[key] = val_data[key][val_data[key]['region'] == location].copy()
-                val_data[key].drop(columns=['region'], inplace=True)
+            try:
+                val_data[key] = dataloader.read_data(filename)
+            except FileNotFoundError:
+                raise FileNotFoundError(f"Validation data file not found: {filename} for location '{location}'")
 
         return val_data
 
@@ -169,10 +161,10 @@ def plot_asfr(sim, ax=None):
     # Extract ASFR from simulation results
     x_labels = [int(i.split('-')[0]) for i in data_agerange_cols]
     asfr_model = sim.connectors.fp.asfr[2:-1, -1]
-    
+
     # Compute mean-normalized RMSE
     rmse_scores['asfr'] = compute_rmse(asfr_model, asfr_data)
-    
+
     # Determine axis setup
     save_individual = False
     if ax is None:
@@ -422,18 +414,6 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
     # Compute mean-normalized RMSE
     rmse_scores['cpr'] = compute_rmse(model_values, data_values)
 
-    # Normalize pandas datetime year data types
-    res['timevec'] = pd.Series(res['timevec'].to_numpy())
-    res['timevec'] = pd.to_datetime(res['timevec']).dt.date
-    data_cpr['year'] = pd.to_datetime(data_cpr['year'], format="%Y").dt.date
-    
-    # Plot 
-    fig, ax = pl.subplots()
-    pl.plot(data_cpr['year'], data_cpr['cpr'], label='UN Data Portal', color='black')
-    pl.plot(res['timevec'], res.contraception.cpr * 100, label='FPsim', color='cornflowerblue')
-    pl.xlabel('Year')
-    pl.ylabel('Percent')
-    pl.xticks(rotation=45)
     # Data to plot
     plot_data = data_cpr.loc[data_cpr.year >= start_year]
     si = sc.findfirst(res['timevec'] >= start_year)
@@ -449,19 +429,17 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
     ax.plot(res['timevec'][si:].years, res.contraception.mcpr[si:] * 100, label='FPsim', color='cornflowerblue')
     ax.set_xlabel('Year')
     ax.set_ylabel('Percent')
+    pl.xticks(rotation=45)
     if Config.show_rmse is True:
         pl.title(f"Contraceptive Prevalence Rate - Model vs Data\n(RMSE: {rmse_scores['cpr']:.2f})")
     else:
         pl.title(f'Contraceptive Prevalence Rate - Model vs Data')
     pl.legend()
 
-    save_figure('cpr.png')
-    if Config.do_show:
-        pl.show()
-
+    if save_individual: save_figure('cpr.png')
+    if Config.do_show: pl.show()
     return ax
-    
-    
+
 
 def plot_tfr(sim, ax=None, start_year=1990, stop_year=2020, legend_kwargs={}):
     """

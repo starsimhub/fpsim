@@ -8,10 +8,12 @@ import numba as nb
 import scipy.stats as sps
 from . import defaults as fpd
 from . import version as fpv
+from scipy import interpolate as si
+
 
 
 # Specify all externally visible things this file defines
-__all__ = ['DuplicateNameException']
+__all__ = ['DuplicateNameException', 'data2interp']
 
 
 @nb.jit((nb.float32[:], ), cache=True, nopython=True)
@@ -38,6 +40,15 @@ def numba_miscarriage_prob(miscarriage_rates, age, resolution):
     '''Run interpolation eval to check for probability of miscarriage here'''
     miscarriage_prob = miscarriage_rates[int(round(age*resolution))]
     return miscarriage_prob
+
+
+def data2interp(data, ages, normalize=False):
+    """ Convert unevenly spaced data into an even spline interpolation """
+    model = si.interp1d(data[0], data[1])
+    interp = model(ages)
+    if normalize:
+        interp = np.minimum(1, np.maximum(0, interp))
+    return interp
 
 
 def set_metadata(obj):

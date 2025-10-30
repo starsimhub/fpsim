@@ -14,6 +14,7 @@ import fpsim.defaults as fpd
 do_plot = False
 sc.options(backend='agg') # Turn off interactive plots
 
+
 def ok(string):
     ''' Print out a successful test nicely '''
     return sc.printgreen(f'✓ {string}\n')
@@ -22,20 +23,19 @@ def ok(string):
 def test_null(do_plot=do_plot):
     sc.heading('Testing no births, no deaths...')
 
-    fp_pars = fp.make_fp_pars()  # For default pars
-    fp_pars.update_location('senegal')
+    pars = fp.all_pars(location='senegal')  # For default pars
 
     # Set things to zero
     for key in ['exposure_factor']:
-        fp_pars[key] = 0
+        pars[key] = 0
 
     for key in ['f', 'm']:
-        fp_pars['age_mortality'][key] *= 0
+        pars['age_mortality'][key] *= 0
 
     for key in ['age_mortality', 'maternal_mortality', 'infant_mortality']:
-        fp_pars[key]['probs'] *= 0
+        pars[key]['probs'] *= 0
 
-    sim = fp.Sim(test=True, fp_pars=fp_pars)
+    sim = fp.Sim(pars=pars)
     sim.run()
 
     # Tests
@@ -108,35 +108,6 @@ def test_method_changes():
     ok(f'No births with completely effective contraception, as expected')
 
 
-def test_register_custom_location():
-    sc.heading('Testing ability to register a custom location')
-
-    # Create a dummy location module
-    dummy_module = types.SimpleNamespace()
-
-    # Add a fake make_pars function
-    def make_pars(seed=None):
-        return {'location': 'dummy', 'seed': seed}
-
-    # Optionally add fake data_utils
-    class DummyDataUtils:
-        @staticmethod
-        def process_contra_use(use_type, location):
-            return f"Processed {use_type} for {location}"
-
-    dummy_module.make_pars = make_pars
-    dummy_module.data_utils = DummyDataUtils()
-
-    # Register the custom location
-    fpd.register_location('dummy', dummy_module)
-
-    # Retrieve it and test
-    assert 'dummy' in fpd.location_registry
-    mod = fpd.location_registry['dummy']
-    assert mod.make_pars(seed=42)['location'] == 'dummy'
-    assert mod.data_utils.process_contra_use('simple', 'dummy') == "Processed simple for dummy"
-
-
 if __name__ == '__main__':
 
     sc.options(backend=None)  # Turn on interactive plots
@@ -144,4 +115,3 @@ if __name__ == '__main__':
         null    = test_null(do_plot=do_plot)
         scale   = test_scale()
         meths   = test_method_changes()
-        custom_loc = test_register_custom_location()

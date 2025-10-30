@@ -16,7 +16,7 @@ def make_sim(**kwargs):
     '''
     Define a default simulation for testing the baseline.
     '''
-    sim = fp.Sim(test=True, **kwargs)
+    sim = fp.Sim(test=True, stop=2010, **kwargs)
     return sim
 
 
@@ -84,12 +84,12 @@ def test_change_people_state():
     """ Testing that change_people_state() modifies sim results in expected ways """
     sc.heading('Testing change_people_state()...')
 
-    pars = dict(n_agents=500, start=2000, stop=2020, rand_seed=1, verbose=-1, location='kenya')
+    pars = dict(n_agents=500, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
     ms = fp.SimpleChoice(location='kenya')
 
     # Change ever user
-    prior_use_lift = fp.change_people_state('fp.ever_used_contra', years=2019, new_val=True, eligibility=np.arange(500), prop=1, annual=False)
-    prior_use_gone = fp.change_people_state('fp.ever_used_contra', years=2020, new_val=False, eligibility=np.arange(500), prop=1, annual=False)
+    prior_use_lift = fp.change_people_state('fp.ever_used_contra', years=2009, new_val=True, eligibility=np.arange(500), prop=1, annual=False)
+    prior_use_gone = fp.change_people_state('fp.ever_used_contra', years=2010, new_val=False, eligibility=np.arange(500), prop=1, annual=False)
 
     # Make and run sim
     s0 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), label="Baseline")

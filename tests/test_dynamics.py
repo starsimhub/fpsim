@@ -40,7 +40,7 @@ def make_sim(label='Baseline', intvs=None, analyzers=None, location=None, **kwar
     return sim
 
 
-def test_mcpr(location=None, do_plot=False):
+def test_mcpr(location='senegal', do_plot=False):
     sc.heading('Testing that mCPR changes as expected with its covariates...')
 
     # Create covariate changes
@@ -146,7 +146,7 @@ def test_mcpr(location=None, do_plot=False):
     return sims
 
 
-def test_durations(location=None):
+def test_durations(location='senegal'):
     sc.heading('Testing that durations are as expected...')
 
     # Create parameters and modules
@@ -175,7 +175,7 @@ def test_durations(location=None):
 
 if __name__ == '__main__':
 
-    sims1 = test_mcpr(location='ethiopia', do_plot=False)
+    sims1 = test_mcpr()
     sims2 = test_durations()
 
     print('Done.')

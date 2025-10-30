@@ -74,6 +74,9 @@ design <- svydesign(
 spacing <- svytable(~space_mo + urban_rural, design) %>%
   as.data.frame()
 
+# Ensure weights column is always a float
+spacing$Freq <- as.numeric(spacing$Freq)
+
 # -------------------------------
 # 4. Save Output to Country Directory
 # -------------------------------
