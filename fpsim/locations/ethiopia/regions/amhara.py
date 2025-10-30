@@ -3,8 +3,8 @@ Set the parameters for FPsim, specifically for Ethiopia.
 '''
 
 import numpy as np
-import starsim as ss
 import fpsim as fp
+import starsim as ss
 from fpsim import defaults as fpd
 import fpsim.locations.data_utils as fpld
 

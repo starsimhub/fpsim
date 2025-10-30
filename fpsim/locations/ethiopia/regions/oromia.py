@@ -24,4 +24,3 @@ def make_calib_pars():
 
 def dataloader(location='oromia'):
     return fpld.DataLoader(location=location)
-
