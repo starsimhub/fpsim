@@ -6,10 +6,9 @@ Define defaults for use throughout FPsim
 import numpy as np
 import sciris as sc
 import starsim as ss
+import fpsim
 import fpsim.arrays as fpa
 
-# test commit actions
-remove_me = True
 
 #%% Global defaults
 useSI          = True
@@ -23,23 +22,27 @@ max_parity_spline = 20   # Used for parity splines
 location_registry = {}  # Registry for external custom locations
 valid_country_locs = ['senegal', 'kenya', 'ethiopia', 'cotedivoire', 'niger', 'nigeria_kano', 'nigeria_kaduna', 'nigeria_lagos', 'pakistan_sindh']
 valid_region_locs = {
-    'ethiopia': ['addis_ababa', 'afar', 'amhara', 'benishangul_gumuz', 'centra' 'dire_dawa', 'gambela', 
+    'ethiopia': ['addis_ababa', 'afar', 'amhara', 'benishangul_gumuz', 'central' 'dire_dawa', 'gambela', 
                  'harari', 'oromia', 'sidama', 'somali', 'south', 'southwest', 'tigray']
 }
 
+
 # Parse locations
 def get_location(location, printmsg=False):
-    default_location = 'senegal'
+
     if not location:
-        if printmsg: print('Location not supplied: using parameters from Senegal')
-        location = default_location
+        print("No location specified. Available locations are: ")
+        print(", ".join(valid_country_locs))
+        print("To use model defaults, set test=True.")
+        print(("To use a custom location, you can construct the sim by passing in a dataloader with a path to where you are keeping your data.\n"
+              "Example:\n"
+              "    import fpsim as fp\n"
+              "    # Load your own data\n"
+              "    my_data = fp.DataLoader(data_path='path-to-my-data')"
+              "    sim = fp.Sim(dataloader=my_data)"))
+
+        raise ValueError('Location must be specified. To use model defaults, set test=True.')
     location = location.lower()  # Ensure it's lowercase
-    if location == 'test':
-        if printmsg: print('Running test simulation using parameters from Senegal')
-        location = default_location
-    if location == 'default':
-        if printmsg: print('Running default simulation using parameters from Senegal')
-        location = default_location
 
     # External locations override internal ones
     if location in location_registry:
@@ -49,21 +52,43 @@ def get_location(location, printmsg=False):
     if location not in valid_country_locs and not any(location in v for v in valid_region_locs.values()):
         errormsg = f'Location "{location}" is not currently supported'
         raise NotImplementedError(errormsg)
-
     return location
 
 
+def get_dataloader(location, printwarn=True):
+    """ Return the data loader module """
+    from . import locations as fplocs
+    location = get_location(location)
 
-# Register custom location (for external users)
-def register_location(name, location_ref):
-    """
-    Register a custom location, either a function (make_pars) or a module (with make_pars + data_utils).
-    """
-    if callable(location_ref):
-        # wrap into a fake module-like object with just make_pars
-        location_ref = type('LocationStub', (), {'make_pars': location_ref})()
+    if hasattr(fplocs, location):
+        dataloader = getattr(fplocs, location).dataloader()
+    else:
+        raise NotImplementedError(f'Could not find dataloader for {location}')
+    return dataloader
 
-    location_registry[name.lower()] = location_ref
+
+def get_calib_pars(location, verbose=1):
+    """ Return the calibration parameters """
+    from . import locations as fplocs
+    if location is None:
+        return
+    location = get_location(location)
+    if hasattr(fplocs, location):
+        calib_pars = getattr(fplocs, location).make_calib_pars()
+    else:
+        sc.printv(f'No calibration parameters found for {location}', thisverbose=0, verbose=verbose)
+        return None
+    return calib_pars
+
+def get_test_defaults():
+    """ Return the test defaults """
+    defaults = {
+        'n_agents': 500,
+        'start': 2000,
+        'stop': 2005,
+        'location': 'senegal',
+    }
+    return defaults
 
 
 # Defaults states and values of any new(born) agent unless initialized with data or other strategy
@@ -77,16 +102,6 @@ fpmod_states = [
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
     ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
-    # Sexual and reproductive states, all False by default and set during simulation
-    ss.BoolState('lam'),
-    ss.BoolState('pregnant'),
-    ss.BoolState('fertile'),
-    ss.BoolState('sexually_active'),
-    ss.BoolState('sexual_debut'),
-    ss.BoolState('lactating'),
-    ss.BoolState('postpartum'),
-
-    # Ages of key events
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
     ss.BoolState('pregnant'),
@@ -134,39 +149,6 @@ fpmod_states = [
     ss.FloatArr('ti_debut'),
     ss.FloatArr('ti_dead'),
 
-    # Counts of events
-    ss.FloatArr('parity', default=0),           # Number of births including stillbirths
-    ss.FloatArr('n_births', default=0),         # Number of live births
-    ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
-    ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
-    ss.FloatArr('n_abortions', default=0),      # Number of abortions
-    ss.FloatArr('n_pregnancies', default=0),    # Number of pregnancies, including miscarriages, stillbirths, abortions
-    ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
-    ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
-
-    # Durations and counters
-    ss.FloatArr('gestation', default=0),  # TODO, remove?
-    ss.FloatArr('remainder_months', default=0),  # TODO, remove?
-    ss.FloatArr('dur_pregnancy', default=0),
-    ss.FloatArr('dur_postpartum', default=0),
-    ss.FloatArr('dur_breastfeed', default=0),
-    ss.FloatArr('dur_breastfeed_total', default=0),
-
-    # Timesteps of significant events
-    ss.FloatArr('ti_conceived'),
-    ss.FloatArr('ti_pregnant'),
-    ss.FloatArr('ti_delivery'),
-    ss.FloatArr('ti_last_delivery'),
-    ss.FloatArr('ti_live_birth'),
-    ss.FloatArr('ti_stillbirth'),
-    ss.FloatArr('ti_postpartum'),
-    ss.FloatArr('ti_miscarriage'),
-    ss.FloatArr('ti_abortion'),
-    ss.FloatArr('ti_stop_postpartum'),
-    ss.FloatArr('ti_stop_breastfeeding'),
-    ss.FloatArr('ti_debut'),
-    ss.FloatArr('ti_dead'),
-
     # Fecundity
     ss.FloatArr('personal_fecundity', default=0),
 
@@ -177,11 +159,6 @@ fpmod_states = [
     fpa.TwoDimensionalArr('stillborn_ages', ncols=max_parity),  # Ages at time of stillbirths
     fpa.TwoDimensionalArr('miscarriage_ages', ncols=max_parity),  # Ages at time of miscarriages
     fpa.TwoDimensionalArr('abortion_ages', ncols=max_parity),  # Ages at time of abortions
-
-    ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
-    ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
-    # ss.State('urban', default=True),  # Urban/rural
-    # ss.FloatArr('wealthquintile', default=3),  # Wealth quintile
 
     ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
     ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
@@ -273,20 +250,6 @@ people_counts = sc.autolist(
     'parity4to5',
     'parity6plus',
     'nonpostpartum',
-)
-
-sim_results = sc.autolist(
-    'n_urban',
-    'n_wq1',
-    'n_wq2',
-    'n_wq3',
-    'n_wq4',
-    'n_wq5',
-)
-
-# Rates and other results that aren't scaled
-rate_results = sc.autolist(
-    'tfr',
 )
 
 sim_results = sc.autolist(
