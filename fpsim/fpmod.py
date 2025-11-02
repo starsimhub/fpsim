@@ -17,7 +17,8 @@ __all__ = ['FPmod']
 
 class FPmod(ss.Module):
     """
-    Class for storing and updating FP-related events
+    Class for storing and updating FP-related events.
+    The fundamental 
     """
 
     def __init__(self, pars=None, location=None, data=None, name='fp', **kwargs):
