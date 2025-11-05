@@ -178,16 +178,11 @@ def test_senegal():
 
 if __name__ == '__main__':
 
-    # sim = test_simple()
-    # s1 = test_random_choice()
-    # sims1 = test_simple_choice()
-    # sims2 = test_mid_choice()
-    # test_sim_creation()
-    # exp = test_senegal()
-
-    sim = fp.Sim(location='kenya')
-    sim.run()
-    import numpy as np
-    count, _ = np.histogram(sim.people.fp.method, bins=np.arange(0,10))
+    sim = test_simple()
+    s1 = test_random_choice()
+    sims1 = test_simple_choice()
+    sims2 = test_mid_choice()
+    test_sim_creation()
+    exp = test_senegal()
 
     print('Done.')

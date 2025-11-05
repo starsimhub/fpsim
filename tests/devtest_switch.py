@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ContraceptiveChoice:
     def __init__(self):
         # Initialize with base methods: no_method, condoms, pill
@@ -18,26 +19,6 @@ class ContraceptiveChoice:
                    initial_share=0.0, renormalize=True):
         """
         Add a new contraceptive method and expand the switching matrix.
-        
-        Parameters:
-        -----------
-        year : int
-            Year when the method becomes available (for tracking/logging)
-        method : str
-            Name of the new method to add
-        copy_from_row : str
-            Existing method whose switching probabilities (outgoing) to copy
-        copy_from_col : str
-            Existing method whose attractiveness (incoming) to copy
-        initial_share : float, default=0.0
-            Initial probability of switching to the new method (will be 
-            distributed proportionally from existing methods if renormalize=True)
-        renormalize : bool, default=True
-            Whether to renormalize rows to sum to 1 after adding the method
-        
-        Returns:
-        --------
-        None (modifies switching_matrix and methods in place)
         """
         if method in self.methods:
             raise ValueError(f"Method '{method}' already exists in the simulation")
@@ -53,7 +34,7 @@ class ContraceptiveChoice:
         
         n = len(self.methods)
         new_matrix = np.zeros((n + 1, n + 1))
-        
+
         # Copy existing matrix to upper-left block
         new_matrix[:n, :n] = self.switching_matrix
         
