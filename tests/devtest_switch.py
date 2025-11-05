@@ -94,6 +94,18 @@ if __name__ == "__main__":
         copy_from_col='pill',
         initial_share=0.1
     )
+
+    # Alternative interfaces that should work but don't yet:
+    choice.adjust_switching(
+        year=2027,
+        row='iud',
+        col='pill',
+        age_group='18-20',
+        new_entry=0.15,
+        renormalize=True
+    )
+
+    #
     
     print("\nAfter adding IUD:")
     choice.display_matrix()
