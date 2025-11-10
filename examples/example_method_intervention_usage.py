@@ -27,7 +27,10 @@ import sciris as sc
 import fpsim as fp
 from plots import plot_comparison_full
 
+usecases = [1, 2, 3]
+plot_compare = [[1,2], [1,3], [2,3]]
 
+# region: Helper functions
 def _default_pars(n_agents=5_000, location='kenya', start_year=2000, end_year=2015):
     """Baseline parameters shared by all example simulations."""
     return dict(
@@ -50,6 +53,9 @@ def _print_key_results(sim: fp.Sim, label: str):
     births_val = float(np.sum(births_series)) if births_series is not None else float('nan')
     print(f'[{label}] CPR={cpr_val:0.3f}, mCPR={mcpr_val:0.3f}, total births={births_val:0.0f}')
 
+# endregion: Helper functions
+
+# region: Baseline simulation
 def run_baseline(
     label='Baseline (no intervention)',
 ):
@@ -60,7 +66,9 @@ def run_baseline(
     _print_key_results(sim, label)
     return sim
 
+# endregion: Baseline simulation
 
+# region: Method mix and probability update
 def run_with_method_mix_adjustment(
     year_apply=2007.0,
     label='run_with_method_mix_adjustment',
@@ -94,7 +102,9 @@ def run_with_method_mix_adjustment(
     _print_key_results(sim, label)
     return sim
 
+# endregion: Method mix and probability update
 
+# region: Efficacy and duration changes
 def run_with_efficacy_and_duration_changes(
     year_apply=2007.0,
     label='run_with_efficacy_and_duration_changes',
@@ -119,7 +129,9 @@ def run_with_efficacy_and_duration_changes(
     _print_key_results(sim, label)
     return sim
 
+# endregion: Efficacy and duration changes
 
+# region: Switching matrix scaling
 def run_with_switching_matrix_scaling(
     year_apply=2007.0,
     label='run_with_switching_matrix_scaling',
@@ -152,51 +164,38 @@ def run_with_switching_matrix_scaling(
     _print_key_results(sim, label)
     return sim
 
+# endregion: Switching matrix scaling
 
+# region: Main function
 if __name__ == '__main__':
-    """
-    Execute the full suite of examples when run as a standalone script.
-    """
-    print("\n" + "=" * 60)
-    print("Running MethodIntervention Showcase")
-    print("=" * 60 + "\n")
 
-    baseline = run_baseline()
-    # mix_adj = run_with_method_mix_adjustment()
-    # eff_dur = run_with_efficacy_and_duration_changes()
-    switch_scale = run_with_switching_matrix_scaling()
-
-    plot_kwargs = dict(
-        show_figure=True,
-        save_figure=False,
-        chart_titles=None,
-        colors=None,
-        exclude_none=True,
-    )
-
-    # plot_comparison_full(
-    #     baseline,
-    #     mix_adj,
-    #     main_title='run_with_method_mix_adjustment',
-    #     filename="run_with_method_mix_adjustment.png",
-    #     **plot_kwargs,
-    # )
-    # plot_comparison_full(
-    #     baseline,
-    #     eff_dur,
-    #     main_title='run_with_efficacy_and_duration_changes',
-    #     filename="run_with_efficacy_and_duration_changes.png",
-    #     **plot_kwargs,
-    # )
-    plot_comparison_full(
-        baseline,
-        switch_scale,
-        main_title='run_with_switching_matrix_scaling',
-        filename="method_mix_comparison_switch_scale.png",
-        **plot_kwargs,
-    )
-
-    print("\n" + "=" * 60)
-    print("All examples completed successfully!")
-    print("=" * 60)
-
+    # Map case numbers to functions
+    cases = {
+        1: ('Baseline', run_baseline),
+        2: ('Method Mix and Probability Update', run_with_method_mix_adjustment),
+        3: ('Efficacy and Duration Changes', run_with_efficacy_and_duration_changes),
+        4: ('Switching Matrix Scaling', run_with_switching_matrix_scaling),
+    }
+    
+    # Parse which cases to run from command line
+    if len(usecases) > 0:
+        to_run = usecases
+    else:
+        to_run = list(cases.keys())
+    
+    # Store simulation results
+    sims = {}
+    
+    for case_num in to_run:
+        if case_num not in cases:
+            print(f"Warning: Case {case_num} not found, skipping")
+            continue
+        name, func = cases[case_num]
+        print(f"\n"+"---"*10 + f" Running Case {case_num}: {name} " + "---"*10 + "\n") 
+        sims[case_num] = func()
+    
+    for plot_pair in plot_compare:
+        name1 = cases[plot_pair[0]][0]
+        name2 = cases[plot_pair[1]][0]
+        title = f"{name1} .vs. {name2}"
+        plot_comparison_full(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"plot_comparison_{plot_pair[0]}_{plot_pair[1]}.png")
