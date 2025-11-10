@@ -98,7 +98,7 @@ class MethodIntervention:
     
     **Better counseling increases continuation:**
     >>> mod = MethodIntervention(year=2025)
-    >>> mod.set_duration_months('inj', 36)  # People stay on injectables for 3 years instead of 2
+    >>> mod.set_duration_months('inj', 36)  # Set target duration to 36 months
     
     **Social marketing campaign shifts method mix:**
     >>> mod = MethodIntervention(year=2025)
@@ -107,8 +107,9 @@ class MethodIntervention:
     
     Important Notes for PST Teams
     ------------------------------
-    - **Duration impacts**: Increasing duration by 50% can more than double method usage
-      because people accumulate on the method over time. This is realistic!
+    - **Duration impacts**: Duration changes translate directly to usage changes in steady state.
+      Increasing duration by 50% increases method usage by 50% because people accumulate on
+      the method over time. This is realistic and expected!
     - **Method competition**: When one method improves, similar methods often decrease
       (e.g., improving injectables may decrease implants as they compete for users)
     - **Units**: Efficacy is 0-1 (e.g., 0.95 = 95%), Duration is in months (e.g., 24 = 2 years)
@@ -320,35 +321,33 @@ class MethodIntervention:
         --------
         >>> # Model improved counseling that increases injectable continuation
         >>> mod = MethodIntervention(year=2025)
-        >>> mod.set_duration_months('inj', 36)  # Increase from ~24 to 36 months
+        >>> mod.set_duration_months('inj', 30)  # Set target duration to 30 months
         
         >>> # Model supply chain improvements reducing pill stockouts
-        >>> mod.set_duration_months('pill', 18)  # Increase from ~12 to 18 months
+        >>> mod.set_duration_months('pill', 15)  # Set target duration to 15 months
         
         >>> # Model comprehensive program improving multiple methods
-        >>> mod.set_duration_months('inj', 36).set_duration_months('impl', 48)
+        >>> mod.set_duration_months('inj', 30).set_duration_months('impl', 40)
         
         Critical Notes for PST Teams
         -----------------------------
         **Duration changes have LARGE effects on method mix:**
-        - Increasing duration by 50% can MORE than double method usage in steady state
+        - Duration changes translate DIRECTLY to usage changes in steady state
         - This is because people "accumulate" on methods they stay on longer
         - Example: If 100 people/month start injectables:
           * At 24 months average duration → ~2,400 current users at any time
           * At 36 months average duration → ~3,600 current users at any time
-          * That's a 50% increase in snapshot prevalence!
+          * That's a 50% duration increase → 50% usage increase!
         
         **Why this is realistic:**
         - Duration/continuation is one of the most impactful real-world program interventions
         - Studies show counseling can increase continuation by 30-60%
         - The large method mix changes you see in results are expected, not bugs!
         
-        **Typical baseline durations:**
-        - Pills: 12-18 months
-        - Injectables: 18-24 months  
-        - IUDs: 36-60 months
-        - Implants: 36-48 months
-        - Condoms: 6-12 months (sporadic use)
+        **Note on baseline durations:**
+        Baseline values are calibrated to country-specific data and vary by location.
+        Use `capture_method_mix_from_sim()` or check your location's calibration parameters
+        to understand current duration distributions before setting intervention targets.
         """
         method_name = self._normalize_name(method)
         mval = float(months)
