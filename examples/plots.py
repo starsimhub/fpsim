@@ -10,9 +10,32 @@ from fpsim import defaults as fpd
 import numpy as np
 import plotly.graph_objects as go
 from enum import Enum
+import os
+from pathlib import Path
 
 __all__ = ['plot_method_mix_simple', 'plot_comparison_full', 'plot_method_bincount'
            'plot_method_mix_by_type_per_year', 'iterable_plots', 'plot_pregnancies_per_year']
+
+
+def _get_results_dir():
+    """
+    Get the results directory path, creating it if it doesn't exist.
+    The results folder is created in the same location as the running script.
+    
+    Returns:
+    --------
+    Path
+        Path object pointing to the results directory
+    """
+    # Get the directory of the running script (or current working directory as fallback)
+    script_dir = Path(os.getcwd())
+    results_dir = script_dir / 'results'
+    
+    # Create the directory if it doesn't exist
+    results_dir.mkdir(exist_ok=True)
+    
+    return results_dir
+
 
 class MethoType(Enum):
     PILL = 'Pill'
@@ -143,20 +166,25 @@ def _get_data(*sims, exclude_none=False):
     # Create method labels using standard mapping (already in index order: 0, 1, 2, ...)
     method_labels = [METHOD_INDEX_TO_NAME.get(i, f'Method_{i}') for i in range(max_method_idx)]
     method_indices = np.arange(max_method_idx)
-    none_idx = 0
-    mask = method_indices != none_idx
-    method_indices = method_indices[mask]
-    method_labels = [method_labels[i] for i in method_indices]
-    
-    # Filter and renormalize all method mix arrays (maintains index order)
-    filtered_arrays = []
-    for mix_array in method_mix_arrays:
-        filtered = mix_array[mask]
-        total = np.sum(filtered)
-        if total > 0:
-            filtered = filtered / total
-        filtered_arrays.append(filtered)
-    method_mix_arrays = filtered_arrays
+    if exclude_none:
+        # Exclude the 'none' method (index 0) and renormalize proportions
+        none_idx = 0
+        mask = method_indices != none_idx
+        method_indices = method_indices[mask]
+        method_labels = [method_labels[i] for i in method_indices]
+        
+        # Filter and renormalize all method mix arrays (maintains index order)
+        filtered_arrays = []
+        for mix_array in method_mix_arrays:
+            filtered = mix_array[mask]
+            total = np.sum(filtered)
+            if total > 0:
+                filtered = filtered / total
+            filtered_arrays.append(filtered)
+        method_mix_arrays = filtered_arrays
+    else:
+        # Keep 'none' included; keep labels and proportions as-is
+        pass
     
     # Data is sorted by method index (excluding 'none' when exclude_none=True)
     # - method_labels[i] corresponds to method index method_indices[i]
@@ -551,8 +579,11 @@ Summary Statistics:
     plt.tight_layout()
     
     if save_figure:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"Figure saved as: {filename}")
+        # Save to results directory
+        results_dir = _get_results_dir()
+        save_path = results_dir / filename
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Figure saved as: {save_path}")
     
     if show_figure:
         plt.show()
@@ -611,8 +642,11 @@ def plot_pregnancies_per_year(sim1, sim2, show_figure=True, save_figure=False, f
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
     if save_figure:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"Figure saved as: {filename}")
+        # Save to results directory
+        results_dir = _get_results_dir()
+        save_path = results_dir / filename
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Figure saved as: {save_path}")
     
     if show_figure:
         plt.show()
@@ -750,8 +784,11 @@ def plot_method_bincount(sim1, sim2=None, title="Method Distribution", show_figu
     plt.tight_layout()
     
     if save_figure:
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"Figure saved as: {filename}")
+        # Save to results directory
+        results_dir = _get_results_dir()
+        save_path = results_dir / filename
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Figure saved as: {save_path}")
     
     if show_figure:
         plt.show()
@@ -866,8 +903,11 @@ def plot_method_mix_by_type_per_year(sim, interventions=None):
     ax.set_xlim(years[0], years[-1])
     
     plt.tight_layout()
-    plt.savefig('method_mix_by_type_per_year.png', dpi=150, bbox_inches='tight')
-    print("  Plot saved as 'method_mix_by_type_per_year.png'")
+    # Save to results directory
+    results_dir = _get_results_dir()
+    save_path = results_dir / 'method_mix_by_type_per_year.png'
+    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    print(f"  Plot saved as '{save_path}'")
     plt.show()
     
     return fig

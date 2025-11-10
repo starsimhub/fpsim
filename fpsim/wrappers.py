@@ -246,7 +246,7 @@ class MethodIntervention:
     # -----------------
     # Builder methods
     # -----------------
-    def set_efficacy(self, method: str, efficacy: float) -> 'MethodIntervention':
+    def set_efficacy(self, method: str, efficacy: float, print_efficacy=False) -> 'MethodIntervention':
         """
         Set the contraceptive efficacy (failure rate prevention) for a method.
         
@@ -289,9 +289,11 @@ class MethodIntervention:
         if not (0.0 <= val <= 1.0):
             raise ValueError(f'Efficacy for {method_name} must be between 0 and 1')
         self._eff[method_name] = val
+        if print_efficacy:
+            print(f'Efficacy: {method_name} = {val}')
         return self
 
-    def set_duration_months(self, method: str, months: Union[int, float]) -> 'MethodIntervention':
+    def set_duration_months(self, method: str, months: Union[int, float], print_duration=False) -> 'MethodIntervention':
         """
         Set how long (in months) people typically stay on a contraceptive method.
         
@@ -354,9 +356,11 @@ class MethodIntervention:
         if mval <= 0:
             raise ValueError(f'Duration (months) for {method_name} must be positive')
         self._dur[method_name] = mval
+        if print_duration:
+            print(f'Duration: {method_name} = {mval} months')
         return self
 
-    def set_probability_of_use(self, p_use: float) -> 'MethodIntervention':
+    def set_probability_of_use(self, p_use: float, print_p_use=False) -> 'MethodIntervention':
         """
         Set the overall probability that eligible people use ANY contraceptive method.
         
@@ -400,9 +404,11 @@ class MethodIntervention:
         if not (0.0 <= p <= 1.0):
             raise ValueError('Probability of use must be between 0 and 1')
         self._p_use = p
+        if print_p_use:
+            print(f'Probability of use: {p}')
         return self
 
-    def set_method_mix(self, method: str, value: float) -> 'MethodIntervention':
+    def set_method_mix(self, method: str, value: float, print_method_mix=False) -> 'MethodIntervention':
         """
         Set the target share/percentage for a specific contraceptive method.
         
@@ -469,6 +475,8 @@ class MethodIntervention:
         if val < 0:
             raise ValueError(f'Method mix for {method_name} cannot be negative')
         self._mix_values[method_name] = val
+        if print_method_mix:
+            print(f'Method mix: {method_name} = {val}')
         return self
 
     def set_method_mix_baseline(self, mix_values: Sequence[float]) -> 'MethodIntervention':
@@ -488,7 +496,7 @@ class MethodIntervention:
         self._method_mix_base = arr / total
         return self
 
-    def capture_method_mix_from_sim(self, sim) -> 'MethodIntervention':
+    def capture_method_mix_from_sim(self, sim, print_method_mix=False) -> 'MethodIntervention':
         """
         Capture the current method mix from a simulation to use as your baseline.
         
@@ -534,6 +542,8 @@ class MethodIntervention:
         if mix is None:
             raise ValueError('Simulation contraception module does not expose a method mix baseline')
         self.set_method_mix_baseline(mix)
+        if print_method_mix:
+            print(f'Method mix baseline: {mix}')
         return self
 
     def set_switching_matrix(self, matrix_or_path: Union[dict, str]) -> 'MethodIntervention':

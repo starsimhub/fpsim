@@ -5,10 +5,14 @@ Examples demonstrating how to build and apply interventions with
 Each example highlights a different capability of the interface while using the
 same core simulation parameters for comparison:
 
-    1. Baseline (no intervention)
-    2. Method mix and probability update (single method, RandomChoice module)
-    3. Efficacy and continuation change (single method, RandomChoice module)
-    4. Switching matrix scaling (single method, SimpleChoice module)
+    0. Baseline (no intervention)
+    1. A very simple use case - improve method efficacy
+    2. Method mix and duration update - LARC promotion program
+    3. Efficacy and continuation changes - comprehensive injectable program
+    4. Switching matrix scaling - improving method switching patterns
+
+All examples use Kenya location with StandardChoice module (the default). 
+They demonstrate interventions that work with all contraception modules.
 
 Method names provided to the interface must match the canonical short names used
 inside fpsim:
@@ -17,6 +21,12 @@ inside fpsim:
 
 The interface converts these names to the labels expected by the core
 `update_methods` intervention when `build()` is called.
+
+IMPORTANT NOTE about `set_probability_of_use()`:
+- This method only works with RandomChoice contraception module
+- StandardChoice/SimpleChoice calculate probability from individual attributes
+  (age, education, wealth, parity) and cannot be overridden with a simple p_use value
+- For those modules, use efficacy, duration, or method mix interventions instead
 """
 
 from __future__ import annotations
@@ -25,13 +35,15 @@ import numpy as np
 import sciris as sc
 
 import fpsim as fp
-from plots import plot_comparison_full
+from plots import plot_comparison_full, plot_method_bincount, plot_method_mix_simple, plot_pregnancies_per_year
 
-usecases = [1, 2, 3]
-plot_compare = [[1,2], [1,3], [2,3]]
+location = 'senegal'
+usecases = [0, 1, 2, 3, 4]
+plot_compare = [[0,1], [0,2], [0,3], [0,4]]
+print('*'*40)
 
-# region: Helper functions
-def _default_pars(n_agents=5_000, location='kenya', start_year=2000, end_year=2015):
+# REGION: Utils & Default simulation parameters
+def _default_pars(n_agents=5_000, location=location, start_year=2000, end_year=2015):
     """Baseline parameters shared by all example simulations."""
     return dict(
         n_agents=n_agents,
@@ -55,7 +67,7 @@ def _print_key_results(sim: fp.Sim, label: str):
 
 # endregion: Helper functions
 
-# region: Baseline simulation
+# REGION: 0. Baseline simulation
 def run_baseline(
     label='Baseline (no intervention)',
 ):
@@ -68,17 +80,49 @@ def run_baseline(
 
 # endregion: Baseline simulation
 
-# region: Method mix and probability update
+# REGION: 1. Simple use case: improve method efficacy
+def run_simple_usecase(
+    year_apply=2007.0,
+    label='A very simple use case',
+):
+    """
+    Minimal example: improve contraceptive efficacy for injectables.
+    
+    This demonstrates a simple, realistic intervention: improving injectable
+    contraceptive effectiveness from baseline ~97% to 99% through better quality
+    products and user education.
+    
+    This works with all contraception modules (StandardChoice, SimpleChoice, RandomChoice).
+    """
+    pars = _default_pars()
+    
+    mod = fp.MethodIntervention(year=year_apply, label=label)
+    mod.set_efficacy('inj', 0.99)  # Improve injectable efficacy to 99%
+    
+    print(f'\nPreview of configured payload ({label}):')
+    sc.pp(mod.preview())
+    
+    intv = mod.build()
+    sim = fp.Sim(pars=pars, interventions=intv, label=label)
+    sim.run()
+    _print_key_results(sim, label)
+    return sim
+
+# endregion: Very simple use case
+
+# REGION: 2. Method mix and duration update  
 def run_with_method_mix_adjustment(
     year_apply=2007.0,
     label='run_with_method_mix_adjustment',
 ):
     """
-    Showcase `set_method_mix` together with `set_probability_of_use`, adjusting a
-    single method (`pill`) while preserving the baseline mix for other methods.
-
-    RandomChoice does not use a switching matrix, so we focus on method mix and
-    global p_use adjustments.
+    Showcase `set_method_mix` together with `set_duration_months`, adjusting a
+    single method (`impl`) while preserving the baseline mix for other methods.
+    
+    This demonstrates a comprehensive LARC promotion intervention: increasing
+    both the share of women choosing implants AND improving continuation rates.
+    
+    Works with all contraception modules (StandardChoice, SimpleChoice, RandomChoice).
     """
     pars = _default_pars()
 
@@ -87,11 +131,11 @@ def run_with_method_mix_adjustment(
     temp_sim.init()
 
     mod = fp.MethodIntervention(year=year_apply, label=label)
-    mod.capture_method_mix_from_sim(temp_sim)
+    mod.capture_method_mix_from_sim(temp_sim, print_method_mix=True)
     del temp_sim
 
-    mod.set_probability_of_use(0.58)
-    mod.set_method_mix('pill', 0.25)  # Target pill share (others rescaled automatically)
+    mod.set_method_mix('impl', 0.20, print_method_mix=True)  # Target 20% implant share
+    mod.set_duration_months('impl', 48)  # Improve continuation to 4 years
 
     print(f'\nPreview of configured payload ({label}):')
     sc.pp(mod.preview())
@@ -102,9 +146,7 @@ def run_with_method_mix_adjustment(
     _print_key_results(sim, label)
     return sim
 
-# endregion: Method mix and probability update
-
-# region: Efficacy and duration changes
+# REGION: 3. Efficacy and duration changes
 def run_with_efficacy_and_duration_changes(
     year_apply=2007.0,
     label='run_with_efficacy_and_duration_changes',
@@ -129,9 +171,9 @@ def run_with_efficacy_and_duration_changes(
     _print_key_results(sim, label)
     return sim
 
-# endregion: Efficacy and duration changes
+# REGION: Efficacy and duration changes
 
-# region: Switching matrix scaling
+# REGION: 4. Switching matrix scaling
 def run_with_switching_matrix_scaling(
     year_apply=2007.0,
     label='run_with_switching_matrix_scaling',
@@ -164,15 +206,16 @@ def run_with_switching_matrix_scaling(
     _print_key_results(sim, label)
     return sim
 
-# endregion: Switching matrix scaling
+# REGION: Switching matrix scaling
 
-# region: Main function
+# REGION: MAIN FUNCTION
 if __name__ == '__main__':
 
     # Map case numbers to functions
     cases = {
-        1: ('Baseline', run_baseline),
-        2: ('Method Mix and Probability Update', run_with_method_mix_adjustment),
+        0: ('Baseline', run_baseline),
+        1: ('Simple: Efficacy Improvement', run_simple_usecase),
+        2: ('Method Mix and Duration Update', run_with_method_mix_adjustment),
         3: ('Efficacy and Duration Changes', run_with_efficacy_and_duration_changes),
         4: ('Switching Matrix Scaling', run_with_switching_matrix_scaling),
     }
@@ -197,5 +240,7 @@ if __name__ == '__main__':
     for plot_pair in plot_compare:
         name1 = cases[plot_pair[0]][0]
         name2 = cases[plot_pair[1]][0]
-        title = f"{name1} .vs. {name2}"
-        plot_comparison_full(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"plot_comparison_{plot_pair[0]}_{plot_pair[1]}.png")
+        title = f"{location}: {name1} vs. {name2}"
+        plot_comparison_full(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_comparison_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
+        plot_method_bincount(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_method_bincount_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
+        plot_pregnancies_per_year(sims[plot_pair[0]], sims[plot_pair[1]], filename=f"{location}_plot_pregnancies_per_year_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
