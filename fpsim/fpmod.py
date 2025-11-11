@@ -645,7 +645,9 @@ class FPmod(ss.Module):
         max_age = self.pars['age_limit_fecundity']
         bool_list_uids = ppl.female & (ppl.age >= min_age) * (ppl.age <= max_age)
         filtered_methods = self.method[bool_list_uids]
-        m_counts, _ = np.histogram(filtered_methods, bins=self.sim.connectors.contraception.n_options)
+        # Use the actual size of method_mix array (which may have been dynamically resized)
+        n_methods = self.method_mix.shape[0]
+        m_counts, _ = np.histogram(filtered_methods, bins=n_methods)
         self.method_mix[:, self.ti] = m_counts / np.sum(m_counts) if np.sum(m_counts) > 0 else 0
         return
 

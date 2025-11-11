@@ -155,18 +155,28 @@ class MethodIntervention:
         self._mix_values: Dict[str, float] = {}
         self._method_mix_base: Optional[np.ndarray] = None
         self._switch: Optional[dict] = None
+        self._new_method: Optional[dict] = None
 
         self._method_mix_order = [name for name in self._method_names if name != 'none']
 
     # -----------------
     # Helper utilities
     # -----------------
-    def _normalize_name(self, name: str) -> str:
-        """Validate that method name is in the approved list."""
+    def _normalize_name(self, name: str, allow_new: bool = True) -> str:
+        """
+        Validate method name.
+        
+        Args:
+            name: Method name to validate
+            allow_new: If True, allows method names not in the standard list
+                      (for dynamically added methods)
+        """
         if not isinstance(name, str):
             raise ValueError('Method name must be a string')
         if name not in self._method_names:
-            raise ValueError(f'Method name must be one of: {self._method_names}')
+            if not allow_new:
+                raise ValueError(f'Method name must be one of: {self._method_names}')
+            # Method might be dynamically added, allow it but don't convert label
         return name
 
     @staticmethod
@@ -684,6 +694,155 @@ class MethodIntervention:
         self._switch = new
         return self
 
+    def add_method(self, method, copy_from_row: str, copy_from_col: str,
+                   initial_share: float = 0.1, renormalize: bool = True) -> 'MethodIntervention':
+        """
+        Add a new contraceptive method to the simulation.
+        
+        **What this models:** Introduction of a new contraceptive product or method that wasn't
+        previously available. This could represent:
+        - Launch of a new LARC product (e.g., subcutaneous DMPA)
+        - Introduction of emergency contraception
+        - New delivery mechanism for existing method (e.g., contraceptive patch)
+        - Country-specific method introduction (e.g., first availability of implants)
+        
+        The new method is added by copying switching behavior from existing similar methods
+        and expanding the switching matrix to accommodate the new option.
+        
+        Parameters
+        ----------
+        method : Method
+            A Method object defining the new contraceptive method.
+            Must include: name, label, efficacy, modern flag, duration distribution
+        copy_from_row : str
+            Method name to copy "switching FROM" behavior from (e.g., 'inj')
+            This determines how people switch away from your new method
+        copy_from_col : str
+            Method name to copy "switching TO" behavior from (e.g., 'inj')
+            This determines how people switch to your new method from other methods
+        initial_share : float, default=0.1
+            Probability of staying on the new method in the switching matrix (0-1)
+            Higher values mean people are more likely to continue the new method
+        renormalize : bool, default=True
+            Whether to renormalize switching probabilities to sum to 1
+            
+        Returns
+        -------
+        self : MethodIntervention
+            Returns self for method chaining
+            
+        Examples
+        --------
+        >>> # Example 1: Add subcutaneous DMPA (similar to regular injectables)
+        >>> import fpsim as fp
+        >>> 
+        >>> # Define the new method
+        >>> sc_dmpa = fp.Method(
+        ...     name='sc_dmpa',
+        ...     label='SC-DMPA',
+        ...     efficacy=0.98,
+        ...     modern=True,
+        ...     dur_use=fp.methods.ln(4, 2.5),  # Lognormal: mean=4 months, std=2.5
+        ...     csv_name='SC-DMPA'
+        ... )
+        >>> 
+        >>> # Create intervention to add it in 2025
+        >>> mod = fp.MethodIntervention(year=2025, label='Introduce SC-DMPA')
+        >>> mod.add_method(
+        ...     method=sc_dmpa,
+        ...     copy_from_row='inj',  # Copy injectable switching patterns
+        ...     copy_from_col='inj',
+        ...     initial_share=0.12  # 12% stay on this method
+        ... )
+        >>> 
+        >>> # Optionally adjust efficacy or duration after adding
+        >>> mod.set_efficacy('sc_dmpa', 0.99)
+        >>> mod.set_duration_months('sc_dmpa', 5)
+        >>> 
+        >>> intv = mod.build()
+        >>> sim = fp.Sim(pars=pars, interventions=intv)
+        >>> sim.run()
+        
+        >>> # Example 2: Add emergency contraception (similar to pills)
+        >>> ec_method = fp.Method(
+        ...     name='ec',
+        ...     label='Emergency contraception',
+        ...     efficacy=0.85,
+        ...     modern=True,
+        ...     dur_use=fp.methods.ln(0.5, 1),  # Very short duration
+        ...     csv_name='EC'
+        ... )
+        >>> 
+        >>> mod = fp.MethodIntervention(year=2023)
+        >>> mod.add_method(
+        ...     method=ec_method,
+        ...     copy_from_row='pill',
+        ...     copy_from_col='pill',
+        ...     initial_share=0.05
+        ... )
+        
+        How This Works
+        --------------
+        When you add a new method:
+        1. The method is added to the available methods list
+        2. The switching matrix is expanded by copying transition probabilities:
+           - Rows (FROM new method): copied from copy_from_row method
+           - Columns (TO new method): copied from copy_from_col method
+        3. All transition probabilities are renormalized to sum to 100%
+        4. The method becomes available for selection starting in the specified year
+        
+        Choosing Copy Methods
+        ----------------------
+        Choose copy_from_row and copy_from_col based on similarity:
+        - **New LARC** → copy from 'impl' or 'iud'
+        - **New short-acting** → copy from 'pill' or 'inj'
+        - **New barrier method** → copy from 'cond'
+        - **New permanent method** → copy from 'btl'
+        
+        Often you'll use the same method for both row and col (e.g., copy_from_row='inj'
+        and copy_from_col='inj') if your new method is similar to an existing one.
+        
+        Notes for PST Teams
+        --------------------
+        - Define the Method object with realistic efficacy and duration values
+        - Use ln(mean, std) for duration: fp.methods.ln(24, 3) = 24 months average
+        - The new method will appear in results using the 'label' you provide
+        - Choose similar methods for copying to get realistic switching patterns
+        - You can combine add_method with other modifications (efficacy, duration, etc.)
+        - The method becomes available simulation-wide starting in the intervention year
+        """
+        # Import here to avoid circular dependency
+        from . import methods as fpm
+        
+        # Validate method object
+        if not isinstance(method, fpm.Method):
+            raise ValueError('method must be a fpsim.Method object')
+        
+        if method.name is None or method.label is None:
+            raise ValueError('Method must have both name and label defined')
+        
+        if method.efficacy is None or method.dur_use is None:
+            raise ValueError('Method must have efficacy and dur_use defined')
+        
+        # Validate copy methods
+        copy_from_row = self._normalize_name(copy_from_row)
+        copy_from_col = self._normalize_name(copy_from_col)
+        
+        # Validate initial_share
+        if not (0.0 <= initial_share <= 1.0):
+            raise ValueError('initial_share must be between 0 and 1')
+        
+        # Store the new method configuration
+        self._new_method = {
+            'method': method,
+            'copy_from_row': copy_from_row,
+            'copy_from_col': copy_from_col,
+            'initial_share': initial_share,
+            'renormalize': renormalize
+        }
+        
+        return self
+
     # -----------------
     # Introspection
     # -----------------
@@ -741,6 +900,17 @@ class MethodIntervention:
                 }
             ),
             switching_matrix=(None if self._switch is None else '<dict>'),
+            new_method=(
+                None if self._new_method is None 
+                else {
+                    'name': self._new_method['method'].name,
+                    'label': self._new_method['method'].label,
+                    'efficacy': self._new_method['method'].efficacy,
+                    'copy_from_row': self._new_method['copy_from_row'],
+                    'copy_from_col': self._new_method['copy_from_col'],
+                    'initial_share': self._new_method['initial_share'],
+                }
+            ),
             label=self.label,
         )
         return summary
@@ -782,8 +952,9 @@ class MethodIntervention:
         - Use preview() before build() to check your configuration
         """
         # Convert method names to labels for the intervention
-        eff_by_label = {self._name_to_label[name]: val for name, val in self._eff.items()} if self._eff else None
-        dur_by_label = {self._name_to_label[name]: val for name, val in self._dur.items()} if self._dur else None
+        # For dynamically added methods, use the name as-is if no label mapping exists
+        eff_by_label = {self._name_to_label.get(name, name): val for name, val in self._eff.items()} if self._eff else None
+        dur_by_label = {self._name_to_label.get(name, name): val for name, val in self._dur.items()} if self._dur else None
         
         kwargs = dict(
             year=self.year,
@@ -792,9 +963,15 @@ class MethodIntervention:
             p_use=self._p_use,
             method_mix=self._build_method_mix_array(),
             method_choice_pars=self._switch,
+            new_method=self._new_method,
         )
         # Drop None values to keep payload clean
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        
+        # Pass label as name to make intervention unique
+        if self.label:
+            kwargs['name'] = self.label
+            
         return fpi.update_methods(**kwargs)
 
 
