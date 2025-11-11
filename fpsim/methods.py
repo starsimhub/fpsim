@@ -7,7 +7,7 @@ Idea:
 
 """
 
-# %% Imports
+# >> Imports
 import numpy as np
 import sciris as sc
 import starsim as ss
@@ -19,7 +19,7 @@ from . import locations as fplocs
 __all__ = ['Method', 'make_methods', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
 
 
-# %% Base definition of contraceptive methods -- can be overwritten by locations
+# >> Base definition of contraceptive methods -- can be overwritten by locations
 class Method:
     def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, csv_name=None):
         self.name = name
@@ -169,7 +169,7 @@ class Fisk(ss.Dist):
         return
 
 
-# %% Define parameters
+# >> Define parameters
 class ContraPars(ss.Pars):
     def __init__(self, **kwargs):
         super().__init__()
@@ -206,7 +206,7 @@ def make_contra_pars():
     return ContraPars()
 
 
-# %% Define classes to contain information about the way women choose contraception
+# >> Define classes to contain information about the way women choose contraception
 
 class ContraceptiveChoice(ss.Connector):
     def __init__(self, pars=None, **kwargs):
@@ -312,13 +312,24 @@ class ContraceptiveChoice(ss.Connector):
         return
 
     def get_method_by_label(self, method_label):
-        """ Extract method according to its label / long name """
+        """ 
+        Extract method according to its label / long name or short name.
+        
+        This method looks for methods by label first, then by name.
+        This allows it to work with both standard methods and dynamically added methods.
+        """
         return_val = None
+        # First try to match by label
         for method_name, method in self.methods.items():
             if method.label == method_label:
                 return_val = method
+                break
+        # If no match, try by name (for dynamically added methods)
+        if return_val is None and method_label in self.methods:
+            return_val = self.methods[method_label]
+        # If still no match, raise error
         if return_val is None:
-            errormsg = f'No method matching {method_label} found.'
+            errormsg = f'No method matching "{method_label}" found in methods: {list(self.methods.keys())}'
             raise ValueError(errormsg)
         return return_val
 
@@ -332,6 +343,258 @@ class ContraceptiveChoice(ss.Connector):
 
     def add_method(self, method):
         self.methods[method.name] = method
+
+    def add_new_method(self, method, copy_from_row=None, copy_from_col=None, 
+                      initial_share=0.1, renormalize=True):
+        """
+        Add a new contraceptive method and expand the switching matrix dynamically.
+        
+        This allows adding new methods during a simulation (e.g., when a new product
+        becomes available). The switching matrix is expanded by copying transition
+        probabilities from existing similar methods.
+        
+        Args:
+            method (Method): Method object with name, efficacy, duration, etc.
+            copy_from_row (str): Method name to copy "from" probabilities (e.g., 'impl')
+            copy_from_col (str): Method name to copy "to" probabilities (e.g., 'impl')
+            initial_share (float): Probability of staying on the new method (0-1)
+            renormalize (bool): Whether to renormalize rows to sum to 1
+            
+        Example:
+            # Add a new long-acting injectable method
+            new_method = fp.Method(
+                name='la_inj', 
+                label='Long-acting injectable',
+                efficacy=0.99, 
+                modern=True,
+                dur_use=fp.ln(6, 2)
+            )
+            sim.connectors.contraception.add_new_method(
+                method=new_method,
+                copy_from_row='inj',  # Copy switching patterns from injectables
+                copy_from_col='inj',
+                initial_share=0.15
+            )
+        """
+        if method.name in self.methods:
+            raise ValueError(f"Method '{method.name}' already exists in the simulation")
+        
+        # Set the index for the new method
+        method.idx = len(self.methods)
+        
+        # Add method to the methods dict
+        self.methods[method.name] = method
+        self.n_options = len(self.methods)
+        self.n_methods = len([m for m in self.methods if m != 'none'])
+        
+        # Handle switching matrix expansion if method_choice_pars exists
+        if hasattr(self, 'pars') and self.pars.method_choice_pars is not None:
+            # This is for modules that use switching matrices (SimpleChoice, StandardChoice)
+            self._expand_switching_matrix(method, copy_from_row, copy_from_col, 
+                                         initial_share, renormalize)
+        
+        # Update method mix if it exists
+        if hasattr(self, 'pars') and hasattr(self.pars, 'method_mix'):
+            # Add a small entry for the new method and renormalize
+            new_mix = np.append(self.pars.method_mix, initial_share)
+            self.pars.method_mix = new_mix / new_mix.sum()
+        
+        # Update method_weights if it exists (used in StandardChoice)
+        if hasattr(self, 'pars') and hasattr(self.pars, 'method_weights'):
+            # Add weight for the new method (copy from the reference method or use 1.0)
+            if copy_from_row and copy_from_row in self.methods:
+                row_idx = self.methods[copy_from_row].idx
+                if row_idx < len(self.pars.method_weights):
+                    new_weight = self.pars.method_weights[row_idx]
+                else:
+                    new_weight = 1.0
+            else:
+                new_weight = 1.0
+            self.pars.method_weights = np.append(self.pars.method_weights, new_weight)
+        
+        # Resize method_mix array in FPmod if it exists
+        # This is needed because method_mix is pre-allocated with fixed size
+        if hasattr(self, 'sim') and hasattr(self.sim, 'connectors'):
+            try:
+                # FPmod is stored as a connector named 'fp'
+                fp_mod = self.sim.connectors['fp']
+                old_shape = fp_mod.method_mix.shape
+                new_shape = (self.n_options, old_shape[1])
+                new_method_mix = np.zeros(new_shape)
+                # Copy existing data
+                new_method_mix[:old_shape[0], :] = fp_mod.method_mix
+                fp_mod.method_mix = new_method_mix
+            except (AttributeError, KeyError) as e:
+                # If method_mix doesn't exist yet, it will be created with correct size
+                pass
+        
+        return
+    
+    def _expand_switching_matrix(self, new_method, copy_from_row, copy_from_col,
+                                 initial_share, renormalize):
+        """
+        Expand the switching matrix to accommodate a new method.
+        
+        This is an internal helper for add_new_method() that handles the complex
+        logic of expanding nested switching matrix structures.
+        """
+        if copy_from_row is None or copy_from_col is None:
+            raise ValueError("copy_from_row and copy_from_col must be provided when adding methods to modules with switching matrices")
+        
+        # Get the source methods for copying probabilities
+        if copy_from_row not in self.methods:
+            raise ValueError(f"copy_from_row '{copy_from_row}' not found in methods")
+        if copy_from_col not in self.methods:
+            raise ValueError(f"copy_from_col '{copy_from_col}' not found in methods")
+        
+        row_method = self.methods[copy_from_row]
+        col_method = self.methods[copy_from_col]
+        
+        mcp = self.pars.method_choice_pars
+        
+        # Update each age bin/event in the switching structure
+        for event_idx, event_data in mcp.items():
+            if not isinstance(event_data, dict):
+                print(f"Warning: Event data for event {event_idx} is not a dictionary: {event_data}")
+                continue
+                
+            # Track current method_idx list
+            if 'method_idx' in event_data:
+                # Add new method index to the list
+                current_idx_list = list(event_data['method_idx'])
+                event_data['method_idx'] = current_idx_list + [new_method.idx]
+            
+            # Iterate through age bins
+            for age_key, age_data in event_data.items():
+                if age_key == 'method_idx':
+                    continue
+                
+                # Handle case where age_data is a numpy array directly (Event 1 structure)
+                if isinstance(age_data, np.ndarray):
+                    # This is a direct probability vector for choosing methods
+                    # We need to append a probability for the new method
+                    probs = age_data
+                    
+                    # Calculate probability for new method based on reference method
+                    if col_method.idx < len(probs):
+                        new_prob = probs[col_method.idx] * initial_share
+                    else:
+                        new_prob = initial_share / len(probs)
+                    
+                    new_probs = np.append(probs, new_prob)
+                    
+                    if renormalize:
+                        new_probs = new_probs / new_probs.sum()
+                    
+                    event_data[age_key] = new_probs
+                    continue
+                
+                if not isinstance(age_data, dict):
+                    continue
+                
+                # For postpartum events (pp1), structure is different
+                if 'probs' in age_data and 'method_idx' in age_data:
+                    # This is a direct probability vector
+                    probs = np.array(age_data['probs'])
+                    method_idx = list(age_data['method_idx'])
+                    
+                    # Find the probability to copy
+                    if col_method.idx in method_idx:
+                        col_idx = method_idx.index(col_method.idx)
+                        new_prob = probs[col_idx] * initial_share
+                    else:
+                        new_prob = initial_share / len(probs)
+                    
+                    # Append new probability
+                    new_probs = np.append(probs, new_prob)
+                    
+                    # Renormalize if requested
+                    if renormalize:
+                        new_probs = new_probs / new_probs.sum()
+                    
+                    age_data['probs'] = new_probs.tolist()
+                    age_data['method_idx'] = method_idx + [new_method.idx]
+                
+                # For regular switching structure
+                else:
+                    # Add a new entry for switching FROM the new method
+                    if row_method.name in age_data:
+                        # Copy the structure from the row method
+                        row_data = age_data[row_method.name]
+                        
+                        # Check if it's a numpy array (direct probabilities) or dict structure
+                        if isinstance(row_data, np.ndarray):
+                            # Direct probability array - append staying probability
+                            probs = row_data.copy()
+                            new_probs = np.append(probs, initial_share)
+                            if renormalize:
+                                new_probs = new_probs / new_probs.sum()
+                            age_data[new_method.name] = new_probs
+                        
+                        elif isinstance(row_data, dict):
+                            # Dictionary structure with 'probs' and 'method_idx' keys
+                            new_method_data = sc.dcp(row_data)
+                            
+                            if 'probs' in new_method_data:
+                                probs = np.array(new_method_data['probs'])
+                                new_probs = np.append(probs, initial_share)
+                                if renormalize:
+                                    new_probs = new_probs / new_probs.sum()
+                                new_method_data['probs'] = new_probs.tolist()
+                            
+                            if 'method_idx' in new_method_data:
+                                method_idx = list(new_method_data['method_idx'])
+                                new_method_data['method_idx'] = method_idx + [new_method.idx]
+                            
+                            age_data[new_method.name] = new_method_data
+                    
+                    # Update existing methods to add probability of switching TO new method
+                    for origin_method_name, origin_data in age_data.items():
+                        if origin_method_name == new_method.name:
+                            continue
+                        
+                        # Handle numpy array structure (direct probabilities)
+                        if isinstance(origin_data, np.ndarray):
+                            probs = origin_data
+                            
+                            # Find the reference method's probability to copy
+                            # col_method.idx is the index in the probability array
+                            if col_method.idx < len(probs):
+                                new_prob = probs[col_method.idx] * initial_share
+                            else:
+                                new_prob = initial_share / len(probs)
+                            
+                            new_probs = np.append(probs, new_prob)
+                            
+                            if renormalize:
+                                new_probs = new_probs / new_probs.sum()
+                            
+                            age_data[origin_method_name] = new_probs
+                        
+                        # Handle dictionary structure
+                        elif isinstance(origin_data, dict):
+                            if 'probs' not in origin_data or 'method_idx' not in origin_data:
+                                continue
+                            
+                            method_idx = list(origin_data['method_idx'])
+                            probs = np.array(origin_data['probs'])
+                            
+                            # Add probability of switching to new method
+                            if col_method.idx in method_idx:
+                                col_idx = method_idx.index(col_method.idx)
+                                new_prob = probs[col_idx] * initial_share
+                            else:
+                                new_prob = initial_share / len(probs)
+                            
+                            new_probs = np.append(probs, new_prob)
+                            
+                            if renormalize:
+                                new_probs = new_probs / new_probs.sum()
+                            
+                            origin_data['probs'] = new_probs.tolist()
+                            origin_data['method_idx'] = method_idx + [new_method.idx]
+        
+        return
 
     def remove_method(self, method_label):
         errormsg = ('remove_method is not currently functional. See example in test_parameters.py if you want to run a '

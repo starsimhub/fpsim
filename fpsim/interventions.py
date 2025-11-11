@@ -248,10 +248,17 @@ class update_methods(ss.Intervention):
 
         p_use (float): probability of using any form of contraception
         method_mix (list/arr): probabilities of selecting each form of contraception
+        
+        new_method (dict): Add a new contraceptive method with keys:
+            - method: Method object to add
+            - copy_from_row: method name to copy "from" switching probabilities
+            - copy_from_col: method name to copy "to" switching probabilities  
+            - initial_share: probability of staying on new method (default 0.1)
+            - renormalize: whether to renormalize switching matrix (default True)
 
     """
 
-    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, verbose=False, **kwargs):
+    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, new_method=None, verbose=False, **kwargs):
         super().__init__(**kwargs)
         self.define_pars(
             year=year,
@@ -260,6 +267,7 @@ class update_methods(ss.Intervention):
             p_use=p_use,
             method_mix=method_mix,
             method_choice_pars=method_choice_pars,
+            new_method=new_method,
             verbose=verbose
         )
 
@@ -289,8 +297,8 @@ class update_methods(ss.Intervention):
         if self.pars.year is None:
             errormsg = 'A year must be supplied'
             raise ValueError(errormsg)
-        if self.pars.eff is None and self.pars.dur_use is None and self.pars.p_use is None and self.pars.method_mix is None and self.pars.method_choice_pars is None:
-            errormsg = 'Either efficacy, durations of use, probability of use, or method mix must be supplied'
+        if self.pars.eff is None and self.pars.dur_use is None and self.pars.p_use is None and self.pars.method_mix is None and self.pars.method_choice_pars is None and self.pars.new_method is None:
+            errormsg = 'Either efficacy, durations of use, probability of use, method mix, or new method must be supplied'
             raise ValueError(errormsg)
         return
 
@@ -303,6 +311,27 @@ class update_methods(ss.Intervention):
         cm = sim.connectors.contraception
         if not self.applied and sim.t.year >= self.pars.year:
             self.applied = True # Ensure we don't apply this more than once
+
+            # Add new method if specified (do this first, before other changes)
+            if self.pars.new_method is not None:
+                method_obj = self.pars.new_method.get('method')
+                copy_from_row = self.pars.new_method.get('copy_from_row')
+                copy_from_col = self.pars.new_method.get('copy_from_col')
+                initial_share = self.pars.new_method.get('initial_share', 0.1)
+                renormalize = self.pars.new_method.get('renormalize', True)
+                
+                if method_obj is None:
+                    raise ValueError('new_method dict must contain a "method" key with a Method object')
+                
+                cm.add_new_method(
+                    method=method_obj,
+                    copy_from_row=copy_from_row,
+                    copy_from_col=copy_from_col,
+                    initial_share=initial_share,
+                    renormalize=renormalize
+                )
+                if self.pars.verbose:
+                    print(f'Added new contraceptive method "{method_obj.name}" in year {sim.t.year}')
 
             # Implement efficacy
             if self.pars.eff is not None:
