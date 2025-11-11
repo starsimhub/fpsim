@@ -99,7 +99,6 @@ fpmod_states = [
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
     ss.FloatArr('barrier', default=0),
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
-    ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
@@ -126,12 +125,11 @@ fpmod_states = [
     ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
 
     # Durations and counters
-    ss.FloatArr('gestation', default=0),  # TODO, remove?
     ss.FloatArr('remainder_months', default=0),  # TODO, remove?
-    ss.FloatArr('dur_pregnancy', default=0),
-    ss.FloatArr('dur_postpartum', default=0),
-    ss.FloatArr('dur_breastfeed', default=0),
-    ss.FloatArr('dur_breastfeed_total', default=0),
+    ss.FloatArr('dur_pregnancy'),
+    ss.FloatArr('dur_pp_sexual_reduction'),  # Duration of postpartum reduction in sexual activity
+    ss.FloatArr('dur_breastfeed'),  # Duration of breastfeeding for current child
+    ss.FloatArr('dur_breastfeed_total'),  # Total duration of breastfeeding across all children
 
     # Timesteps of significant events
     ss.FloatArr('ti_conceived'),
