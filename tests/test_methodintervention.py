@@ -45,14 +45,15 @@ def test_methodintervention_method_names():
 
 
 def test_methodintervention_invalid_method_name():
-    """Test that invalid method names raise errors."""
+    """Test that invalid method names raise errors when allow_new=False."""
     mod = fp.MethodIntervention(year=2025)
     
+    # With allow_new=False, should raise error for invalid method
     with pytest.raises(ValueError, match='Method name must be one of'):
-        mod._normalize_name('invalid_method')
+        mod._normalize_name('invalid_method', allow_new=False)
     
     with pytest.raises(ValueError, match='Method name must be a string'):
-        mod._normalize_name(123)
+        mod._normalize_name(123, allow_new=False)
 
 
 # =============================================================================
