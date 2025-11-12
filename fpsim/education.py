@@ -207,9 +207,9 @@ class Education(ss.Connector):
         Interrupt education due to pregnancy. This method hinders education progression if a
         woman is pregnant and towards the end of the first trimester
         """
-        ppl = self.sim.people
+        fp = self.sim.demographics.fp
         # Hinder education progression if a woman is pregnant and towards the end of the first trimester
-        pregnant_students = self.in_school & ppl.fp.pregnant & (ppl.fp.gestation == self.sim.pars.fp['end_first_tri'])
+        pregnant_students = fp.end_tri1_uids[self.in_school[fp.end_tri1_uids]]
         self.interrupted[pregnant_students] = True
         return
 
