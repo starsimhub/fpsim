@@ -1070,8 +1070,26 @@ COLORS = {
     'new_method': '#F18F01',
 }
 
-def plot_injectable_methods_comparison(baseline_sim, intervention_sim, START_YEAR, END_YEAR, location, save_path='add_method_injectables.png'):
-    """Plot injectable method usage comparison over time."""
+def plot_injectable_methods_comparison(
+    baseline_sim,
+    intervention_sim,
+    START_YEAR,
+    END_YEAR,
+    location,
+    intervention_year=None,
+    save_path='add_method_injectables.png',
+):
+    """
+    Plot injectable method usage comparison over time.
+
+    Args:
+        baseline_sim: Simulation without the intervention.
+        intervention_sim: Simulation with the new method intervention.
+        START_YEAR / END_YEAR: Year range for the plot.
+        location (str): Name used for titles/labels.
+        intervention_year (float, optional): Year to mark with a vertical “program start” line.
+        save_path (Path-like): Where to write the figure.
+    """
     plt.style.use('seaborn-v0_8-darkgrid')
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
@@ -1103,8 +1121,15 @@ def plot_injectable_methods_comparison(baseline_sim, intervention_sim, START_YEA
             ax1.plot(years, interv_mix[idx, :] * 100, 
                     label=f'{label} (Program)', linewidth=2.5, color=color)
     
-    ax1.axvline(INTERVENTION_YEAR, color='red', linestyle='--', linewidth=2, 
-               alpha=0.5, label='Program Start')
+    if intervention_year is not None:
+        ax1.axvline(
+            intervention_year,
+            color='red',
+            linestyle='--',
+            linewidth=2,
+            alpha=0.5,
+            label='Program Start',
+        )
     ax1.set_xlabel('Year', fontsize=12)
     ax1.set_ylabel('Percentage of Users (%)', fontsize=12)
     ax1.set_title('Injectable Methods: Individual Trends', fontsize=13, fontweight='bold')
@@ -1121,7 +1146,14 @@ def plot_injectable_methods_comparison(baseline_sim, intervention_sim, START_YEA
             color=COLORS['baseline'], linewidth=2.5)
     ax2.plot(years, interv_inj_total, label='Program (Inj + MY-NEW-METHOD)', 
             color=COLORS['intervention'], linewidth=2.5)
-    ax2.axvline(INTERVENTION_YEAR, color='red', linestyle='--', linewidth=2, alpha=0.5)
+    if intervention_year is not None:
+        ax2.axvline(
+            intervention_year,
+            color='red',
+            linestyle='--',
+            linewidth=2,
+            alpha=0.5,
+        )
     
     # Add annotation showing increase
     final_increase = interv_inj_total[-1] - baseline_inj_total[-1]
