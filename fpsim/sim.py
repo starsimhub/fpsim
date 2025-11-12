@@ -142,7 +142,7 @@ class Sim(ss.Sim):
         # Process demographics
         if demographics is None and not len(self.pars['demographics']):
             deaths = fp.Deaths(pars=self.deaths_pars)
-            default_fp = fp.FPmod2(pars=self.fp_pars)
+            default_fp = fp.FPmod(pars=self.fp_pars)
             fp_module = fp_module or sc.dcp(default_fp)
             self.pars['demographics'] = [fp_module, deaths]
 

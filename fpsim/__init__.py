@@ -5,7 +5,6 @@ from .defaults import *
 from .demographics import *
 from .locations.data_utils import *
 from .fpmod import *
-from .fpmod_new import *
 from .parameters import *
 from .people import *
 from .methods import *
