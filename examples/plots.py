@@ -1073,8 +1073,8 @@ COLORS = {
 def plot_injectable_methods_comparison(
     baseline_sim,
     intervention_sim,
-    START_YEAR,
-    END_YEAR,
+    start_year,
+    end_year,
     location,
     intervention_year=None,
     save_path='add_method_injectables.png',
@@ -1085,7 +1085,7 @@ def plot_injectable_methods_comparison(
     Args:
         baseline_sim: Simulation without the intervention.
         intervention_sim: Simulation with the new method intervention.
-        START_YEAR / END_YEAR: Year range for the plot.
+        start_year / end_year: Year range for the plot.
         location (str): Name used for titles/labels.
         intervention_year (float, optional): Year to mark with a vertical “program start” line.
         save_path (Path-like): Where to write the figure.
@@ -1094,7 +1094,7 @@ def plot_injectable_methods_comparison(
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
     # Get years as numeric array
-    years = np.linspace(START_YEAR, END_YEAR, len(baseline_sim.results.timevec))
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
     
     # Get method mix data
     baseline_fp = baseline_sim.connectors['fp']
@@ -1168,7 +1168,7 @@ def plot_injectable_methods_comparison(
     ax2.legend(fontsize=10)
     ax2.grid(True, alpha=0.3)
     
-    fig.suptitle(f'Injectable Methods Comparison in {LOCATION.title()}', 
+    fig.suptitle(f'Injectable Methods Comparison in {location.title()}', 
                 fontsize=15, fontweight='bold', y=0.98)
     
     plt.tight_layout()
@@ -1177,7 +1177,7 @@ def plot_injectable_methods_comparison(
     return fig
 
 
-def plot_method_mix_evolution(sim, START_YEAR, END_YEAR, location, title='Method Mix Over Time', save_path='add_method_mix.png'):
+def plot_method_mix_evolution(sim, start_year, end_year, intervention_year, location, title='Method Mix Over Time', save_path='add_method_mix.png'):
     """Plot stacked area chart of method mix over time."""
     fig, ax = plt.subplots(figsize=(14, 7))
     
@@ -1185,7 +1185,7 @@ def plot_method_mix_evolution(sim, START_YEAR, END_YEAR, location, title='Method
     fp_mod = sim.connectors['fp']
     method_mix = fp_mod.method_mix
     # Get years as numeric array
-    years = np.linspace(START_YEAR, END_YEAR, len(sim.results.timevec))
+    years = np.linspace(start_year, end_year, len(sim.results.timevec))
     
     # Get method labels
     methods = sim.connectors.contraception.methods
@@ -1201,11 +1201,11 @@ def plot_method_mix_evolution(sim, START_YEAR, END_YEAR, location, title='Method
     # Plot stacked area
     ax.stackplot(years, method_mix_users, labels=labels, colors=colors, alpha=0.8)
     
-    ax.axvline(INTERVENTION_YEAR, color='red', linestyle='--', linewidth=2, 
+    ax.axvline(intervention_year, color='red', linestyle='--', linewidth=2, 
                label='MY-NEW-METHOD Introduced', alpha=0.7)
     ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Proportion of Users', fontsize=12)
-    ax.set_title(f'{title} in {LOCATION.title()}', fontsize=14, fontweight='bold')
+    ax.set_title(f'{title} in {location.title()}', fontsize=14, fontweight='bold')
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=9)
     ax.grid(True, alpha=0.3, axis='y')
     ax.set_ylim([0, 1])
@@ -1222,7 +1222,7 @@ def plot_method_mix_evolution(sim, START_YEAR, END_YEAR, location, title='Method
     return fig
 
 
-def plot_new_method_adoption(sim, START_YEAR, END_YEAR, location, save_path='add_method_adoption.png'):
+def plot_new_method_adoption(sim, start_year, end_year, intervention_year, location, save_path='add_method_adoption.png'):
     """Plot adoption of the new method over time."""
     fig, ax = plt.subplots(figsize=(12, 6))
     
@@ -1230,7 +1230,7 @@ def plot_new_method_adoption(sim, START_YEAR, END_YEAR, location, save_path='add
     fp_mod = sim.connectors['fp']
     method_mix = fp_mod.method_mix
     # Get years as numeric array
-    years = np.linspace(START_YEAR, END_YEAR, len(sim.results.timevec))
+    years = np.linspace(start_year, end_year, len(sim.results.timevec))
     
     # Find MY-NEW-METHOD index
     methods = sim.connectors.contraception.methods
@@ -1249,15 +1249,15 @@ def plot_new_method_adoption(sim, START_YEAR, END_YEAR, location, save_path='add
                 color=COLORS['new_method'], linewidth=3, label='MY-NEW-METHOD Trend')
         
         # Mark intervention point
-        ax.axvline(INTERVENTION_YEAR, color='red', linestyle='--', linewidth=2, 
+        ax.axvline(intervention_year, color='red', linestyle='--', linewidth=2, 
                   label='Introduction Year', alpha=0.7)
         
         # Add annotations
         final_adoption = my_new_method_proportion[-1] * 100
         if final_adoption > 0.1:
             ax.annotate(f'Final adoption:\n{final_adoption:.2f}%', 
-                       xy=(END_YEAR, my_new_method_proportion[-1] * 100),
-                       xytext=(END_YEAR - 3, final_adoption + 2),
+                       xy=(end_year, my_new_method_proportion[-1] * 100),
+                       xytext=(end_year - 3, final_adoption + 2),
                        fontsize=11, fontweight='bold',
                        bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', alpha=0.7),
                        arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
@@ -1276,11 +1276,11 @@ def plot_new_method_adoption(sim, START_YEAR, END_YEAR, location, save_path='add
     
     ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Percentage of Users (%)', fontsize=12)
-    ax.set_title(f'MY-NEW-METHOD Adoption in {LOCATION.title()} - Comprehensive Program Impact', 
+    ax.set_title(f'MY-NEW-METHOD Adoption in {location.title()} - Comprehensive Program Impact', 
                 fontsize=14, fontweight='bold')
     ax.legend(fontsize=11)
     ax.grid(True, alpha=0.3)
-    ax.set_xlim([START_YEAR, END_YEAR])
+    ax.set_xlim([start_year, end_year])
     
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -1288,7 +1288,7 @@ def plot_new_method_adoption(sim, START_YEAR, END_YEAR, location, save_path='add
     return fig
 
 
-def plot_method_comparison_bar(baseline_sim, intervention_sim, START_YEAR, END_YEAR, location, save_path='add_method_bar.png'):
+def plot_method_comparison_bar(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path='add_method_bar.png'):
     """Bar chart comparing final method usage."""
     fig, ax = plt.subplots(figsize=(12, 7))
     
@@ -1335,7 +1335,7 @@ def plot_method_comparison_bar(baseline_sim, intervention_sim, START_YEAR, END_Y
     
     ax.set_xlabel('Contraceptive Method', fontsize=12)
     ax.set_ylabel('Number of Users', fontsize=12)
-    ax.set_title(f'Contraceptive Method Usage at End of Simulation ({END_YEAR})', 
+    ax.set_title(f'Contraceptive Method Usage at End of Simulation ({end_year})', 
                 fontsize=14, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels(all_methods, rotation=45, ha='right', fontsize=10)
@@ -1357,12 +1357,12 @@ def plot_method_comparison_bar(baseline_sim, intervention_sim, START_YEAR, END_Y
     return fig
 
 
-def plot_births_comparison(baseline_sim, intervention_sim, START_YEAR, END_YEAR, location, save_path='add_method_births.png'):
+def plot_births_comparison(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path='add_method_births.png'):
     """Plot births over time comparison."""
     fig, ax = plt.subplots(figsize=(12, 6))
     
     # Get years as numeric array
-    years = np.linspace(START_YEAR, END_YEAR, len(baseline_sim.results.timevec))
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
     
     # Get births
     baseline_births = baseline_sim.results.fp.births
@@ -1373,10 +1373,10 @@ def plot_births_comparison(baseline_sim, intervention_sim, START_YEAR, END_YEAR,
            color=COLORS['baseline'], linewidth=2, marker='o', markersize=3)
     ax.plot(years, intervention_births, label='With MY-NEW-METHOD', 
            color=COLORS['intervention'], linewidth=2, marker='s', markersize=3)
-    ax.axvline(INTERVENTION_YEAR, color='gray', linestyle='--', alpha=0.5, label='Intervention')
+    ax.axvline(intervention_year, color='gray', linestyle='--', alpha=0.5, label='Intervention')
     
     # Calculate and show cumulative difference
-    years_mask = years >= INTERVENTION_YEAR
+    years_mask = years >= intervention_year
     baseline_total = np.sum(baseline_births[years_mask])
     intervention_total = np.sum(intervention_births[years_mask])
     births_averted = baseline_total - intervention_total
@@ -1387,7 +1387,7 @@ def plot_births_comparison(baseline_sim, intervention_sim, START_YEAR, END_YEAR,
     
     ax.set_xlabel('Year', fontsize=12)
     ax.set_ylabel('Births per Month', fontsize=12)
-    ax.set_title(f'Births Over Time: Baseline vs. MY-NEW-METHOD Program in {LOCATION.title()}', 
+    ax.set_title(f'Births Over Time: Baseline vs. MY-NEW-METHOD Program in {location.title()}', 
                 fontsize=14, fontweight='bold')
     ax.legend(fontsize=11, loc='upper right')
     ax.grid(True, alpha=0.3)
@@ -1398,13 +1398,13 @@ def plot_births_comparison(baseline_sim, intervention_sim, START_YEAR, END_YEAR,
     return fig
 
 
-def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, location, save_path='add_method_summary.png'):
+def create_summary_figure(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path='add_method_summary.png'):
     """Create a comprehensive summary figure with multiple subplots."""
     fig = plt.figure(figsize=(16, 12))
     gs = fig.add_gridspec(4, 2, hspace=0.35, wspace=0.3)
     
     # Get years as numeric array
-    years = np.linspace(START_YEAR, END_YEAR, len(baseline_sim.results.timevec))
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
     
     # Get method mix data
     baseline_fp = baseline_sim.connectors['fp']
@@ -1420,7 +1420,7 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
     my_new_method_proportion = interv_mix[my_new_method_idx, :] * 100
     ax1.fill_between(years, 0, my_new_method_proportion, color=COLORS['new_method'], alpha=0.4)
     ax1.plot(years, my_new_method_proportion, color=COLORS['new_method'], linewidth=3, label='MY-NEW-METHOD Users')
-    ax1.axvline(INTERVENTION_YEAR, color='red', linestyle='--', linewidth=2, alpha=0.7, label='Introduction')
+    ax1.axvline(intervention_year, color='red', linestyle='--', linewidth=2, alpha=0.7, label='Introduction')
     
     # Add program info
     info_text = 'Program: Inj patterns | 60% staying | 60 mo duration | 99.5% efficacy | LARC-level continuation'
@@ -1446,7 +1446,7 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
             color='green', linewidth=2.5)
     ax2.plot(years, interv_my_new_method, label='MY-NEW-METHOD (New)', 
             color=COLORS['new_method'], linewidth=2.5)
-    ax2.axvline(INTERVENTION_YEAR, color='red', linestyle='--', alpha=0.5)
+    ax2.axvline(intervention_year, color='red', linestyle='--', alpha=0.5)
     ax2.set_xlabel('Year', fontsize=11)
     ax2.set_ylabel('% of Users', fontsize=11)
     ax2.set_title('Injectable Methods: Individual Trends', fontweight='bold', fontsize=12)
@@ -1465,7 +1465,7 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
             color=COLORS['baseline'], linewidth=2.5)
     ax3.plot(years, interv_inj_total, label='Program Total', 
             color=COLORS['intervention'], linewidth=2.5)
-    ax3.axvline(INTERVENTION_YEAR, color='red', linestyle='--', alpha=0.5)
+    ax3.axvline(intervention_year, color='red', linestyle='--', alpha=0.5)
     
     final_increase = interv_inj_total[-1] - baseline_inj_total[-1]
     ax3.text(0.5, 0.95, f'+{final_increase:.1f} pp increase',
@@ -1551,7 +1551,7 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
         bars[sc_idx].set_linewidth(3)
     
     ax5.set_xlabel('Number of Users', fontsize=11)
-    ax5.set_title(f'Top 6 Methods by Usage ({END_YEAR})', fontweight='bold', fontsize=12)
+    ax5.set_title(f'Top 6 Methods by Usage ({end_year})', fontweight='bold', fontsize=12)
     ax5.grid(True, alpha=0.3, axis='x')
     
     # Add value labels
@@ -1597,14 +1597,14 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
     
     ax6.set_xlabel('Contraceptive Method', fontsize=11)
     ax6.set_ylabel('Number of Users', fontsize=11)
-    ax6.set_title(f'All Methods: Final Usage Comparison ({END_YEAR})', fontweight='bold', fontsize=12)
+    ax6.set_title(f'All Methods: Final Usage Comparison ({end_year})', fontweight='bold', fontsize=12)
     ax6.set_xticks(x)
     ax6.set_xticklabels(all_methods, rotation=45, ha='right', fontsize=9)
     ax6.legend(fontsize=10)
     ax6.grid(True, alpha=0.3, axis='y')
     
     # Overall title
-    fig.suptitle(f'Impact of Introducing MY-NEW-METHOD in {LOCATION.title()} (2010-2020) - Comprehensive Program', 
+    fig.suptitle(f'Impact of Introducing MY-NEW-METHOD in {location.title()} ({start_year}-{end_year}) - Comprehensive Program', 
                 fontsize=16, fontweight='bold', y=0.995)
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -1612,14 +1612,14 @@ def create_summary_figure(baseline_sim, intervention_sim, START_YEAR, END_YEAR, 
     return fig
 
 
-def print_summary_statistics(baseline_sim, intervention_sim, START_YEAR, END_YEAR):
+def print_summary_statistics(baseline_sim, intervention_sim, start_year, end_year, intervention_year):
     """Print summary statistics comparing both simulations."""
     print("\n" + "="*70)
     print("SUMMARY STATISTICS")
     print("="*70)
     
     # Final CPR/mCPR
-    print(f"\nFinal Prevalence Rates ({END_YEAR}):")
+    print(f"\nFinal Prevalence Rates ({end_year}):")
     print(f"{'Metric':<20} {'Baseline':>15} {'With MY-NEW-METHOD':>15} {'Change':>15}")
     print("-" * 70)
     
@@ -1632,13 +1632,13 @@ def print_summary_statistics(baseline_sim, intervention_sim, START_YEAR, END_YEA
     print(f"{'CPR':<20} {baseline_cpr:>14.3f} {interv_cpr:>14.3f} {interv_cpr-baseline_cpr:>+14.3f}")
     
     # Total births
-    years_numeric = np.linspace(START_YEAR, END_YEAR, len(baseline_sim.results.timevec))
-    years_mask = years_numeric >= INTERVENTION_YEAR
+    years_numeric = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
+    years_mask = years_numeric >= intervention_year
     baseline_births = np.sum(baseline_sim.results.fp.births[years_mask])
     interv_births = np.sum(intervention_sim.results.fp.births[years_mask])
     births_averted = baseline_births - interv_births
     
-    print(f"\nBirths After Intervention ({INTERVENTION_YEAR}-{END_YEAR}):")
+    print(f"\nBirths After Intervention ({intervention_year}-{end_year}):")
     print(f"{'Baseline births':<30} {int(baseline_births):>10,}")
     print(f"{'With MY-NEW-METHOD births':<30} {int(interv_births):>10,}")
     print(f"{'Births averted':<30} {int(births_averted):>10,}")

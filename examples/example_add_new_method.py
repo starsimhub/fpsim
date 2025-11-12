@@ -109,14 +109,14 @@ if __name__ == '__main__':
         location, intervention_year=intervention_year,
         save_path=figures_dir / 'add_method_injectables.png',
     )    
-    plot_method_mix_evolution(intervention_sim, start_year, end_year, location, save_path=figures_dir / 'add_method_mix.png')
-    plot_new_method_adoption(intervention_sim, start_year, end_year, location, save_path=figures_dir / 'add_method_adoption.png')
-    plot_method_comparison_bar(baseline_sim, intervention_sim, start_year, end_year, location, save_path=figures_dir / 'add_method_bar.png')
-    plot_births_comparison(baseline_sim, intervention_sim, start_year, end_year, location, save_path=figures_dir / 'add_method_births.png')
-    create_summary_figure(baseline_sim, intervention_sim, start_year, end_year, location, save_path=figures_dir / 'add_method_summary.png')
+    plot_method_mix_evolution(intervention_sim, start_year, end_year, intervention_year, location, save_path=figures_dir / 'add_method_mix.png')
+    plot_new_method_adoption(intervention_sim, start_year, end_year, intervention_year, location, save_path=figures_dir / 'add_method_adoption.png')
+    plot_method_comparison_bar(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path=figures_dir / 'add_method_bar.png')
+    plot_births_comparison(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path=figures_dir / 'add_method_births.png')
+    create_summary_figure(baseline_sim, intervention_sim, start_year, end_year, intervention_year, location, save_path=figures_dir / 'add_method_summary.png')
     
     # Print statistics
-    print_summary_statistics(baseline_sim, intervention_sim, start_year, end_year, location )
+    print_summary_statistics(baseline_sim, intervention_sim, start_year, end_year, intervention_year)
     
     print(f"\n{'='*70}")
     print(f"All figures saved to: {figures_dir}")
