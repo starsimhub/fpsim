@@ -9,6 +9,11 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :depth: 1
 
 
+Version 3.5 (2025-11-XX)
+---------------------------
+  TBC - placeholder for intervention wrappers
+
+
 Version 3.4.1 (2025-09-22)
 ---------------------------
 
