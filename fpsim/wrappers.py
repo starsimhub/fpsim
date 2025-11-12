@@ -61,7 +61,13 @@ Quick Reference for PST Teams
 from __future__ import annotations
 
 import json
-from typing import Dict, Optional, Sequence, Union
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+from enum import Enum
+from functools import wraps, singledispatch
+from operator import attrgetter
+from pathlib import Path
+from typing import Dict, Optional, Sequence, Union, TypedDict, List, Any
 
 import numpy as np
 import sciris as sc
@@ -71,8 +77,128 @@ from . import interventions as fpi
 __all__ = [
     'MethodIntervention',
     'make_update_methods',
+    'MethodName',
 ]
 
+
+# ==========================================
+# Enums and Type Definitions
+# ==========================================
+
+class MethodName(str, Enum):
+    """Enumeration of standard contraceptive method names."""
+    NONE = 'none'
+    PILL = 'pill'
+    IUD = 'iud'
+    INJECTABLE = 'inj'
+    CONDOM = 'cond'
+    BTL = 'btl'
+    WITHDRAWAL = 'wdraw'
+    IMPLANT = 'impl'
+    OTHER_TRAD = 'othtrad'
+    OTHER_MOD = 'othmod'
+    
+    @classmethod
+    def values(cls) -> List[str]:
+        """Return list of all method name values."""
+        return [m.value for m in cls]
+    
+    @classmethod
+    def excluding_none(cls) -> List[str]:
+        """Return list of method names excluding 'none'."""
+        return [m.value for m in cls if m != cls.NONE]
+
+
+class PreviewDict(TypedDict, total=False):
+    """Typed dictionary for preview() return value."""
+    year: float
+    efficacy: Optional[Dict[str, float]]
+    duration_months: Optional[Dict[str, Union[int, float]]]
+    p_use: Optional[float]
+    method_mix: Optional[Dict[str, float]]
+    switching_matrix: Optional[str]
+    new_method: Optional[Dict[str, Any]]
+    label: Optional[str]
+
+
+@dataclass(slots=True)
+class InterventionConfig:
+    """Container for intervention parameters with default values."""
+    eff: Dict[str, float] = field(default_factory=dict)
+    dur: Dict[str, Union[int, float]] = field(default_factory=dict)
+    p_use: Optional[float] = None
+    mix_values: Dict[str, float] = field(default_factory=dict)
+    method_mix_base: Optional[np.ndarray] = None
+    switch: Optional[dict] = None
+    new_method: Optional[dict] = None
+
+
+# ==========================================
+# Utility Functions
+# ==========================================
+
+@singledispatch
+def load_config(source) -> dict:
+    """Load configuration from various sources."""
+    raise ValueError(f"Unsupported type: {type(source)}. Expected str, Path, or dict.")
+
+
+@load_config.register(str)
+def _(path: str) -> dict:
+    """Load from string path."""
+    return load_config(Path(path))
+
+
+@load_config.register(Path)
+def _(path: Path) -> dict:
+    """Load from Path object."""
+    if path.suffix == '.json':
+        return json.loads(path.read_text())
+    elif path.suffix in ('.yml', '.yaml'):
+        try:
+            import yaml
+        except ImportError as e:
+            raise ImportError('YAML support not available. Please install pyyaml to load YAML files.') from e
+        return yaml.safe_load(path.read_text())
+    raise ValueError(f'Unsupported file type: {path.suffix}. Expected .json, .yml, or .yaml')
+
+
+@load_config.register(dict)
+def _(data: dict) -> dict:
+    """Return copy of dictionary."""
+    return sc.dcp(data)
+
+
+@contextmanager
+def _print_if(condition: bool, message: str):
+    """Context manager for conditional printing."""
+    try:
+        yield
+        if condition:
+            print(message)
+    except Exception:
+        raise
+
+
+def validate_method_name(allow_new: bool = True):
+    """
+    Decorator to validate and normalize method names.
+    
+    Args:
+        allow_new: If True, allows method names not in the standard list
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, method: str, *args, **kwargs):
+            normalized = self._normalize_name(method, allow_new=allow_new)
+            return func(self, normalized, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
+# ==========================================
+# Main Class
+# ==========================================
 
 class MethodIntervention:
     """
@@ -115,20 +241,12 @@ class MethodIntervention:
     - **Units**: Efficacy is 0-1 (e.g., 0.95 = 95%), Duration is in months (e.g., 24 = 2 years)
     - **Mix values**: Can provide as percentages (25) or fractions (0.25), both work
     """
+    
+    __slots__ = ('year', 'label', '_config')
 
-    # Method names (must match method.name in fpsim)
-    _method_names = [
-        'none',
-        'pill',
-        'iud',
-        'inj',
-        'cond',
-        'btl',
-        'wdraw',
-        'impl',
-        'othtrad',
-        'othmod',
-    ]
+    # Standard method names and orderings
+    _method_names = MethodName.values()
+    _method_mix_order = MethodName.excluding_none()
     
     # Mapping from method.name to method.label (for interventions)
     _name_to_label = {
@@ -147,18 +265,41 @@ class MethodIntervention:
     def __init__(self, year: float, label: Optional[str] = None):
         self.year: float = year
         self.label: Optional[str] = label
+        self._config = InterventionConfig()
 
-        # Internal payload pieces
-        self._eff: Dict[str, float] = {}
-        self._dur: Dict[str, Union[int, float]] = {}
-        self._p_use: Optional[float] = None
-        self._mix_values: Dict[str, float] = {}
-        self._method_mix_base: Optional[np.ndarray] = None
-        self._switch: Optional[dict] = None
-        self._new_method: Optional[dict] = None
-
-        self._method_mix_order = [name for name in self._method_names if name != 'none']
-
+    # -----------------
+    # Properties
+    # -----------------
+    @property
+    def method_mix_order(self) -> List[str]:
+        """List of contraceptive methods available for mix calculations (excludes 'none')."""
+        return self._method_mix_order
+    
+    @property
+    def has_efficacy_changes(self) -> bool:
+        """Check if any efficacy changes are configured."""
+        return bool(self._config.eff)
+    
+    @property
+    def has_duration_changes(self) -> bool:
+        """Check if any duration changes are configured."""
+        return bool(self._config.dur)
+    
+    @property
+    def has_method_mix_changes(self) -> bool:
+        """Check if any method mix changes are configured."""
+        return bool(self._config.mix_values)
+    
+    @property
+    def has_switching_matrix_changes(self) -> bool:
+        """Check if switching matrix is modified."""
+        return self._config.switch is not None
+    
+    @property
+    def has_new_method(self) -> bool:
+        """Check if a new method is being added."""
+        return self._config.new_method is not None
+    
     # -----------------
     # Helper utilities
     # -----------------
@@ -181,17 +322,12 @@ class MethodIntervention:
 
     @staticmethod
     def _load_file(path: str) -> dict:
-        if path.lower().endswith(('.json',)):
-            with open(path, 'r') as f:
-                return json.load(f)
-        if path.lower().endswith(('.yml', '.yaml')):
-            try:
-                import yaml  # type: ignore
-            except Exception as e:
-                raise ImportError('YAML support not available. Please install pyyaml to load YAML files.') from e
-            with open(path, 'r') as f:
-                return yaml.safe_load(f)
-        raise ValueError('Unsupported file type for switching matrix; expected .json or .yaml')
+        """
+        Load configuration file (deprecated - use load_config instead).
+        
+        This method is kept for backward compatibility.
+        """
+        return load_config(path)
 
     def _convert_mix_value(self, value: float) -> float:
         val = float(value)
@@ -202,39 +338,45 @@ class MethodIntervention:
         return val
 
     def _ensure_method_mix_base(self) -> np.ndarray:
-        if self._method_mix_base is None:
+        if self._config.method_mix_base is None:
             raise ValueError(
                 'Method mix baseline not set. Call `set_method_mix_baseline()` or '
                 '`capture_method_mix_from_sim(sim)` before modifying the mix.'
             )
-        return self._method_mix_base
+        return self._config.method_mix_base
 
     def _build_method_mix_array(self) -> Optional[np.ndarray]:
-        if not self._mix_values:
+        """Calculate normalized method mix array from baseline and targeted method changes."""
+        if not self._config.mix_values:
             return None
 
         base = self._ensure_method_mix_base()
         arr = base.copy()
 
-        targeted_indices = set()
-        targeted_sum = 0.0
-        for name, val in self._mix_values.items():
+        # Track which methods have been explicitly targeted
+        n_methods = len(arr)
+        targeted_mask = np.zeros(n_methods, dtype=bool)
+        
+        # Apply targeted method mix values
+        for name, val in self._config.mix_values.items():
             if name == 'none':
                 raise ValueError('Method mix cannot be set for "none"; use probability of use instead.')
-            if name not in self._method_mix_order:
-                raise ValueError(f'Method mix updates must reference one of: {self._method_mix_order}')
-            idx = self._method_mix_order.index(name)
+            if name not in self.method_mix_order:
+                raise ValueError(f'Method mix updates must reference one of: {self.method_mix_order}')
+            idx = self.method_mix_order.index(name)
             new_val = self._convert_mix_value(val)
             arr[idx] = new_val
-            targeted_indices.add(idx)
-            targeted_sum += new_val
+            targeted_mask[idx] = True
 
+        # Calculate total of targeted methods
+        targeted_sum = arr[targeted_mask].sum()
+        
         if targeted_sum > 1.0 + 1e-6:
             raise ValueError('Method mix updates sum to more than 1.0; reduce the requested values.')
 
-        base_remaining = base.copy()
-        base_remaining[list(targeted_indices)] = 0.0
-        remaining_total_base = base_remaining.sum()
+        # Calculate remaining probability for non-targeted methods
+        untargeted_mask = ~targeted_mask
+        remaining_total_base = base[untargeted_mask].sum()
 
         if remaining_total_base < 1e-12:
             if targeted_sum < 1.0 - 1e-6:
@@ -243,11 +385,10 @@ class MethodIntervention:
         else:
             scale = max(0.0, (1.0 - targeted_sum) / remaining_total_base)
 
-        for idx, base_val in enumerate(base):
-            if idx in targeted_indices:
-                continue
-            arr[idx] = base_val * scale
+        # Scale non-targeted methods proportionally
+        arr[untargeted_mask] = base[untargeted_mask] * scale
 
+        # Normalize to ensure sum equals 1.0
         total = arr.sum()
         if total <= 0:
             raise ValueError('Provided method mix sums to zero after applying updates')
@@ -256,6 +397,7 @@ class MethodIntervention:
     # -----------------
     # Builder methods
     # -----------------
+    @validate_method_name(allow_new=True)
     def set_efficacy(self, method: str, efficacy: float, print_efficacy=False) -> 'MethodIntervention':
         """
         Set the contraceptive efficacy (failure rate prevention) for a method.
@@ -294,15 +436,16 @@ class MethodIntervention:
         - Small changes (2-3%) can have meaningful impact on unintended pregnancies
         - Efficacy changes affect pregnancy outcomes but don't directly change method mix
         """
-        method_name = self._normalize_name(method)
         val = float(efficacy)
         if not (0.0 <= val <= 1.0):
-            raise ValueError(f'Efficacy for {method_name} must be between 0 and 1')
-        self._eff[method_name] = val
-        if print_efficacy:
-            print(f'Efficacy: {method_name} = {val}')
+            raise ValueError(f'Efficacy for {method} must be between 0 and 1')
+        
+        with _print_if(print_efficacy, f'Efficacy: {method} = {val}'):
+            self._config.eff[method] = val
+        
         return self
 
+    @validate_method_name(allow_new=True)
     def set_duration_months(self, method: str, months: Union[int, float], print_duration=False) -> 'MethodIntervention':
         """
         Set how long (in months) people typically stay on a contraceptive method.
@@ -361,13 +504,13 @@ class MethodIntervention:
         Use `capture_method_mix_from_sim()` or check your location's calibration parameters
         to understand current duration distributions before setting intervention targets.
         """
-        method_name = self._normalize_name(method)
         mval = float(months)
         if mval <= 0:
-            raise ValueError(f'Duration (months) for {method_name} must be positive')
-        self._dur[method_name] = mval
-        if print_duration:
-            print(f'Duration: {method_name} = {mval} months')
+            raise ValueError(f'Duration (months) for {method} must be positive')
+        
+        with _print_if(print_duration, f'Duration: {method} = {mval} months'):
+            self._config.dur[method] = mval
+        
         return self
 
     def set_probability_of_use(self, p_use: float, print_p_use=False) -> 'MethodIntervention':
@@ -413,12 +556,14 @@ class MethodIntervention:
         p = float(p_use)
         if not (0.0 <= p <= 1.0):
             raise ValueError('Probability of use must be between 0 and 1')
-        self._p_use = p
-        if print_p_use:
-            print(f'Probability of use: {p}')
+        
+        with _print_if(print_p_use, f'Probability of use: {p}'):
+            self._config.p_use = p
+        
         return self
 
-    def set_method_mix(self, method: str, value: float, print_method_mix=False) -> 'MethodIntervention':
+    @validate_method_name(allow_new=True)
+    def set_method_mix(self, method: str, value: float, baseline_sim=None, print_method_mix=False) -> 'MethodIntervention':
         """
         Set the target share/percentage for a specific contraceptive method.
         
@@ -430,9 +575,6 @@ class MethodIntervention:
         - Changes in method availability at service delivery points
         - Community-based distribution focusing on specific methods
         
-        **IMPORTANT:** You must call `capture_method_mix_from_sim()` first to establish
-        a baseline, so other methods retain their current shares and adjust proportionally.
-        
         Parameters
         ----------
         method : str
@@ -440,6 +582,10 @@ class MethodIntervention:
         value : float
             Target share as decimal (0.25 = 25%) or percentage (25 = 25%)
             The tool will auto-detect and normalize either format
+        baseline_sim : fp.Sim, optional
+            Baseline simulation to capture current method mix from.
+            Only needed if you haven't already called capture_method_mix_from_sim().
+            The simulation must be initialized (sim.init() must have been called).
             
         Returns
         -------
@@ -448,18 +594,20 @@ class MethodIntervention:
             
         Examples
         --------
-        >>> # Model LARC promotion campaign targeting 30% implant use
+        >>> # Simple usage with baseline_sim parameter (recommended)
         >>> baseline_sim = fp.Sim(pars=pars)
         >>> baseline_sim.init()
         >>> mod = MethodIntervention(year=2025)
-        >>> mod.capture_method_mix_from_sim(baseline_sim)  # Capture current mix
-        >>> mod.set_method_mix('impl', 0.30)  # Target 30% implants
+        >>> mod.set_method_mix('impl', 0.30, baseline_sim=baseline_sim)  # Auto-captures baseline
         
-        >>> # Model multi-method social marketing
+        >>> # Multi-method targeting (baseline captured on first call)
+        >>> mod.set_method_mix('inj', 0.25, baseline_sim=baseline_sim)
+        >>> mod.set_method_mix('impl', 0.20)  # Baseline already captured
+        
+        >>> # Alternative: capture once, then set multiple
         >>> mod.capture_method_mix_from_sim(baseline_sim)
-        >>> mod.set_method_mix('inj', 0.25)  # Target 25% injectables
-        >>> mod.set_method_mix('impl', 0.20)  # Target 20% implants
-        >>> # Other methods will be rescaled proportionally to sum to 100%
+        >>> mod.set_method_mix('inj', 0.25)
+        >>> mod.set_method_mix('impl', 0.20)
         
         How Method Mix Adjustment Works
         --------------------------------
@@ -474,19 +622,23 @@ class MethodIntervention:
         
         Notes for PST Teams
         --------------------
-        - Always capture baseline first: `mod.capture_method_mix_from_sim(baseline_sim)`
+        - Pass baseline_sim parameter for convenience, or capture explicitly with capture_method_mix_from_sim()
         - You can target multiple methods in one intervention
         - Non-targeted methods adjust automatically (proportional rescaling)
         - Use percentages (25) or decimals (0.25), both work
         - Method mix changes model demand-side shifts, not supply constraints
         """
-        method_name = self._normalize_name(method)
+        # Auto-capture baseline if provided and not already set
+        if baseline_sim is not None and self._config.method_mix_base is None:
+            self.capture_method_mix_from_sim(baseline_sim)
+        
         val = float(value)
         if val < 0:
-            raise ValueError(f'Method mix for {method_name} cannot be negative')
-        self._mix_values[method_name] = val
-        if print_method_mix:
-            print(f'Method mix: {method_name} = {val}')
+            raise ValueError(f'Method mix for {method} cannot be negative')
+        
+        with _print_if(print_method_mix, f'Method mix: {method} = {val}'):
+            self._config.mix_values[method] = val
+        
         return self
 
     def set_method_mix_baseline(self, mix_values: Sequence[float]) -> 'MethodIntervention':
@@ -494,8 +646,8 @@ class MethodIntervention:
         arr = np.asarray(mix_values, dtype=float)
         if arr.ndim != 1:
             raise ValueError('Baseline method mix must be a one-dimensional sequence')
-        if arr.size != len(self._method_mix_order):
-            raise ValueError(f'Baseline method mix must have {len(self._method_mix_order)} entries')
+        if arr.size != len(self.method_mix_order):
+            raise ValueError(f'Baseline method mix must have {len(self.method_mix_order)} entries')
         if (arr < 0).any():
             raise ValueError('Baseline method mix cannot contain negative values')
         if arr.max() > 1.0 + 1e-6:
@@ -503,7 +655,7 @@ class MethodIntervention:
         total = arr.sum()
         if total <= 0:
             raise ValueError('Baseline method mix sums to zero')
-        self._method_mix_base = arr / total
+        self._config.method_mix_base = arr / total
         return self
 
     def capture_method_mix_from_sim(self, sim, print_method_mix=False) -> 'MethodIntervention':
@@ -556,13 +708,9 @@ class MethodIntervention:
             print(f'Method mix baseline: {mix}')
         return self
 
-    def set_switching_matrix(self, matrix_or_path: Union[dict, str]) -> 'MethodIntervention':
-        if isinstance(matrix_or_path, str):
-            self._switch = self._load_file(matrix_or_path)
-        elif isinstance(matrix_or_path, dict):
-            self._switch = sc.dcp(matrix_or_path)
-        else:
-            raise ValueError('Switching matrix must be a dict or a path to a JSON/YAML file')
+    def set_switching_matrix(self, matrix_or_path: Union[dict, str, Path]) -> 'MethodIntervention':
+        """Set the switching matrix from a dict, file path, or Path object."""
+        self._config.switch = load_config(matrix_or_path)
         return self
 
     def scale_switching_matrix(self, sim, target_method: str, scale_factor: float) -> 'MethodIntervention':
@@ -691,7 +839,7 @@ class MethodIntervention:
                 
                 origin_data['probs'] = probs.tolist()
         
-        self._switch = new
+        self._config.switch = new
         return self
 
     def add_method(self, method, copy_from_row: str, copy_from_col: str,
@@ -833,7 +981,7 @@ class MethodIntervention:
             raise ValueError('initial_share must be between 0 and 1')
         
         # Store the new method configuration
-        self._new_method = {
+        self._config.new_method = {
             'method': method,
             'copy_from_row': copy_from_row,
             'copy_from_col': copy_from_col,
@@ -846,7 +994,7 @@ class MethodIntervention:
     # -----------------
     # Introspection
     # -----------------
-    def preview(self) -> dict:
+    def preview(self) -> PreviewDict:
         """
         Preview the intervention configuration before building it.
         
@@ -887,32 +1035,32 @@ class MethodIntervention:
         - Check that method names are correct and values make sense
         - None means that parameter wasn't modified (uses baseline values)
         """
-        summary = dict(
-            year=self.year,
-            efficacy=sc.dcp(self._eff) or None,
-            duration_months=sc.dcp(self._dur) or None,
-            p_use=self._p_use,
-            method_mix=(
-                None if not self._mix_values
+        summary: PreviewDict = {
+            'year': self.year,
+            'efficacy': sc.dcp(self._config.eff) or None,
+            'duration_months': sc.dcp(self._config.dur) or None,
+            'p_use': self._config.p_use,
+            'method_mix': (
+                None if not self._config.mix_values
                 else {
                     name: val
-                    for name, val in zip(self._method_mix_order, self._build_method_mix_array())
+                    for name, val in zip(self.method_mix_order, self._build_method_mix_array())
                 }
             ),
-            switching_matrix=(None if self._switch is None else '<dict>'),
-            new_method=(
-                None if self._new_method is None 
+            'switching_matrix': (None if self._config.switch is None else '<dict>'),
+            'new_method': (
+                None if self._config.new_method is None 
                 else {
-                    'name': self._new_method['method'].name,
-                    'label': self._new_method['method'].label,
-                    'efficacy': self._new_method['method'].efficacy,
-                    'copy_from_row': self._new_method['copy_from_row'],
-                    'copy_from_col': self._new_method['copy_from_col'],
-                    'initial_share': self._new_method['initial_share'],
+                    'name': self._config.new_method['method'].name,
+                    'label': self._config.new_method['method'].label,
+                    'efficacy': self._config.new_method['method'].efficacy,
+                    'copy_from_row': self._config.new_method['copy_from_row'],
+                    'copy_from_col': self._config.new_method['copy_from_col'],
+                    'initial_share': self._config.new_method['initial_share'],
                 }
             ),
-            label=self.label,
-        )
+            'label': self.label,
+        }
         return summary
 
     # -----------------
@@ -951,19 +1099,28 @@ class MethodIntervention:
         - You can pass multiple interventions as a list: fp.Sim(interventions=[intv1, intv2])
         - Use preview() before build() to check your configuration
         """
-        # Convert method names to labels for the intervention
-        # For dynamically added methods, use the name as-is if no label mapping exists
-        eff_by_label = {self._name_to_label.get(name, name): val for name, val in self._eff.items()} if self._eff else None
-        dur_by_label = {self._name_to_label.get(name, name): val for name, val in self._dur.items()} if self._dur else None
+        # Convert method names to standard labels for the intervention
+        # For dynamically added methods, use the method name as-is
+        if self._config.eff:
+            label_lookup = self._name_to_label.get
+            eff_by_label = {label_lookup(name, name): val for name, val in self._config.eff.items()}
+        else:
+            eff_by_label = None
+            
+        if self._config.dur:
+            label_lookup = self._name_to_label.get
+            dur_by_label = {label_lookup(name, name): val for name, val in self._config.dur.items()}
+        else:
+            dur_by_label = None
         
         kwargs = dict(
             year=self.year,
             eff=eff_by_label,
             dur_use=dur_by_label,
-            p_use=self._p_use,
+            p_use=self._config.p_use,
             method_mix=self._build_method_mix_array(),
-            method_choice_pars=self._switch,
-            new_method=self._new_method,
+            method_choice_pars=self._config.switch,
+            new_method=self._config.new_method,
         )
         # Drop None values to keep payload clean
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
@@ -983,15 +1140,64 @@ def make_update_methods(
     p_use: Optional[float] = None,
     method_mix_value: Optional[float] = None,
     method_mix_baseline: Optional[Sequence[float]] = None,
+    baseline_sim=None,
     switch: Optional[Union[dict, str]] = None,
     label: Optional[str] = None,
 ):
     """
     Functional shortcut to build an update_methods intervention for a single method.
+    
+    Parameters
+    ----------
+    year : float
+        Year when intervention takes effect
+    method : str, optional
+        Method name for efficacy, duration, or method_mix changes
+    efficacy : float, optional
+        New efficacy value (0-1)
+    duration_months : int or float, optional
+        New duration in months
+    p_use : float, optional
+        Probability of contraceptive use (0-1)
+    method_mix_value : float, optional
+        Target method mix value for the specified method
+    method_mix_baseline : Sequence[float], optional
+        Explicit baseline method mix values (9 methods)
+    baseline_sim : fp.Sim, optional
+        Baseline simulation to auto-capture method mix from (alternative to method_mix_baseline)
+    switch : dict or str, optional
+        Switching matrix as dict or path to file
+    label : str, optional
+        Label for the intervention
+        
+    Returns
+    -------
+    update_methods
+        Built intervention ready for simulation
+        
+    Examples
+    --------
+    >>> # Simple efficacy change
+    >>> intv = make_update_methods(year=2025, method='pill', efficacy=0.95)
+    
+    >>> # Method mix with auto-capture
+    >>> baseline_sim = fp.Sim(location='kenya')
+    >>> baseline_sim.init()
+    >>> intv = make_update_methods(s
+    ...     year=2025, 
+    ...     method='impl', 
+    ...     method_mix_value=0.30,
+    ...     baseline_sim=baseline_sim
+    ... )
     """
     builder = MethodIntervention(year=year, label=label)
+    
+    # Handle baseline - explicit array or auto-capture from sim
     if method_mix_baseline is not None:
         builder.set_method_mix_baseline(method_mix_baseline)
+    elif baseline_sim is not None:
+        builder.capture_method_mix_from_sim(baseline_sim)
+    
     if efficacy is not None:
         if method is None:
             raise ValueError('`method` must be provided when setting efficacy')

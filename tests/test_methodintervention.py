@@ -24,12 +24,12 @@ def test_methodintervention_init():
     
     assert mod.year == year
     assert mod.label == label
-    assert mod._eff == {}
-    assert mod._dur == {}
-    assert mod._p_use is None
-    assert mod._mix_values == {}
-    assert mod._method_mix_base is None
-    assert mod._switch is None
+    assert mod._config.eff == {}
+    assert mod._config.dur == {}
+    assert mod._config.p_use is None
+    assert mod._config.mix_values == {}
+    assert mod._config.method_mix_base is None
+    assert mod._config.switch is None
 
 
 def test_methodintervention_method_names():
@@ -69,15 +69,15 @@ def test_set_efficacy_valid():
     assert result is mod  # Returns self for chaining
     
     # Test value is stored
-    assert mod._eff['pill'] == 0.95
+    assert mod._config.eff['pill'] == 0.95
     
     # Test multiple methods
     mod.set_efficacy('inj', 0.99)
     mod.set_efficacy('impl', 0.994)
     
-    assert len(mod._eff) == 3
-    assert mod._eff['inj'] == 0.99
-    assert mod._eff['impl'] == 0.994
+    assert len(mod._config.eff) == 3
+    assert mod._config.eff['inj'] == 0.99
+    assert mod._config.eff['impl'] == 0.994
 
 
 def test_set_efficacy_boundary_values():
@@ -87,8 +87,8 @@ def test_set_efficacy_boundary_values():
     mod.set_efficacy('none', 0.0)  # Valid minimum
     mod.set_efficacy('btl', 1.0)   # Valid maximum
     
-    assert mod._eff['none'] == 0.0
-    assert mod._eff['btl'] == 1.0
+    assert mod._config.eff['none'] == 0.0
+    assert mod._config.eff['btl'] == 1.0
 
 
 def test_set_efficacy_invalid_range():
@@ -115,11 +115,11 @@ def test_set_duration_months_valid():
     assert result is mod
     
     # Test value is stored
-    assert mod._dur['inj'] == 36.0
+    assert mod._config.dur['inj'] == 36.0
     
     # Test float values
     mod.set_duration_months('pill', 12.5)
-    assert mod._dur['pill'] == 12.5
+    assert mod._config.dur['pill'] == 12.5
 
 
 def test_set_duration_months_invalid():
@@ -143,14 +143,14 @@ def test_set_probability_of_use_valid():
     
     result = mod.set_probability_of_use(0.5)
     assert result is mod
-    assert mod._p_use == 0.5
+    assert mod._config.p_use == 0.5
     
     # Test boundary values
     mod.set_probability_of_use(0.0)
-    assert mod._p_use == 0.0
+    assert mod._config.p_use == 0.0
     
     mod.set_probability_of_use(1.0)
-    assert mod._p_use == 1.0
+    assert mod._config.p_use == 1.0
 
 
 def test_set_probability_of_use_invalid():
@@ -179,10 +179,10 @@ def test_set_method_mix_baseline():
     assert result is mod
     
     # Should normalize
-    assert np.isclose(mod._method_mix_base.sum(), 1.0)
+    assert np.isclose(mod._config.method_mix_base.sum(), 1.0)
     
     # Should have correct length
-    assert len(mod._method_mix_base) == 9
+    assert len(mod._config.method_mix_base) == 9
 
 
 def test_set_method_mix_baseline_percentage():
@@ -195,8 +195,8 @@ def test_set_method_mix_baseline_percentage():
     mod.set_method_mix_baseline(baseline_pct)
     
     # Should be normalized to fractions
-    assert np.isclose(mod._method_mix_base.sum(), 1.0)
-    assert np.all(mod._method_mix_base <= 1.0)
+    assert np.isclose(mod._config.method_mix_base.sum(), 1.0)
+    assert np.all(mod._config.method_mix_base <= 1.0)
 
 
 def test_set_method_mix_baseline_invalid():
@@ -226,7 +226,7 @@ def test_set_method_mix():
     
     result = mod.set_method_mix('pill', 0.3)
     assert result is mod
-    assert mod._mix_values['pill'] == 0.3
+    assert mod._config.mix_values['pill'] == 0.3
 
 
 def test_set_method_mix_without_baseline():
@@ -269,11 +269,11 @@ def test_method_mix_rescaling():
     assert np.isclose(result.sum(), 1.0)
     
     # Pill should be 50%
-    pill_idx = mod._method_mix_order.index('pill')
+    pill_idx = mod.method_mix_order.index('pill')
     assert np.isclose(result[pill_idx], 0.5)
     
     # Others should share remaining 50% proportionally
-    for idx, method in enumerate(mod._method_mix_order):
+    for idx, method in enumerate(mod.method_mix_order):
         if method != 'pill':
             assert result[idx] < baseline[idx]  # All others reduced
 
@@ -509,8 +509,8 @@ def test_overwrite_efficacy_same_method():
     mod.set_efficacy('pill', 0.90)
     mod.set_efficacy('pill', 0.95)  # Overwrite
     
-    assert mod._eff['pill'] == 0.95
-    assert len(mod._eff) == 1
+    assert mod._config.eff['pill'] == 0.95
+    assert len(mod._config.eff) == 1
 
 
 def test_overwrite_duration_same_method():
@@ -520,8 +520,8 @@ def test_overwrite_duration_same_method():
     mod.set_duration_months('inj', 20)
     mod.set_duration_months('inj', 30)  # Overwrite
     
-    assert mod._dur['inj'] == 30.0
-    assert len(mod._dur) == 1
+    assert mod._config.dur['inj'] == 30.0
+    assert len(mod._config.dur) == 1
 
 
 def test_overwrite_probability_of_use():
@@ -531,7 +531,7 @@ def test_overwrite_probability_of_use():
     mod.set_probability_of_use(0.4)
     mod.set_probability_of_use(0.6)  # Overwrite
     
-    assert mod._p_use == 0.6
+    assert mod._config.p_use == 0.6
 
 
 def test_method_mix_all_to_single_method():
@@ -546,11 +546,11 @@ def test_method_mix_all_to_single_method():
     result = mod._build_method_mix_array()
     
     assert np.isclose(result.sum(), 1.0)
-    impl_idx = mod._method_mix_order.index('impl')
+    impl_idx = mod.method_mix_order.index('impl')
     assert np.isclose(result[impl_idx], 1.0)
     
     # All others should be ~0
-    for idx, method in enumerate(mod._method_mix_order):
+    for idx, method in enumerate(mod.method_mix_order):
         if method != 'impl':
             assert result[idx] < 1e-6
 
@@ -570,7 +570,7 @@ def test_method_mix_multiple_methods_fill_100_percent():
     assert np.isclose(result.sum(), 1.0)
     # All other methods should be ~0
     for method in ['iud', 'cond', 'btl', 'wdraw', 'othtrad', 'othmod']:
-        idx = mod._method_mix_order.index(method)
+        idx = mod.method_mix_order.index(method)
         assert result[idx] < 1e-6
 
 
@@ -588,7 +588,7 @@ def test_method_mix_with_zero_baseline():
     result = mod._build_method_mix_array()
     
     assert np.isclose(result.sum(), 1.0)
-    pill_idx = mod._method_mix_order.index('pill')
+    pill_idx = mod.method_mix_order.index('pill')
     assert np.isclose(result[pill_idx], 0.5)
 
 
@@ -602,7 +602,7 @@ def test_method_mix_percentage_conversion():
     mod.set_method_mix('impl', 30)  # Should be interpreted as 30% = 0.30
     
     result = mod._build_method_mix_array()
-    impl_idx = mod._method_mix_order.index('impl')
+    impl_idx = mod.method_mix_order.index('impl')
     
     # Should convert 30 → 0.30
     assert np.isclose(result[impl_idx], 0.30, atol=0.01)
@@ -703,7 +703,7 @@ def test_method_mix_overwrite_target():
     mod.set_method_mix('impl', 0.3)  # Overwrite
     
     result = mod._build_method_mix_array()
-    impl_idx = mod._method_mix_order.index('impl')
+    impl_idx = mod.method_mix_order.index('impl')
     
     assert np.isclose(result[impl_idx], 0.3, atol=0.01)
 
@@ -797,9 +797,9 @@ def test_string_to_float_conversion():
     mod.set_duration_months('inj', float('30'))
     mod.set_probability_of_use(float('0.6'))
     
-    assert mod._eff['pill'] == 0.95
-    assert mod._dur['inj'] == 30.0
-    assert mod._p_use == 0.6
+    assert mod._config.eff['pill'] == 0.95
+    assert mod._config.dur['inj'] == 30.0
+    assert mod._config.p_use == 0.6
 
 
 # =============================================================================

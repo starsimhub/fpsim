@@ -38,11 +38,12 @@ import fpsim as fp
 from plots import plot_comparison_full, plot_method_bincount, plot_method_mix_simple, plot_pregnancies_per_year
 
 location = 'senegal'
-usecases = [0, 1, 2, 3, 4]
-plot_compare = [[0,1], [0,2], [0,3], [0,4]]
+usecases = [0, 1]
+plot_compare = [[0,1]]
 print('*'*40)
+baseline_sim = None
 
-# REGION: Utils & Default simulation parameters
+# region: Utils & Default simulation parameters
 def _default_pars(n_agents=5_000, location=location, start_year=2000, end_year=2015):
     """Baseline parameters shared by all example simulations."""
     return dict(
@@ -67,7 +68,7 @@ def _print_key_results(sim: fp.Sim, label: str):
 
 # endregion: Helper functions
 
-# REGION: 0. Baseline simulation
+# region: 0. Baseline simulation
 def run_baseline(
     label='Baseline (no intervention)',
 ):
@@ -76,11 +77,13 @@ def run_baseline(
     sim = fp.Sim(pars=pars, label=label)
     sim.run()
     _print_key_results(sim, label)
+    global baseline_sim
+    baseline_sim = sim
     return sim
 
 # endregion: Baseline simulation
 
-# REGION: 1. Simple use case: improve method efficacy
+# region: 1. Simple use case: improve method efficacy
 def run_simple_usecase(
     year_apply=2007.0,
     label='A very simple use case',
@@ -106,11 +109,14 @@ def run_simple_usecase(
     sim = fp.Sim(pars=pars, interventions=intv, label=label)
     sim.run()
     _print_key_results(sim, label)
+    # if baseline_sim is provided, plot the method mix
+    if baseline_sim is not None:
+        plot_method_bincount(baseline_sim, sim, title=label, filename=f"{location}_plot_method_bincount_{label}.png", save_figure=True)
     return sim
 
 # endregion: Very simple use case
 
-# REGION: 2. Method mix and duration update  
+# region: 2. Method mix and duration update  
 def run_with_method_mix_adjustment(
     year_apply=2007.0,
     label='run_with_method_mix_adjustment',
@@ -123,18 +129,20 @@ def run_with_method_mix_adjustment(
     both the share of women choosing implants AND improving continuation rates.
     
     Works with all contraception modules (StandardChoice, SimpleChoice, RandomChoice).
+    
+    The baseline method mix is captured automatically by passing `baseline_sim`
+    to the first `set_method_mix` call.
     """
     pars = _default_pars()
 
-    # Capture the existing method mix so only the provided values change
-    temp_sim = fp.Sim(pars=pars, label='Tmp method mix baseline (mix case)')
-    temp_sim.init()
-
     mod = fp.MethodIntervention(year=year_apply, label=label)
-    mod.capture_method_mix_from_sim(temp_sim, print_method_mix=True)
-    del temp_sim
+    
+    # Capture the existing method mix using the convenience baseline_sim parameter
+    baseline_sim = fp.Sim(pars=pars, label='Tmp method mix baseline (mix case)')
+    baseline_sim.init()
+    mod.set_method_mix('impl', 0.20, baseline_sim=baseline_sim, print_method_mix=True)  # Target 20% implant share
+    del baseline_sim
 
-    mod.set_method_mix('impl', 0.20, print_method_mix=True)  # Target 20% implant share
     mod.set_duration_months('impl', 48)  # Improve continuation to 4 years
 
     print(f'\nPreview of configured payload ({label}):')
@@ -144,9 +152,12 @@ def run_with_method_mix_adjustment(
     sim = fp.Sim(pars=pars, interventions=intv, label=label)
     sim.run()
     _print_key_results(sim, label)
+    if baseline_sim is not None:
+        plot_method_bincount(baseline_sim, sim, title=label, filename=f"{location}_run_with_method_mix_adjustment_{label}.png", save_figure=True)
+    
     return sim
 
-# REGION: 3. Efficacy and duration changes
+# region: 3. Efficacy and duration changes
 def run_with_efficacy_and_duration_changes(
     year_apply=2007.0,
     label='run_with_efficacy_and_duration_changes',
@@ -173,7 +184,7 @@ def run_with_efficacy_and_duration_changes(
 
 # REGION: Efficacy and duration changes
 
-# REGION: 4. Switching matrix scaling
+# region: 4. Switching matrix scaling
 def run_with_switching_matrix_scaling(
     year_apply=2007.0,
     label='run_with_switching_matrix_scaling',
@@ -208,7 +219,7 @@ def run_with_switching_matrix_scaling(
 
 # REGION: Switching matrix scaling
 
-# REGION: MAIN FUNCTION
+# region: MAIN FUNCTION
 if __name__ == '__main__':
 
     # Map case numbers to functions
@@ -244,3 +255,5 @@ if __name__ == '__main__':
         plot_comparison_full(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_comparison_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
         plot_method_bincount(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_method_bincount_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
         plot_pregnancies_per_year(sims[plot_pair[0]], sims[plot_pair[1]], filename=f"{location}_plot_pregnancies_per_year_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
+        
+#endregion: MAIN FUNCTION
