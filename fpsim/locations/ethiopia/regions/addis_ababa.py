@@ -28,13 +28,6 @@ def dataloader(location='addis_ababa'):
 Set the parameters for FPsim, specifically for Ethiopia.
 '''
 
-import numpy as np
-import starsim as ss
-import fpsim as fp
-from fpsim import defaults as fpd
-import fpsim.locations.data_utils as fpld
-
-
 def make_calib_pars():
     pars = {}
 
