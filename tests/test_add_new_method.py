@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 import sciris as sc
 import fpsim as fp
+from fpsim.methods import NewMethodConfig
 
 
 def make_sim(**kwargs):
@@ -696,6 +697,7 @@ def test_wrapper_api():
     assert 'year' in preview
     assert 'new_method' in preview
     assert preview['new_method']['name'] == 'api_test'
+    assert isinstance(mod._config.new_method, NewMethodConfig)
     
     # Test build and run
     intv = mod.build()
@@ -705,6 +707,66 @@ def test_wrapper_api():
     assert 'api_test' in sim.connectors.contraception.methods
     
     print('✓ Wrapper API validation successful')
+    return sim
+
+
+def test_new_method_initial_share_callable():
+    """Ensure initial_share can be provided as callable or distribution."""
+    baseline_sim = make_sim()
+    baseline_sim.init()
+
+    new_method = fp.Method(
+        name='callable_share',
+        label='Callable Share',
+        efficacy=0.96,
+        modern=True,
+        dur_use=fp.methods.ln(6, 2)
+    )
+
+    # Callable returning a deterministic share
+    mod = fp.MethodIntervention(year=2010)
+    mod.set_method_mix('inj', 0.2, baseline_sim=baseline_sim)  # Ensure baseline captured for build
+    mod.add_method(
+        method=new_method,
+        copy_from_row='inj',
+        copy_from_col='inj',
+        initial_share=lambda: 0.25  # Callable
+    )
+
+    assert np.isclose(mod._config.new_method.initial_share, 0.25)
+
+    # Distribution-like object with .rvs()
+    class DummyDist:
+        def rvs(self):
+            return 0.4
+
+    mod2 = fp.MethodIntervention(year=2010)
+    mod2.set_method_mix('inj', 0.2, baseline_sim=baseline_sim)
+    mod2.add_method(
+        method=fp.Method(
+            name='dist_share',
+            label='Dist Share',
+            efficacy=0.95,
+            modern=True,
+            dur_use=fp.methods.ln(6, 2),
+        ),
+        copy_from_row='inj',
+        copy_from_col='inj',
+        initial_share=DummyDist(),
+    )
+    assert np.isclose(mod2._config.new_method.initial_share, 0.4)
+
+    intv = mod.build()
+    sim = make_sim(interventions=intv)
+    sim.run()
+    assert 'callable_share' in sim.connectors.contraception.methods
+
+    intv2 = mod2.build()
+    sim2 = make_sim(interventions=intv2)
+    sim2.run()
+    assert 'dist_share' in sim2.connectors.contraception.methods
+
+    print('✓ Callable initial_share handled correctly')
     return sim
 
 

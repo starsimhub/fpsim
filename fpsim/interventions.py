@@ -249,17 +249,20 @@ class update_methods(ss.Intervention):
         p_use (float): probability of using any form of contraception
         method_mix (list/arr): probabilities of selecting each form of contraception
         
-        new_method (dict): Add a new contraceptive method with keys:
-            - method: Method object to add
-            - copy_from_row: method name to copy "from" switching probabilities
-            - copy_from_col: method name to copy "to" switching probabilities  
-            - initial_share: probability of staying on new method (default 0.1)
-            - renormalize: whether to renormalize switching matrix (default True)
+        new_method (dict | fpsim.methods.NewMethodConfig): Configuration for dynamically adding a new method.
+            If a dict is provided, it must contain the fields required to construct
+            :class:`fpsim.methods.NewMethodConfig`.
 
     """
 
     def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, new_method=None, verbose=False, **kwargs):
         super().__init__(**kwargs)
+
+        if new_method is not None and not isinstance(new_method, fpm.NewMethodConfig):
+            if not isinstance(new_method, dict):
+                raise TypeError('new_method must be a dict or NewMethodConfig instance')
+            new_method = fpm.NewMethodConfig(**new_method)
+
         self.define_pars(
             year=year,
             eff=eff,
@@ -314,24 +317,9 @@ class update_methods(ss.Intervention):
 
             # Add new method if specified (do this first, before other changes)
             if self.pars.new_method is not None:
-                method_obj = self.pars.new_method.get('method')
-                copy_from_row = self.pars.new_method.get('copy_from_row')
-                copy_from_col = self.pars.new_method.get('copy_from_col')
-                initial_share = self.pars.new_method.get('initial_share', 0.1)
-                renormalize = self.pars.new_method.get('renormalize', True)
-                
-                if method_obj is None:
-                    raise ValueError('new_method dict must contain a "method" key with a Method object')
-                
-                cm.add_new_method(
-                    method=method_obj,
-                    copy_from_row=copy_from_row,
-                    copy_from_col=copy_from_col,
-                    initial_share=initial_share,
-                    renormalize=renormalize
-                )
+                cm.add_new_method(self.pars.new_method)
                 if self.pars.verbose:
-                    print(f'Added new contraceptive method "{method_obj.name}" in year {sim.t.year}')
+                    print(f'Added new contraceptive method "{self.pars.new_method.method.name}" in year {sim.t.year}')
 
             # Implement efficacy
             if self.pars.eff is not None:

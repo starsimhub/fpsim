@@ -73,6 +73,7 @@ import numpy as np
 import sciris as sc
 
 from . import interventions as fpi
+from .methods import NewMethodConfig
 
 __all__ = [
     'MethodIntervention',
@@ -130,7 +131,7 @@ class InterventionConfig:
     mix_values: Dict[str, float] = field(default_factory=dict)
     method_mix_base: Optional[np.ndarray] = None
     switch: Optional[dict] = None
-    new_method: Optional[dict] = None
+    new_method: Optional[NewMethodConfig] = None
 
 
 # ==========================================
@@ -847,7 +848,8 @@ class MethodIntervention:
         """
         Add a new contraceptive method to the simulation.
         
-        **What this models:** Introduction of a new contraceptive product or method that wasn't
+        What this models:
+        Introduction of a new contraceptive product or method that wasn't
         previously available. This could represent:
         - Launch of a new LARC product (e.g., subcutaneous DMPA)
         - Introduction of emergency contraception
@@ -856,6 +858,9 @@ class MethodIntervention:
         
         The new method is added by copying switching behavior from existing similar methods
         and expanding the switching matrix to accommodate the new option.
+        
+        Internally this constructs a :class:`fpsim.methods.NewMethodConfig`
+        payload that is passed through to the core contraception module.
         
         Parameters
         ----------
@@ -868,9 +873,11 @@ class MethodIntervention:
         copy_from_col : str
             Method name to copy "switching TO" behavior from (e.g., 'inj')
             This determines how people switch to your new method from other methods
-        initial_share : float, default=0.1
-            Probability of staying on the new method in the switching matrix (0-1)
-            Higher values mean people are more likely to continue the new method
+        initial_share : float or callable or distribution, default=0.1
+            Probability of staying on the new method in the switching matrix (0-1).
+            You can provide a scalar, a callable returning a scalar, or a Starsim/scipy
+            distribution object (e.g., ``ss.beta(...)``); it will be evaluated once
+            when the intervention is built.
         renormalize : bool, default=True
             Whether to renormalize switching probabilities to sum to 1
             
@@ -972,23 +979,19 @@ class MethodIntervention:
         if method.efficacy is None or method.dur_use is None:
             raise ValueError('Method must have efficacy and dur_use defined')
         
-        # Validate copy methods
-        copy_from_row = self._normalize_name(copy_from_row)
-        copy_from_col = self._normalize_name(copy_from_col)
-        
-        # Validate initial_share
-        if not (0.0 <= initial_share <= 1.0):
-            raise ValueError('initial_share must be between 0 and 1')
-        
-        # Store the new method configuration
-        self._config.new_method = {
-            'method': method,
-            'copy_from_row': copy_from_row,
-            'copy_from_col': copy_from_col,
-            'initial_share': initial_share,
-            'renormalize': renormalize
-        }
-        
+        # Normalise reference method names (must exist already)
+        normalized_row = self._normalize_name(copy_from_row)
+        normalized_col = self._normalize_name(copy_from_col)
+
+        # Store the new method configuration as a dataclass payload
+        self._config.new_method = NewMethodConfig(
+            method=method,
+            copy_from_row=normalized_row,
+            copy_from_col=normalized_col,
+            initial_share=initial_share,
+            renormalize=renormalize,
+        )
+
         return self
 
     # -----------------
@@ -1049,14 +1052,15 @@ class MethodIntervention:
             ),
             'switching_matrix': (None if self._config.switch is None else '<dict>'),
             'new_method': (
-                None if self._config.new_method is None 
+                None
+                if self._config.new_method is None
                 else {
-                    'name': self._config.new_method['method'].name,
-                    'label': self._config.new_method['method'].label,
-                    'efficacy': self._config.new_method['method'].efficacy,
-                    'copy_from_row': self._config.new_method['copy_from_row'],
-                    'copy_from_col': self._config.new_method['copy_from_col'],
-                    'initial_share': self._config.new_method['initial_share'],
+                    'name': self._config.new_method.method.name,
+                    'label': self._config.new_method.method.label,
+                    'efficacy': self._config.new_method.method.efficacy,
+                    'copy_from_row': self._config.new_method.copy_from_row,
+                    'copy_from_col': self._config.new_method.copy_from_col,
+                    'initial_share': self._config.new_method.initial_share,
                 }
             ),
             'label': self.label,

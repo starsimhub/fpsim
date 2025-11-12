@@ -8,6 +8,11 @@ Idea:
 """
 
 # >> Imports
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Callable, Optional, Union
+
 import numpy as np
 import sciris as sc
 import starsim as ss
@@ -16,7 +21,7 @@ from scipy.stats import fisk
 from . import defaults as fpd
 from . import locations as fplocs
 
-__all__ = ['Method', 'make_methods', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
+__all__ = ['Method', 'NewMethodConfig', 'make_methods', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
 
 
 # >> Base definition of contraceptive methods -- can be overwritten by locations
@@ -160,6 +165,56 @@ def make_method_map(method_list):
 def make_methods(method_list=None):
     if method_list is None: method_list = make_method_list()
     return ss.ndict(method_list, type=Method)
+
+
+InitialShareInput = Union[float, int, np.ndarray, Callable[[], float], ss.Dist]
+
+
+@dataclass(slots=True)
+class NewMethodConfig:
+    """Configuration payload used when dynamically adding a new contraceptive method."""
+
+    method: Method
+    copy_from_row: Optional[str]
+    copy_from_col: Optional[str]
+    initial_share: InitialShareInput = 0.1
+    renormalize: bool = True
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.method, Method):
+            raise TypeError('`method` must be a fpsim.Method instance')
+        if self.copy_from_row is None or self.copy_from_col is None:
+            raise ValueError('copy_from_row and copy_from_col must be provided')
+        self.initial_share = self._coerce_initial_share(self.initial_share)
+
+    @staticmethod
+    def _coerce_initial_share(value: InitialShareInput) -> float:
+        """Convert initial_share inputs (float/int/callable/distribution) to a bounded float."""
+        # Numpy scalar/array
+        if isinstance(value, np.ndarray):
+            if value.size != 1:
+                raise ValueError('initial_share ndarray must contain a single value')
+            value = value.item()
+
+        # Starsim/scipy distribution objects (have .rvs)
+        if hasattr(value, 'rvs') and callable(getattr(value, 'rvs')):
+            sampled = value.rvs()
+            return NewMethodConfig._coerce_initial_share(sampled)
+
+        # Callables returning a value
+        if callable(value):
+            sampled = value()
+            return NewMethodConfig._coerce_initial_share(sampled)
+
+        # Numeric types
+        try:
+            numeric = float(value)
+        except (TypeError, ValueError):
+            raise TypeError('initial_share must be a float, int, numpy scalar, callable, or distribution')
+
+        if not (0.0 <= numeric <= 1.0):
+            raise ValueError('initial_share must be between 0 and 1')
+        return numeric
 
 
 class Fisk(ss.Dist):
@@ -344,8 +399,7 @@ class ContraceptiveChoice(ss.Connector):
     def add_method(self, method):
         self.methods[method.name] = method
 
-    def add_new_method(self, method, copy_from_row=None, copy_from_col=None, 
-                      initial_share=0.1, renormalize=True):
+    def add_new_method(self, config: NewMethodConfig):
         """
         Add a new contraceptive method and expand the switching matrix dynamically.
         
@@ -354,11 +408,7 @@ class ContraceptiveChoice(ss.Connector):
         probabilities from existing similar methods.
         
         Args:
-            method (Method): Method object with name, efficacy, duration, etc.
-            copy_from_row (str): Method name to copy "from" probabilities (e.g., 'impl')
-            copy_from_col (str): Method name to copy "to" probabilities (e.g., 'impl')
-            initial_share (float): Probability of staying on the new method (0-1)
-            renormalize (bool): Whether to renormalize rows to sum to 1
+            config (NewMethodConfig): Configuration payload describing the method to add
             
         Example:
             # Add a new long-acting injectable method
@@ -369,13 +419,15 @@ class ContraceptiveChoice(ss.Connector):
                 modern=True,
                 dur_use=fp.ln(6, 2)
             )
-            sim.connectors.contraception.add_new_method(
+            cfg = fp.NewMethodConfig(
                 method=new_method,
                 copy_from_row='inj',  # Copy switching patterns from injectables
                 copy_from_col='inj',
                 initial_share=0.15
             )
+            sim.connectors.contraception.add_new_method(cfg)
         """
+        method = config.method
         if method.name in self.methods:
             raise ValueError(f"Method '{method.name}' already exists in the simulation")
         
@@ -390,20 +442,21 @@ class ContraceptiveChoice(ss.Connector):
         # Handle switching matrix expansion if method_choice_pars exists
         if hasattr(self, 'pars') and self.pars.method_choice_pars is not None:
             # This is for modules that use switching matrices (SimpleChoice, StandardChoice)
-            self._expand_switching_matrix(method, copy_from_row, copy_from_col, 
-                                         initial_share, renormalize)
+            self._expand_switching_matrix(config)
         
         # Update method mix if it exists
         if hasattr(self, 'pars') and hasattr(self.pars, 'method_mix'):
             # Add a small entry for the new method and renormalize
-            new_mix = np.append(self.pars.method_mix, initial_share)
-            self.pars.method_mix = new_mix / new_mix.sum()
+            new_mix = np.append(self.pars.method_mix, config.initial_share)
+            mix_sum = new_mix.sum()
+            if mix_sum > 0:
+                self.pars.method_mix = new_mix / mix_sum
         
         # Update method_weights if it exists (used in StandardChoice)
         if hasattr(self, 'pars') and hasattr(self.pars, 'method_weights'):
             # Add weight for the new method (copy from the reference method or use 1.0)
-            if copy_from_row and copy_from_row in self.methods:
-                row_idx = self.methods[copy_from_row].idx
+            if config.copy_from_row and config.copy_from_row in self.methods:
+                row_idx = self.methods[config.copy_from_row].idx
                 if row_idx < len(self.pars.method_weights):
                     new_weight = self.pars.method_weights[row_idx]
                 else:
@@ -430,25 +483,28 @@ class ContraceptiveChoice(ss.Connector):
         
         return
     
-    def _expand_switching_matrix(self, new_method, copy_from_row, copy_from_col,
-                                 initial_share, renormalize):
+    def _expand_switching_matrix(self, config: NewMethodConfig):
         """
         Expand the switching matrix to accommodate a new method.
         
         This is an internal helper for add_new_method() that handles the complex
         logic of expanding nested switching matrix structures.
         """
-        if copy_from_row is None or copy_from_col is None:
-            raise ValueError("copy_from_row and copy_from_col must be provided when adding methods to modules with switching matrices")
-        
+        new_method = config.method
+        copy_from_row = config.copy_from_row
+        copy_from_col = config.copy_from_col
+        initial_share = config.initial_share
+        renormalize = config.renormalize
+
         # Get the source methods for copying probabilities
         if copy_from_row not in self.methods:
             raise ValueError(f"copy_from_row '{copy_from_row}' not found in methods")
         if copy_from_col not in self.methods:
             raise ValueError(f"copy_from_col '{copy_from_col}' not found in methods")
         
-        row_method = self.methods[copy_from_row]
-        col_method = self.methods[copy_from_col]
+        method_lookup = self.methods
+        row_method = method_lookup[copy_from_row]
+        col_method = method_lookup[copy_from_col]
         
         mcp = self.pars.method_choice_pars
         
