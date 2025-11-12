@@ -90,11 +90,11 @@ class People(ss.People):
 
     @property
     def ever_used_contra(self):
-        return self.sim.connectors.fp.ever_used_contra  # TODO, fix
+        return self.sim.demographics.fp.ever_used_contra  # TODO, fix
 
     @property
     def parity(self):
-        return self.sim.connectors.fp.parity  # TODO, fix
+        return self.sim.demographics.fp.parity  # TODO, fix
 
     def set_urban(self, pars):
         """ Get initial distribution of urban """
@@ -157,11 +157,12 @@ class People(ss.People):
             return np.array(self.age, dtype=np.int64)
         return np.array(self.age[uids], dtype=np.int64)
 
-    def int_age_clip(self, uids=None):
+    def int_age_clip(self, uids=None, max=None):
         """ Return ages as integers, clipped to maximum allowable age for pregnancy """
+        if max is None: max = self.sim.pars.fp.max_age
         if uids is None:
-            return np.minimum(self.int_age(), fp.max_age_preg)
-        return np.minimum(self.int_age(uids), fp.max_age_preg)
+            return np.minimum(self.int_age(), max)
+        return np.minimum(self.int_age(uids), max)
 
     def update_post(self):
         """ Final updates at the very end of the timestep """

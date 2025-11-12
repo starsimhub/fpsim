@@ -12,11 +12,11 @@ import fpsim.arrays as fpa
 
 #%% Global defaults
 useSI          = True
-mpy            = 12   # Months per year, to avoid magic numbers
+# mpy            = 12   # Months per year, to avoid magic numbers
 eps            = 1e-9 # To avoid divide-by-zero
-min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
-max_age        = 99   # Maximum age (inclusive)
-max_age_preg   = 50   # Maximum age to become pregnant
+# min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
+spline_max_age  = 99   # Maximum age of agents (inclusive)
+spline_max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
 max_parity_spline = 20   # Used for parity splines
 location_registry = {}  # Registry for external custom locations
@@ -97,17 +97,12 @@ fpmod_states = [
     ss.BoolState('on_contra', default=False),  # whether she's on contraception
     ss.IntArr('method', default=0),  # Which method to use. 0 used for those on no method
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
-    ss.FloatArr('barrier', default=0),
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
-    ss.BoolState('pregnant'),
-    ss.BoolState('fertile'),
     ss.BoolState('sexually_active'),
     ss.BoolState('sexual_debut'),
-    ss.BoolState('lactating'),
-    ss.BoolState('postpartum'),
 
     # Ages of key events
     ss.FloatArr('sexual_debut_age', default=-1),
@@ -115,7 +110,6 @@ fpmod_states = [
     ss.FloatArr('first_birth_age', default=-1),
 
     # Counts of events
-    ss.FloatArr('parity', default=0),           # Number of births including stillbirths
     ss.FloatArr('n_births', default=0),         # Number of live births
     ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
     ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
@@ -125,16 +119,10 @@ fpmod_states = [
     ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
 
     # Durations and counters
-    ss.FloatArr('remainder_months', default=0),  # TODO, remove?
-    ss.FloatArr('dur_pregnancy'),
-    ss.FloatArr('dur_pp_sexual_reduction'),  # Duration of postpartum reduction in sexual activity
-    ss.FloatArr('dur_breastfeed'),  # Duration of breastfeeding for current child
-    ss.FloatArr('dur_breastfeed_total'),  # Total duration of breastfeeding across all children
+    ss.FloatArr('dur_breastfeed_total', default=0),
 
     # Timesteps of significant events
     ss.FloatArr('ti_conceived'),
-    ss.FloatArr('ti_pregnant'),
-    ss.FloatArr('ti_delivery'),
     ss.FloatArr('ti_last_delivery'),
     ss.FloatArr('ti_live_birth'),
     ss.FloatArr('ti_stillbirth'),
@@ -142,9 +130,7 @@ fpmod_states = [
     ss.FloatArr('ti_miscarriage'),
     ss.FloatArr('ti_abortion'),
     ss.FloatArr('ti_stop_postpartum'),
-    ss.FloatArr('ti_stop_breastfeeding'),
     ss.FloatArr('ti_debut'),
-    ss.FloatArr('ti_dead'),
 
     # Fecundity
     ss.FloatArr('personal_fecundity', default=0),
@@ -183,8 +169,8 @@ age_bin_map = {
 }
 
 # Age and parity splines
-spline_ages      = np.arange(max_age + 1)
-spline_preg_ages = np.arange(max_age_preg + 1)
+spline_ages      = np.arange(spline_max_age + 1)
+spline_preg_ages = np.arange(spline_max_age_preg + 1)
 spline_parities  = np.arange(max_parity_spline + 1)
 
 # Define allowable keys to select all (all ages, all methods, etc)
@@ -197,7 +183,7 @@ method_age_map = {
     '18-20': [18, 20],
     '20-25': [20, 25],
     '25-35': [25, 35],
-    '>35':   [35, max_age+1], # +1 since we're using < rather than <=
+    '>35':   [35, spline_max_age+1], # +1 since we're using < rather than <=
 }
 
 immutable_method_age_map = {
@@ -206,7 +192,7 @@ immutable_method_age_map = {
     '20-25': [20, 25],
     '25-30': [25, 30],
     '30-35': [30, 35],
-    '>35':   [35, max_age+1], # +1 since we're using < rather than <=
+    '>35':   [35, spline_max_age+1], # +1 since we're using < rather than <=
 }
 
 method_youth_age_map = {
@@ -215,18 +201,16 @@ method_youth_age_map = {
     '18-19': [18, 20],
     '20-22': [20, 23],
     '23-25': [23, 26],
-    '>25': [26, max_age+1]
+    '>25': [26, spline_max_age+1]
 }
 
 # Counts - we compute number of new events each timestep, plus number of cumulative events
 event_counts = sc.autolist(
-    'births',
     'stillbirths',
     'miscarriages',
     'abortions',
     'short_intervals',
     'secondary_births',
-    'pregnancies',
     'total_births',
     'maternal_deaths',
     'infant_deaths',
@@ -260,7 +244,6 @@ sim_results = sc.autolist(
 
 # Rates and other results that aren't scaled
 rate_results = sc.autolist(
-    'tfr',
     'mmr',
     'imr',
     'p_short_interval',

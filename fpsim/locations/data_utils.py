@@ -61,7 +61,7 @@ class DataLoader:
         Load data used within the FP module. All of these are stored directly as parameters
         """
         fp_data = sc.objdict()
-        fp_data.dur_breastfeeding = self.bf_stats()
+        fp_data.dur_breastfeed = self.bf_stats()
         fp_data.debut_age = self.debut_age()
         fp_data.age_fecundity = self.female_age_fecundity()
         fp_data.fecundity_ratio_nullip = self.fecundity_ratio_nullip()
@@ -69,7 +69,7 @@ class DataLoader:
         fp_data.sexual_activity = self.sexual_activity()
         sexual_activity_pp = self.sexual_activity_pp()
         fp_data.sexual_activity_pp = sexual_activity_pp
-        fp_data.max_pp_sexual_reduction = sexual_activity_pp['month'][-1].astype(int)
+        fp_data.max_pp_activity_reduction = sexual_activity_pp['month'][-1].astype(int)
         fp_data.debut_age = self.debut_age()
         fp_data.spacing_pref = self.birth_spacing_pref()
         fp_data.abortion_prob, fp_data.twins_prob = self.scalar_probs()

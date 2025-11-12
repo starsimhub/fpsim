@@ -779,6 +779,7 @@ class StandardChoice(SimpleChoice):
         """
         ppl = self.sim.people
         year = self.t.year
+        fppars = self.sim.pars.fp
 
         # Figure out which coefficients to use
         if event is None : p = self.pars.contra_use_pars[0]
@@ -794,8 +795,8 @@ class StandardChoice(SimpleChoice):
 
         # Add age
         int_age = ppl.int_age(uids)
-        int_age[int_age < fpd.min_age] = fpd.min_age
-        int_age[int_age >= fpd.max_age_preg] = fpd.max_age_preg-1
+        int_age[int_age < fppars.method_age] = fppars.method_age
+        int_age[int_age >= fppars.max_age] = fppars.max_age-1
         dfa = self.pars.age_spline.loc[int_age]
         rhs += p.age_factors[0] * dfa['knot_1'].values + p.age_factors[1] * dfa['knot_2'].values + p.age_factors[2] * dfa['knot_3'].values
         rhs += (p.age_ever_user_factors[0] * dfa['knot_1'].values * ppl.ever_used_contra[uids]

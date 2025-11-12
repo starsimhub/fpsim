@@ -134,17 +134,17 @@ class Sim(ss.Sim):
         # Process modules by adding them as Starsim connectors
         default_contra = fp.StandardChoice(pars=self.contra_pars)
         default_edu = fp.Education(pars=self.edu_pars)
-        default_fp = fp.FPmod(pars=self.fp_pars)
         contraception_module = contraception_module or sc.dcp(default_contra)
         education_module = education_module or sc.dcp(default_edu)
-        fp_module = fp_module or sc.dcp(default_fp)
-        connectors = sc.tolist(connectors) + [contraception_module, education_module, fp_module]
+        connectors = sc.tolist(connectors) + [contraception_module, education_module]
         self.pars['connectors'] = connectors
 
         # Process demographics
         if demographics is None and not len(self.pars['demographics']):
             deaths = fp.Deaths(pars=self.deaths_pars)
-            self.pars['demographics'] = deaths
+            default_fp = fp.FPmod2(pars=self.fp_pars)
+            fp_module = fp_module or sc.dcp(default_fp)
+            self.pars['demographics'] = [fp_module, deaths]
 
         # Metadata and settings
         fpu.set_metadata(self)  # Set version, date, and git info

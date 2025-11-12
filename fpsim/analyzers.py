@@ -708,7 +708,7 @@ class state_tracker(ss.Analyzer):
     living women who live in rural settings)
     '''
 
-    def __init__(self, state_name=None, min_age=fpd.min_age, max_age=fpd.max_age):
+    def __init__(self, state_name=None, min_age=None, max_age=None):
         """
         Initializes bins and data variables
         """
@@ -727,6 +727,10 @@ class state_tracker(ss.Analyzer):
         """
         sim = self.sim
         super().init_post()
+        if self.min_age is None:
+            self.min_age = self.sim.pars.fp.min_age
+        if self.max_age is None:
+            self.max_age = self.sim.pars.fp.max_age
         self.data_num = np.full((sim.t.npts,), np.nan)
         self.data_perc = np.full((sim.t.npts,), np.nan)
         self.data_n_female = np.full((sim.t.npts,), np.nan)

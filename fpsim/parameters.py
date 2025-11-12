@@ -51,86 +51,19 @@ class FPPars(ss.Pars):
         # Settings - what aspects are being modeled - TODO, remove
         self.use_partnership = 0
 
-        # Parameters related to the likelihood of conception
-        self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
-        self.p_infertility = ss.bernoulli(p=0.05)
-        self.p_abortion = ss.bernoulli(p=0)  # Placeholder, to be updated by data
-        self.p_stillbirth = ss.bernoulli(p=0)  # Placeholder, to be updated by data
-
-        self.fecundity_low = 0.7
-        self.fecundity_high = 1.1  # Personal fecundity distribution
-        self.exposure_factor = 1  # Overall exposure factor, to be calibrated
-        self.exposure_age = dict(age    =[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
-                                 rel_exp=[1, 1,  1,    1,  1,  1,  1,  1,  1,  1,  1,  1,  1])
-        self.exposure_parity = dict(parity =[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
-                                    rel_exp=[1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01])
-
-        ###################################
-        # Context-specific data-derived parameters, all need to be loaded from data
-        ###################################
-        self.age_fecundity = None
-        self.fecundity_ratio_nullip = None
-        self.lactational_amenorrhea = None
-        self.sexual_activity = None
-        self.sexual_activity_pp = None
-        self.debut_age = None
-        self.spacing_pref = None
-        self.age_partnership = None
-
-        self.update(kwargs)
-
-        if location is not None:
-            self.update_location(location=location)
-        else:
-            # Process parameters even when no location is specified
-            self.process_parameters()
-
-        return
-
-    def update_location(self, location=None):
-        """
-        Update the location-specific FP parameters
-        """
-        location_module = fp.get_dataloader(location)
-        location_pars = location_module.make_fp_pars()
-        self.update(**location_pars)
-        self.process_parameters()
-        return
-
-    def process_parameters(self):
-        """
-        Process parameters after all updates are complete.
-        Convert fecundity_low/fecundity_high to ss.uniform distribution.
-        """
-        # Convert fecundity bounds to distribution
-        if hasattr(self, 'fecundity_low') and hasattr(self, 'fecundity_high'):
-            self.fecundity = ss.uniform(low=self.fecundity_low, high=self.fecundity_high)
-        elif not hasattr(self, 'fecundity'):
-            # Fallback to default if no fecundity parameters are set
-            self.fecundity = ss.uniform(low=0.7, high=1.1)
-        return
-
-
-class PregnancyPars(ss.Pars):
-    def __init__(self, location=None, **kwargs):
-        super().__init__()
-
         # Age limits (in years)
         self.method_age = 15
         self.age_limit_fecundity = 50
-        self.max_age = 99
+        self.min_age = 10  # Minimum age for pregnancy
+        self.max_age = 50  # Maximum age for pregnancy
 
         # Durations (in months)
-        self.end_first_tri = 3      # Months
-        self.dur_pregnancy = ss.uniform(low=ss.months(9), high=ss.months(9))
-        self.dur_breastfeeding = ss.normal(loc=ss.months(24), scale=ss.months(6))
-        self.max_pp_sexual_reduction = None      # Updated by data, do not modify
+        self.max_pp_activity_reduction = None  # Length of postpartum activity reduction: updated by data, do not modify
         self.max_lam_dur = 5            # Duration of lactational amenorrhea (months)
         self.short_int = ss.months(24)  # Duration of a short birth interval between live births (months)
 
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
-        self.primary_infertility = 0.05
 
         # Parameters typically tuned during calibration
         self.maternal_mortality_factor = 1
