@@ -13,7 +13,7 @@ What you can model:
 4. **Probability of use**: Model changes in overall contraceptive uptake
 5. **Switching patterns**: Model how people transition between methods
 
-Key concepts for PST teams:
+Key concepts :
 ---------------------------
 - **Efficacy**: How well the method prevents pregnancy (0 to 1, where 0.99 = 99% effective)
 - **Duration**: How many months people typically stay on the method before discontinuing
@@ -24,7 +24,7 @@ Note: Small changes in duration can have large effects on method mix because peo
 accumulate on methods they stay on longer. This is realistic - improving continuation
 rates is one of the most impactful interventions.
 
-Quick Reference for PST Teams
+Quick Reference 
 ------------------------------
 **What intervention should I model for...**
 
@@ -231,7 +231,7 @@ class MethodIntervention:
     >>> mod.capture_method_mix_from_sim(baseline_sim)
     >>> mod.set_method_mix('impl', 0.25)  # Target 25% of users choosing implants
     
-    Important Notes for PST Teams
+    Important Notes 
     ------------------------------
     - **Duration impacts**: Duration changes translate directly to usage changes in steady state.
       Increasing duration by 50% increases method usage by 50% because people accumulate on
@@ -430,7 +430,7 @@ class MethodIntervention:
         >>> # Model better condom education
         >>> mod.set_efficacy('cond', 0.96)  # Increase correct use effectiveness
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - Typical efficacies: Pills ~94%, IUDs ~99%, Implants ~99%, Condoms ~95%
         - Small changes (2-3%) can have meaningful impact on unintended pregnancies
@@ -484,7 +484,7 @@ class MethodIntervention:
         >>> # Model comprehensive program improving multiple methods
         >>> mod.set_duration_months('inj', 30).set_duration_months('impl', 40)
         
-        Critical Notes for PST Teams
+        Critical Notes 
         -----------------------------
         **Duration changes have LARGE effects on method mix:**
         - Duration changes translate DIRECTLY to usage changes in steady state
@@ -546,7 +546,7 @@ class MethodIntervention:
         >>> mod.set_probability_of_use(0.55)  # Increase overall use
         >>> mod.set_method_mix('impl', 0.20)  # Target 20% choosing implants
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - This affects overall contraceptive prevalence (CPR)
         - Use this for interventions that increase access/demand broadly
@@ -620,7 +620,7 @@ class MethodIntervention:
         [Pills: 10%, Injectables: 20%, Implants: 50%]
         (Pills and injectables scaled down proportionally)
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - Pass baseline_sim parameter for convenience, or capture explicitly with capture_method_mix_from_sim()
         - You can target multiple methods in one intervention
@@ -692,7 +692,7 @@ class MethodIntervention:
         >>> intervention_sim = fp.Sim(pars=pars, interventions=intv)
         >>> intervention_sim.run()
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - You must call sim.init() before using this function
         - This captures the method mix from the location's calibrated data
@@ -773,7 +773,7 @@ class MethodIntervention:
         
         All probabilities are automatically re-normalized to sum to 100%.
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - This is an ADVANCED feature - start with set_duration_months if you're new
         - Use this when you want to model improved access to switching, not initial uptake
@@ -950,7 +950,7 @@ class MethodIntervention:
         Often you'll use the same method for both row and col (e.g., copy_from_row='inj'
         and copy_from_col='inj') if your new method is similar to an existing one.
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - Define the Method object with realistic efficacy and duration values
         - Use ln(mean, std) for duration: fp.methods.ln(24, 3) = 24 months average
@@ -1029,7 +1029,7 @@ class MethodIntervention:
          'switching_matrix': None,
          'label': 'Counseling Program'}
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - Use this to verify your intervention before running (catches typos/mistakes)
         - Check that method names are correct and values make sense
@@ -1092,7 +1092,7 @@ class MethodIntervention:
         >>> sim = fp.Sim(pars=pars, interventions=intv)
         >>> sim.run()
         
-        Notes for PST Teams
+        Notes 
         --------------------
         - Always call build() as the last step after all set_X() calls
         - The returned intervention can be used directly in fp.Sim()
