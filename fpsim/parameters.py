@@ -53,7 +53,10 @@ class FPPars(ss.Pars):
 
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
-        self.primary_infertility = 0.05
+        self.p_infertility = ss.bernoulli(p=0.05)
+        self.p_abortion = ss.bernoulli(p=0)  # Placeholder, to be updated by data
+        self.p_stillbirth = ss.bernoulli(p=0)  # Placeholder, to be updated by data
+
         self.fecundity_low = 0.7
         self.fecundity_high = 1.1  # Personal fecundity distribution
         self.exposure_factor = 1  # Overall exposure factor, to be calibrated
