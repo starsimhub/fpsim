@@ -15,7 +15,7 @@ __all__ = ['FPmod']
 
 
 # %% Define classes
-class FPmod(ss.Pregnancy):
+class Pregnancy(ss.Pregnancy):
     """
     Class for storing and updating FP-related events. Inherits from Starsim's Pregnancy module.
     """
