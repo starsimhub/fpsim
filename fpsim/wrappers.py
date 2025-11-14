@@ -79,11 +79,9 @@ __all__ = [
     'MethodName',
 ]
 
-
 # ==========================================
 # Enums and Type Definitions
 # ==========================================
-
 class MethodName(str, Enum):
     """Enumeration of standard contraceptive method names."""
     NONE = 'none'
@@ -107,7 +105,6 @@ class MethodName(str, Enum):
         """Return list of method names excluding 'none'."""
         return [m.value for m in cls if m != cls.NONE]
 
-
 class PreviewDict(TypedDict, total=False):
     """Typed dictionary for preview() return value."""
     year: float
@@ -119,7 +116,6 @@ class PreviewDict(TypedDict, total=False):
     new_method: Optional[Dict[str, Any]]
     label: Optional[str]
 
-
 @dataclass(slots=True)
 class InterventionConfig:
     """Container for intervention parameters with default values."""
@@ -130,11 +126,6 @@ class InterventionConfig:
     method_mix_base: Optional[np.ndarray] = None
     switch: Optional[dict] = None
     new_method: Optional[NewMethodConfig] = None
-
-
-# ==========================================
-# Utility Functions
-# ==========================================
 
 def load_config(source: Union[str, Path, dict]) -> dict:
     """Load configuration from dict or JSON file."""
@@ -148,7 +139,6 @@ def load_config(source: Union[str, Path, dict]) -> dict:
     
     return json.loads(path.read_text())
 
-
 @contextmanager
 def _print_if(condition: bool, message: str):
     """Context manager for conditional printing."""
@@ -158,7 +148,6 @@ def _print_if(condition: bool, message: str):
             print(message)
     except Exception:
         raise
-
 
 def validate_method_name(allow_new: bool = True):
     """
