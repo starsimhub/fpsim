@@ -1,6 +1,4 @@
 """
-User-friendly interface for modeling contraceptive method interventions.
-
 This module provides an easy-to-use interface for program teams to model
 contraceptive interventions without needing to understand the complex internal FPsim structure.
 
@@ -58,13 +56,11 @@ Quick Reference
 - 'othmod' = Other modern methods
 """
 
-from __future__ import annotations
-
 import json
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
-from functools import wraps, singledispatch
+from functools import wraps
 from operator import attrgetter
 from pathlib import Path
 from typing import Dict, Optional, Sequence, Union, TypedDict, List, Any
@@ -138,36 +134,17 @@ class InterventionConfig:
 # Utility Functions
 # ==========================================
 
-@singledispatch
-def load_config(source) -> dict:
-    """Load configuration from various sources."""
-    raise ValueError(f"Unsupported type: {type(source)}. Expected str, Path, or dict.")
-
-
-@load_config.register(str)
-def _(path: str) -> dict:
-    """Load from string path."""
-    return load_config(Path(path))
-
-
-@load_config.register(Path)
-def _(path: Path) -> dict:
-    """Load from Path object."""
-    if path.suffix == '.json':
-        return json.loads(path.read_text())
-    elif path.suffix in ('.yml', '.yaml'):
-        try:
-            import yaml
-        except ImportError as e:
-            raise ImportError('YAML support not available. Please install pyyaml to load YAML files.') from e
-        return yaml.safe_load(path.read_text())
-    raise ValueError(f'Unsupported file type: {path.suffix}. Expected .json, .yml, or .yaml')
-
-
-@load_config.register(dict)
-def _(data: dict) -> dict:
-    """Return copy of dictionary."""
-    return sc.dcp(data)
+def load_config(source: Union[str, Path, dict]) -> dict:
+    """Load configuration from dict or JSON file."""
+    if isinstance(source, dict):
+        return sc.dcp(source)
+    
+    path = Path(source) if isinstance(source, str) else source
+    
+    if path.suffix != '.json':
+        raise ValueError(f'Unsupported file type: {path.suffix}. Expected .json')
+    
+    return json.loads(path.read_text())
 
 
 @contextmanager
@@ -184,9 +161,7 @@ def _print_if(condition: bool, message: str):
 def validate_method_name(allow_new: bool = True):
     """
     Decorator to validate and normalize method names.
-    
-    Args:
-        allow_new: If True, allows method names not in the standard list
+    allow_new: If True, allows method names not in the standard list
     """
     def decorator(func):
         @wraps(func)
@@ -321,14 +296,6 @@ class MethodIntervention:
             # Method might be dynamically added, allow it but don't convert label
         return name
 
-    @staticmethod
-    def _load_file(path: str) -> dict:
-        """
-        Load configuration file (deprecated - use load_config instead).
-        
-        This method is kept for backward compatibility.
-        """
-        return load_config(path)
 
     def _convert_mix_value(self, value: float) -> float:
         val = float(value)
