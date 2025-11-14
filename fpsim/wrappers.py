@@ -1,3 +1,4 @@
+# region: Introduction
 """
 This module provides an easy-to-use interface for program teams to model
 contraceptive interventions without needing to understand the complex internal FPsim structure.
@@ -55,6 +56,7 @@ Quick Reference
 - 'othtrad' = Other traditional methods
 - 'othmod' = Other modern methods
 """
+# endregion: Introduction
 
 import json
 from contextlib import contextmanager
@@ -177,6 +179,7 @@ def validate_method_name(allow_new: bool = True):
 # ==========================================
 
 class MethodIntervention:
+    # region: docstring
     """
     Builder for creating contraceptive method interventions with a user-friendly API.
 
@@ -217,6 +220,7 @@ class MethodIntervention:
     - **Units**: Efficacy is 0-1 (e.g., 0.95 = 95%), Duration is in months (e.g., 24 = 2 years)
     - **Mix values**: Can provide as percentages (25) or fractions (0.25), both work
     """
+    # endregion: docstring
     
     __slots__ = ('year', 'label', '_config')
 
@@ -367,6 +371,7 @@ class MethodIntervention:
     # -----------------
     @validate_method_name(allow_new=True)
     def set_efficacy(self, method: str, efficacy: float, print_efficacy=False) -> 'MethodIntervention':
+        # region: docstring
         """
         Set the contraceptive efficacy (failure rate prevention) for a method.
         
@@ -404,6 +409,8 @@ class MethodIntervention:
         - Small changes (2-3%) can have meaningful impact on unintended pregnancies
         - Efficacy changes affect pregnancy outcomes but don't directly change method mix
         """
+        # endregion: documentation
+        
         val = float(efficacy)
         if not (0.0 <= val <= 1.0):
             raise ValueError(f'Efficacy for {method} must be between 0 and 1')
@@ -415,6 +422,7 @@ class MethodIntervention:
 
     @validate_method_name(allow_new=True)
     def set_duration_months(self, method: str, months: Union[int, float], print_duration=False) -> 'MethodIntervention':
+        # region: docstring
         """
         Set how long (in months) people typically stay on a contraceptive method.
         
@@ -472,6 +480,8 @@ class MethodIntervention:
         Use `capture_method_mix_from_sim()` or check your location's calibration parameters
         to understand current duration distributions before setting intervention targets.
         """
+        # endregion: documentation
+        
         mval = float(months)
         if mval <= 0:
             raise ValueError(f'Duration (months) for {method} must be positive')
@@ -482,6 +492,7 @@ class MethodIntervention:
         return self
 
     def set_probability_of_use(self, p_use: float, print_p_use=False) -> 'MethodIntervention':
+        # region: docstring
         """
         Set the overall probability that eligible people use ANY contraceptive method.
         
@@ -521,6 +532,8 @@ class MethodIntervention:
         - For method-specific interventions, use set_duration_months or set_method_mix instead
         - Note: May not work with all FPsim choice modules (the model will warn you)
         """
+        # endregion: docstring
+        
         p = float(p_use)
         if not (0.0 <= p <= 1.0):
             raise ValueError('Probability of use must be between 0 and 1')
@@ -532,6 +545,7 @@ class MethodIntervention:
 
     @validate_method_name(allow_new=True)
     def set_method_mix(self, method: str, value: float, baseline_sim=None, print_method_mix=False) -> 'MethodIntervention':
+        # region: docstring
         """
         Set the target share/percentage for a specific contraceptive method.
         
@@ -596,6 +610,8 @@ class MethodIntervention:
         - Use percentages (25) or decimals (0.25), both work
         - Method mix changes model demand-side shifts, not supply constraints
         """
+        # endregion: docstring
+        
         # Auto-capture baseline if provided and not already set
         if baseline_sim is not None and self._config.method_mix_base is None:
             self.capture_method_mix_from_sim(baseline_sim)
@@ -627,6 +643,7 @@ class MethodIntervention:
         return self
 
     def capture_method_mix_from_sim(self, sim, print_method_mix=False) -> 'MethodIntervention':
+        # region: docstring
         """
         Capture the current method mix from a simulation to use as your baseline.
         
@@ -667,6 +684,8 @@ class MethodIntervention:
         - Use the same sim parameters for both baseline and intervention sims
         - The baseline sim can be discarded after capturing (you don't need to run it)
         """
+        # endregion: docstring
+        
         cm = sim.connectors.contraception
         mix = cm.pars.get('method_mix')
         if mix is None:
@@ -682,6 +701,7 @@ class MethodIntervention:
         return self
 
     def scale_switching_matrix(self, sim, target_method: str, scale_factor: float) -> 'MethodIntervention':
+        # region: docstring
         """
         Modify the probability that people switch TO a specific method from other methods.
         
@@ -749,6 +769,8 @@ class MethodIntervention:
         - Scale factors between 1.1-1.5 (10-50% increase) are typical for programmatic changes
         - The sim must be initialized first: sim.init()
         """
+        # endregion: docstring
+        
         # Normalize the method name
         target_name = self._normalize_name(target_method)
         
@@ -812,6 +834,7 @@ class MethodIntervention:
 
     def add_method(self, method, copy_from_row: str, copy_from_col: str,
                    initial_share: float = 0.1, renormalize: bool = True) -> 'MethodIntervention':
+        # region: docstring
         """
         Add a new contraceptive method to the simulation.
         
@@ -933,6 +956,8 @@ class MethodIntervention:
         - You can combine add_method with other modifications (efficacy, duration, etc.)
         - The method becomes available simulation-wide starting in the intervention year
         """
+        # endregion: docstring
+        
         # Import here to avoid circular dependency
         from . import methods as fpm
         
@@ -965,6 +990,7 @@ class MethodIntervention:
     # Introspection
     # -----------------
     def preview(self) -> PreviewDict:
+        # region: docstring
         """
         Preview the intervention configuration before building it.
         
@@ -1005,6 +1031,8 @@ class MethodIntervention:
         - Check that method names are correct and values make sense
         - None means that parameter wasn't modified (uses baseline values)
         """
+        # endregion: docstring
+        
         summary: PreviewDict = {
             'year': self.year,
             'efficacy': sc.dcp(self._config.eff) or None,
@@ -1038,6 +1066,7 @@ class MethodIntervention:
     # Build
     # -----------------
     def build(self):
+        # region: docstring
         """
         Build the intervention and return it ready to use in a simulation.
         
@@ -1070,6 +1099,8 @@ class MethodIntervention:
         - You can pass multiple interventions as a list: fp.Sim(interventions=[intv1, intv2])
         - Use preview() before build() to check your configuration
         """
+        # endregion: docstring
+        
         # Convert method names to standard labels for the intervention
         # For dynamically added methods, use the method name as-is
         if self._config.eff:
@@ -1114,7 +1145,9 @@ def make_update_methods(
     baseline_sim=None,
     switch: Optional[Union[dict, str]] = None,
     label: Optional[str] = None,
-):
+    ):
+    
+    # region: docstring
     """
     Functional shortcut to build an update_methods intervention for a single method.
     
@@ -1161,6 +1194,8 @@ def make_update_methods(
     ...     baseline_sim=baseline_sim
     ... )
     """
+    # endregion: docstring
+    
     builder = MethodIntervention(year=year, label=label)
     
     # Handle baseline - explicit array or auto-capture from sim
