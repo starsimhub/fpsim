@@ -652,13 +652,224 @@ class ContraceptiveChoice(ss.Connector):
         
         return
 
-    def remove_method(self, method_label):
-        errormsg = ('remove_method is not currently functional. See example in test_parameters.py if you want to run a '
-                    'simulation with a subset of the standard set of methods. The remove_method logic needs to be'
-                    'replaced with something that can remove a method partway through a simulation.')
-        raise ValueError(errormsg)
-        # method = self.get_method_by_label(method_label)
-        # del self.methods[method.name]
+    def remove_method(self, method_label, reassign_to='none'):
+        """
+        Remove a contraceptive method from the simulation.
+        
+        This allows removing methods during a simulation (e.g., when a product
+        is discontinued or becomes unavailable). The switching matrix is adjusted
+        by removing the method's row and column, and users currently on that method
+        are reassigned to another method.
+        
+        Args:
+            method_label (str): Label or name of the method to remove
+            reassign_to (str): Method to reassign current users to (default: 'none')
+            
+        Example:
+            # Remove a method from the simulation
+            sim.connectors.contraception.remove_method('Implants', reassign_to='Injectables')
+        """
+        # Get the method to remove
+        method = self.get_method_by_label(method_label)
+        if method is None:
+            raise ValueError(f"Method '{method_label}' not found")
+        
+        # Don't allow removing 'none' method
+        if method.name == 'none':
+            raise ValueError("Cannot remove the 'none' method")
+        
+        # Store the index and name before removal for matrix adjustments
+        removed_idx = method.idx
+        removed_name = method.name
+        
+        # Reassign people currently using this method
+        if hasattr(self, 'sim') and self.sim is not None:
+            ppl = self.sim.people
+            currently_using = ppl.fp.method == removed_idx
+            
+            if currently_using.any():
+                # Get the reassignment method
+                reassign_method = self.get_method_by_label(reassign_to)
+                if reassign_method is None:
+                    raise ValueError(f"Reassignment method '{reassign_to}' not found")
+                
+                # Reassign users
+                ppl.fp.method[currently_using] = reassign_method.idx
+                
+                # If reassigning to 'none', turn off contraception
+                if reassign_method.name == 'none':
+                    ppl.fp.on_contra[currently_using] = False
+        
+        # Remove method from the methods dict
+        del self.methods[method.name]
+        
+        # Update counters
+        self.n_options = len(self.methods)
+        self.n_methods = len([m for m in self.methods if m != 'none'])
+        
+        # Re-index remaining methods (shift indices down for methods after removed one)
+        for mname, m in self.methods.items():
+            if m.idx > removed_idx:
+                m.idx -= 1
+        
+        # Adjust method indices in people's state
+        if hasattr(self, 'sim') and self.sim is not None:
+            ppl = self.sim.people
+            # Shift down all method indices greater than removed_idx
+            higher_indices = ppl.fp.method > removed_idx
+            ppl.fp.method[higher_indices] -= 1
+        
+        # Handle switching matrix contraction if method_choice_pars exists
+        if hasattr(self, 'pars') and self.pars.method_choice_pars is not None:
+            self._contract_switching_matrix(removed_idx, removed_name)
+        
+        # Update method mix if it exists
+        if hasattr(self, 'pars') and hasattr(self.pars, 'method_mix'):
+            # Remove the entry for this method and renormalize
+            if removed_idx < len(self.pars.method_mix):
+                # For method_mix, we need to handle the fact that 'none' is not included
+                # Method indices are 0-based, but method_mix excludes 'none' (idx 0)
+                mix_idx = removed_idx - 1 if removed_idx > 0 else None
+                if mix_idx is not None and mix_idx >= 0 and mix_idx < len(self.pars.method_mix):
+                    self.pars.method_mix = np.delete(self.pars.method_mix, mix_idx)
+                    # Renormalize
+                    mix_sum = self.pars.method_mix.sum()
+                    if mix_sum > 0:
+                        self.pars.method_mix = self.pars.method_mix / mix_sum
+        
+        # Update method_weights if it exists
+        if hasattr(self, 'pars') and hasattr(self.pars, 'method_weights'):
+            if removed_idx < len(self.pars.method_weights):
+                mix_idx = removed_idx - 1 if removed_idx > 0 else None
+                if mix_idx is not None and mix_idx >= 0 and mix_idx < len(self.pars.method_weights):
+                    self.pars.method_weights = np.delete(self.pars.method_weights, mix_idx)
+        
+        # Resize method_mix array in FPmod if it exists
+        if hasattr(self, 'sim') and hasattr(self.sim, 'connectors'):
+            try:
+                fp_mod = self.sim.connectors['fp']
+                if hasattr(fp_mod, 'method_mix'):
+                    old_shape = fp_mod.method_mix.shape
+                    new_shape = (self.n_options, old_shape[1])
+                    if new_shape[0] < old_shape[0]:
+                        # Create new smaller array and copy data
+                        new_method_mix = np.zeros(new_shape)
+                        # Copy rows before removed index
+                        new_method_mix[:removed_idx, :] = fp_mod.method_mix[:removed_idx, :]
+                        # Copy rows after removed index (shifted down)
+                        if removed_idx < old_shape[0] - 1:
+                            new_method_mix[removed_idx:, :] = fp_mod.method_mix[removed_idx+1:, :]
+                        fp_mod.method_mix = new_method_mix
+            except (AttributeError, KeyError):
+                pass
+        
+        return
+    
+    def _contract_switching_matrix(self, removed_idx, removed_name):
+        """
+        Contract the switching matrix to remove a method.
+        
+        This is an internal helper for remove_method() that handles the complex
+        logic of contracting nested switching matrix structures.
+        
+        Args:
+            removed_idx: The index of the method being removed
+            removed_name: The name of the method being removed
+        """
+        mcp = self.pars.method_choice_pars
+        
+        # Update each age bin/event in the switching structure
+        for event_idx, event_data in mcp.items():
+            if not isinstance(event_data, dict):
+                continue
+            
+            # Update method_idx list if present
+            if 'method_idx' in event_data:
+                method_idx_list = list(event_data['method_idx'])
+                if removed_idx in method_idx_list:
+                    idx_pos = method_idx_list.index(removed_idx)
+                    method_idx_list.pop(idx_pos)
+                    # Shift down indices greater than removed_idx
+                    method_idx_list = [idx - 1 if idx > removed_idx else idx for idx in method_idx_list]
+                    event_data['method_idx'] = method_idx_list
+            
+            # Iterate through age bins
+            for age_key, age_data in event_data.items():
+                if age_key == 'method_idx':
+                    continue
+                
+                # Handle case where age_data is a numpy array directly (Event 1 structure)
+                if isinstance(age_data, np.ndarray):
+                    # Remove the probability for the removed method
+                    if removed_idx < len(age_data):
+                        new_probs = np.delete(age_data, removed_idx)
+                        # Renormalize
+                        if new_probs.sum() > 0:
+                            new_probs = new_probs / new_probs.sum()
+                        event_data[age_key] = new_probs
+                    continue
+                
+                if not isinstance(age_data, dict):
+                    continue
+                
+                # For postpartum events (pp1), structure is different
+                if 'probs' in age_data and 'method_idx' in age_data:
+                    method_idx_list = list(age_data['method_idx'])
+                    if removed_idx in method_idx_list:
+                        idx_pos = method_idx_list.index(removed_idx)
+                        probs = np.array(age_data['probs'])
+                        
+                        # Remove the probability at that position
+                        new_probs = np.delete(probs, idx_pos)
+                        # Renormalize
+                        if new_probs.sum() > 0:
+                            new_probs = new_probs / new_probs.sum()
+                        
+                        age_data['probs'] = new_probs.tolist()
+                        method_idx_list.pop(idx_pos)
+                        # Shift down indices
+                        method_idx_list = [idx - 1 if idx > removed_idx else idx for idx in method_idx_list]
+                        age_data['method_idx'] = method_idx_list
+                
+                # For regular switching structure - need to remove the method as an origin
+                # Use the removed_name parameter instead of searching for it
+                if removed_name in age_data:
+                    del age_data[removed_name]
+                
+                # Now update remaining methods to remove probability of switching TO removed method
+                for origin_method_name, origin_data in age_data.items():
+                    # Handle numpy array structure (direct probabilities)
+                    if isinstance(origin_data, np.ndarray):
+                        if removed_idx < len(origin_data):
+                            new_probs = np.delete(origin_data, removed_idx)
+                            # Renormalize
+                            if new_probs.sum() > 0:
+                                new_probs = new_probs / new_probs.sum()
+                            age_data[origin_method_name] = new_probs
+                    
+                    # Handle dictionary structure
+                    elif isinstance(origin_data, dict):
+                        if 'probs' not in origin_data or 'method_idx' not in origin_data:
+                            continue
+                        
+                        method_idx_list = list(origin_data['method_idx'])
+                        if removed_idx in method_idx_list:
+                            idx_pos = method_idx_list.index(removed_idx)
+                            probs = np.array(origin_data['probs'])
+                            
+                            # Remove probability at that position
+                            new_probs = np.delete(probs, idx_pos)
+                            # Renormalize
+                            if new_probs.sum() > 0:
+                                new_probs = new_probs / new_probs.sum()
+                            
+                            origin_data['probs'] = new_probs.tolist()
+                            method_idx_list.pop(idx_pos)
+                            # Shift down indices
+                            method_idx_list = [idx - 1 if idx > removed_idx else idx for idx in method_idx_list]
+                            origin_data['method_idx'] = method_idx_list
+        
+        return
 
     def get_prob_use(self, uids, event=None):
         pass

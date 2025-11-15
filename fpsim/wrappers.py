@@ -114,6 +114,7 @@ class PreviewDict(TypedDict, total=False):
     method_mix: Optional[Dict[str, float]]
     switching_matrix: Optional[str]
     new_method: Optional[Dict[str, Any]]
+    remove_method: Optional[Dict[str, str]]
     label: Optional[str]
 
 @dataclass(slots=True)
@@ -126,6 +127,7 @@ class InterventionConfig:
     method_mix_base: Optional[np.ndarray] = None
     switch: Optional[dict] = None
     new_method: Optional[NewMethodConfig] = None
+    remove_method: Optional[dict] = None
 
 def load_config(source: Union[str, Path, dict]) -> dict:
     """Load configuration from dict or JSON file."""
@@ -268,6 +270,11 @@ class MethodIntervention:
     def has_new_method(self) -> bool:
         """Check if a new method is being added."""
         return self._config.new_method is not None
+    
+    @property
+    def has_remove_method(self) -> bool:
+        """Check if a method is being removed."""
+        return self._config.remove_method is not None
     
     # -----------------
     # Helper utilities
@@ -974,6 +981,99 @@ class MethodIntervention:
         )
 
         return self
+    
+    def remove_method(self, method: str, reassign_to: str = 'none') -> 'MethodIntervention':
+        # region: docstring
+        """
+        Remove a contraceptive method from the simulation.
+        
+        **What this models:** Discontinuation of a contraceptive method that becomes unavailable.
+        This could result from:
+        - Product discontinuation by manufacturer
+        - Supply chain disruption making method unavailable
+        - Policy changes restricting certain methods
+        - Clinical concerns leading to method withdrawal
+        
+        When a method is removed, users currently on that method are automatically reassigned
+        to another method you specify. The switching matrix is adjusted to remove all
+        transitions involving the discontinued method.
+        
+        Parameters
+        ----------
+        method : str
+            Method name to remove: 'pill', 'inj', 'impl', 'iud', 'cond', etc.
+        reassign_to : str, default='none'
+            Method to reassign current users to. Options:
+            - 'none': Users stop using contraception
+            - Any other method name: Users switch to that method
+            Examples: 'Injectables', 'IUDs', 'Pill'
+            
+        Returns
+        -------
+        self : MethodIntervention
+            Returns self for method chaining
+            
+        Examples
+        --------
+        >>> # Example 1: Remove implants due to supply disruption, reassign to injectables
+        >>> mod = MethodIntervention(year=2024, label='Implant Discontinuation')
+        >>> mod.remove_method('impl', reassign_to='inj')
+        >>> 
+        >>> intv = mod.build()
+        >>> sim = fp.Sim(pars=pars, interventions=intv)
+        >>> sim.run()
+        
+        >>> # Example 2: Remove a specific brand/method, users stop contraception
+        >>> mod = MethodIntervention(year=2025)
+        >>> mod.remove_method('othmod', reassign_to='none')
+        
+        >>> # Example 3: Model policy change removing certain methods
+        >>> # First remove the restricted method
+        >>> mod = MethodIntervention(year=2023, label='Method Restriction')
+        >>> mod.remove_method('wdraw', reassign_to='cond')  # Traditional -> modern
+        
+        How This Works
+        --------------
+        When you remove a method:
+        1. All users currently on that method are immediately reassigned
+        2. The method is removed from the available methods list
+        3. The switching matrix is contracted (rows and columns removed)
+        4. Method mix probabilities are renormalized
+        5. The method is no longer available for new initiators
+        
+        Reassignment Options
+        --------------------
+        Choose reassign_to based on program reality:
+        - **Similar method**: 'inj' → 'impl' (both injectables/LARCs)
+        - **Program alternative**: 'impl' → 'iud' (switching to available LARC)
+        - **Discontinuation**: reassign_to='none' (users become non-users)
+        
+        Notes 
+        --------------------
+        - Cannot remove the 'none' method (non-use state)
+        - Reassignment happens instantly at the intervention year
+        - Consider combining with other interventions to model transition programs:
+          e.g., remove one method + increase duration on alternative method
+        - The removed method cannot be re-added (would need separate add_method call)
+        - Method labels must match exactly (case-sensitive)
+        """
+        # endregion: docstring
+        
+        # Normalize method name
+        normalized_method = self._normalize_name(method, allow_new=False)
+        normalized_reassign = self._normalize_name(reassign_to, allow_new=False)
+        
+        # Convert to label format for intervention (if standard method)
+        method_label = self._name_to_label.get(normalized_method, normalized_method)
+        reassign_label = self._name_to_label.get(normalized_reassign, normalized_reassign)
+        
+        # Store the removal configuration
+        self._config.remove_method = {
+            'method_label': method_label,
+            'reassign_to': reassign_label
+        }
+        
+        return self
 
     # -----------------
     # Introspection
@@ -1047,6 +1147,7 @@ class MethodIntervention:
                     'initial_share': self._config.new_method.initial_share,
                 }
             ),
+            'remove_method': self._config.remove_method,
             'label': self.label,
         }
         return summary
@@ -1112,6 +1213,7 @@ class MethodIntervention:
             method_mix=self._build_method_mix_array(),
             method_choice_pars=self._config.switch,
             new_method=self._config.new_method,
+            remove_method=self._config.remove_method,
         )
         # Drop None values to keep payload clean
         kwargs = {k: v for k, v in kwargs.items() if v is not None}

@@ -10,6 +10,7 @@ same core simulation parameters for comparison:
     2. Method mix and duration update - LARC promotion program
     3. Efficacy and continuation changes - comprehensive injectable program
     4. Switching matrix scaling - improving method switching patterns
+    5. Method removal - removing a contraceptive method from the simulation
 
 All examples use Kenya location with StandardChoice module (the default). 
 They demonstrate interventions that work with all contraception modules.
@@ -35,11 +36,14 @@ import numpy as np
 import sciris as sc
 
 import fpsim as fp
-from plots import plot_comparison_full, plot_method_bincount, plot_method_mix_simple, plot_pregnancies_per_year
+from plots import (plot_comparison_full, plot_method_bincount, plot_method_mix_simple, 
+                   plot_pregnancies_per_year, plot_method_removal_impact, 
+                   plot_method_redistribution, plot_removed_method_timeline, 
+                   create_removal_summary_figure)
 
 location = 'senegal'
-usecases = [0, 1]
-plot_compare = [[0,1]]
+usecases = [0, 5]
+plot_compare = [[0,5]]
 print('*'*40)
 baseline_sim = None
 
@@ -219,6 +223,35 @@ def run_with_switching_matrix_scaling(
 
 # REGION: Switching matrix scaling
 
+# region: 5. Method removal
+def run_with_method_removal(
+    year_apply=2007.0,
+    label='run_with_method_removal',
+):
+    """
+    Demonstrate `remove_method` to discontinue a contraceptive method.
+    
+    This example shows removing withdrawal ('wdraw') from available methods,
+    simulating a policy shift away from traditional methods toward modern ones.
+    Users of the removed method will switch to other available methods based
+    on the switching matrix.
+    """
+    pars = _default_pars()
+    
+    mod = fp.MethodIntervention(year=year_apply, label=label)
+    mod.remove_method('wdraw')  # Remove withdrawal method
+    
+    print(f'\nPreview of configured payload ({label}):')
+    sc.pp(mod.preview())
+    
+    intv = mod.build()
+    sim = fp.Sim(pars=pars, interventions=intv, label=label)
+    sim.run()
+    _print_key_results(sim, label)
+    return sim
+
+# endregion: Method removal
+
 # region: MAIN FUNCTION
 if __name__ == '__main__':
 
@@ -229,6 +262,7 @@ if __name__ == '__main__':
         2: ('Method Mix and Duration Update', run_with_method_mix_adjustment),
         3: ('Efficacy and Duration Changes', run_with_efficacy_and_duration_changes),
         4: ('Switching Matrix Scaling', run_with_switching_matrix_scaling),
+        5: ('Method Removal', run_with_method_removal),
     }
     
     # Parse which cases to run from command line
@@ -255,5 +289,31 @@ if __name__ == '__main__':
         plot_comparison_full(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_comparison_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
         plot_method_bincount(sims[plot_pair[0]], sims[plot_pair[1]], title=title, filename=f"{location}_plot_method_bincount_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
         plot_pregnancies_per_year(sims[plot_pair[0]], sims[plot_pair[1]], filename=f"{location}_plot_pregnancies_per_year_{plot_pair[0]}_{plot_pair[1]}.png", save_figure=True)
+        
+        # If comparing with method removal (case 5), generate specialized removal plots
+        if 5 in plot_pair:
+            baseline_idx = 0 if plot_pair[0] == 0 else 1
+            removal_idx = 0 if plot_pair[0] == 5 else 1
+            baseline_sim = sims[plot_pair[baseline_idx]]
+            removal_sim = sims[plot_pair[removal_idx]]
+            
+            # Get simulation parameters
+            start_year = baseline_sim.pars.get('start_year', 2000)
+            end_year = baseline_sim.pars.get('end_year', 2015)
+            removal_year = 2007.0  # Default intervention year from run_with_method_removal
+            
+            print(f"\nGenerating specialized method removal plots...")
+            plot_method_removal_impact(baseline_sim, removal_sim, start_year, end_year, 
+                                      removal_year, location, 
+                                      save_path=f'figures/{location}_removal_impact.png')
+            plot_method_redistribution(baseline_sim, removal_sim, removal_year, location,
+                                      save_path=f'figures/{location}_removal_redistribution.png')
+            plot_removed_method_timeline(baseline_sim, removal_sim, start_year, end_year,
+                                        removal_year, location,
+                                        save_path=f'figures/{location}_removal_timeline.png')
+            create_removal_summary_figure(baseline_sim, removal_sim, start_year, end_year,
+                                         removal_year, location,
+                                         save_path=f'figures/{location}_removal_summary.png')
+            print(f"✓ Specialized removal plots saved to figures/")
         
 #endregion: MAIN FUNCTION

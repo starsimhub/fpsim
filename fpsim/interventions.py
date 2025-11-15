@@ -252,10 +252,16 @@ class update_methods(ss.Intervention):
         new_method (dict | fpsim.methods.NewMethodConfig): Configuration for dynamically adding a new method.
             If a dict is provided, it must contain the fields required to construct
             :class:`fpsim.methods.NewMethodConfig`.
+        
+        remove_method (dict): Configuration for removing a method.
+            Must contain:
+                - 'method_label': The label or name of the method to remove
+                - 'reassign_to': (optional) The method to reassign current users to (default: 'none')
+            Example: {'method_label': 'Implants', 'reassign_to': 'Injectables'}
 
     """
 
-    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, new_method=None, verbose=False, **kwargs):
+    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, new_method=None, remove_method=None, verbose=False, **kwargs):
         super().__init__(**kwargs)
 
         if new_method is not None and not isinstance(new_method, fpm.NewMethodConfig):
@@ -271,6 +277,7 @@ class update_methods(ss.Intervention):
             method_mix=method_mix,
             method_choice_pars=method_choice_pars,
             new_method=new_method,
+            remove_method=remove_method,
             verbose=verbose
         )
 
@@ -300,8 +307,8 @@ class update_methods(ss.Intervention):
         if self.pars.year is None:
             errormsg = 'A year must be supplied'
             raise ValueError(errormsg)
-        if self.pars.eff is None and self.pars.dur_use is None and self.pars.p_use is None and self.pars.method_mix is None and self.pars.method_choice_pars is None and self.pars.new_method is None:
-            errormsg = 'Either efficacy, durations of use, probability of use, method mix, or new method must be supplied'
+        if self.pars.eff is None and self.pars.dur_use is None and self.pars.p_use is None and self.pars.method_mix is None and self.pars.method_choice_pars is None and self.pars.new_method is None and self.pars.remove_method is None:
+            errormsg = 'Either efficacy, durations of use, probability of use, method mix, new method, or remove method must be supplied'
             raise ValueError(errormsg)
         return
 
@@ -320,6 +327,16 @@ class update_methods(ss.Intervention):
                 cm.add_new_method(self.pars.new_method)
                 if self.pars.verbose:
                     print(f'Added new contraceptive method "{self.pars.new_method.method.name}" in year {sim.t.year}')
+            
+            # Remove method if specified (do this before other changes that might reference removed method)
+            if self.pars.remove_method is not None:
+                method_label = self.pars.remove_method.get('method_label')
+                reassign_to = self.pars.remove_method.get('reassign_to', 'none')
+                if method_label is None:
+                    raise ValueError('remove_method must contain "method_label"')
+                cm.remove_method(method_label=method_label, reassign_to=reassign_to)
+                if self.pars.verbose:
+                    print(f'Removed contraceptive method "{method_label}" in year {sim.t.year}, reassigned users to "{reassign_to}"')
 
             # Implement efficacy
             if self.pars.eff is not None:

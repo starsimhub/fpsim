@@ -16,7 +16,9 @@ __all__ = ['plot_method_mix_simple', 'plot_comparison_full', 'plot_method_bincou
            'plot_method_mix_by_type_per_year', 'iterable_plots', 'plot_pregnancies_per_year',
            'plot_injectable_methods_comparison', 'plot_method_mix_evolution', 'plot_new_method_adoption',
            'plot_method_comparison_bar', 'plot_cpr_comparison', 'plot_births_comparison', 'create_summary_figure',
-           'print_summary_statistics', 'generate_figure_prefix']
+           'print_summary_statistics', 'generate_figure_prefix',
+           'plot_method_removal_impact', 'plot_method_redistribution', 'plot_removed_method_timeline',
+           'create_removal_summary_figure']
 
 # region: Helper functions for plotting and data extraction
 def _get_results_dir():
@@ -1907,3 +1909,561 @@ def print_summary_statistics(baseline_sim, intervention_sim, start_year, end_yea
             print(f"{method.label + ' number of users':<30} {n_users:>10,}")
 
 # endregion: PLOTTING FUNCTIONS FOR NEW METHOD
+
+# region: PLOTTING FUNCTIONS FOR METHOD REMOVAL
+
+def _get_removed_method_names(baseline_sim, intervention_sim):
+    """
+    Identify methods that were removed (present in baseline but not in intervention).
+    
+    Parameters:
+    -----------
+    baseline_sim : fp.Sim
+        Baseline simulation with all methods
+    intervention_sim : fp.Sim
+        Intervention simulation with method(s) removed
+        
+    Returns:
+    --------
+    list
+        List of removed method labels
+    """
+    baseline_methods = set(baseline_sim.connectors.contraception.methods.keys())
+    intervention_methods = set(intervention_sim.connectors.contraception.methods.keys())
+    
+    removed_method_names = baseline_methods - intervention_methods
+    
+    # Get labels for removed methods
+    removed_labels = []
+    for name in removed_method_names:
+        method = baseline_sim.connectors.contraception.methods[name]
+        removed_labels.append(method.label)
+    
+    return removed_labels
+
+
+def plot_method_removal_impact(baseline_sim, intervention_sim, start_year, end_year, 
+                                removal_year, location, save_path='remove_method_impact.png'):
+    """
+    Plot the impact of removing a contraceptive method over time.
+    
+    Shows how the removed method's usage drops to zero and how overall
+    contraceptive prevalence is affected.
+    
+    Parameters:
+    -----------
+    baseline_sim : fp.Sim
+        Baseline simulation (with all methods)
+    intervention_sim : fp.Sim
+        Intervention simulation (with method removed)
+    start_year, end_year : float
+        Year range for plotting
+    removal_year : float
+        Year when method was removed
+    location : str
+        Location name for title
+    save_path : str or Path
+        Where to save the figure
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Get years
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
+    
+    # Identify removed methods
+    removed_labels = _get_removed_method_names(baseline_sim, intervention_sim)
+    removed_str = ', '.join(removed_labels) if removed_labels else 'Method'
+    
+    # Get method mix data
+    baseline_fp = baseline_sim.connectors['fp']
+    intervention_fp = intervention_sim.connectors['fp']
+    baseline_mix = baseline_fp.method_mix
+    interv_mix = intervention_fp.method_mix
+    
+    baseline_methods = baseline_sim.connectors.contraception.methods
+    interv_methods = intervention_sim.connectors.contraception.methods
+    
+    # Left panel: Removed method usage over time
+    for label in removed_labels:
+        # Find method in baseline
+        for name, method in baseline_methods.items():
+            if method.label == label:
+                idx = method.idx
+                ax1.plot(years, baseline_mix[idx, :] * 100, 
+                        label=f'{label} (Baseline)', linewidth=2.5, 
+                        color='crimson', alpha=0.8)
+                ax1.fill_between(years, 0, baseline_mix[idx, :] * 100,
+                                alpha=0.3, color='crimson')
+                break
+    
+    ax1.axvline(removal_year, color='red', linestyle='--', linewidth=2, 
+               label='Removal Point', alpha=0.7)
+    ax1.axhline(0, color='black', linestyle='-', linewidth=0.5, alpha=0.5)
+    
+    ax1.set_xlabel('Year', fontsize=12)
+    ax1.set_ylabel('Percentage of Users (%)', fontsize=12)
+    ax1.set_title(f'{removed_str} Usage Before Removal', fontsize=13, fontweight='bold')
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
+    ax1.set_xlim([start_year, end_year])
+    
+    # Add annotation
+    ax1.text(0.98, 0.95, f'Method removed\nin {int(removal_year)}',
+            transform=ax1.transAxes, fontsize=11, fontweight='bold',
+            verticalalignment='top', horizontalalignment='right',
+            bbox=dict(boxstyle='round,pad=0.6', facecolor='lightyellow', 
+                     alpha=0.85, edgecolor='red', linewidth=2))
+    
+    # Right panel: Overall CPR comparison
+    baseline_cpr = baseline_sim.results.contraception.cpr * 100
+    intervention_cpr = intervention_sim.results.contraception.cpr * 100
+    
+    ax2.plot(years, baseline_cpr, label='Baseline (with all methods)', 
+            color=COLORS['baseline'], linewidth=2.5)
+    ax2.plot(years, intervention_cpr, label=f'After Removing {removed_str}', 
+            color=COLORS['intervention'], linewidth=2.5)
+    ax2.axvline(removal_year, color='red', linestyle='--', linewidth=2, alpha=0.7)
+    
+    # Calculate CPR change
+    final_cpr_change = intervention_cpr[-1] - baseline_cpr[-1]
+    ax2.text(0.02, 0.95, f'Final CPR change:\n{final_cpr_change:+.2f} pp',
+            transform=ax2.transAxes, fontsize=11, fontweight='bold',
+            verticalalignment='top',
+            bbox=dict(boxstyle='round,pad=0.6', facecolor='wheat', alpha=0.85))
+    
+    ax2.set_xlabel('Year', fontsize=12)
+    ax2.set_ylabel('CPR (%)', fontsize=12)
+    ax2.set_title('Contraceptive Prevalence Rate', fontsize=13, fontweight='bold')
+    ax2.legend(fontsize=10)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_xlim([start_year, end_year])
+    
+    fig.suptitle(f'Impact of Removing {removed_str} in {location.title()}',
+                fontsize=15, fontweight='bold', y=0.98)
+    
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"Saved method removal impact plot to {save_path}")
+    return fig
+
+
+def plot_method_redistribution(baseline_sim, intervention_sim, removal_year, 
+                                location, save_path='remove_method_redistribution.png'):
+    """
+    Show how users of the removed method redistributed to other methods.
+    
+    Compares final method mix between baseline and intervention to see
+    which methods gained users after the removal.
+    
+    Parameters:
+    -----------
+    baseline_sim : fp.Sim
+        Baseline simulation (with all methods)
+    intervention_sim : fp.Sim
+        Intervention simulation (with method removed)
+    removal_year : float
+        Year when method was removed
+    location : str
+        Location name for title
+    save_path : str or Path
+        Where to save the figure
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Identify removed methods
+    removed_labels = _get_removed_method_names(baseline_sim, intervention_sim)
+    removed_str = ', '.join(removed_labels) if removed_labels else 'Method'
+    
+    # Get final method usage for both sims
+    baseline_methods_data = {}
+    intervention_methods_data = {}
+    
+    # Baseline
+    ppl = baseline_sim.people
+    methods = baseline_sim.connectors.contraception.methods
+    for name, method in methods.items():
+        if name != 'none':
+            count = np.sum(ppl.fp.method == method.idx)
+            pct = (count / len(ppl)) * 100
+            baseline_methods_data[method.label] = {'count': count, 'pct': pct}
+    
+    # Intervention
+    ppl = intervention_sim.people
+    methods = intervention_sim.connectors.contraception.methods
+    for name, method in methods.items():
+        if name != 'none':
+            count = np.sum(ppl.fp.method == method.idx)
+            pct = (count / len(ppl)) * 100
+            intervention_methods_data[method.label] = {'count': count, 'pct': pct}
+    
+    # Calculate changes
+    method_changes = {}
+    all_methods = sorted(set(list(baseline_methods_data.keys()) + 
+                            list(intervention_methods_data.keys())))
+    
+    for method in all_methods:
+        if method not in removed_labels:  # Skip removed method
+            baseline_pct = baseline_methods_data.get(method, {'pct': 0})['pct']
+            interv_pct = intervention_methods_data.get(method, {'pct': 0})['pct']
+            change = interv_pct - baseline_pct
+            if abs(change) > 0.01:  # Only show meaningful changes
+                method_changes[method] = change
+    
+    # Left panel: Horizontal bar chart of changes
+    sorted_methods = sorted(method_changes.items(), key=lambda x: x[1], reverse=True)
+    labels = [m[0] for m in sorted_methods]
+    changes = [m[1] for m in sorted_methods]
+    
+    colors_bars = ['lightgreen' if c > 0 else 'lightcoral' for c in changes]
+    bars = ax1.barh(labels, changes, color=colors_bars, alpha=0.8, edgecolor='black', linewidth=1.5)
+    ax1.axvline(0, color='black', linewidth=1.5)
+    ax1.set_xlabel('Change in % of Population', fontsize=12)
+    ax1.set_title('Where Did Users Go?', fontsize=13, fontweight='bold')
+    ax1.grid(True, alpha=0.3, axis='x')
+    
+    # Add value labels
+    for i, (label, val) in enumerate(zip(labels, changes)):
+        ax1.text(val + (0.15 if val > 0 else -0.15), i, f'{val:+.2f}%', 
+                va='center', ha='left' if val > 0 else 'right', 
+                fontsize=9, fontweight='bold')
+    
+    # Add note about removed method
+    ax1.text(0.98, 0.02, f'{removed_str} removed',
+            transform=ax1.transAxes, fontsize=10, style='italic',
+            verticalalignment='bottom', horizontalalignment='right',
+            bbox=dict(boxstyle='round,pad=0.4', facecolor='lightyellow', alpha=0.8))
+    
+    # Right panel: Stacked bar comparison
+    # Show baseline vs intervention method mix
+    baseline_vals = [baseline_methods_data.get(m, {'pct': 0})['pct'] for m in all_methods 
+                     if m not in removed_labels]
+    interv_vals = [intervention_methods_data.get(m, {'pct': 0})['pct'] for m in all_methods 
+                   if m not in removed_labels]
+    method_labels = [m for m in all_methods if m not in removed_labels]
+    
+    x = np.arange(2)
+    width = 0.5
+    bottom_baseline = 0
+    bottom_interv = 0
+    
+    colors_list = plt.cm.tab20(np.linspace(0, 1, len(method_labels)))
+    
+    for idx, (method, baseline_val, interv_val) in enumerate(zip(method_labels, baseline_vals, interv_vals)):
+        ax2.bar(0, baseline_val, width, bottom=bottom_baseline, 
+               label=method if idx < 6 else '', color=colors_list[idx], 
+               alpha=0.8, edgecolor='black', linewidth=0.5)
+        ax2.bar(1, interv_val, width, bottom=bottom_interv, 
+               color=colors_list[idx], alpha=0.8, edgecolor='black', linewidth=0.5)
+        bottom_baseline += baseline_val
+        bottom_interv += interv_val
+    
+    ax2.set_ylabel('Percentage of Population (%)', fontsize=12)
+    ax2.set_title('Method Mix Comparison', fontsize=13, fontweight='bold')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(['Baseline\n(all methods)', f'After Removal\n(no {removed_str})'], 
+                        fontsize=11)
+    ax2.legend(fontsize=8, loc='upper left', ncol=1, bbox_to_anchor=(1, 1))
+    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.set_ylim([0, 100])
+    
+    fig.suptitle(f'User Redistribution After Removing {removed_str} in {location.title()}',
+                fontsize=15, fontweight='bold', y=0.98)
+    
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"Saved method redistribution plot to {save_path}")
+    return fig
+
+
+def plot_removed_method_timeline(baseline_sim, intervention_sim, start_year, end_year,
+                                 removal_year, location, save_path='remove_method_timeline.png'):
+    """
+    Timeline showing all methods over time, highlighting the removed method's disappearance.
+    
+    Parameters:
+    -----------
+    baseline_sim : fp.Sim
+        Baseline simulation (with all methods)
+    intervention_sim : fp.Sim
+        Intervention simulation (with method removed)
+    start_year, end_year : float
+        Year range for plotting
+    removal_year : float
+        Year when method was removed
+    location : str
+        Location name for title
+    save_path : str or Path
+        Where to save the figure
+    """
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
+    
+    # Get years
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
+    
+    # Identify removed methods
+    removed_labels = _get_removed_method_names(baseline_sim, intervention_sim)
+    removed_str = ', '.join(removed_labels) if removed_labels else 'Method'
+    
+    # Get method mix data
+    baseline_fp = baseline_sim.connectors['fp']
+    intervention_fp = intervention_sim.connectors['fp']
+    baseline_mix = baseline_fp.method_mix
+    interv_mix = intervention_fp.method_mix
+    
+    baseline_methods = baseline_sim.connectors.contraception.methods
+    interv_methods = intervention_sim.connectors.contraception.methods
+    
+    # Top panel: Baseline (all methods including the one to be removed)
+    baseline_labels = [m.label for m in baseline_methods.values() if m.name != 'none']
+    baseline_mix_users = baseline_mix[1:, :]  # Skip 'none'
+    
+    n_methods_baseline = len(baseline_labels)
+    colors_baseline = plt.cm.tab20(np.linspace(0, 1, n_methods_baseline))
+    
+    # Highlight removed method in special color
+    for idx, label in enumerate(baseline_labels):
+        if label in removed_labels:
+            colors_baseline[idx] = np.array([1, 0, 0, 0.8])  # Red for removed method
+    
+    ax1.stackplot(years, baseline_mix_users, labels=baseline_labels, 
+                 colors=colors_baseline, alpha=0.8)
+    ax1.axvline(removal_year, color='red', linestyle='--', linewidth=2.5, 
+               label=f'{removed_str} Removed', alpha=0.8)
+    
+    ax1.set_ylabel('Proportion of Users', fontsize=12)
+    ax1.set_title(f'Baseline: All Methods (including {removed_str})', 
+                 fontsize=13, fontweight='bold')
+    ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=9)
+    ax1.grid(True, alpha=0.3, axis='y')
+    ax1.set_ylim([0, 1])
+    
+    # Bottom panel: Intervention (without removed method)
+    interv_labels = [m.label for m in interv_methods.values() if m.name != 'none']
+    interv_mix_users = interv_mix[1:, :]  # Skip 'none'
+    
+    n_methods_interv = len(interv_labels)
+    colors_interv = plt.cm.tab20(np.linspace(0, 1, n_methods_interv))
+    
+    ax2.stackplot(years, interv_mix_users, labels=interv_labels, 
+                 colors=colors_interv, alpha=0.8)
+    ax2.axvline(removal_year, color='red', linestyle='--', linewidth=2.5, 
+               label='Removal Point', alpha=0.8)
+    
+    ax2.set_xlabel('Year', fontsize=12)
+    ax2.set_ylabel('Proportion of Users', fontsize=12)
+    ax2.set_title(f'After Removal: Remaining Methods (no {removed_str})', 
+                 fontsize=13, fontweight='bold')
+    ax2.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=9)
+    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.set_ylim([0, 1])
+    ax2.set_xlim([start_year, end_year])
+    
+    fig.suptitle(f'Method Mix Evolution: {removed_str} Removal in {location.title()}',
+                fontsize=15, fontweight='bold', y=0.995)
+    
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"Saved method timeline plot to {save_path}")
+    return fig
+
+
+def create_removal_summary_figure(baseline_sim, intervention_sim, start_year, end_year,
+                                  removal_year, location, save_path='remove_method_summary.png'):
+    """
+    Create a comprehensive summary figure for method removal analysis.
+    
+    Parameters:
+    -----------
+    baseline_sim : fp.Sim
+        Baseline simulation (with all methods)
+    intervention_sim : fp.Sim
+        Intervention simulation (with method removed)
+    start_year, end_year : float
+        Year range for plotting
+    removal_year : float
+        Year when method was removed
+    location : str
+        Location name for title
+    save_path : str or Path
+        Where to save the figure
+    """
+    fig = plt.figure(figsize=(16, 12))
+    gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.3)
+    
+    # Get years
+    years = np.linspace(start_year, end_year, len(baseline_sim.results.timevec))
+    
+    # Identify removed methods
+    removed_labels = _get_removed_method_names(baseline_sim, intervention_sim)
+    removed_str = ', '.join(removed_labels) if removed_labels else 'Method'
+    
+    # Get method data
+    baseline_fp = baseline_sim.connectors['fp']
+    intervention_fp = intervention_sim.connectors['fp']
+    baseline_mix = baseline_fp.method_mix
+    interv_mix = intervention_fp.method_mix
+    baseline_methods = baseline_sim.connectors.contraception.methods
+    interv_methods = intervention_sim.connectors.contraception.methods
+    
+    # 1. Removed Method Usage Over Time
+    ax1 = fig.add_subplot(gs[0, :])
+    for label in removed_labels:
+        for name, method in baseline_methods.items():
+            if method.label == label:
+                idx = method.idx
+                usage = baseline_mix[idx, :] * 100
+                ax1.plot(years, usage, label=f'{label} Usage', 
+                        linewidth=3, color='crimson')
+                ax1.fill_between(years, 0, usage, alpha=0.3, color='crimson')
+                
+                # Calculate users at removal year
+                removal_idx = int((removal_year - start_year) / (end_year - start_year) * len(years))
+                users_at_removal = usage[removal_idx]
+                break
+    
+    ax1.axvline(removal_year, color='red', linestyle='--', linewidth=2.5, 
+               label='Removal Point', alpha=0.8)
+    ax1.set_xlabel('Year', fontsize=11)
+    ax1.set_ylabel('Percentage of Users (%)', fontsize=11)
+    ax1.set_title(f'{removed_str} Usage Before Removal', fontsize=13, fontweight='bold')
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
+    
+    # Add annotation
+    ax1.text(0.5, 0.95, f'Method removed in {int(removal_year)} • {users_at_removal:.2f}% of users affected',
+            transform=ax1.transAxes, fontsize=12, fontweight='bold',
+            ha='center', va='top',
+            bbox=dict(boxstyle='round,pad=0.6', facecolor='lightyellow', 
+                     alpha=0.85, edgecolor='red', linewidth=2))
+    
+    # 2. CPR Comparison
+    ax2 = fig.add_subplot(gs[1, 0])
+    baseline_cpr = baseline_sim.results.contraception.cpr * 100
+    intervention_cpr = intervention_sim.results.contraception.cpr * 100
+    
+    ax2.plot(years, baseline_cpr, label='Baseline', 
+            color=COLORS['baseline'], linewidth=2.5)
+    ax2.plot(years, intervention_cpr, label='After Removal', 
+            color=COLORS['intervention'], linewidth=2.5)
+    ax2.axvline(removal_year, color='red', linestyle='--', linewidth=2, alpha=0.7)
+    
+    final_cpr_change = intervention_cpr[-1] - baseline_cpr[-1]
+    ax2.text(0.98, 0.05, f'CPR change:\n{final_cpr_change:+.2f} pp',
+            transform=ax2.transAxes, fontsize=10, fontweight='bold',
+            ha='right', va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.85))
+    
+    ax2.set_xlabel('Year', fontsize=11)
+    ax2.set_ylabel('CPR (%)', fontsize=11)
+    ax2.set_title('Contraceptive Prevalence Rate', fontsize=12, fontweight='bold')
+    ax2.legend(fontsize=10)
+    ax2.grid(True, alpha=0.3)
+    
+    # 3. mCPR Comparison
+    ax3 = fig.add_subplot(gs[1, 1])
+    baseline_mcpr = baseline_sim.results.contraception.mcpr * 100
+    intervention_mcpr = intervention_sim.results.contraception.mcpr * 100
+    
+    ax3.plot(years, baseline_mcpr, label='Baseline', 
+            color=COLORS['baseline'], linewidth=2.5)
+    ax3.plot(years, intervention_mcpr, label='After Removal', 
+            color=COLORS['intervention'], linewidth=2.5)
+    ax3.axvline(removal_year, color='red', linestyle='--', linewidth=2, alpha=0.7)
+    
+    final_mcpr_change = intervention_mcpr[-1] - baseline_mcpr[-1]
+    ax3.text(0.98, 0.05, f'mCPR change:\n{final_mcpr_change:+.2f} pp',
+            transform=ax3.transAxes, fontsize=10, fontweight='bold',
+            ha='right', va='bottom',
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.85))
+    
+    ax3.set_xlabel('Year', fontsize=11)
+    ax3.set_ylabel('mCPR (%)', fontsize=11)
+    ax3.set_title('Modern Contraceptive Prevalence', fontsize=12, fontweight='bold')
+    ax3.legend(fontsize=10)
+    ax3.grid(True, alpha=0.3)
+    
+    # 4. Method Redistribution
+    ax4 = fig.add_subplot(gs[2, 0])
+    
+    # Calculate changes in method usage
+    baseline_methods_data = {}
+    intervention_methods_data = {}
+    
+    ppl = baseline_sim.people
+    for name, method in baseline_methods.items():
+        if name != 'none':
+            count = np.sum(ppl.fp.method == method.idx)
+            pct = (count / len(ppl)) * 100
+            baseline_methods_data[method.label] = pct
+    
+    ppl = intervention_sim.people
+    for name, method in interv_methods.items():
+        if name != 'none':
+            count = np.sum(ppl.fp.method == method.idx)
+            pct = (count / len(ppl)) * 100
+            intervention_methods_data[method.label] = pct
+    
+    # Calculate changes (excluding removed method)
+    method_changes = {}
+    for label in baseline_methods_data.keys():
+        if label not in removed_labels:
+            baseline_pct = baseline_methods_data.get(label, 0)
+            interv_pct = intervention_methods_data.get(label, 0)
+            change = interv_pct - baseline_pct
+            if abs(change) > 0.01:
+                method_changes[label] = change
+    
+    sorted_methods = sorted(method_changes.items(), key=lambda x: x[1], reverse=True)
+    labels = [m[0] for m in sorted_methods]
+    changes = [m[1] for m in sorted_methods]
+    
+    colors_bars = ['lightgreen' if c > 0 else 'lightcoral' for c in changes]
+    bars = ax4.barh(labels, changes, color=colors_bars, alpha=0.8, 
+                   edgecolor='black', linewidth=1.5)
+    ax4.axvline(0, color='black', linewidth=1.5)
+    ax4.set_xlabel('Change in % of Population', fontsize=11)
+    ax4.set_title('Where Did Users Go?', fontsize=12, fontweight='bold')
+    ax4.grid(True, alpha=0.3, axis='x')
+    
+    # Add value labels
+    for i, (label, val) in enumerate(zip(labels, changes)):
+        ax4.text(val + (0.1 if val > 0 else -0.1), i, f'{val:+.2f}%', 
+                va='center', ha='left' if val > 0 else 'right', 
+                fontsize=9, fontweight='bold')
+    
+    # 5. Final Method Mix Comparison
+    ax5 = fig.add_subplot(gs[2, 1])
+    
+    # Get final counts for all methods (excluding 'none')
+    all_methods = sorted(set(list(baseline_methods_data.keys()) + 
+                            list(intervention_methods_data.keys())))
+    all_methods = [m for m in all_methods if m not in removed_labels]
+    
+    baseline_counts = [baseline_methods_data.get(m, 0) for m in all_methods]
+    intervention_counts = [intervention_methods_data.get(m, 0) for m in all_methods]
+    
+    x = np.arange(len(all_methods))
+    width = 0.35
+    
+    ax5.bar(x - width/2, baseline_counts, width, label='Baseline', 
+           color=COLORS['baseline'], alpha=0.8, edgecolor='black', linewidth=0.5)
+    ax5.bar(x + width/2, intervention_counts, width, label='After Removal', 
+           color=COLORS['intervention'], alpha=0.8, edgecolor='black', linewidth=0.5)
+    
+    ax5.set_xlabel('Contraceptive Method', fontsize=11)
+    ax5.set_ylabel('% of Population', fontsize=11)
+    ax5.set_title(f'Final Method Mix ({end_year})', fontsize=12, fontweight='bold')
+    ax5.set_xticks(x)
+    ax5.set_xticklabels(all_methods, rotation=45, ha='right', fontsize=9)
+    ax5.legend(fontsize=10)
+    ax5.grid(True, alpha=0.3, axis='y')
+    
+    # Overall title
+    fig.suptitle(f'Summary: Removing {removed_str} in {location.title()} ({start_year}-{end_year})',
+                fontsize=16, fontweight='bold', y=0.995)
+    
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"Saved removal summary figure to {save_path}")
+    return fig
+
+# endregion: PLOTTING FUNCTIONS FOR METHOD REMOVAL
