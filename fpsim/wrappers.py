@@ -184,17 +184,20 @@ class MethodIntervention:
     3. Build intervention: `intv = mod.build()`
     4. Run simulation: `sim = fp.Sim(pars=pars, interventions=intv)`
     
-    Real-world Examples
+    Real-world Examples:
     -------------------
     **Improving method quality:**
+
     >>> mod = MethodIntervention(year=2025)
     >>> mod.set_efficacy('pill', 0.95)  # Improve pill effectiveness to 95%
     
     **Better counseling increases continuation:**
+
     >>> mod = MethodIntervention(year=2025)
     >>> mod.set_duration_months('inj', 36)  # Set target duration to 36 months
     
     **Social marketing campaign shifts method mix:**
+    
     >>> mod = MethodIntervention(year=2025)
     >>> mod.capture_method_mix_from_sim(baseline_sim)
     >>> mod.set_method_mix('impl', 0.25)  # Target 25% of users choosing implants

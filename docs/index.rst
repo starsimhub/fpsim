@@ -13,6 +13,8 @@ Full contents
    :maxdepth: 3
 
    overview
+   wrappers_quickstart
+   wrappers_guide
    tutorials
    whatsnew
    api/index
