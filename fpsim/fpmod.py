@@ -90,22 +90,27 @@ class FPmod(ss.Pregnancy):
         all stored in defaults.py. Any other results with different formats can also be added here.
         """
         super().init_results()
-        scaling_kw = dict(shape=self.t.npts, timevec=self.t.timevec, dtype=int, scale=True)
-        nonscaling_kw = dict(shape=self.t.npts, timevec=self.t.timevec, dtype=float, scale=False, summarize_by='sum')
+        scaling_kw = dict(dtype=int, scale=True)
+        nonscaling_kw = dict(dtype=float, scale=False, summarize_by='sum')
+        results = sc.autolist()
 
         # Add event counts - these are all integers, and are scaled by the number of agents
         # We compute new results for each event type, and also cumulative results
         for key in fpd.event_counts:
-            self.results += ss.Result(key, label=key, **scaling_kw)
-            self.results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False)
+            results += ss.Result(key, label=key, **scaling_kw)
+            results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False)
 
         # Add people counts - these are all integers, and are scaled by the number of agents
         # However, for these we do not include cumulative totals
         for key in fpd.people_counts:
-            self.results += ss.Result(key, label=key, **scaling_kw)
+            results += ss.Result(key, label=key, **scaling_kw)
 
-        for key in fpd.rate_results:
-            self.results += ss.Result(key, label=key, **nonscaling_kw)
+        # Add infant mortality and short interval births - these are proportions, not scaled
+        results += ss.Result('imr', label='Infant mortality rate', **nonscaling_kw, summarize_by='mean')
+        results += ss.Result('p_short_interval', label='Proportion of short interval births', **nonscaling_kw, summarize_by='mean')
+
+        # Store results
+        self.define_results(*results)
 
         # Additional results with different formats, stored separately
         # These will not be appended to sim.results, and must be accessed
@@ -528,7 +533,8 @@ class FPmod(ss.Pregnancy):
 
     def update_results(self):
         super().update_results()
-
+        ti = self.ti
+        self.results['imr'][ti] = sc.safedivide(self.results['infant_deaths'][ti], self.results['new_births'][ti]) * 1e3
         return
 
     def finalize(self):

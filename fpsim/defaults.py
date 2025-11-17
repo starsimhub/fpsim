@@ -227,9 +227,3 @@ sim_results = sc.autolist(
     'n_wq4',
     'n_wq5',
 )
-
-# Rates and other results that aren't scaled
-rate_results = sc.autolist(
-    'imr',
-    'p_short_interval',
-)
