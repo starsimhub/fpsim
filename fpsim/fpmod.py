@@ -185,7 +185,23 @@ class FPmod(ss.Pregnancy):
         return contra_eff
 
     def get_lam_eff(self):
-        return self.pars['LAM_efficacy'] * self.lam
+        """ Get LAM efficacy adjustment """
+        max_lam_dur = self.pars['max_lam_dur']
+        lam_candidates = self.breastfeeding & self.susceptible
+        if lam_candidates.any():
+            timesteps_since_birth = (self.ti - self.ti_delivery[lam_candidates]).astype(int)
+            probs = self.pars['lactational_amenorrhea']['rate'][timesteps_since_birth]
+            self._p_lam.set(p=probs)
+            self.lam[lam_candidates] = self._p_lam.rvs(lam_candidates)
+
+        # Switch LAM off for anyone not breastfeeding or over max_lam_dur postpartum
+        over5mo = (self.ti - self.ti_delivery) > max_lam_dur
+        not_breastfeeding = ~self.breastfeeding
+        not_lam = over5mo & not_breastfeeding
+        self.lam[not_lam] = False
+
+        lam_eff = self.pars['LAM_efficacy'] * self.lam
+        return lam_eff
 
     def set_rel_sus(self):
         """ Set relative susceptibility to pregnancy """
@@ -326,25 +342,22 @@ class FPmod(ss.Pregnancy):
 
         # Update states
         self.pregnant[uids] = False
-        self.gestation[uids] = 0
+        self.gestation[uids] = np.nan  # No longer pregnant so remove gestational clock
         self.ti_delivery[uids] = np.nan
         self.n_miscarriages[uids] += 1
         self.ti_miscarriage[uids] = self.ti
+        self.ti_contra[uids] = self.ti+1  # Update contraceptive choices
 
         # Track ages
         for uid in uids:
-            age_idx = np.where(np.isnan(self.miscarriage_ages[uid]))[0]
-            if len(age_idx):
-                self.miscarriage_ages[uid, age_idx[0]] = ppl.age[uid]
+            # put miscarriage age in first nan slot
+            age_idx = np.where(np.isnan(self.miscarriage_ages[uid]))[0][0]
+            self.miscarriage_ages[uid, age_idx] = ppl.age[uid]
 
         # Track death of unborn child
         child_uids = ss.uids(self.child_uid[uids])
         self.sim.people.request_death(child_uids)
         self.child_uid[uids] = np.nan
-
-        # Trigger contraceptive update
-        if hasattr(self.sim, 'contraception'):
-            self.sim.contraception.ti_contra[uids] = self.ti + 1
 
         # Update results
         self.results['miscarriages'][self.ti] = n_miscarriages
