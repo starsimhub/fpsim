@@ -186,8 +186,8 @@ class FPmod(ss.Pregnancy):
 
     def get_lam_eff(self):
         """ Get LAM efficacy adjustment """
-        max_lam_dur = self.pars['max_lam_dur']
-        lam_candidates = self.breastfeeding & self.susceptible
+        lam_data_max = max(self.pars['lactational_amenorrhea']['month'])
+        lam_candidates = self.breastfeeding & self.susceptible & ((self.ti - self.ti_delivery) <= lam_data_max)
         if lam_candidates.any():
             timesteps_since_birth = (self.ti - self.ti_delivery[lam_candidates]).astype(int)
             probs = self.pars['lactational_amenorrhea']['rate'][timesteps_since_birth]
@@ -195,9 +195,10 @@ class FPmod(ss.Pregnancy):
             self.lam[lam_candidates] = self._p_lam.rvs(lam_candidates)
 
         # Switch LAM off for anyone not breastfeeding or over max_lam_dur postpartum
-        over5mo = (self.ti - self.ti_delivery) > max_lam_dur
+        max_lam_dur = self.pars['max_lam_dur']
+        over_max = (self.ti - self.ti_delivery) > max_lam_dur
         not_breastfeeding = ~self.breastfeeding
-        not_lam = over5mo & not_breastfeeding
+        not_lam = over_max & not_breastfeeding
         self.lam[not_lam] = False
 
         lam_eff = self.pars['LAM_efficacy'] * self.lam
