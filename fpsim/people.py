@@ -25,7 +25,6 @@ class PeoplePars(ss.Pars):
         self.age_pyramid = None
         self.urban_prop = None
         self.wealth_quintile = None
-        self.use_partnership = False
         self.age_partnership = None
         self.update(kwargs)
         return
@@ -50,7 +49,7 @@ class People(ss.People):
 
         # Person defaults
         self.person_defaults = [
-            ss.FloatArr('partnership_age', default=ss.choice(a=1)),  # Will remain at these values if use_partnership is False
+            ss.FloatArr('partnership_age', default=ss.choice(a=100)),  # If no data, set to high age so everyone is unpartnered by default
             ss.BoolState('urban', default=ss.bernoulli(p=0.5)),  # Urban/rural
             ss.FloatArr('wealthquintile', default=ss.choice(a=5)),  # Wealth quintile
         ]
@@ -108,7 +107,7 @@ class People(ss.People):
         return
 
     def set_partnership(self, pars):
-        if not pars['use_partnership']:
+        if pars.get('age_partnership') is None:
             return
         pship = pars['age_partnership']
         pship_age = pship['age']
