@@ -5,6 +5,7 @@ Test running sims
 import fpsim as fp
 import sciris as sc
 import starsim as ss
+import numpy as np
 import pytest
 
 
@@ -14,7 +15,7 @@ parallel = 1  # Whether to run in serial (for debugging)
 
 def test_simple():
     sc.heading('Test simplest possible FPsim run')
-    sim = fp.Sim(test=True, twins_prob=0.5)
+    sim = fp.Sim(test=True)
     sim.run()
     sim.to_df(resample='year', use_years=True)
     return sim
@@ -176,15 +177,43 @@ def test_senegal():
     return exp
 
 
+def test_birth_outcomes():
+    sim = fp.Sim(test=True, twins_prob=0.3)
+    sim.run()
+
+    # Check that n_pregnancies matches sum of outcomes
+    fpmod = sim.people.fp
+    was_preg_bools = (fpmod.n_pregnancies > 0) & ~(fpmod.pregnant)
+    n_pregnancies = fpmod.n_pregnancies[was_preg_bools]
+    n_outcomes = (
+        fpmod.n_births[was_preg_bools] +
+        fpmod.n_stillbirths[was_preg_bools] +
+        fpmod.n_miscarriages[was_preg_bools] +
+        fpmod.n_abortions[was_preg_bools]
+    )
+    aa = was_preg_bools.uids[(n_pregnancies != n_outcomes).nonzero()[-1]]
+    assert np.array_equal(n_pregnancies, n_outcomes), f'Birth outcomes do not sum to pregnancies for agents: {aa}'
+    sc.printgreen('✓ (Birth outcomes sum to pregnancies)')
+
+    # Check that parity increments correctly
+    expected_parity = (fpmod.n_births + fpmod.n_twinbirths + fpmod.n_stillbirths
+    assert fpmod.parity == expected_parity).all(), 'Parity does not match number of live/still births'
+    sc.printgreen('✓ (Parity increments correctly)')
+
+    return sim
+
+
 if __name__ == '__main__':
 
     ss.options.warnings = 'error'  # Ignore warnings for testing
 
-    sim = test_simple()
+    # sim = test_simple()
     # s1 = test_random_choice()
     # sims1 = test_simple_choice()
     # sims2 = test_mid_choice()
     # test_sim_creation()
     # exp = test_senegal()
+
+    sim = test_birth_outcomes()
 
     print('Done.')

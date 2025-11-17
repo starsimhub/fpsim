@@ -257,38 +257,43 @@ class FPmod(ss.Pregnancy):
         self.ti_contra[uids] = self.ti + 1
 
         # Stop breastfeeding
-        self.breastfeeding[uids] = False
+        self.ti_stop_breastfeed[uids] = self.ti + 1  # Stop breastfeeding next month
 
-        # Track death of unborn child
-        child_uids = ss.uids(self.child_uid[uids])
-        try:
-            self.sim.people.request_death(child_uids)
-        except:
-            print('hi')
-
-        mothers_with_twins = self.twin_uid.notnan.uids & uids
-        twin_uids = ss.uids(self.twin_uid[mothers_with_twins])
-        self.sim.people.request_death(twin_uids)
-
+        # Track death of unborn child/ren
+        child_uids, mothers_with_twins = self._get_children(uids)
+        self.sim.people.request_death(child_uids)
         self.child_uid[uids] = np.nan
         self.twin_uid[mothers_with_twins] = np.nan
 
         return
 
+    def _get_children(self, uids):
+        """ Get UIDs for children born to mothers in uids """
+        child_uids = ss.uids(self.child_uid[uids])
+        mothers_with_twins = self.twin_uid.notnan.uids & uids
+        twin_uids = ss.uids(self.twin_uid[mothers_with_twins])
+        return child_uids | twin_uids, mothers_with_twins
+
+    def update_breastfeeding(self, uids):
+        stopping = super().update_breastfeeding(uids)
+        if len(stopping):
+            self.dur_breastfeed_total[stopping] += self.dur_breastfeed[stopping]
+        return
+
     def process_delivery(self, uids, newborn_uids):
         """
-        Enhanced delivery processing with stillbirths and neonatal mortality
+        Enhanced delivery processing with stillbirths, neonatal mortality, twins,
+        and tracking of ages at events.
         """
         # Call parent to handle standard delivery processing
-        super().process_delivery(uids, newborn_uids)
+        uids, newborn_uids = super().process_delivery(uids, newborn_uids)
 
         ppl = self.sim.people
         fp_pars = self.pars  # Shorten
 
-        # Handle stillbirth
+        # Extract probability of stillbirth adjusted for age
         still_prob = self.mortality_probs['stillbirth']
         rate_ages = fp_pars['stillbirth_rate']['ages']
-
         age_ind = np.searchsorted(rate_ages, ppl.age[uids], side="left")
         prev_idx_is_less = ((age_ind == len(rate_ages)) | (
                 np.fabs(ppl.age[uids] - rate_ages[np.maximum(age_ind - 1, 0)]) < np.fabs(
@@ -296,9 +301,17 @@ class FPmod(ss.Pregnancy):
         age_ind[prev_idx_is_less] -= 1  # adjusting for quirks of np.searchsorted
         still_prob = still_prob * (fp_pars['stillbirth_rate']['age_probs'][age_ind]) if len(self) > 0 else 0
 
-        # Sort into stillbirths and live births and record times
+        # Sort into stillbirths and live births (single and twin) and record times
         self._p_stillbirth.set(p=still_prob)
         stillborn, live = self._p_stillbirth.split(uids)
+
+        # Sort mothers into single and multiple births
+        _, twins = self._get_children(live)
+        single = live - twins
+        self.parity[twins] += 1  # Increment parity for twins
+        self.n_births[live] += 1
+        self.n_twinbirths[twins] += 1
+        self.record_ages(stillborn, single, twins)
 
         # Update states for mothers of stillborns
         self.n_stillbirths[stillborn] += 1  # Track number of stillbirths for each woman
@@ -314,9 +327,48 @@ class FPmod(ss.Pregnancy):
         self.handle_loss(mothers_of_nnds)  # State updates for mothers of NNDs
         self.results['infant_deaths'][self.ti] += len(nnds)
 
-        # # Calculate short intervals
-        # self.compute_short_intervals(single_uids, twin_uids)
-        #
+        # Calculate mothers of live babies
+        mothers = uids - stillborn - mothers_of_nnds
+        live_babies, _ = self._get_children(mothers)
+
+        return live, live_babies
+
+    def record_ages(self, stillborn, single, twin):
+        """
+        Record ages at stillbirth and live birth and compute short intervals
+        """
+        ppl = self.sim.people
+
+        # Record ages of agents when live births / stillbirths occur
+        for parity in np.unique(self.n_births[single]):
+            single_uids = single[self.n_births[single] == parity]
+            self.birth_ages[ss.uids(single_uids), int(parity-1)] = ppl.age[ss.uids(single_uids)]
+            if parity == 1: self.first_birth_age[single_uids] = ppl.age[single_uids]
+        for parity in np.unique(self.n_births[twin]):
+            twin_uids = twin[self.n_births[twin] == parity]
+            self.birth_ages[twin_uids, int(parity-1)] = ppl.age[twin_uids]
+            self.birth_ages[twin_uids, int(parity)-2] = ppl.age[twin_uids]
+            if parity == 2: self.first_birth_age[twin_uids] = ppl.age[twin_uids]
+        for parity in np.unique(self.n_stillbirths[stillborn]):
+            uids = stillborn[self.n_stillbirths[stillborn] == parity]
+            self.stillborn_ages[uids, int(parity)] = ppl.age[uids]
+
+        # Calculate short intervals
+        prev_birth_single = single[self.n_births[single] > 1]
+        prev_birth_twins = twin[self.n_births[twin] > 2]
+        if len(prev_birth_single):
+            pidx = (self.n_births[prev_birth_single] - 1).astype(int)
+            all_ints = [self.birth_ages[r, pidx] - self.birth_ages[r, pidx-1] for r in prev_birth_single]
+            latest_ints = np.array([r[~np.isnan(r)][-1] for r in all_ints])
+            short_ints = np.count_nonzero(latest_ints < (self.pars['short_int'].years))
+            self.results['short_intervals'][self.ti] += short_ints
+        if len(prev_birth_twins):
+            pidx = (self.n_births[prev_birth_twins] - 2).astype(int)
+            all_ints = [self.birth_ages[r, pidx] - self.birth_ages[r, pidx-1] for r in prev_birth_twins]
+            latest_ints = np.array([r[~np.isnan(r)][-1] for r in all_ints])
+            short_ints = np.count_nonzero(latest_ints < (self.pars['short_int'].years))
+            self.results['short_intervals'][self.ti] += short_ints
+
         return
 
     def check_infant_mortality(self, uids):
@@ -331,34 +383,6 @@ class FPmod(ss.Pregnancy):
         mothers_of_nnd = self._p_inf_mort.filter(uids)
         nnds = ss.uids(self.child_uid[mothers_of_nnd])
         return mothers_of_nnd, nnds
-
-    def compute_short_intervals(self, single_uids, twin_uids):
-        """Calculate short birth intervals"""
-        short_int_threshold = self.pars.short_int.years
-        n_short = 0
-
-        # Singles with previous birth
-        prev_birth_single = single_uids[self.parity[single_uids] > 1]
-        if len(prev_birth_single):
-            pidx = (self.parity[prev_birth_single] - 1).astype(int)
-            for uid, p in zip(prev_birth_single, pidx):
-                if p > 0:
-                    interval = self.birth_ages[uid, p] - self.birth_ages[uid, p-1]
-                    if interval < short_int_threshold:
-                        n_short += 1
-
-        # Twins with previous birth
-        prev_birth_twins = twin_uids[self.parity[twin_uids] > 2]
-        if len(prev_birth_twins):
-            pidx = (self.parity[prev_birth_twins] - 2).astype(int)
-            for uid, p in zip(prev_birth_twins, pidx):
-                if p > 0:
-                    interval = self.birth_ages[uid, p] - self.birth_ages[uid, p-1]
-                    if interval < short_int_threshold:
-                        n_short += 1
-
-        self.results['short_intervals'][self.ti] = n_short
-        return
 
     def progress_pregnancies(self):
         """
@@ -453,7 +477,6 @@ class FPmod(ss.Pregnancy):
         # Check for abortion
         self._p_abortion.set(p=self.pars.abortion_prob)
         abort_uids, preg_uids = self._p_abortion.split(conceived)
-
         if len(abort_uids):
             self.handle_abortion(abort_uids)
 
@@ -472,6 +495,7 @@ class FPmod(ss.Pregnancy):
         ppl = self.sim.people
         n_abortions = len(uids)
         self.n_abortions[uids] += 1
+        self.n_pregnancies[uids] += 1  # Still count in total pregnancies
         self.ti_abortion[uids] = self.ti
 
         # Track ages
@@ -511,7 +535,7 @@ class FPmod(ss.Pregnancy):
         if self.ti < 0:
             self.sim.people.age[new_twin_uids] += -self.ti * self.sim.t.dt_year
 
-        return new_uids
+        return new_uids | new_twin_uids
 
     def make_pregnancies(self, uids):
         """ Create new pregnancies """

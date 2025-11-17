@@ -103,33 +103,28 @@ fpmod_states = [
     ss.BoolState('sexual_debut'),
 
     # Ages of key events
-    ss.FloatArr('sexual_debut_age', default=-1),
-    ss.FloatArr('fated_debut', default=-1),
-    ss.FloatArr('first_birth_age', default=-1),
+    ss.FloatArr('sexual_debut_age'),
+    ss.FloatArr('fated_debut'),
+    ss.FloatArr('first_birth_age'),
 
     # Counts of events
     ss.FloatArr('n_births', default=0),         # Number of live births
     ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
     ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
-    ss.FloatArr('n_pregnancies', default=0),    # Number of pregnancies, including miscarriages, stillbirths, abortions
+    ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
-    ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
     ss.FloatArr('twin_uid', label='UID of second twin, if applicable'),
 
     # Durations and counters
     ss.FloatArr('dur_breastfeed_total', default=0),
 
     # Timesteps of significant events
-    ss.FloatArr('ti_conceived'),
     ss.FloatArr('ti_last_delivery'),
     ss.FloatArr('ti_live_birth'),
     ss.FloatArr('ti_stillbirth'),
-    ss.FloatArr('ti_postpartum'),
     ss.FloatArr('ti_miscarriage'),
     ss.FloatArr('ti_abortion'),
-    ss.FloatArr('ti_stop_postpartum'),
-    ss.FloatArr('ti_debut'),
 
     # Fecundity
     ss.FloatArr('personal_fecundity', default=0),
