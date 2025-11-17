@@ -421,7 +421,6 @@ class FPmod(ss.Pregnancy):
         ppl = self.sim.people
         n_abortions = len(uids)
 
-<<<<<<< HEAD
         # Update states
         self.n_abortions[uids] += 1
         self.ti_abortion[uids] = self.ti
@@ -431,10 +430,6 @@ class FPmod(ss.Pregnancy):
             age_idx = np.where(np.isnan(self.abortion_ages[uid]))[0]
             if len(age_idx):
                 self.abortion_ages[uid, age_idx[0]] = ppl.age[uid]
-=======
-        # Progress pregnancy, advancing gestation and handling miscarriage
-        self.progress_pregnancy(self.pregnant.uids)
->>>>>>> fix-partnerships
 
         # Trigger contraceptive update
         if hasattr(self.sim, 'contraception'):
