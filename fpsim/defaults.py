@@ -207,7 +207,6 @@ event_counts = sc.autolist(
     'short_intervals',
     'secondary_births',
     'total_births',
-    'maternal_deaths',
     'infant_deaths',
     'method_failures',
 )
@@ -231,7 +230,6 @@ sim_results = sc.autolist(
 
 # Rates and other results that aren't scaled
 rate_results = sc.autolist(
-    'mmr',
     'imr',
     'p_short_interval',
 )

@@ -124,7 +124,6 @@ class FPmod(ss.Pregnancy):
             'maternal_mortality': 'maternal',
             'stillbirth_rate': 'stillbirth',
         }
-
         self.mortality_probs = {}
         for key1, key2 in mapping.items():
             ind = sc.findnearest(self.pars[key1]['year'], self.t.now('year'))
@@ -133,7 +132,6 @@ class FPmod(ss.Pregnancy):
                 self.pars.p_maternal_death.set(p=val)
             else:
                 self.mortality_probs[key2] = val
-
         return
 
     def check_sexually_active(self, uids=None):
@@ -258,7 +256,10 @@ class FPmod(ss.Pregnancy):
 
         # Track death of unborn child
         child_uids = ss.uids(self.child_uid[uids])
-        self.sim.people.request_death(child_uids)
+        try:
+            self.sim.people.request_death(child_uids)
+        except:
+            print('hi')
 
         mothers_with_twins = self.twin_uid.notnan.uids & uids
         twin_uids = ss.uids(self.twin_uid[mothers_with_twins])
@@ -459,16 +460,14 @@ class FPmod(ss.Pregnancy):
         return preg_uids
 
     def handle_abortion(self, uids):
-        """Handle abortion outcomes"""
+        """
+        Handle abortion outcomes. We don't have to reset the pregnancy states because
+        this method is called prior to make_embryos or make_pregnancies
+        """
         ppl = self.sim.people
         n_abortions = len(uids)
-
-        # Update states
         self.n_abortions[uids] += 1
         self.ti_abortion[uids] = self.ti
-
-        # Handle loss of infant and contraceptive update
-        self.handle_loss(uids)
 
         # Track ages
         for uid in uids:
