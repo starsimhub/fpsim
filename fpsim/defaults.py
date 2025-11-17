@@ -115,6 +115,7 @@ fpmod_states = [
     ss.FloatArr('n_pregnancies', default=0),    # Number of pregnancies, including miscarriages, stillbirths, abortions
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
     ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
+    ss.FloatArr('twin_uid', label='UID of second twin, if applicable'),
 
     # Durations and counters
     ss.FloatArr('dur_breastfeed_total', default=0),
@@ -141,10 +142,6 @@ fpmod_states = [
     fpa.TwoDimensionalArr('miscarriage_ages', ncols=max_parity),  # Ages at time of miscarriages
     fpa.TwoDimensionalArr('abortion_ages', ncols=max_parity),  # Ages at time of abortions
 
-    ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
-    ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
-    # ss.State('urban', default=True),  # Urban/rural
-    # ss.FloatArr('wealthquintile', default=3),  # Wealth quintile
 ]
 
 # Postpartum keys to months

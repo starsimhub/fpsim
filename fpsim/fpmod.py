@@ -36,6 +36,7 @@ class FPmod(ss.Pregnancy):
         self.update_pars(data)
 
         # Binary distributions specific to FPmod, used for calculating p_conceive
+        self._p_inf_mort = ss.bernoulli(p=0)  # Probability of infant mortality
         self._p_abortion = ss.bernoulli(p=0)  # Probability of abortion
         self._p_lam = ss.bernoulli(p=0)  # Probability of LAM
         self._p_active = ss.bernoulli(p=0)
@@ -45,6 +46,7 @@ class FPmod(ss.Pregnancy):
 
         # All other distributions
         self._fated_debut = ss.choice(a=self.pars['debut_age']['ages'], p=self.pars['debut_age']['probs'])
+        self.choose_slots_twins = None # Initialized in init_pre
 
         # Deal with exposure parameters
         if isinstance(self.pars['exposure_age'], dict):
@@ -65,6 +67,10 @@ class FPmod(ss.Pregnancy):
 
     def init_pre(self, sim):
         super().init_pre(sim)
+        low = sim.pars.n_agents + 1
+        high = int(self.pars.slot_scale*sim.pars.n_agents)
+        high = np.maximum(high, self.pars.min_slots) # Make sure there are at least min_slots slots to avoid artifacts related to small populations
+        self.choose_slots_twins = ss.randint(low=low, high=high, sim=sim, module=self)
         return
 
     @property
@@ -123,7 +129,10 @@ class FPmod(ss.Pregnancy):
         for key1, key2 in mapping.items():
             ind = sc.findnearest(self.pars[key1]['year'], self.t.now('year'))
             val = self.pars[key1]['probs'][ind]
-            self.mortality_probs[key2] = val
+            if key2 == 'maternal':
+                self.pars.p_maternal_death.set(p=val)
+            else:
+                self.mortality_probs[key2] = val
 
         return
 
@@ -235,9 +244,34 @@ class FPmod(ss.Pregnancy):
 
         return uids
 
+    def handle_loss(self, uids):
+        """
+        Trigger updates for women whose pregnancies do not end in a live birth/baby, due to
+        miscarriage, stillbirth, abortion, neonatal death. Currently a lightweight wrapper
+        for resetting contraception, but separated out so that it can be called independently.
+        """
+        # Trigger update to contraceptive choices
+        self.ti_contra[uids] = self.ti + 1
+
+        # Stop breastfeeding
+        self.breastfeeding[uids] = False
+
+        # Track death of unborn child
+        child_uids = ss.uids(self.child_uid[uids])
+        self.sim.people.request_death(child_uids)
+
+        mothers_with_twins = self.twin_uid.notnan.uids & uids
+        twin_uids = ss.uids(self.twin_uid[mothers_with_twins])
+        self.sim.people.request_death(twin_uids)
+
+        self.child_uid[uids] = np.nan
+        self.twin_uids[mothers_with_twins] = np.nan
+
+        return
+
     def process_delivery(self, uids, newborn_uids):
         """
-        Enhanced delivery processing with stillbirth and twins.
+        Enhanced delivery processing with stillbirths and neonatal mortality
         """
         # Call parent to handle standard delivery processing
         super().process_delivery(uids, newborn_uids)
@@ -259,22 +293,38 @@ class FPmod(ss.Pregnancy):
         # Sort into stillbirths and live births and record times
         self._p_stillbirth.set(p=still_prob)
         stillborn, live = self._p_stillbirth.split(uids)
-        self.ti_live_birth[live] = self.ti  # Record the time of live birth
-        self.ti_stillbirth[stillborn] = self.ti  # Record the time of stillbirth
 
         # Update states for mothers of stillborns
-        self.breastfeeding[stillborn] = False  # Set agents of stillbith to not lactate
         self.n_stillbirths[stillborn] += 1  # Track number of stillbirths for each woman
+        self.handle_loss(stillborn)  # State updates for mothers of stillborns
         self.results['stillbirths'][self.ti] = len(stillborn)
 
         # Update times
         self.ti_stillbirth[stillborn] = self.ti
         self.ti_live_birth[live] = self.ti
 
+        # Handle infant mortality
+        mothers_of_nnds, nnds = self.check_infant_mortality(live)
+        self.handle_loss(mothers_of_nnds)  # State updates for mothers of NNDs
+        self.results['infant_deaths'][self.ti] += len(nnds)
+
         # # Calculate short intervals
         # self.compute_short_intervals(single_uids, twin_uids)
         #
         return
+
+    def check_infant_mortality(self, uids):
+        """
+        Check for probability of infant mortality (death < 1 year of age)
+        """
+        death_prob = (self.mortality_probs['infant'])
+        if len(uids) > 0:
+            age_inds = sc.findnearest(self.pars['infant_mortality']['ages'], self.sim.people.age[uids])
+            death_prob = death_prob * (self.pars['infant_mortality']['age_probs'][age_inds])
+        self._p_inf_mort.set(p=death_prob)
+        mothers_of_nnd = self._p_inf_mort.filter(uids)
+        nnds = ss.uids(self.child_uid[mothers_of_nnd])
+        return mothers_of_nnd, nnds
 
     def compute_short_intervals(self, single_uids, twin_uids):
         """Calculate short birth intervals"""
@@ -304,19 +354,6 @@ class FPmod(ss.Pregnancy):
         self.results['short_intervals'][self.ti] = n_short
         return
 
-    def process_postpartum(self, uids):
-        """
-        FP-specific postpartum processing.
-        """
-        # Call parent
-        super().process_postpartum(uids)
-
-        # Trigger contraceptive choice update
-        if hasattr(self.sim, 'contraception'):
-            self.sim.contraception.ti_contra[uids] = self.ti + 1
-
-        return
-
     def progress_pregnancies(self):
         """
         Update ongoing pregnancies and check for miscarriage.
@@ -341,24 +378,21 @@ class FPmod(ss.Pregnancy):
         ppl = self.sim.people
         n_miscarriages = len(uids)
 
-        # Update states
+        # Update states to reflect miscarriage
         self.pregnant[uids] = False
         self.gestation[uids] = np.nan  # No longer pregnant so remove gestational clock
         self.ti_delivery[uids] = np.nan
         self.n_miscarriages[uids] += 1
         self.ti_miscarriage[uids] = self.ti
-        self.ti_contra[uids] = self.ti+1  # Update contraceptive choices
+
+        # Handle loss of infant and contraceptive update
+        self.handle_loss(uids)
 
         # Track ages
         for uid in uids:
             # put miscarriage age in first nan slot
             age_idx = np.where(np.isnan(self.miscarriage_ages[uid]))[0][0]
             self.miscarriage_ages[uid, age_idx] = ppl.age[uid]
-
-        # Track death of unborn child
-        child_uids = ss.uids(self.child_uid[uids])
-        self.sim.people.request_death(child_uids)
-        self.child_uid[uids] = np.nan
 
         # Update results
         self.results['miscarriages'][self.ti] = n_miscarriages
@@ -456,7 +490,7 @@ class FPmod(ss.Pregnancy):
     def _make_twin_uids(self, conceive_uids):
         """ Helper method to link embryos to mothers """
         # Choose slots for the unborn agents
-        new_slots = self.choose_slots.rvs(conceive_uids)
+        new_slots = self.choose_slots_twins.rvs(conceive_uids)
         new_uids = self.sim.people.grow(len(new_slots), new_slots)
         return new_uids, new_slots
 
@@ -470,11 +504,10 @@ class FPmod(ss.Pregnancy):
         twin_uids, single_uids = self._p_twins.split(conceive_uids)
 
         # Grow the population and assign properties to twins
-        newborns_with_twins = ss.uids(self.child_uid[twin_uids])
-        slots_for_newborns_with_twins = self.sim.people.slot[newborns_with_twins]
-        slots_for_twins = slots_for_newborns_with_twins+1  # Place twins in next slot
-        new_twin_uids = self.sim.people.grow(len(slots_for_twins), slots_for_twins)  # Grow the population again
-        self._set_embryo_states(twin_uids, new_twin_uids, slots_for_twins)
+        new_twin_uids, new_twin_slots = self._make_twin_uids(twin_uids)
+        self._set_embryo_states(twin_uids, new_twin_uids, new_twin_slots)
+        self.child_uid[conceive_uids] = new_uids  # Stored for the duration of pregnancy then removed
+        self.twin_uid[twin_uids] = new_twin_uids  # Link twin embryos to their mothers
 
         # Handle burn-in (aging embryos to ti=0)
         if self.ti < 0:
