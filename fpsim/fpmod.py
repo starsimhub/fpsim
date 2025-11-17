@@ -529,6 +529,7 @@ class FPmod(ss.Pregnancy):
 
     def update_results(self):
         super().update_results()
+
         return
 
     def finalize(self):

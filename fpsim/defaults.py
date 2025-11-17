@@ -217,13 +217,6 @@ people_counts = sc.autolist(
     'new_users',
     'ever_used_contra',
     'switchers',
-    'pp0to5',
-    'pp6to11',
-    'pp12to23',
-    'parity0to1',
-    'parity2to3',
-    'parity4to5',
-    'parity6plus',
     'nonpostpartum',
 )
 

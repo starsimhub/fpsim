@@ -788,6 +788,55 @@ class state_tracker(ss.Analyzer):
         return fig
 
 
+class track_parity(ss.Analyzer):
+    """
+    Analyzer for binning parity
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.parity_bins = np.array([1, 3, 5, 100])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.parity_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of parity """
+        fpmod = self.sim.demographics.fp
+        self.results[self.ti, :], _ = np.histogram(fpmod.parity, bins=self.parity_bins)
+        return
+
+
+class track_postpartum(ss.Analyzer):
+    """
+    Analyzer for tracking postpartum status, binned by months
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.pp_bins = np.array([0, 6, 12, 24, 1000])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.pp_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of postpartum status """
+        fpmod = self.sim.demographics.fp
+        timesteps_since_birth = fpmod.ti - fpmod.ti_delivery
+        self.results[self.ti, :], _ = np.histogram(timesteps_since_birth[fpmod.postpartum], bins=self.pp_bins)
+        return
+
+
 class track_as(ss.Analyzer):
     """
     Analyzer for tracking age-specific results
