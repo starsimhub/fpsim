@@ -56,9 +56,9 @@ class FPPars(ss.Pars):
         self.age_limit_fecundity = 50
         self.min_age = 10  # Minimum age for pregnancy
         self.max_age = 50  # Maximum age for pregnancy
+        self.max_sim_age = 99  # Maximum age for agents in the sim
 
         # Durations (in months)
-        self.max_pp_activity_reduction = None  # Length of postpartum activity reduction: updated by data, do not modify
         self.max_lam_dur = 5            # Duration of lactational amenorrhea (months)
         self.short_int = ss.months(24)  # Duration of a short birth interval between live births (months)
 

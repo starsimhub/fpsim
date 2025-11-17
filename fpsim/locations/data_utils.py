@@ -5,6 +5,7 @@ import os
 import numpy as np
 import pandas as pd
 import sciris as sc
+import starsim as ss
 import yaml
 import fpsim as fp
 from fpsim import defaults as fpd
@@ -69,7 +70,7 @@ class DataLoader:
         fp_data.sexual_activity = self.sexual_activity()
         sexual_activity_pp = self.sexual_activity_pp()
         fp_data.sexual_activity_pp = sexual_activity_pp
-        fp_data.max_pp_activity_reduction = sexual_activity_pp['month'][-1].astype(int)
+        fp_data.dur_postpartum = ss.months(sexual_activity_pp['month'][-1].astype(int))
         fp_data.debut_age = self.debut_age()
         fp_data.spacing_pref = self.birth_spacing_pref()
         fp_data.abortion_prob, fp_data.twins_prob = self.scalar_probs()

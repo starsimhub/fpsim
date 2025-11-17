@@ -91,7 +91,7 @@ class FPmod(ss.Pregnancy):
         # We compute new results for each event type, and also cumulative results
         for key in fpd.event_counts:
             self.results += ss.Result(key, label=key, **scaling_kw)
-            self.results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False)  # TODO, check
+            self.results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False)
 
         # Add people counts - these are all integers, and are scaled by the number of agents
         # However, for these we do not include cumulative totals
@@ -141,9 +141,8 @@ class FPmod(ss.Pregnancy):
             uids = self.alive.uids
 
         # Set postpartum probabilities
-        is_pp = self.postpartum[uids]
-        pp = uids[is_pp]
-        non_pp = uids[(ppl.age[uids] >= self.fated_debut[uids]) & ~is_pp]
+        pp = uids & self.postpartum.uids
+        non_pp = uids - self.postpartum.uids
         timesteps_since_birth = self.ti - self.ti_delivery[pp]
 
         # Adjust for postpartum women's birth spacing preferences
@@ -228,6 +227,7 @@ class FPmod(ss.Pregnancy):
         # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
         self.fated_debut[uids] = self._fated_debut.rvs(uids)
         self.check_sexually_active(self.fecund.uids)  # Check for all women of childbearing age
+        self.start_partnership()
 
         return uids
 
@@ -507,3 +507,8 @@ class FPmod(ss.Pregnancy):
         super().finalize()
         return
 
+    def finalize_results(self):
+        super().finalize_results()
+        for res in fpd.event_counts:
+            self.results[f'cum_{res}'] = np.cumsum(self.results[res])
+        return

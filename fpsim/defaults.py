@@ -12,9 +12,7 @@ import fpsim.arrays as fpa
 
 #%% Global defaults
 useSI          = True
-# mpy            = 12   # Months per year, to avoid magic numbers
 eps            = 1e-9 # To avoid divide-by-zero
-# min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
 spline_max_age  = 99   # Maximum age of agents (inclusive)
 spline_max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
@@ -222,7 +220,6 @@ people_counts = sc.autolist(
     'new_users',
     'ever_used_contra',
     'switchers',
-    'n_fecund',
     'pp0to5',
     'pp6to11',
     'pp12to23',

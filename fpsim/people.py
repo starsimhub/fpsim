@@ -170,7 +170,7 @@ class People(ss.People):
         if sim.pars.use_aging:
             self.age[self.alive.uids] += sim.t.dt_year
             # there is a max age for some of the stats, so if we exceed that, reset it
-            self.age[self.alive.uids] = np.minimum(self.age[self.alive.uids], self.sim.pars.fp['max_age'])
+            self.age[self.alive.uids] = np.minimum(self.age[self.alive.uids], self.sim.pars.fp['max_sim_age'])
         return
 
     def compute_method_usage(self):
