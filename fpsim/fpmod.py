@@ -91,19 +91,19 @@ class FPmod(ss.Pregnancy):
         """
         super().init_results()
         scaling_kw = dict(dtype=int, scale=True)
-        nonscaling_kw = dict(dtype=float, scale=False, summarize_by='sum')
+        nonscaling_kw = dict(dtype=float, scale=False)
         results = sc.autolist()
 
         # Add event counts - these are all integers, and are scaled by the number of agents
         # We compute new results for each event type, and also cumulative results
         for key in fpd.event_counts:
-            results += ss.Result(key, label=key, **scaling_kw)
-            results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False)
+            results += ss.Result(key, label=key, **scaling_kw, summarize_by='sum')
+            results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False, summarize_by='last')
 
         # Add people counts - these are all integers, and are scaled by the number of agents
         # However, for these we do not include cumulative totals
         for key in fpd.people_counts:
-            results += ss.Result(key, label=key, **scaling_kw)
+            results += ss.Result(key, label=key, **scaling_kw, summarize_by='sum')
 
         # Add infant mortality and short interval births - these are proportions, not scaled
         results += ss.Result('imr', label='Infant mortality rate', **nonscaling_kw, summarize_by='mean')
