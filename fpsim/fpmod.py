@@ -451,11 +451,6 @@ class FPmod(ss.Pregnancy):
         if len(abort_uids):
             self.handle_abortion(abort_uids)
 
-            # Track as method failure if on contraception
-            if hasattr(self.sim, 'contraception'):
-                on_method = self.sim.contraception.method[abort_uids] != 0
-                self.results['method_failures'][self.ti] += on_method.sum()
-
         # Track method failures for continuing pregnancies
         if hasattr(self.sim, 'contraception') and len(preg_uids):
             on_method = self.sim.contraception.method[preg_uids] != 0
@@ -472,15 +467,14 @@ class FPmod(ss.Pregnancy):
         self.n_abortions[uids] += 1
         self.ti_abortion[uids] = self.ti
 
+        # Handle loss of infant and contraceptive update
+        self.handle_loss(uids)
+
         # Track ages
         for uid in uids:
             age_idx = np.where(np.isnan(self.abortion_ages[uid]))[0]
             if len(age_idx):
                 self.abortion_ages[uid, age_idx[0]] = ppl.age[uid]
-
-        # Trigger contraceptive update
-        if hasattr(self.sim, 'contraception'):
-            self.sim.contraception.ti_contra[uids] = self.ti + 1
 
         # Update results
         self.results['abortions'][self.ti] = n_abortions
