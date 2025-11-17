@@ -265,7 +265,7 @@ class FPmod(ss.Pregnancy):
         self.sim.people.request_death(twin_uids)
 
         self.child_uid[uids] = np.nan
-        self.twin_uids[mothers_with_twins] = np.nan
+        self.twin_uid[mothers_with_twins] = np.nan
 
         return
 
