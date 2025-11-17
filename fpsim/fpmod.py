@@ -215,7 +215,6 @@ class FPmod(ss.Pregnancy):
         # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
         self.fated_debut[uids] = self._fated_debut.rvs(uids)
         self.check_sexually_active(self.fecund.uids)  # Check for all women of childbearing age
-        self.start_partnership()
 
         return uids
 
