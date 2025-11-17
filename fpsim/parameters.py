@@ -48,9 +48,6 @@ class FPPars(ss.Pars):
     def __init__(self, location=None, **kwargs):
         super().__init__()
 
-        # Settings - what aspects are being modeled - TODO, remove
-        self.use_partnership = 0
-
         # Age limits (in years)
         self.method_age = 15
         self.age_limit_fecundity = 50
@@ -91,7 +88,6 @@ class FPPars(ss.Pars):
         self.sexual_activity_pp = None
         self.debut_age = None
         self.spacing_pref = None
-        self.age_partnership = None
         self.region = None
         self.regional = None
 

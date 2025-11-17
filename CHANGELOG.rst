@@ -9,6 +9,15 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :depth: 1
 
 
+Version 3.5 (2025-11-XX)
+---------------------------
+  TBC - placeholder for intervention wrappers
+
+
+* **Minor changes**
+  * Fixes a bug with partnership ages. If `use_partnerships` is set to True, then agents will be initialized with a `partnership_age` attribute that records the age at which they have their first partnership. Once beyond that age, then the `partnered` property is set to True. This feature should be used with care, as it does not accurately record whether or not an agent is in a partnership, and it does not currently relate in any way to the various attributes that track whether an agent is sexually active.
+  * 
+
 Version 3.4.1 (2025-09-22)
 ---------------------------
 

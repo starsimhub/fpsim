@@ -177,18 +177,6 @@ class FPmod(ss.Pregnancy):
 
         return
 
-    def start_partnership(self, uids):
-        """
-        Decide if an agent has reached their age at first partnership. Age-based data from DHS.
-        Note, this is not used anywhere.
-        """
-        ppl = self.sim.people
-        is_not_partnered = self.partnered[uids] == 0
-        reached_partnership_age = ppl.age[uids] >= self.partnership_age[uids]
-        first_timers = uids[is_not_partnered & reached_partnership_age]
-        self.partnered[first_timers] = True
-        return
-
     def get_contra_eff(self):
         """ Get contraception method mix adjustment """
         cm = self.sim.connectors.contraception
@@ -433,6 +421,7 @@ class FPmod(ss.Pregnancy):
         ppl = self.sim.people
         n_abortions = len(uids)
 
+<<<<<<< HEAD
         # Update states
         self.n_abortions[uids] += 1
         self.ti_abortion[uids] = self.ti
@@ -442,6 +431,10 @@ class FPmod(ss.Pregnancy):
             age_idx = np.where(np.isnan(self.abortion_ages[uid]))[0]
             if len(age_idx):
                 self.abortion_ages[uid, age_idx[0]] = ppl.age[uid]
+=======
+        # Progress pregnancy, advancing gestation and handling miscarriage
+        self.progress_pregnancy(self.pregnant.uids)
+>>>>>>> fix-partnerships
 
         # Trigger contraceptive update
         if hasattr(self.sim, 'contraception'):
