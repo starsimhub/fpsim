@@ -63,30 +63,30 @@ def test_sim_creation():
     # Test 1: par passed in separate dicts
     contra_pars = dict(prob_use_year=2000)
     edu_pars = dict(init_dropout=0.2)
-    fp_pars = dict(primary_infertility=0.1)
+    fp_pars = dict(p_infertile=0.1)
     sim1 = fp.Sim(sim_pars=par_kwargs, fp_pars=fp_pars, contra_pars=contra_pars, edu_pars=edu_pars, location='kenya')
     sim1.init()
 
     assert sim1.pars.n_agents == 500, "Sim par failed"
     assert sim1.connectors.contraception.pars.prob_use_year == contra_pars['prob_use_year'], "Contraception par failed"
     assert sim1.connectors.edu.pars.init_dropout.pars.p == edu_pars['init_dropout'], "Education par failed"
-    assert sim1.pars.fp.primary_infertility == fp_pars['primary_infertility'], "FP par failed"
+    assert sim1.pars.fp.p_infertile.pars.p == fp_pars['p_infertile'], "FP par failed"
 
     # Test 2: separate modules
     contra_mod = fp.SimpleChoice(location='kenya', prob_use_trend_par=0.3)
     edu_mod = fp.Education(location='kenya', init_dropout=0.1)
 
-    sim2 = fp.Sim(pars=par_kwargs, primary_infertility=0.1, contraception_module=contra_mod, education_module=edu_mod, location='kenya')
+    sim2 = fp.Sim(pars=par_kwargs, p_infertile=0.1, contraception_module=contra_mod, education_module=edu_mod, location='kenya')
     sim2.init()
 
     assert sim2.connectors.contraception.pars.prob_use_trend_par == 0.3, "Contraception par failed"
     assert sim2.connectors.edu.pars.init_dropout.pars.p == 0.1, "Education par failed"
-    assert sim2.pars.fp.primary_infertility == 0.1, "FP par failed"
+    assert sim2.pars.fp.p_infertile.pars.p == 0.1, "FP par failed"
 
     # Test 3: flat pars dict
     pars = dict(
         start=2010,  # Sim par
-        primary_infertility=0.18,  # FP par
+        p_infertile=0.18,  # FP par
         prob_use_intercept=0.5,  # Contraception par
         init_dropout=0.15,  # Education par
         location='kenya',
@@ -97,7 +97,7 @@ def test_sim_creation():
 
     assert sim3.connectors.contraception.pars.prob_use_intercept == 0.5, "Contraception par failed"
     assert sim3.connectors.edu.pars.init_dropout.pars.p == 0.15, "Education par failed"
-    assert sim3.pars.fp.primary_infertility == 0.18, "FP par failed"
+    assert sim3.pars.fp.p_infertile.pars.p == 0.18, "FP par failed"
 
     # Test 4: mixed types: some flat pars, some in dicts, and some modules
     fp_pars = dict(short_int=20)
@@ -110,7 +110,7 @@ def test_sim_creation():
     assert sim4.connectors.contraception.pars.prob_use_year == 2010, "Contraception par failed"
     assert sim4.connectors.edu.pars.age_start == 7, "Education par failed"
     assert sim4.pars.fp.short_int == 20, "FP par failed"
-    assert sim4.pars.fp.primary_infertility == 0.18, "FP par failed"
+    assert sim4.pars.fp.p_infertile.pars.p == 0.18, "FP par failed"
 
     print('✓ (successfully created sims with different methods)')
 
@@ -183,7 +183,7 @@ def test_birth_outcomes():
 
     # Check that n_pregnancies matches sum of outcomes
     fpmod = sim.people.fp
-    was_preg_bools = (fpmod.n_pregnancies > 0) & ~(fpmod.pregnant)
+    was_preg_bools = (fpmod.n_pregnancies > 0) & ~fpmod.pregnant
     n_pregnancies = fpmod.n_pregnancies[was_preg_bools]
     n_outcomes = (
         fpmod.n_births[was_preg_bools] +
@@ -196,8 +196,8 @@ def test_birth_outcomes():
     sc.printgreen('✓ (Birth outcomes sum to pregnancies)')
 
     # Check that parity increments correctly
-    expected_parity = (fpmod.n_births + fpmod.n_twinbirths + fpmod.n_stillbirths
-    assert fpmod.parity == expected_parity).all(), 'Parity does not match number of live/still births'
+    expected_parity = fpmod.n_births + fpmod.n_twinbirths + fpmod.n_stillbirths
+    assert (fpmod.parity == expected_parity).all(), 'Parity does not match number of live/still births'
     sc.printgreen('✓ (Parity increments correctly)')
 
     return sim
@@ -207,13 +207,12 @@ if __name__ == '__main__':
 
     ss.options.warnings = 'error'  # Ignore warnings for testing
 
-    # sim = test_simple()
-    # s1 = test_random_choice()
-    # sims1 = test_simple_choice()
-    # sims2 = test_mid_choice()
-    # test_sim_creation()
-    # exp = test_senegal()
-
+    sim = test_simple()
+    s1 = test_random_choice()
+    sims1 = test_simple_choice()
+    sims2 = test_mid_choice()
+    test_sim_creation()
+    exp = test_senegal()
     sim = test_birth_outcomes()
 
     print('Done.')

@@ -44,7 +44,7 @@ def make_sim_pars(**kwargs):
     return SimPars(**kwargs)
 
 
-class FPPars(ss.Pars):
+class FPPars(ss.PregnancyPars):
     def __init__(self, location=None, **kwargs):
         super().__init__()
 

@@ -244,8 +244,40 @@ class FPmod(ss.Pregnancy):
         # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
         self.fated_debut[uids] = self._fated_debut.rvs(uids)
         self.check_sexually_active(self.fecund.uids)  # Check for all women of childbearing age
+        self.update_time_to_choose(uids)
+
+        # Update methods for those who are eligible
+        method_updaters = ((self.ti_contra <= self.ti) & self.fecund & ~self.pregnant).uids
+        if len(method_updaters):
+            self.sim.connectors.contraception.update_contra(method_updaters)
+            self.results['switchers'][self.ti] = len(method_updaters)  # How many people switch methods (incl on/off)
+        methods_ok = np.array_equal(self.on_contra.nonzero()[-1], self.method.nonzero()[-1])
+        if not methods_ok:
+            errormsg = 'Agents not using contraception are not the same as agents who are using None method'
+            raise ValueError(errormsg)
 
         return uids
+
+    def update_time_to_choose(self, uids=None):
+        """
+        Initialise the counter to determine when girls/women will have to first choose a method.
+        """
+        ppl = self.sim.people
+        if uids is None:
+            uids = self.alive.uids
+
+        fecund = uids[(ppl.female[uids] == True) & (ppl.age[uids] < self.pars['age_limit_fecundity'])]
+        ti_to_debut = ss.years(self.fated_debut[fecund]-ppl.age[fecund])/self.t.dt
+
+        # If ti_contra is less than one timestep away, we want to also set it to 0 so floor time_to_debut.
+        self.ti_contra[fecund] = np.maximum(np.floor(ti_to_debut), 0)
+
+        # Validation
+        time_to_set_contra = self.ti_contra[fecund] == 0
+        if not np.array_equal(((ppl.age[fecund] - self.fated_debut[fecund]) > - self.t.dt), time_to_set_contra):
+            errormsg = 'Should be choosing contraception for everyone past fated debut age.'
+            raise ValueError(errormsg)
+        return
 
     def handle_loss(self, uids):
         """
@@ -482,7 +514,7 @@ class FPmod(ss.Pregnancy):
 
         # Track method failures for continuing pregnancies
         if hasattr(self.sim, 'contraception') and len(preg_uids):
-            on_method = self.sim.contraception.method[preg_uids] != 0
+            on_method = self.method[preg_uids] != 0
             self.results['method_failures'][self.ti] += on_method.sum()
 
         return preg_uids
@@ -540,6 +572,8 @@ class FPmod(ss.Pregnancy):
     def make_pregnancies(self, uids):
         """ Create new pregnancies """
         super().make_pregnancies(uids)
+        self.on_contra[uids] = False  # Not using contraception during pregnancy
+        self.method[uids] = 0  # Method zero due to non-use
         return
 
     def do_step(self):

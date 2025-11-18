@@ -694,9 +694,9 @@ class SimpleChoice(RandomChoice):
                     raise ValueError(errormsg)
 
         dt = self.t.dt.months
-        timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].years)  # Include a maximum. Durs seem way too high
+        timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].months)  # Include a maximum. Durs seem way too high
 
-        return timesteps_til_update
+        return timesteps_til_update.astype(int)
 
     def choose_method(self, uids, event=None, jitter=1e-4):
         ppl = self.sim.people
