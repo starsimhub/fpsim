@@ -592,7 +592,19 @@ class FPmod(ss.Pregnancy):
     def update_results(self):
         super().update_results()
         ti = self.ti
-        self.results['imr'][ti] = sc.safedivide(self.results['infant_deaths'][ti], self.results['new_births'][ti]) * 1e3
+        self.results['imr'][ti] = sc.safedivide(self.results['infant_deaths'][ti], self.results['births'][ti]) * 1e3
+        self.compute_method_usage()
+        return
+
+    def compute_method_usage(self):
+        """ Store number of women using each method """
+        ppl = self.sim.people
+        min_age = self.pars.method_age
+        max_age = self.pars.max_age
+        bool_list_uids = ppl.female & (ppl.age >= min_age) * (ppl.age <= max_age)
+        filtered_methods = self.method[bool_list_uids]
+        m_counts, _ = np.histogram(filtered_methods, bins=self.sim.connectors.contraception.n_options)
+        self.method_mix[:, self.ti] = m_counts / np.sum(m_counts) if np.sum(m_counts) > 0 else 0
         return
 
     def finalize(self):
