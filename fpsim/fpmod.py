@@ -198,7 +198,7 @@ class FPmod(ss.Pregnancy):
 
     def get_lam_eff(self):
         """ Get LAM efficacy adjustment """
-        lam_data_max = max(self.pars['lactational_amenorrhea']['month'])
+        lam_data_max = int(max(self.pars['lactational_amenorrhea']['month']))
         lam_candidates = self.breastfeeding & self.susceptible & ((self.ti - self.ti_delivery) <= lam_data_max)
         if lam_candidates.any():
             timesteps_since_birth = (self.ti - self.ti_delivery[lam_candidates]).astype(int)
@@ -576,19 +576,6 @@ class FPmod(ss.Pregnancy):
         self.method[uids] = 0  # Method zero due to non-use
         return
 
-    def do_step(self):
-        """ Perform all updates except for deaths, which are handled in finish_step """
-        super().do_step()
-        return
-
-    def step_die(self, uids):
-        super().step_die(uids)
-        return
-
-    def finish_step(self):
-        super().finish_step()
-        return
-
     def update_results(self):
         super().update_results()
         ti = self.ti
@@ -605,10 +592,6 @@ class FPmod(ss.Pregnancy):
         filtered_methods = self.method[bool_list_uids]
         m_counts, _ = np.histogram(filtered_methods, bins=self.sim.connectors.contraception.n_options)
         self.method_mix[:, self.ti] = m_counts / np.sum(m_counts) if np.sum(m_counts) > 0 else 0
-        return
-
-    def finalize(self):
-        super().finalize()
         return
 
     def finalize_results(self):
