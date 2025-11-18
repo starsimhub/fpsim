@@ -16,7 +16,7 @@ from scipy.stats import fisk
 from . import defaults as fpd
 from . import locations as fplocs
 
-__all__ = ['Method', 'make_methods', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
+__all__ = ['Method', 'make_methods', 'make_method_list', 'ContraPars', 'make_contra_pars', 'Switching', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
 
 
 # %% Base definition of contraceptive methods -- can be overwritten by locations
@@ -206,6 +206,309 @@ def make_contra_pars():
     return ContraPars()
 
 
+class Switching(sc.prettyobj):
+    """ Lightweight class to help create and modify contraceptive method switching matrices """
+    def __init__(self, methods, df=None, location=None, create=True):
+        self.methods = methods
+        self.matrix = None
+        self.df = df
+        self.location = location
+
+        if create:
+            if df is not None:
+                self.from_df(df)
+            else:
+                if location is not None:  # Load from location defaults
+                    dataloader = fpd.get_dataloader(location)
+                    matrix, _ = dataloader.load_method_switching(df=df, methods=self.methods)
+                    self.matrix = matrix
+                else:
+                    self.make_empty()
+        return
+
+    @property
+    def n_options(self):
+        """ Number of contraceptive methods defined """
+        return len(self.methods)
+
+    @property
+    def n_methods(self):
+        return len([m for m in self.methods if m != 'none'])
+
+    @property
+    def method_idx(self):
+        return [m.idx for m in self.methods.values() if m.name != 'none']
+
+    def from_df(self, df):
+        """
+        Create switching matrix from a dataframe
+        """
+        from fpsim.locations import data_utils
+        self.matrix = data_utils.load_method_switching(df, self.methods)
+        return
+
+    def make_empty(self):
+        """
+        Create an empty switching matrix with zero entries
+        """
+        mc = dict()
+        for pp in [0, 1, 6]:
+            mc[pp] = sc.objdict()
+            for age_grp in fpd.method_age_map.keys():
+                if pp == 1:  # Postpartum = 1 has direct array (no from_method level)
+                    mc[pp][age_grp] = np.zeros(len(self.method_idx))
+                else:  # pp = 0 or 6, has from_method level
+                    mc[pp][age_grp] = sc.objdict()
+                    for from_method in self.methods.keys():
+                        mc[pp][age_grp][from_method] = np.zeros(len(self.method_idx))
+        self.matrix = mc
+        return
+
+    def extend_matrix(self, new_name, replace=False):
+        """
+        Add a new method to the switching matrix with zero entries
+        """
+        mc = sc.dcp(self.matrix)
+        # Iterate through all states in the switching matrix
+        for pp in mc.keys():
+
+            # Update method_idx at this level
+            mc[pp].method_idx = self.method_idx.copy()
+
+            for age_grp in mc[pp].keys():
+                if age_grp == 'method_idx':  # Skip the method_idx key
+                    continue
+
+                if pp == 1:  # Postpartum = 1 has direct array (no from_method level)
+                    # Get current array
+                    old_array = mc[pp][age_grp]
+
+                    # Create new array with one more element
+                    new_array = np.zeros(len(old_array) + 1)
+                    new_array[:-1] = old_array
+                    mc[pp][age_grp] = new_array
+
+                else:  # pp = 0 or 6, has from_method level
+
+                    # Process each existing from_method
+                    for from_method in list(mc[pp][age_grp].keys()):
+                        if from_method == 'method_idx':
+                            continue
+
+                        # Get current array
+                        old_array = mc[pp][age_grp][from_method]
+
+                        # Create new array with one more element
+                        new_array = np.zeros(len(old_array) + 1)
+                        new_array[:-1] = old_array
+                        mc[pp][age_grp][from_method] = new_array
+
+                    # Add new from_method entry with zeros
+                    mc[pp][age_grp][new_name] = np.zeros(self.n_options)
+
+        if replace:
+            self.matrix = mc
+            return
+
+        return mc
+
+    def set_entry(self, from_method, to_method, value, postpartum=None,
+                  age_grp=None, renormalize=False):
+        """
+        Set switching probability from one method to another.
+        """
+        if to_method not in self.methods:
+            raise ValueError(f"to_method '{to_method}' not found")
+
+        to_idx = self.methods[to_method].idx-1
+
+        # Convert to lists for iteration
+        pp_list = self._to_list(postpartum, self._get_pp_keys())
+        age_list = self._to_list(age_grp, self._get_age_groups())
+
+        for pp in pp_list:
+            for age in age_list:
+                if pp == 1:
+                    # Direct array access for postpartum=1
+                    if from_method != 'birth':
+                        raise ValueError(f"For postpartum=1, from_method must be 'birth', got '{from_method}'")
+                    self.matrix[pp][age][to_idx] = value
+                    if renormalize:
+                        self._renormalize_row(pp, age, from_method)
+                else:
+                    # Need from_method for pp=0 or 6
+                    if from_method not in self.methods:
+                        raise ValueError(f"from_method '{from_method}' not found")
+                    self.matrix[pp][age][from_method][to_idx] = value
+                    if renormalize:
+                        self._renormalize_row(pp, age, from_method)
+
+    def get_entry(self, from_method, to_method, postpartum, age_grp):
+        """
+        Get switching probability from one method to another.
+        """
+        if to_method not in self.methods:
+            raise ValueError(f"to_method '{to_method}' not found")
+
+        to_idx = self.methods[to_method].idx-1
+
+        if postpartum == 1:
+            if from_method != 'birth':
+                raise ValueError(f"For postpartum=1, from_method must be 'birth', got '{from_method}'")
+            return self.matrix[postpartum][age_grp][to_idx]
+        else:
+            if from_method not in self.methods:
+                raise ValueError(f"from_method '{from_method}' not found")
+            return self.matrix[postpartum][age_grp][from_method][to_idx]
+
+    def copy_entries(self, from_method_source, to_method_source,
+                    from_method_dest, to_method_dest,
+                    postpartum=None, age_grp=None, renormalize=False):
+        """
+        Copy switching probability from one method pair to another.
+
+        Example: Copy the probability of switching from pill->iud
+                 to the probability of switching from condom->implant
+        """
+        pp_list = self._to_list(postpartum, self._get_pp_keys())
+        age_list = self._to_list(age_grp, self._get_age_groups())
+
+        for pp in pp_list:
+            for age in age_list:
+                value = self.get_entry(from_method_source, to_method_source, pp, age)
+                self.set_entry(from_method_dest, to_method_dest, value, pp, age,
+                             renormalize=renormalize)
+
+    def copy_from_method_column(self, source_to_method, dest_to_method, postpartum=None, age_grp=None, renormalize=False):
+        """
+        Copy all switching probabilities TO a method (entire column).
+
+        Example: Copy all probabilities of switching to IUD
+                 to be the probabilities of switching to implant.
+        """
+        pp_list = self._to_list(postpartum, self._get_pp_keys())
+        age_list = self._to_list(age_grp, self._get_age_groups())
+
+        for pp in pp_list:
+            for age in age_list:
+                if pp == 1:
+                    # Copy from birth
+                    value = self.get_entry('birth', source_to_method, pp, age)
+                    self.set_entry('birth', dest_to_method, value, pp, age, renormalize=renormalize)
+                else:
+                    # Copy from all methods (excluding permanent methods like btl that can't switch)
+                    for from_method in self.methods.keys():
+                        # Check if this method can switch (has a row in the matrix)
+                        if from_method in self.matrix[pp][age]:
+                            value = self.get_entry(from_method, source_to_method, pp, age)
+                            self.set_entry(from_method, dest_to_method, value, pp, age, renormalize=renormalize)
+
+    def copy_from_method_row(self, source_from_method, dest_from_method,
+                            postpartum=None, age_grp=None, renormalize=False):
+        """
+        Copy all switching probabilities FROM a method (entire row).
+
+        Example: Copy all probabilities of switching from pill to other methods
+                 to be the probabilities of switching from implant to other methods.
+                 This makes implant users switch like pill users.
+        """
+        pp_list = self._to_list(postpartum, self._get_pp_keys())
+        age_list = self._to_list(age_grp, self._get_age_groups())
+
+        for pp in pp_list:
+            if pp == 1:
+                continue  # Skip postpartum=1 as it has no from_method dimension
+
+            for age in age_list:
+                # Copy entire row at once, then renormalize once if needed
+                for to_method in self.methods.keys():
+                    value = self.get_entry(source_from_method, to_method, pp, age)
+                    # Don't renormalize on each set, only after all values copied
+                    self.set_entry(dest_from_method, to_method, value, pp, age, renormalize=False)
+
+                # Renormalize once after all values are set
+                if renormalize:
+                    self._renormalize_row(pp, age, dest_from_method)
+
+    def _to_list(self, value, all_values):
+        """Convert None, single value, or list to list."""
+        if value is None:
+            return all_values
+        elif isinstance(value, (list, tuple)):
+            return value
+        else:
+            return [value]
+
+    def _get_pp_keys(self):
+        """Get all postpartum keys."""
+        return sorted([k for k in self.matrix.keys()])
+
+    def _get_age_groups(self):
+        """Get all age groups from first postpartum level."""
+        for pp in self._get_pp_keys():
+            return [k for k in self.matrix[pp].keys() if k != 'method_idx']
+        return []
+
+    def get_matrix(self, postpartum, from_method=None):
+        """
+        Get switching matrix for a particular postpartum status across all age groups.
+        """
+        if postpartum not in self._get_pp_keys():
+            raise ValueError(f"postpartum={postpartum} not found. "
+                           f"Available: {self._get_pp_keys()}")
+
+        if postpartum == 1:
+            # For postpartum=1, return direct arrays for all age groups
+            result = {}
+            for age_grp in self._get_age_groups():
+                result[age_grp] = self.matrix[postpartum][age_grp]
+            return result
+        else:
+            # For postpartum=0 or 6, need from_method
+            if from_method is None:
+                raise ValueError(f"from_method is required when postpartum={postpartum}")
+
+            if from_method not in self.methods:
+                raise ValueError(f"from_method '{from_method}' not found. "
+                               f"Available: {list(self.methods.keys())}")
+
+            result = {}
+            for age_grp in self._get_age_groups():
+                if from_method in self.matrix[postpartum][age_grp]:
+                    result[age_grp] = self.matrix[postpartum][age_grp][from_method]
+                else:
+                    # Method doesn't have a row (e.g., btl can't switch)
+                    result[age_grp] = None
+
+            return result
+
+    def _renormalize_row(self, pp, age_grp, from_method):
+        """
+        Renormalize a row to sum to 1.
+        """
+        if pp == 1:
+            row = self.matrix[pp][age_grp]
+        else:
+            row = self.matrix[pp][age_grp][from_method]
+
+        row_sum = row.sum()
+        if row_sum > 0:
+            row /= row_sum
+
+    def renormalize_all(self):
+        """
+        Renormalize all rows in the switching matrix to sum to 1.
+        """
+        for pp in self._get_pp_keys():
+            for age in self._get_age_groups():
+                if pp == 1:
+                    self._renormalize_row(pp, age, 'birth')
+                else:
+                    for from_method in self.methods.keys():
+                        if from_method in self.matrix[pp][age]:
+                            self._renormalize_row(pp, age, from_method)
+
+
 # %% Define classes to contain information about the way women choose contraception
 
 class ContraceptiveChoice(ss.Connector):
@@ -222,14 +525,14 @@ class ContraceptiveChoice(ss.Connector):
 
         # Copy methods as main attribute
         self.methods = make_methods(self.pars.methods)  # Store the methods as an ndict
-        self.n_options = len(self.methods)
-        self.n_methods = len([m for m in self.methods if m != 'none'])
-
         # Process pars
         if self.pars.method_mix == 'uniform':
             self.pars.method_mix = np.array([1/self.n_methods]*self.n_methods)
         if self.pars.method_weights is None:
             self.pars.method_weights = np.ones(self.n_methods)
+
+        # Make switching matrix
+        self.switch = Switching(self.methods, create=True)
 
         self.init_dist = None
         self.data = {}
@@ -239,6 +542,19 @@ class ContraceptiveChoice(ss.Connector):
         self._jitter_dist = ss.normal(loc=0, scale=1e-4)
 
         return
+
+    @property
+    def n_options(self):
+        """ Number of contraceptive methods defined """
+        return len(self.methods)
+
+    @property
+    def n_methods(self):
+        return len([m for m in self.methods if m != 'none'])
+
+    @property
+    def method_idx(self):
+        return [m.idx for m in self.methods.values() if m.name != 'none']
 
     def init_results(self):
         """
@@ -330,8 +646,16 @@ class ContraceptiveChoice(ss.Connector):
         method = self.get_method_by_label(method_label)
         method.dur_use = new_duration
 
-    def add_method(self, method):
-        self.methods[method.name] = method
+    def add_method(self, method, new_switch=None):
+        method_list = self.methods.values()
+        self.methods = make_methods(method_list + [method])
+        self.methods[-1].idx = self.methods[-2].idx + 1  # Assign new index - TODO, fix this, fragile!
+        self.switch.methods = self.methods
+        if new_switch is not None:
+            self.pars.method_choice_pars = new_switch
+        else:
+            self.switch.extend_matrix(method.name, replace=True)
+        return
 
     def remove_method(self, method_label):
         errormsg = ('remove_method is not currently functional. See example in test_parameters.py if you want to run a '
@@ -567,6 +891,7 @@ class SimpleChoice(RandomChoice):
             data = dataloader.load_contra_data(contra_mod, return_data=True)
         self.update_pars(data)
         if self.pars.dur_use_df is not None: self.process_durations()
+        self.switch = Switching(self.methods, location=location, create=True)
 
         self.age_bins = np.sort([fpd.method_age_map[k][1] for k in self.pars.method_choice_pars[0].keys() if k != 'method_idx'])
 

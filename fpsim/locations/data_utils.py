@@ -587,10 +587,11 @@ class DataLoader:
 
         return contra_use_pars
 
-    def load_method_switching(self, methods=None):
+    def load_method_switching(self, df=None, methods=None):
         """ Choice of method is age and previous method """
 
-        df = self.read_data('method_mix_matrix_switch.csv', keep_default_na=False, na_values=['NaN'])
+        if df is None:
+            df = self.read_data('method_mix_matrix_switch.csv', keep_default_na=False, na_values=['NaN'])
 
         # Get default methods - TODO, think of something better
         if methods is None:

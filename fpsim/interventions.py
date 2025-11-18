@@ -10,7 +10,7 @@ from . import methods as fpm
 
 #%% Generic intervention classes
 
-__all__ = ['change_par', 'update_methods', 'change_people_state', 'change_initiation_prob', 'change_initiation']
+__all__ = ['change_par', 'update_methods', 'add_method', 'change_people_state', 'change_initiation_prob', 'change_initiation']
 
 
 class change_par(ss.Intervention):
@@ -119,6 +119,36 @@ class change_par(ss.Intervention):
             errormsg = f'Not all values were applied ({n_vals} ≠ {n_counter})'
             raise RuntimeError(errormsg)
         super().finalize()
+        return
+
+
+class add_method(ss.Intervention):
+    """
+    Intervention to add a new contraceptive method to the simulation at a specified time.
+    """
+    def __init__(self, year=None, method=None, copy_from=None, pars=None, **kwargs):
+        super().__init__()
+        self.year = year
+        self.method = method
+        self.copy_from = copy_from
+        self.define_pars()
+        self.update_pars(pars, **kwargs)
+        return
+
+    def init_pre(self, sim):
+        super().init_pre(sim)
+        cm = self.sim.connectors.contraception
+        cm.add_method(self.method)
+        self.sim.connectors.fp.method_mix = np.zeros((cm.n_options, self.t.npts))
+        return
+
+    def step(self):
+        sim = self.sim
+        if sim.t.year == self.year:
+            print(f'Activating new contraceptive method "{self.method.name}" in year {sim.t.year}')
+            sw = sim.connectors.contraception.switch
+            sw.copy_from_method_column(self.copy_from, self.method.name, postpartum=0)
+            sw.copy_from_method_row(self.copy_from, self.method.name, postpartum=0)
         return
 
 
