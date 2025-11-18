@@ -6,7 +6,6 @@ Define defaults for use throughout FPsim
 import numpy as np
 import sciris as sc
 import starsim as ss
-import fpsim
 import fpsim.arrays as fpa
 
 

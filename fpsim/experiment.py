@@ -169,7 +169,7 @@ class Experiment(sc.prettyobj):
     def get_crude_birth_rate(self, fp_df=None, sim_df=None):
         dd = self.load_data('basic_wb')
         self.data['crude_birth_rate'] = dd['crude_birth_rate']
-        births_last_year = fp_df['new_births'].values[-1]
+        births_last_year = fp_df['births'].values[-1]
         self.model['crude_birth_rate'] = sc.safedivide(births_last_year, sim_df['n_alive'].values[-1]) * 1000
         return
 
