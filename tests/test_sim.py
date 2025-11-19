@@ -205,10 +205,6 @@ def test_birth_outcomes():
 
 if __name__ == '__main__':
 
-    # ss.options.warnings = 'error'  # Ignore warnings for testing
-    # import warnings
-    # warnings.filterwarnings("error", category=RuntimeWarning)
-
     sim = test_simple()
     s1 = test_random_choice()
     sims1 = test_simple_choice()

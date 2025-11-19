@@ -292,19 +292,10 @@ class FPmod(ss.Pregnancy):
         self.ti_stop_breastfeed[uids] = self.ti + 1  # Stop breastfeeding next month
 
         # Track death of unborn child/ren
-        child_uids, mothers_with_twins = self._get_children(uids)
+        child_uids = self.find_unborn_children(uids)
         self.sim.people.request_death(child_uids)
-        self.child_uid[uids] = np.nan
-        self.twin_uid[mothers_with_twins] = np.nan
 
         return
-
-    def _get_children(self, uids):
-        """ Get UIDs for children born to mothers in uids """
-        child_uids = ss.uids(self.child_uid[uids])
-        mothers_with_twins = self.twin_uid.notnan.uids & uids
-        twin_uids = ss.uids(self.twin_uid[mothers_with_twins])
-        return child_uids | twin_uids, mothers_with_twins
 
     def update_breastfeeding(self, uids):
         stopping = super().update_breastfeeding(uids)
@@ -338,12 +329,13 @@ class FPmod(ss.Pregnancy):
         stillborn, live = self._p_stillbirth.split(uids)
 
         # Sort mothers into single and multiple births
-        _, twins = self._get_children(live)
+        twins = live & self.carrying_multiple.uids
         single = live - twins
         self.parity[twins] += 1  # Increment parity for twins
         self.n_births[live] += 1
         self.n_twinbirths[twins] += 1
         self.record_ages(stillborn, single, twins)
+        self.carrying_multiple[twins] = False
 
         # Update states for mothers of stillborns
         self.n_stillbirths[stillborn] += 1  # Track number of stillbirths for each woman
@@ -361,7 +353,7 @@ class FPmod(ss.Pregnancy):
 
         # Calculate mothers of live babies
         mothers = uids - stillborn - mothers_of_nnds
-        live_babies, _ = self._get_children(mothers)
+        live_babies = self.find_unborn_children(mothers)
 
         return live, live_babies
 
@@ -413,7 +405,7 @@ class FPmod(ss.Pregnancy):
             death_prob = death_prob * (self.pars['infant_mortality']['age_probs'][age_inds])
         self._p_inf_mort.set(p=death_prob)
         mothers_of_nnd = self._p_inf_mort.filter(uids)
-        nnds = ss.uids(self.child_uid[mothers_of_nnd])
+        nnds = self.find_unborn_children(mothers_of_nnd)  # Technically the children have been born, but age < dt
         return mothers_of_nnd, nnds
 
     def progress_pregnancies(self):
@@ -556,12 +548,11 @@ class FPmod(ss.Pregnancy):
         # Determine who is having twins
         self._p_twins.set(p=self.pars.twins_prob)
         twin_uids, single_uids = self._p_twins.split(conceive_uids)
+        self.carrying_multiple[twin_uids] = True
 
         # Grow the population and assign properties to twins
         new_twin_uids, new_twin_slots = self._make_twin_uids(twin_uids)
         self._set_embryo_states(twin_uids, new_twin_uids, new_twin_slots)
-        self.child_uid[conceive_uids] = new_uids  # Stored for the duration of pregnancy then removed
-        self.twin_uid[twin_uids] = new_twin_uids  # Link twin embryos to their mothers
 
         # Handle burn-in (aging embryos to ti=0)
         if self.ti < 0:

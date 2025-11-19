@@ -98,6 +98,7 @@ fpmod_states = [
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
+    ss.BoolState('carrying_multiple'),
     ss.BoolState('sexually_active'),
     ss.BoolState('sexual_debut'),
 
