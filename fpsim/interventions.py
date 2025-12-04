@@ -8,7 +8,7 @@ import starsim as ss
 from . import utils as fpu
 from . import methods as fpm
 
-#%% Generic intervention classes
+#>> Generic intervention classes
 
 __all__ = ['change_par', 'update_methods', 'add_method', 'change_people_state', 'change_initiation_prob', 'change_initiation']
 
@@ -125,30 +125,226 @@ class change_par(ss.Intervention):
 class add_method(ss.Intervention):
     """
     Intervention to add a new contraceptive method to the simulation at a specified time.
+   
+    Args:
+        year (float): The year at which to activate the new method
+        method (Method): A Method object defining the new contraceptive method
+        copy_from (str): Name of the existing method to copy switching probabilities from
+        verbose (bool): Whether to print messages when method is activated (default True)
+    
+    **Example**::
+    
+        intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
     """
-    def __init__(self, year=None, method=None, copy_from=None, pars=None, **kwargs):
-        super().__init__()
+    
+    def __init__(self, year=None, method=None, copy_from=None, verbose=True, **kwargs):
+        super().__init__(**kwargs)
+        
+        # Validate inputs
+        if year is None:
+            raise ValueError('Year must be specified for add_method intervention')
+        if method is None:
+            raise ValueError('A Method object must be provided')
+        if copy_from is None:
+            raise ValueError('copy_from must specify an existing method name to copy switching behavior from')
+        
         self.year = year
         self.method = method
         self.copy_from = copy_from
-        self.define_pars()
-        self.update_pars(pars, **kwargs)
+        self.verbose = verbose
+        self.activated = False
+        self._method_idx = None  # Will be set after method is added
+        
+        self.define_pars(year=year, method=method, copy_from=copy_from, verbose=verbose)
+        self.update_pars(**kwargs)
+        
         return
 
     def init_pre(self, sim):
+        """
+        Initialize the intervention before the simulation starts.
+        This registers the new method but does not activate it yet.
+        """
         super().init_pre(sim)
-        cm = self.sim.connectors.contraception
+        
+        # Validate year is within simulation range
+        if not (sim.pars.start <= self.year <= sim.pars.stop):
+            raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
+        
+        # Validate that copy_from method exists
+        cm = sim.connectors.contraception
+        if self.copy_from not in cm.methods:
+            available = list(cm.methods.keys())
+            raise ValueError(f'copy_from method "{self.copy_from}" not found. Available methods: {available}')
+        
+        # Add the new method to the contraception module
         cm.add_method(self.method)
-        self.sim.connectors.fp.method_mix = np.zeros((cm.n_options, self.t.npts))
+        # Get the actual index after the method is added
+        self._method_idx = cm.methods[self.method.name].idx
+        
+        # Resize the method_mix array in fpmod to accommodate the new method
+        fp_mod = sim.connectors.fp
+        old_mix = fp_mod.method_mix
+        new_mix = np.zeros((cm.n_options, sim.t.npts))
+        new_mix[:old_mix.shape[0], :] = old_mix
+        fp_mod.method_mix = new_mix
+        
+        if self.verbose:
+            print(f'Registered new method "{self.method.name}" (idx={self._method_idx}), will activate in year {self.year}')
+        
         return
 
     def step(self):
+        """
+        At the specified year, copy switching probabilities to make the method available.
+        """
         sim = self.sim
-        if sim.t.year == self.year:
-            print(f'Activating new contraceptive method "{self.method.name}" in year {sim.t.year}')
-            sw = sim.connectors.contraception.switch
-            sw.copy_from_method_column(self.copy_from, self.method.name, postpartum=0)
-            sw.copy_from_method_row(self.copy_from, self.method.name, postpartum=0)
+        
+        # Check if we've reached the activation year and haven't already activated
+        if not self.activated and sim.t.year >= self.year:
+            self.activated = True
+            
+            if self.verbose:
+                print(f'Activating new contraceptive method "{self.method.name}" in year {sim.t.year:.1f}')
+            
+            cm = sim.connectors.contraception
+            
+            # Update the method_choice_pars which is what choose_method actually uses
+            self._extend_method_choice_pars(cm)
+            
+            # Also update the Switching matrix for consistency
+            sw = cm.switch
+            
+            # Copy switching probabilities for all postpartum states
+            for pp in [0, 6]:  # Non-postpartum and 6+ months postpartum
+                sw.copy_from_method_column(
+                    source_to_method=self.copy_from,
+                    dest_to_method=self.method.name,
+                    postpartum=pp
+                )
+                sw.copy_from_method_row(
+                    source_from_method=self.copy_from,
+                    dest_from_method=self.method.name,
+                    postpartum=pp
+                )
+            
+            # Handle postpartum=1 separately (different structure)
+            sw.copy_from_method_column(
+                source_to_method=self.copy_from,
+                dest_to_method=self.method.name,
+                postpartum=1
+            )
+            
+            # Renormalize all switching probabilities
+            sw.renormalize_all()
+            self._renormalize_method_choice_pars(cm)
+        
+        return
+    
+    def _extend_method_choice_pars(self, cm):
+        """
+        Extend method_choice_pars to include the new method with probabilities 
+        copied from the source method. Also extend method_weights.
+        """
+        # Extend method_weights array
+        if cm.pars.method_weights is not None:
+            cm.pars.method_weights = np.append(cm.pars.method_weights, 1.0)
+        
+        mcp = cm.pars.method_choice_pars
+        if mcp is None:
+            return
+        
+        # Get the index of the source method to copy probabilities from
+        source_method = cm.methods[self.copy_from]
+        # The index in the probability arrays (method_idx starts at 1, so subtract 1)
+        source_idx_in_array = np.where(mcp[0].method_idx == source_method.idx)[0][0]
+        
+        # Process each postpartum state
+        for pp in mcp.keys():
+            pp_dict = mcp[pp]
+            
+            # Add new method to method_idx
+            pp_dict.method_idx = np.append(pp_dict.method_idx, self._method_idx)
+            
+            # Process each age group
+            for age_grp in pp_dict.keys():
+                if age_grp == 'method_idx':
+                    continue
+                
+                if pp == 1:
+                    # For pp=1, age groups have direct arrays
+                    old_probs = pp_dict[age_grp]
+                    # Copy probability from source method for the new method
+                    new_prob = old_probs[source_idx_in_array]
+                    pp_dict[age_grp] = np.append(old_probs, new_prob)
+                else:
+                    # For pp=0 and pp=6, age groups have from_method dicts
+                    age_dict = pp_dict[age_grp]
+                    
+                    # For each existing from_method, add a probability to switch TO the new method
+                    for from_method in list(age_dict.keys()):
+                        old_probs = age_dict[from_method]
+                        # Copy the probability of switching to the source method
+                        new_prob = old_probs[source_idx_in_array]
+                        age_dict[from_method] = np.append(old_probs, new_prob)
+                    
+                    # Add the new method as a from_method (copy switching behavior from source)
+                    if self.copy_from in age_dict:
+                        # Copy the source method's switching probabilities
+                        # Note: source_probs now has N+1 elements after the loop above extended it
+                        source_probs = age_dict[self.copy_from].copy()
+                        # The last element is probability of switching to the new method (itself)
+                        # Set this to 0 since methods don't switch to themselves
+                        source_probs[-1] = 0.0
+                        age_dict[self.method.name] = source_probs
+        
+        return
+    
+    def _renormalize_method_choice_pars(self, cm):
+        """
+        Renormalize all probability arrays in method_choice_pars to sum to 1.
+        """
+        mcp = cm.pars.method_choice_pars
+        if mcp is None:
+            return
+        
+        for pp in mcp.keys():
+            pp_dict = mcp[pp]
+            
+            for age_grp in pp_dict.keys():
+                if age_grp == 'method_idx':
+                    continue
+                
+                if pp == 1:
+                    probs = pp_dict[age_grp]
+                    if probs.sum() > 0:
+                        pp_dict[age_grp] = probs / probs.sum()
+                else:
+                    for from_method in pp_dict[age_grp].keys():
+                        probs = pp_dict[age_grp][from_method]
+                        if probs.sum() > 0:
+                            pp_dict[age_grp][from_method] = probs / probs.sum()
+        
+        return
+    
+    def finalize(self):
+        """
+        Report summary statistics about the new method usage.
+        """
+        super().finalize()
+        
+        if self.verbose:
+            sim = self.sim
+            fp_mod = sim.connectors.fp
+            
+            # Get final method usage for the new method
+            final_usage = fp_mod.method_mix[self._method_idx, -1] if self._method_idx < fp_mod.method_mix.shape[0] else 0
+            
+            # Count current users
+            n_users = np.sum(fp_mod.method == self._method_idx)
+            
+            print(f'add_method finalized: "{self.method.name}" has {n_users} users ({final_usage*100:.2f}% of method mix)')
+        
         return
 
 
