@@ -114,11 +114,68 @@ def test_change_people_state():
     return s0, s1, s2
 
 
+def test_add_method():
+    """ Test the add_method intervention """
+    sc.heading('Testing add_method()...')
+    
+    pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
+    
+    # Test 1: Basic add_method functionality
+    new_method = fp.Method(
+        name='test_method',
+        label='Test Method',
+        efficacy=0.99,
+        modern=True,
+        dur_use=ss.lognorm_ex(mean=2, std=1),
+    )
+    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', verbose=False)
+    sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
+    sim.run()
+    
+    cm = sim.connectors.contraception
+    assert new_method.name in cm.methods, f'New method should be in contraception methods'
+    assert cm.n_methods > 9, f'Should have more than default 9 methods after adding one'
+    print(f'  ✓ Basic add_method works')
+    
+    # Test 2: Late introduction (year before simulation end)
+    late_method = fp.Method(name='late', label='Late Method', efficacy=0.99, modern=True,
+                           dur_use=ss.lognorm_ex(mean=2, std=1))
+    late_intv = fp.add_method(year=pars['stop']-1, method=late_method, copy_from='impl', verbose=False)
+    sim_late = fp.Sim(pars=pars, interventions=[late_intv], verbose=0)
+    sim_late.run()
+    print(f'  ✓ Late introduction works')
+    
+    # Test 3: Year before simulation start should raise error
+    early_method = fp.Method(name='early', label='Early Method', efficacy=0.99, modern=True,
+                            dur_use=ss.lognorm_ex(mean=2, std=1))
+    early_intv = fp.add_method(year=pars['start']-5, method=early_method, copy_from='impl', verbose=False)
+    try:
+        sim_early = fp.Sim(pars=pars, interventions=[early_intv], verbose=0)
+        sim_early.run()
+        raise AssertionError('Should have raised ValueError for year before simulation start')
+    except ValueError:
+        print(f'  ✓ Invalid year correctly rejected')
+    
+    # Test 4: Invalid copy_from should raise error
+    bad_method = fp.Method(name='bad', label='Bad Method', efficacy=0.99, modern=True,
+                          dur_use=ss.lognorm_ex(mean=2, std=1))
+    bad_intv = fp.add_method(year=2010, method=bad_method, copy_from='nonexistent', verbose=False)
+    try:
+        sim_bad = fp.Sim(pars=pars, interventions=[bad_intv], verbose=0)
+        sim_bad.run()
+        raise AssertionError('Should have raised ValueError for invalid copy_from')
+    except ValueError:
+        print(f'  ✓ Invalid copy_from correctly rejected')
+    
+    return sim
+
+
 if __name__ == '__main__':
     s0 = test_intervention_fn()
     s1 = test_change_par()
     s3 = test_plot()
     s4, s5, s6 = test_change_people_state()
+    s7 = test_add_method()
 
     print('Done.')
 
