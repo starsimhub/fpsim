@@ -638,6 +638,32 @@ class ContraceptiveChoice(ss.Connector):
             raise ValueError(errormsg)
         return return_val
 
+    def get_method(self, identifier):
+        """
+        Get a method by name or label.
+        
+        Tries to find the method by name first, then by label.
+        
+        Args:
+            identifier (str): Method name (e.g., 'impl') or label (e.g., 'Implants')
+            
+        Returns:
+            Method: The matching method object
+        """
+        # Try by name first
+        if identifier in self.methods:
+            return self.methods[identifier]
+        
+        # Try by label
+        for method in self.methods.values():
+            if method.label == identifier:
+                return method
+        
+        # Not found
+        available_names = list(self.methods.keys())
+        available_labels = [m.label for m in self.methods.values()]
+        raise ValueError(f'Method "{identifier}" not found. Available names: {available_names}, labels: {available_labels}')
+
     def update_efficacy(self, method_label=None, new_efficacy=None):
         method = self.get_method_by_label(method_label)
         method.efficacy = new_efficacy
@@ -655,6 +681,88 @@ class ContraceptiveChoice(ss.Connector):
             self.pars.method_choice_pars = new_switch
         else:
             self.switch.extend_matrix(method.name, replace=True)
+        return
+
+    def extend_method_choice_pars(self, new_method_name, copy_from_method):
+        """
+        Extend method_choice_pars to include a new method with probabilities 
+        copied from an existing method. Also extends method_weights.
+        
+        Args:
+            new_method_name (str): Name of the new method being added
+            copy_from_method (str): Name of existing method to copy probabilities from
+        """
+        # Extend method_weights array
+        if self.pars.method_weights is not None:
+            self.pars.method_weights = np.append(self.pars.method_weights, 1.0)
+        
+        mcp = self.pars.method_choice_pars
+        if mcp is None:
+            return
+        
+        # Get the indices
+        new_method_idx = self.methods[new_method_name].idx
+        source_method = self.methods[copy_from_method]
+        source_idx_in_array = np.where(mcp[0].method_idx == source_method.idx)[0][0]
+        
+        # Process each postpartum state
+        for pp in mcp.keys():
+            pp_dict = mcp[pp]
+            
+            # Add new method to method_idx
+            pp_dict.method_idx = np.append(pp_dict.method_idx, new_method_idx)
+            
+            # Process each age group
+            for age_grp in pp_dict.keys():
+                if age_grp == 'method_idx':
+                    continue
+                
+                if pp == 1:
+                    # For pp=1, age groups have direct arrays
+                    old_probs = pp_dict[age_grp]
+                    new_prob = old_probs[source_idx_in_array]
+                    pp_dict[age_grp] = np.append(old_probs, new_prob)
+                else:
+                    # For pp=0 and pp=6, age groups have from_method dicts
+                    age_dict = pp_dict[age_grp]
+                    
+                    # For each existing from_method, add probability to switch TO the new method
+                    for from_method in list(age_dict.keys()):
+                        old_probs = age_dict[from_method]
+                        new_prob = old_probs[source_idx_in_array]
+                        age_dict[from_method] = np.append(old_probs, new_prob)
+                    
+                    # Add the new method as a from_method (copy switching behavior from source)
+                    if copy_from_method in age_dict:
+                        source_probs = age_dict[copy_from_method].copy()
+                        source_probs[-1] = 0.0  # Methods don't switch to themselves
+                        age_dict[new_method_name] = source_probs
+        return
+
+    def renormalize_method_choice_pars(self):
+        """
+        Renormalize all probability arrays in method_choice_pars to sum to 1.
+        """
+        mcp = self.pars.method_choice_pars
+        if mcp is None:
+            return
+        
+        for pp in mcp.keys():
+            pp_dict = mcp[pp]
+            
+            for age_grp in pp_dict.keys():
+                if age_grp == 'method_idx':
+                    continue
+                
+                if pp == 1:
+                    probs = pp_dict[age_grp]
+                    if probs.sum() > 0:
+                        pp_dict[age_grp] = probs / probs.sum()
+                else:
+                    for from_method in pp_dict[age_grp].keys():
+                        probs = pp_dict[age_grp][from_method]
+                        if probs.sum() > 0:
+                            pp_dict[age_grp][from_method] = probs / probs.sum()
         return
 
     def remove_method(self, method_label):

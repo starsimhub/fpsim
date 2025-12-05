@@ -155,9 +155,6 @@ class add_method(ss.Intervention):
         self.activated = False
         self._method_idx = None  # Will be set after method is added
         
-        self.define_pars(year=year, method=method, copy_from=copy_from, verbose=verbose)
-        self.update_pars(**kwargs)
-        
         return
 
     def init_pre(self, sim):
@@ -171,15 +168,13 @@ class add_method(ss.Intervention):
         if not (sim.pars.start <= self.year <= sim.pars.stop):
             raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
         
-        # Validate that copy_from method exists
+        # Resolve copy_from to method name (supports both name and label)
         cm = sim.connectors.contraception
-        if self.copy_from not in cm.methods:
-            available = list(cm.methods.keys())
-            raise ValueError(f'copy_from method "{self.copy_from}" not found. Available methods: {available}')
+        source_method = cm.get_method(self.copy_from)
+        self._copy_from_name = source_method.name  # Store resolved name for use in step()
         
-        # Add the new method to the contraception module
+        # Add the new method to the contraception module (this also extends the switching matrix)
         cm.add_method(self.method)
-        # Get the actual index after the method is added
         self._method_idx = cm.methods[self.method.name].idx
         
         # Resize the method_mix array in fpmod to accommodate the new method
@@ -208,122 +203,34 @@ class add_method(ss.Intervention):
                 print(f'Activating new contraceptive method "{self.method.name}" in year {sim.t.year:.1f}')
             
             cm = sim.connectors.contraception
-            
-            # Update the method_choice_pars which is what choose_method actually uses
-            self._extend_method_choice_pars(cm)
-            
-            # Also update the Switching matrix for consistency
             sw = cm.switch
             
-            # Copy switching probabilities for all postpartum states
+            # Extend method_choice_pars with probabilities copied from source method
+            cm.extend_method_choice_pars(self.method.name, self._copy_from_name)
+            
+            # Copy switching probabilities in the Switching matrix
             for pp in [0, 6]:  # Non-postpartum and 6+ months postpartum
                 sw.copy_from_method_column(
-                    source_to_method=self.copy_from,
+                    source_to_method=self._copy_from_name,
                     dest_to_method=self.method.name,
                     postpartum=pp
                 )
                 sw.copy_from_method_row(
-                    source_from_method=self.copy_from,
+                    source_from_method=self._copy_from_name,
                     dest_from_method=self.method.name,
                     postpartum=pp
                 )
             
-            # Handle postpartum=1 separately (different structure)
+            # Handle postpartum=1 separately (different structure - no from_method dimension)
             sw.copy_from_method_column(
-                source_to_method=self.copy_from,
+                source_to_method=self._copy_from_name,
                 dest_to_method=self.method.name,
                 postpartum=1
             )
             
-            # Renormalize all switching probabilities
+            # Renormalize all probabilities
             sw.renormalize_all()
-            self._renormalize_method_choice_pars(cm)
-        
-        return
-    
-    def _extend_method_choice_pars(self, cm):
-        """
-        Extend method_choice_pars to include the new method with probabilities 
-        copied from the source method. Also extend method_weights.
-        """
-        # Extend method_weights array
-        if cm.pars.method_weights is not None:
-            cm.pars.method_weights = np.append(cm.pars.method_weights, 1.0)
-        
-        mcp = cm.pars.method_choice_pars
-        if mcp is None:
-            return
-        
-        # Get the index of the source method to copy probabilities from
-        source_method = cm.methods[self.copy_from]
-        # The index in the probability arrays (method_idx starts at 1, so subtract 1)
-        source_idx_in_array = np.where(mcp[0].method_idx == source_method.idx)[0][0]
-        
-        # Process each postpartum state
-        for pp in mcp.keys():
-            pp_dict = mcp[pp]
-            
-            # Add new method to method_idx
-            pp_dict.method_idx = np.append(pp_dict.method_idx, self._method_idx)
-            
-            # Process each age group
-            for age_grp in pp_dict.keys():
-                if age_grp == 'method_idx':
-                    continue
-                
-                if pp == 1:
-                    # For pp=1, age groups have direct arrays
-                    old_probs = pp_dict[age_grp]
-                    # Copy probability from source method for the new method
-                    new_prob = old_probs[source_idx_in_array]
-                    pp_dict[age_grp] = np.append(old_probs, new_prob)
-                else:
-                    # For pp=0 and pp=6, age groups have from_method dicts
-                    age_dict = pp_dict[age_grp]
-                    
-                    # For each existing from_method, add a probability to switch TO the new method
-                    for from_method in list(age_dict.keys()):
-                        old_probs = age_dict[from_method]
-                        # Copy the probability of switching to the source method
-                        new_prob = old_probs[source_idx_in_array]
-                        age_dict[from_method] = np.append(old_probs, new_prob)
-                    
-                    # Add the new method as a from_method (copy switching behavior from source)
-                    if self.copy_from in age_dict:
-                        # Copy the source method's switching probabilities
-                        # Note: source_probs now has N+1 elements after the loop above extended it
-                        source_probs = age_dict[self.copy_from].copy()
-                        # The last element is probability of switching to the new method (itself)
-                        # Set this to 0 since methods don't switch to themselves
-                        source_probs[-1] = 0.0
-                        age_dict[self.method.name] = source_probs
-        
-        return
-    
-    def _renormalize_method_choice_pars(self, cm):
-        """
-        Renormalize all probability arrays in method_choice_pars to sum to 1.
-        """
-        mcp = cm.pars.method_choice_pars
-        if mcp is None:
-            return
-        
-        for pp in mcp.keys():
-            pp_dict = mcp[pp]
-            
-            for age_grp in pp_dict.keys():
-                if age_grp == 'method_idx':
-                    continue
-                
-                if pp == 1:
-                    probs = pp_dict[age_grp]
-                    if probs.sum() > 0:
-                        pp_dict[age_grp] = probs / probs.sum()
-                else:
-                    for from_method in pp_dict[age_grp].keys():
-                        probs = pp_dict[age_grp][from_method]
-                        if probs.sum() > 0:
-                            pp_dict[age_grp][from_method] = probs / probs.sum()
+            cm.renormalize_method_choice_pars()
         
         return
     
