@@ -1,100 +1,127 @@
-region,method,perc,freq
-addis_ababa,Condoms,0.8,0.008
-addis_ababa,Implants,6.7,0.067
-addis_ababa,Injectables,9.1,0.091
-addis_ababa,IUDs,2.5,0.025
-addis_ababa,Other modern,1.2,0.012
-addis_ababa,Other traditional,1.4,0.014
-addis_ababa,Pill,4.5,0.045
-addis_ababa,BTL,0,0
-addis_ababa,Withdrawal,0,0
-afar,Condoms,0.2,0.002
-afar,Implants,1.2,0.012
-afar,Injectables,6.7,0.067
-afar,IUDs,0.6,0.006
-afar,Other modern,0.5,0.005
-afar,Other traditional,0,0
-afar,Pill,1.9,0.019
-afar,BTL,0,0
-afar,Withdrawal,0,0
-amhara,Condoms,0,0
-amhara,Implants,7.5,0.075
-amhara,Injectables,24.7,0.247
-amhara,IUDs,0.9,0.009
-amhara,Other modern,0.2,0.002
-amhara,Other traditional,0,0
-amhara,Pill,1.1,0.011
-amhara,BTL,0.1,0.001
-amhara,Withdrawal,0,0
-benishangul_gumuz,Condoms,0,0
-benishangul_gumuz,Implants,11.1,0.111
-benishangul_gumuz,Injectables,12.1,0.121
-benishangul_gumuz,IUDs,1.5,0.015
-benishangul_gumuz,Other modern,0.6,0.006
-benishangul_gumuz,Other traditional,1.3,0.013
-benishangul_gumuz,Pill,0.7,0.007
-benishangul_gumuz,BTL,0,0
-benishangul_gumuz,Withdrawal,0.1,0.001
-dire_dawa,Condoms,0.6,0.006
-dire_dawa,Implants,7.2,0.072
-dire_dawa,Injectables,4.9,0.049
-dire_dawa,IUDs,0.5,0.005
-dire_dawa,Other modern,1.5,0.015
-dire_dawa,Other traditional,0.3,0.003
-dire_dawa,Pill,3.3,0.033
-dire_dawa,BTL,0.2,0.002
-dire_dawa,Withdrawal,0,0
-gambela,Condoms,0.1,0.001
-gambela,Implants,0.6,0.006
-gambela,Injectables,20.5,0.205
-gambela,IUDs,0.2,0.002
-gambela,Other modern,0,0
-gambela,Other traditional,0.4,0.004
-gambela,Pill,1.7,0.017
-gambela,BTL,0,0
-gambela,Withdrawal,0,0
-harari,Condoms,0.8,0.008
-harari,Implants,6.9,0.069
-harari,Injectables,6.3,0.063
-harari,IUDs,0.8,0.008
-harari,Other modern,2,0.02
-harari,Other traditional,1.3,0.013
-harari,Pill,2.4,0.024
-harari,BTL,0.1,0.001
-harari,Withdrawal,0,0
-oromia,Condoms,0,0
-oromia,Implants,5.2,0.052
-oromia,Injectables,18.3,0.183
-oromia,IUDs,1.1,0.011
-oromia,Other modern,0.9,0.009
-oromia,Other traditional,1,0.01
-oromia,Pill,1.4,0.014
-oromia,BTL,0.6,0.006
-oromia,Withdrawal,0.4,0.004
-snnpr,Condoms,0.1,0.001
-snnpr,Implants,5.4,0.054
-snnpr,Injectables,23.4,0.234
-snnpr,IUDs,1,0.01
-snnpr,Other modern,0.2,0.002
-snnpr,Other traditional,0.1,0.001
-snnpr,Pill,0.9,0.009
-snnpr,BTL,0.2,0.002
-snnpr,Withdrawal,0.2,0.002
-somali,Condoms,0,0
-somali,Implants,0.3,0.003
-somali,Injectables,1.3,0.013
-somali,IUDs,0,0
-somali,Other modern,0.5,0.005
-somali,Other traditional,0,0
-somali,Pill,0.7,0.007
-somali,BTL,0,0
-somali,Withdrawal,0,0
-tigray,Condoms,1.2,0.012
-tigray,Implants,10.3,0.103
-tigray,Injectables,11,0.11
-tigray,IUDs,0.7,0.007
-tigray,Other modern,0.4,0.004
-tigray,Other traditional,0.3,0.003
-tigray,Pill,2.6,0.026
-tigray,BTL,0,0
-tigray,Withdrawal,0.2,0.002
+"region","method","perc","freq"
+"addis_ababa","BTL",0.516563966197379,0.00516563966197379
+"addis_ababa","Condoms",0.509016131286887,0.00509016131286887
+"addis_ababa","IUDs",0.373618150495981,0.00373618150495981
+"addis_ababa","Implants",34.3834478028037,0.343834478028037
+"addis_ababa","Injectables",55.2803210884077,0.552803210884077
+"addis_ababa","Other modern",0.779644817944955,0.00779644817944955
+"addis_ababa","Other traditional",2.63813598454787,0.0263813598454787
+"addis_ababa","Pill",4.25705158597005,0.0425705158597005
+"addis_ababa","Withdrawal",1.26220047234552,0.0126220047234552
+"afar","BTL",0,0
+"afar","Condoms",0,0
+"afar","IUDs",0,0
+"afar","Implants",34.3147269010796,0.343147269010796
+"afar","Injectables",42.1360293206981,0.421360293206981
+"afar","Other modern",0,0
+"afar","Other traditional",10.1083416728671,0.101083416728671
+"afar","Pill",13.4409021053552,0.134409021053552
+"afar","Withdrawal",0,0
+"amhara","BTL",0.495959317012943,0.00495959317012943
+"amhara","Condoms",0.508071863379592,0.00508071863379592
+"amhara","IUDs",2.70741763584503,0.0270741763584503
+"amhara","Implants",29.4088344172683,0.294088344172683
+"amhara","Injectables",56.0812095043076,0.560812095043076
+"amhara","Other modern",0.475885786102391,0.00475885786102391
+"amhara","Other traditional",1.90995196133011,0.0190995196133011
+"amhara","Pill",7.88441853381343,0.0788441853381343
+"amhara","Withdrawal",0.52825098094053,0.0052825098094053
+"benishangul_gumuz","BTL",0,0
+"benishangul_gumuz","Condoms",0,0
+"benishangul_gumuz","IUDs",0,0
+"benishangul_gumuz","Implants",37.2590259272481,0.372590259272481
+"benishangul_gumuz","Injectables",58.2285760131279,0.582285760131279
+"benishangul_gumuz","Other modern",0,0
+"benishangul_gumuz","Other traditional",0,0
+"benishangul_gumuz","Pill",4.51239805962401,0.0451239805962401
+"benishangul_gumuz","Withdrawal",0,0
+"central","BTL",0,0
+"central","Condoms",0.371901649461796,0.00371901649461796
+"central","IUDs",1.16152096721199,0.0116152096721199
+"central","Implants",40.7934566078401,0.407934566078401
+"central","Injectables",47.5832721585781,0.475832721585781
+"central","Other modern",0.952414025725987,0.00952414025725987
+"central","Other traditional",3.56881915211381,0.0356881915211381
+"central","Pill",3.37318634255822,0.0337318634255822
+"central","Withdrawal",2.19542909651001,0.0219542909651001
+"dire_dawa","BTL",0,0
+"dire_dawa","Condoms",0,0
+"dire_dawa","IUDs",0.345847791935456,0.00345847791935456
+"dire_dawa","Implants",28.6744669763122,0.286744669763122
+"dire_dawa","Injectables",64.8448972163039,0.648448972163039
+"dire_dawa","Other modern",1.18164655769112,0.0118164655769112
+"dire_dawa","Other traditional",0.489698911015391,0.00489698911015391
+"dire_dawa","Pill",4.46344254674195,0.0446344254674195
+"dire_dawa","Withdrawal",0,0
+"gambela","BTL",0.279776881724062,0.00279776881724062
+"gambela","Condoms",2.26840839902208,0.0226840839902208
+"gambela","IUDs",9.22740717197583,0.0922740717197583
+"gambela","Implants",38.8916995731868,0.388916995731868
+"gambela","Injectables",21.7209382599167,0.217209382599167
+"gambela","Other modern",1.78044545952762,0.0178044545952762
+"gambela","Other traditional",8.92267568688245,0.0892267568688245
+"gambela","Pill",15.4903382008012,0.154903382008012
+"gambela","Withdrawal",1.4183103669633,0.014183103669633
+"harari","BTL",0,0
+"harari","Condoms",0,0
+"harari","IUDs",7.61139492867285,0.0761139492867285
+"harari","Implants",39.5665892972103,0.395665892972103
+"harari","Injectables",21.1113259207722,0.211113259207722
+"harari","Other modern",3.80569746433643,0.0380569746433643
+"harari","Other traditional",5.07339936508384,0.0507339936508384
+"harari","Pill",22.8315930239244,0.228315930239244
+"harari","Withdrawal",0,0
+"oromia","BTL",1.55028788707439,0.0155028788707439
+"oromia","Condoms",0.177713179985987,0.00177713179985987
+"oromia","IUDs",1.77651775540579,0.0177651775540579
+"oromia","Implants",38.5753277630555,0.385753277630555
+"oromia","Injectables",48.3020967358238,0.483020967358238
+"oromia","Other modern",1.38938821078489,0.0138938821078489
+"oromia","Other traditional",2.64841563722403,0.0264841563722403
+"oromia","Pill",4.64393517276493,0.0464393517276493
+"oromia","Withdrawal",0.936317657880693,0.00936317657880693
+"sidama","BTL",6.01865189531616,0.0601865189531616
+"sidama","Condoms",0,0
+"sidama","IUDs",0,0
+"sidama","Implants",48.8648517933927,0.488648517933927
+"sidama","Injectables",21.5783329835771,0.215783329835771
+"sidama","Other modern",0,0
+"sidama","Other traditional",11.1706976840855,0.111706976840855
+"sidama","Pill",12.3674656436285,0.123674656436285
+"sidama","Withdrawal",0,0
+"somali","BTL",0,0
+"somali","Condoms",0,0
+"somali","IUDs",0,0
+"somali","Implants",24.2756985432742,0.242756985432742
+"somali","Injectables",24.2756985432742,0.242756985432742
+"somali","Other modern",0,0
+"somali","Other traditional",32.6160623517452,0.326160623517452
+"somali","Pill",18.8325405617065,0.188325405617065
+"somali","Withdrawal",0,0
+"south","BTL",0,0
+"south","Condoms",0.780150455250478,0.00780150455250478
+"south","IUDs",0,0
+"south","Implants",14.7894168385225,0.147894168385225
+"south","Injectables",61.1288835439866,0.611288835439866
+"south","Other modern",3.68010393771428,0.0368010393771428
+"south","Other traditional",5.21178492977971,0.0521178492977971
+"south","Pill",14.0704587198804,0.140704587198804
+"south","Withdrawal",0.339201574866044,0.00339201574866044
+"southwest","BTL",0,0
+"southwest","Condoms",7.51260398774208,0.0751260398774208
+"southwest","IUDs",8.77472192888911,0.0877472192888911
+"southwest","Implants",17.5494438577782,0.175494438577782
+"southwest","Injectables",25.0620478455203,0.250620478455203
+"southwest","Other modern",0,0
+"southwest","Other traditional",16.1632302255906,0.161632302255906
+"southwest","Pill",24.9379521544797,0.249379521544797
+"southwest","Withdrawal",0,0
+"tigray","BTL",1.20250595903963,0.0120250595903963
+"tigray","Condoms",2.52292628019062,0.0252292628019062
+"tigray","IUDs",0.542341055111736,0.00542341055111736
+"tigray","Implants",38.3287253100575,0.383287253100575
+"tigray","Injectables",33.8352017537964,0.338352017537964
+"tigray","Other modern",3.97022804899735,0.0397022804899735
+"tigray","Other traditional",14.9732922274303,0.149732922274303
+"tigray","Pill",3.78105078393517,0.0378105078393517
+"tigray","Withdrawal",0.843728581441386,0.00843728581441386

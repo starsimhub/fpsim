@@ -1,0 +1,71 @@
+﻿region,barrier,perc
+addis_ababa,access,2.272727221
+addis_ababa,health,15.90909095
+addis_ababa,knowledge,1.136363611
+addis_ababa,no need,72.72727281
+addis_ababa,opposition,7.954545408
+afar,access,8.333333171
+afar,health,8.333333171
+afar,knowledge,0
+afar,no need,54.16666707
+afar,opposition,29.16666659
+amhara,access,3.982300892
+amhara,health,19.91150441
+amhara,knowledge,1.327433648
+amhara,no need,59.73451327
+amhara,opposition,15.04424778
+benishangul_gumuz,access,2.631578891
+benishangul_gumuz,health,2.631578891
+benishangul_gumuz,knowledge,0
+benishangul_gumuz,no need,81.57894746
+benishangul_gumuz,opposition,13.15789476
+central,access,3.435114509
+central,health,27.48091603
+central,knowledge,0.76335876
+central,no need,50.76335878
+central,opposition,17.55725192
+dire_dawa,access,0
+dire_dawa,health,10.25641029
+dire_dawa,knowledge,0
+dire_dawa,no need,60.25641022
+dire_dawa,opposition,29.48717949
+gambela,access,5.714285599
+gambela,health,8.571428734
+gambela,knowledge,5.714285599
+gambela,no need,74.28571447
+gambela,opposition,5.714285599
+harari,access,0
+harari,health,10.90909087
+harari,knowledge,0
+harari,no need,61.81818186
+harari,opposition,27.27272727
+oromia,access,2.739726013
+oromia,health,29.68036532
+oromia,knowledge,2.28310502
+oromia,no need,46.11872145
+oromia,opposition,19.1780822
+sidama,access,3.435114509
+sidama,health,27.48091603
+sidama,knowledge,0.76335876
+sidama,no need,50.76335878
+sidama,opposition,17.55725192
+somali,access,0
+somali,health,0
+somali,knowledge,18.18181779
+somali,no need,54.54545445
+somali,opposition,27.27272776
+south,access,3.435114509
+south,health,27.48091603
+south,knowledge,0.76335876
+south,no need,50.76335878
+south,opposition,17.55725192
+southwest,access,3.435114509
+southwest,health,27.48091603
+southwest,knowledge,0.76335876
+southwest,no need,50.76335878
+southwest,opposition,17.55725192
+tigray,access,0.7352941
+tigray,health,21.32352941
+tigray,knowledge,0
+tigray,no need,70.58823531
+tigray,opposition,7.352941171

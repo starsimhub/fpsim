@@ -11,10 +11,13 @@ from .ethiopia.regions import addis_ababa
 from .ethiopia.regions import afar
 from .ethiopia.regions import amhara
 from .ethiopia.regions import benishangul_gumuz
+from .ethiopia.regions import central
 from .ethiopia.regions import dire_dawa
 from .ethiopia.regions import gambela
 from .ethiopia.regions import harari
 from .ethiopia.regions import oromia
-from .ethiopia.regions import snnpr
+from .ethiopia.regions import sidama
 from .ethiopia.regions import somali
+from .ethiopia.regions import south
+from .ethiopia.regions import southwest
 from .ethiopia.regions import tigray

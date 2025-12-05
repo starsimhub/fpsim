@@ -236,8 +236,8 @@ class DataLoader:
 
     def wealth(self):
         """ Process percent distribution of people in each wealth quintile"""
-        cols = ["quintile", "percent"]
-        wealth_data = self.read_data('wealth.csv', header=0, names=cols)
+        # cols = ["quintile", "percent"]
+        wealth_data = self.read_data('wealth.csv', header=0)
         return wealth_data
 
     def urban_proportion(self):

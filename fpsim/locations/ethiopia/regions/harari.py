@@ -24,4 +24,3 @@ def make_calib_pars():
 
 def dataloader(location='harari'):
     return fpld.DataLoader(location=location)
-
