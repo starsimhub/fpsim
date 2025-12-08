@@ -48,10 +48,11 @@ class Scenario(sc.prettyobj, sc.dictobj):
         year (float): as above
         eff  (dict): a dictionary of method names and new efficacy values
 
-    Args (probablity):
-        year   (float): as above
-        matrix (str): as above
-        ages   (str): as above
+    Args (probability):
+        year  (float): as above
+        probs (list): a list of dicts for modifying switching probabilities (see keys below)
+        matrix (str): which set of probabilities to modify (e.g. 'annual', 'pp1', 'pp6')
+        ages   (str/list): the age groups to modify the probabilities for
         source (str): the method to switch from
         dest   (str): the method to switch to
         factor (float): if supplied, multiply the [source, dest] probability by this amount
@@ -60,8 +61,9 @@ class Scenario(sc.prettyobj, sc.dictobj):
 
     Args (initiation/discontinuation):
         year   (float): as above
+        probs  (list): as above
         matrix (str): as above
-        ages   (str): as above
+        ages   (str/list): as above
         method (str): the method for initiation/discontinuation
         init_factor    (float): as with "factor" above, for initiation (None → method)
         discont_factor (float): as with "factor" above, for discontinuation (method → None)
@@ -83,11 +85,17 @@ class Scenario(sc.prettyobj, sc.dictobj):
         # Basic efficacy scenario
         s1 = fp.make_scen(eff={'Injectables':0.99}, year=2020)
 
-        # Double rate of injectables initiation -- alternate approach
-        s3 = fp.make_scen(method='Injectables', init_factor=2)
+        # Double rate of injectables initiation using probs
+        s2 = fp.make_scen(year=2020, probs=[{'method': 'Injectables', 'init_factor': 2}])
+
+        # Set initiation and discontinuation values
+        s3 = fp.make_scen(year=2020, probs=[
+            {'method': 'Injectables', 'init_value': 0.1},
+            {'method': 'Injectables', 'discont_value': 0.02}
+        ])
 
         # Parameter scenario: halve exposure
-        s5 = fp.make_scen(par='exposure_factor', years=2010, vals=0.5)
+        s5 = fp.make_scen(par='exposure_factor', par_years=2010, par_vals=0.5)
 
         # Custom scenario
         def update_sim(sim): sim.updated = True
@@ -95,15 +103,15 @@ class Scenario(sc.prettyobj, sc.dictobj):
 
         # Combining multiple scenarios: change probabilities and exposure factor
         s7 = fp.make_scen(
-            dict(method='Injectables', init_value=0.1, discont_value=0.02, create=True),
-            dict(par='exposure_factor', years=2010, vals=0.5)
+            dict(probs=[{'method': 'Injectables', 'init_value': 0.1}], year=2020),
+            dict(par='exposure_factor', par_years=2010, par_vals=0.5)
         )
 
         # Scenarios can be combined
         s8 = s1 + s2
     '''
     def __init__(self, spec=None, label=None, pars=None, year=None, # Basic settings
-                 eff=None, dur_use=None, p_use=None, method_mix=None, # Option 1
+                 eff=None, dur_use=None, p_use=None, method_mix=None, probs=None, # Option 1
                  par=None, par_years=None, par_vals=None, # Option 4
                  interventions=None, # Option 5
                  ):
@@ -121,7 +129,7 @@ class Scenario(sc.prettyobj, sc.dictobj):
         intv_specs = None
 
         # It's a scenario related to changing the contraceptive mix parameters
-        for scentype, input in {'eff': eff, 'dur_use': dur_use, 'p_use': p_use, 'method_mix': method_mix}.items():
+        for scentype, input in {'eff': eff, 'dur_use': dur_use, 'p_use': p_use, 'method_mix': method_mix, 'probs': probs}.items():
             if input is not None:
                 contraceptive_spec = sc.objdict({
                     'which': scentype,
@@ -313,7 +321,7 @@ class Scenarios(sc.prettyobj):
                     which = spec.pop('which')
 
                 # Handle interventions
-                if which in ['eff', 'dur_use', 'p_use', 'method_mix']:
+                if which in ['eff', 'dur_use', 'p_use', 'method_mix', 'probs']:
                     pardict  = spec.pop(which)
                     year = spec.pop('year')
                     interventions += fpi.update_methods(**{which: pardict, 'year': year})
