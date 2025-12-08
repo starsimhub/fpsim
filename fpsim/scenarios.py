@@ -48,18 +48,18 @@ class Scenario(sc.prettyobj, sc.dictobj):
         year (float): as above
         eff  (dict): a dictionary of method names and new efficacy values
 
-    Args (probability):
+    Args (probability - keys within probs dicts):
         year  (float): as above
         probs (list): a list of dicts for modifying switching probabilities (see keys below)
         matrix (str): which set of probabilities to modify (e.g. 'annual', 'pp1', 'pp6')
         ages   (str/list): the age groups to modify the probabilities for
-        source (str): the method to switch from
-        dest   (str): the method to switch to
+        source (str): the method to switch from (or 'none' for initiation)
+        dest   (str): the method to switch to (or 'none' for discontinuation)
         factor (float): if supplied, multiply the [source, dest] probability by this amount
         value  (float): if supplied, instead of factor, replace the [source, dest] probability by this value
         copy_from (str): if supplied, copy probabilities from a different method
 
-    Args (initiation/discontinuation):
+    Args (initiation/discontinuation - keys within probs dicts):
         year   (float): as above
         probs  (list): as above
         matrix (str): as above
