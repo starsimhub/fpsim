@@ -10,7 +10,107 @@ from . import methods as fpm
 
 #>> Generic intervention classes
 
-__all__ = ['change_par', 'update_methods', 'add_method', 'change_people_state', 'change_initiation_prob', 'change_initiation']
+__all__ = ['change_par', 'update_methods', 'add_method', 'change_people_state', 
+           'change_initiation_prob', 'change_initiation', 'intervention_from_json']
+
+
+#%% Helper functions for JSON serialization
+
+def _make_repr(obj, skip_none=True, skip_defaults=None):
+    """
+    Create a recreatable string representation of an intervention.
+    
+    Args:
+        obj: The intervention object
+        skip_none: Whether to skip None values (default True)
+        skip_defaults: Dict of param names to default values to skip
+        
+    Returns:
+        str: A string like "fp.change_par(par='exposure_factor', years=[2000], vals=[0.5])"
+    """
+    skip_defaults = skip_defaults or {}
+    class_name = obj.__class__.__name__
+    
+    # Get parameters from the object
+    if hasattr(obj, 'pars') and obj.pars is not None:
+        pars = dict(obj.pars)
+    else:
+        pars = {}
+    
+    # Also check for direct attributes that aren't in pars
+    for attr in ['par', 'years', 'vals', 'verbose', 'year', 'method', 'copy_from']:
+        if hasattr(obj, attr) and attr not in pars:
+            pars[attr] = getattr(obj, attr)
+    
+    # Build parameter string
+    par_strs = []
+    for k, v in pars.items():
+        # Skip None values if requested
+        if skip_none and v is None:
+            continue
+        # Skip default values
+        if k in skip_defaults and v == skip_defaults[k]:
+            continue
+        # Format the value
+        if isinstance(v, str):
+            par_strs.append(f"{k}='{v}'")
+        else:
+            par_strs.append(f"{k}={v!r}")
+    
+    return f"fp.{class_name}({', '.join(par_strs)})"
+
+
+def intervention_from_json(json_data, module=None):
+    """
+    Recreate an intervention from JSON data.
+    
+    Args:
+        json_data: A dict or objdict from to_json(), or a JSON string
+        module: The module containing intervention classes (default: fpsim.interventions)
+        
+    Returns:
+        An intervention object
+        
+    **Example**::
+    
+        intv = fp.update_methods(year=2020, eff={'Injectables': 0.99})
+        json_data = intv.to_json()
+        intv2 = fp.intervention_from_json(json_data)
+    """
+    import json as json_module
+    
+    # Parse JSON string if needed
+    if isinstance(json_data, str):
+        json_data = json_module.loads(json_data)
+    
+    # Convert to dict if it's an objdict
+    if hasattr(json_data, 'to_dict'):
+        json_data = dict(json_data)
+    
+    # Get the intervention type
+    intv_type = json_data.get('type') or json_data.get('which')
+    if intv_type is None:
+        raise ValueError("JSON data must have 'type' or 'which' key specifying the intervention class")
+    
+    # Get the parameters
+    pars = json_data.get('pars', {})
+    if hasattr(pars, 'to_dict'):
+        pars = dict(pars)
+    
+    # Filter out None values
+    pars = {k: v for k, v in pars.items() if v is not None}
+    
+    # Get the intervention class
+    if module is None:
+        import fpsim.interventions as module
+    
+    if not hasattr(module, intv_type):
+        raise ValueError(f"Unknown intervention type: {intv_type}")
+    
+    intv_class = getattr(module, intv_type)
+    
+    # Create and return the intervention
+    return intv_class(**pars)
 
 
 class change_par(ss.Intervention):
@@ -61,6 +161,15 @@ class change_par(ss.Intervention):
         self.vals = vals
 
         return
+
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        years_repr = list(self.years) if hasattr(self.years, '__iter__') else self.years
+        vals_repr = list(self.vals) if hasattr(self.vals, '__iter__') else self.vals
+        parts = [f"par='{self.par}'", f"years={years_repr}", f"vals={vals_repr}"]
+        if self.verbose:
+            parts.append("verbose=True")
+        return f"fp.change_par({', '.join(parts)})"
 
     def init_pre(self, sim):
         super().init_pre(sim)
@@ -156,6 +265,14 @@ class add_method(ss.Intervention):
         self._method_idx = None  # Will be set after method is added
         
         return
+
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        method_repr = f"<Method '{self.method.name}'>" if self.method else None
+        parts = [f"year={self.year}", f"method={method_repr}", f"copy_from='{self.copy_from}'"]
+        if not self.verbose:
+            parts.append("verbose=False")
+        return f"fp.add_method({', '.join(parts)})"
 
     def init_pre(self, sim):
         """
@@ -291,6 +408,10 @@ class change_people_state(ss.Intervention):
         self.annual_perc = None
         return
 
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        return _make_repr(self, skip_defaults={'prop': 1.0, 'annual': False})
+
     def init_pre(self, sim):
         super().init_pre(sim)
         self._validate_pars()
@@ -381,10 +502,43 @@ class update_methods(ss.Intervention):
 
         p_use (float): probability of using any form of contraception
         method_mix (list/arr): probabilities of selecting each form of contraception
+        
+        probs (list): A list of dictionaries for modifying switching probabilities. Each dict can have:
+            source (str): the source method (method switching FROM), or 'none' for initiation
+            dest   (str): the destination method (method switching TO), or 'none' for discontinuation
+            method (str): shorthand - if specified alone with init_*/discont_*, sets source/dest automatically
+            factor (float): multiply existing probability by this amount
+            value  (float): set probability to this absolute value (mutually exclusive with factor)
+            init_factor (float): multiply initiation probability (none→method) by this amount
+            init_value  (float): set initiation probability to this value
+            discont_factor (float): multiply discontinuation probability (method→none) by this amount
+            discont_value  (float): set discontinuation probability to this value
+            copy_from (str): copy probabilities from this method
+            ages   (str/list): age group(s) to target, e.g. '<18', '18-20', ['20-25', '25-35']
+            matrix (int/str): postpartum state - 0/'annual', 1/'pp1', 6/'pp6' (default: 0)
+
+    **Examples**::
+
+        # Double switching probability from Pill to IUDs
+        fp.update_methods(year=2020, probs=[{'source': 'Pill', 'dest': 'IUDs', 'factor': 2.0}])
+
+        # Set initiation rate for Injectables to 0.1
+        fp.update_methods(year=2020, probs=[{'method': 'Injectables', 'init_value': 0.1}])
+
+        # Increase discontinuation of Implants by 50% for young women
+        fp.update_methods(year=2020, probs=[{
+            'method': 'Implants', 
+            'discont_factor': 1.5, 
+            'ages': ['<18', '18-20']
+        }])
+
+        # Copy switching behavior from Implants to a new method
+        fp.update_methods(year=2020, probs=[{'dest': 'NewMethod', 'copy_from': 'Implants'}])
 
     """
 
-    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, method_choice_pars=None, verbose=False, **kwargs):
+    def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None, 
+                 method_choice_pars=None, probs=None, verbose=False, **kwargs):
         super().__init__(**kwargs)
         self.define_pars(
             year=year,
@@ -393,12 +547,16 @@ class update_methods(ss.Intervention):
             p_use=p_use,
             method_mix=method_mix,
             method_choice_pars=method_choice_pars,
+            probs=probs,
             verbose=verbose
         )
 
         self.applied = False
         return
 
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        return _make_repr(self, skip_defaults={'verbose': False})
 
     def init_pre(self, sim):
         super().init_pre(sim)
@@ -422,9 +580,223 @@ class update_methods(ss.Intervention):
         if self.pars.year is None:
             errormsg = 'A year must be supplied'
             raise ValueError(errormsg)
-        if self.pars.eff is None and self.pars.dur_use is None and self.pars.p_use is None and self.pars.method_mix is None and self.pars.method_choice_pars is None:
-            errormsg = 'Either efficacy, durations of use, probability of use, or method mix must be supplied'
+        has_input = any([
+            self.pars.eff is not None,
+            self.pars.dur_use is not None,
+            self.pars.p_use is not None,
+            self.pars.method_mix is not None,
+            self.pars.method_choice_pars is not None,
+            self.pars.probs is not None,
+        ])
+        if not has_input:
+            errormsg = 'At least one of eff, dur_use, p_use, method_mix, method_choice_pars, or probs must be supplied'
             raise ValueError(errormsg)
+        
+        # Validate probs entries if provided
+        if self.pars.probs is not None:
+            self._validate_probs()
+        return
+
+    def _validate_probs(self):
+        """Validate the probs parameter entries."""
+        probs = sc.tolist(self.pars.probs)
+        
+        # Valid keys for probs entries
+        valid_keys = {
+            'source', 'dest', 'method', 'factor', 'value',
+            'init_factor', 'init_value', 'discont_factor', 'discont_value',
+            'copy_from', 'ages', 'matrix'
+        }
+        
+        # Map string matrix names to numeric values
+        matrix_map = {'annual': 0, 'pp1': 1, 'pp6': 6, 0: 0, 1: 1, 6: 6}
+        
+        for i, entry in enumerate(probs):
+            entry = sc.dcp(entry)
+            
+            # Check for invalid keys
+            invalid_keys = set(entry.keys()) - valid_keys
+            if invalid_keys:
+                errormsg = f'probs[{i}]: Invalid keys {invalid_keys}. Valid keys are: {valid_keys}'
+                raise ValueError(errormsg)
+            
+            # Get modification type counts
+            has_factor = entry.get('factor') is not None
+            has_value = entry.get('value') is not None
+            has_init_factor = entry.get('init_factor') is not None
+            has_init_value = entry.get('init_value') is not None
+            has_discont_factor = entry.get('discont_factor') is not None
+            has_discont_value = entry.get('discont_value') is not None
+            has_copy_from = entry.get('copy_from') is not None
+            
+            # Count how many modification types are specified
+            n_mods = sum([
+                has_factor or has_value,
+                has_init_factor or has_init_value,
+                has_discont_factor or has_discont_value,
+                has_copy_from
+            ])
+            
+            if n_mods != 1:
+                errormsg = (f'probs[{i}]: Must specify one of: factor, value, init_factor, init_value, discont_factor, discont_value, or copy_from' 
+                            if n_mods == 0 else f'probs[{i}]: Can only specify one modification type (factor/value, init_*, discont_*, or copy_from)')
+                raise ValueError(errormsg)
+            
+            # Check factor/value mutual exclusivity
+            # Example valid entries:
+            # probs = [    
+            #      {'source': 'None', 'dest': 'Pill', 'factor': 1.5},    # multiply switching prob by 1.5    
+            #      {'method': 'IUDs', 'init_value': 0.10},               # set initiation prob to 10%    
+            #      {'method': 'Condoms', 'copy_from': 'Pill'},           # copy Pill's probs to Condoms]
+            # Example invalid entry:
+            # {'method': 'Pill', 'factor': 2.0, 'init_factor': 1.5}  # ✗ can't mix factor AND init_factor
+
+            if has_factor and has_value:
+                errormsg = f'probs[{i}]: Cannot specify both factor and value'
+                raise ValueError(errormsg)
+            if has_init_factor and has_init_value:
+                errormsg = f'probs[{i}]: Cannot specify both init_factor and init_value'
+                raise ValueError(errormsg)
+            if has_discont_factor and has_discont_value:
+                errormsg = f'probs[{i}]: Cannot specify both discont_factor and discont_value'
+                raise ValueError(errormsg)
+            
+            # Check source/dest vs method usage
+            has_source = entry.get('source') is not None
+            has_dest = entry.get('dest') is not None
+            has_method = entry.get('method') is not None
+            
+            if has_method and (has_source or has_dest):
+                errormsg = f'probs[{i}]: Cannot specify both "method" and "source"/"dest"'
+                raise ValueError(errormsg)
+            
+            # For factor/value, need source and dest (or method for init/discont)
+            # Exception: for matrix='pp1' or matrix=1, only dest is required (source is implicitly 'birth')
+            if has_factor or has_value:
+                matrix = entry.get('matrix', 0)
+                is_pp1 = matrix in ['pp1', 1]
+                if is_pp1:
+                    # For postpartum=1, only dest is required
+                    if not has_dest and not has_method:
+                        errormsg = f'probs[{i}]: Must specify dest (or method) when using factor/value with matrix=pp1'
+                        raise ValueError(errormsg)
+                else:
+                    if not (has_source and has_dest) and not has_method:
+                        errormsg = f'probs[{i}]: Must specify source and dest (or method) when using factor/value'
+                        raise ValueError(errormsg)
+            
+            # Validate matrix value
+            matrix = entry.get('matrix')
+            if matrix is not None and matrix not in matrix_map:
+                errormsg = f'probs[{i}]: Invalid matrix "{matrix}". Must be one of: {list(matrix_map.keys())}'
+                raise ValueError(errormsg)
+        
+        return
+
+    def _apply_probs(self, cm):
+        """
+        Apply probability modifications to the switching matrix.
+        
+        Args:
+            cm: The contraception module (sim.connectors.contraception)
+        """
+        probs = sc.tolist(self.pars.probs)
+        sw = cm.switch
+        
+        # Map string matrix names to numeric postpartum values
+        matrix_map = {'annual': 0, 'pp1': 1, 'pp6': 6, 0: 0, 1: 1, 6: 6}
+        
+        for entry in probs:
+            entry = sc.dcp(entry)
+            
+            # Extract common parameters
+            ages = entry.get('ages')
+            matrix = entry.get('matrix', 0)  # Default to annual/non-postpartum
+            postpartum = matrix_map.get(matrix, 0)
+            
+            # Extract modification parameters
+            source = entry.get('source')
+            dest = entry.get('dest')
+            method = entry.get('method')
+            factor = entry.get('factor')
+            value = entry.get('value')
+            init_factor = entry.get('init_factor')
+            init_value = entry.get('init_value')
+            discont_factor = entry.get('discont_factor')
+            discont_value = entry.get('discont_value')
+            copy_from = entry.get('copy_from')
+            
+            # Resolve method shorthand for init/discont
+            if method is not None:
+                if init_factor is not None or init_value is not None:
+                    source = 'none'
+                    dest = method
+                    factor = init_factor
+                    value = init_value
+                elif discont_factor is not None or discont_value is not None:
+                    source = method
+                    dest = 'none'
+                    factor = discont_factor
+                    value = discont_value
+                else:
+                    # method used with factor/value means source=dest=method (staying on same method)
+                    source = method
+                    dest = method
+            
+            # Resolve method names to internal names (support both name and label)
+            if source is not None and source.lower() != 'none':
+                source = cm.get_method(source).name
+            elif source is not None:
+                source = 'none'
+                
+            if dest is not None and dest.lower() != 'none':
+                dest = cm.get_method(dest).name
+            elif dest is not None:
+                dest = 'none'
+            
+            # Handle copy_from
+            if copy_from is not None:
+                copy_from_method = cm.get_method(copy_from).name
+                if dest is not None:
+                    # Copy column (all switches TO dest)
+                    sw.copy_from_method_column(
+                        source_to_method=copy_from_method,
+                        dest_to_method=dest,
+                        postpartum=postpartum,
+                        age_grp=ages,
+                        renormalize=True
+                    )
+                if source is not None and source != 'none':
+                    # Copy row (all switches FROM source)
+                    sw.copy_from_method_row(
+                        source_from_method=copy_from_method,
+                        dest_from_method=source,
+                        postpartum=postpartum,
+                        age_grp=ages,
+                        renormalize=True
+                    )
+                continue  # Done with this entry
+            
+            # Handle factor/value modifications
+            if factor is not None or value is not None:
+                # Determine the source method
+                from_method = 'birth' if postpartum == 1 else source
+                
+                if factor is not None:
+                    # Use scale_entry for multiplicative changes
+                    sw.scale_entry(from_method, dest, factor, postpartum=postpartum, 
+                                   age_grp=ages, renormalize=False)
+                else:
+                    # Use set_entry for absolute values (handles iteration internally)
+                    sw.set_entry(from_method, dest, value, postpartum=postpartum, 
+                                 age_grp=ages, renormalize=False)
+        
+        # Renormalize all probabilities after all modifications
+        sw.renormalize_all()
+        
+        if self.pars.verbose:
+            print(f'Applied {len(probs)} probability modification(s) in year {self.sim.t.year}')
+        
         return
 
     def step(self):
@@ -460,6 +832,10 @@ class update_methods(ss.Intervention):
             if self.pars.method_choice_pars is not None:
                 print(f'Changed contraceptive switching matrix in year {sim.t.year}')
                 cm.method_choice_pars = self.pars.method_choice_pars
+            
+            # Apply probability modifications
+            if self.pars.probs is not None:
+                self._apply_probs(cm)
                 
         return
 
@@ -483,6 +859,13 @@ class change_initiation_prob(ss.Intervention):
         self.applied = False
         self.par_name = None
         return
+
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        parts = [f"year={self.year}", f"prob_use_intercept={self.prob_use_intercept}"]
+        if self.verbose:
+            parts.append("verbose=True")
+        return f"fp.change_initiation_prob({', '.join(parts)})"
 
     def init_pre(self, sim=None):
         super().init_pre(sim)
@@ -550,6 +933,21 @@ class change_initiation(ss.Intervention):
         # nothing else affected the dynamics of the contraception. Tracked for validation.
         self.expected_women_oncontra = None
         return
+
+    def __repr__(self):
+        """Return a recreatable string representation."""
+        parts = []
+        if self.years is not None:
+            parts.append(f"years={self.years}")
+        if self.eligibility is not None:
+            parts.append(f"eligibility={self.eligibility!r}")
+        if self.perc != 0.0:
+            parts.append(f"perc={self.perc}")
+        if not self.annual:
+            parts.append("annual=False")
+        if self.force_theoretical:
+            parts.append("force_theoretical=True")
+        return f"fp.change_initiation({', '.join(parts)})"
 
     def init_pre(self, sim=None):
         super().init_pre(sim)
