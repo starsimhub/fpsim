@@ -14,6 +14,8 @@ import starsim as ss
 from scipy.special import expit
 from scipy.stats import fisk
 from . import defaults as fpd
+import fpsim.locations.data_utils as fpld
+import pandas as pd
 
 __all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
 
@@ -165,7 +167,8 @@ class ContraPars(ss.Pars):
 
         # Methods
         self.methods = None  # Will be populated from methods_df
-        self.methods_df = None  # Store the DataFrame for reference
+        self.methods_file = sc.makepath('methods.csv', fpld.sd_dir)  # Store the provenance
+        self.methods_df = pd.read_csv(self.methods_file, keep_default_na=False, na_values=['NaN'])  # Store DataFrame
         self.method_column_order = None  # Store column order from CSV for validation
 
         # Probabilities and choices
@@ -195,7 +198,6 @@ def make_contra_pars():
     return ContraPars()
 
 
-
 # %% Define classes to contain information about the way women choose contraception
 
 class ContraceptiveChoice(ss.Connector):
@@ -213,6 +215,8 @@ class ContraceptiveChoice(ss.Connector):
         # Create methods from DataFrame or use default
         if self.pars.methods_df is not None:
             method_list = make_method_list(self.pars.methods_df)
+        elif self.pars.methods is not None:
+            method_list = self.pars.methods
         else:
             raise ValueError('A methods_df must be provided to define contraceptive methods.')
 
@@ -1007,6 +1011,10 @@ class RandomChoice(ContraceptiveChoice):
     def __init__(self, pars=None, **kwargs):
         super().__init__(pars=pars, **kwargs)
         self._method_choice_dist = ss.choice(a=np.arange(1, self.n_methods+1))
+
+        # Set durations
+        for method in self.methods.values():
+            method.dur_use = ss.lognorm_ex(mean=ss.years(1), std=ss.years(1))
         return
 
     def init_method_dist(self, uids):

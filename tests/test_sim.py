@@ -23,7 +23,12 @@ def test_simple():
 def test_random_choice():
     sc.heading('Random method choice')
 
-    rc = fp.RandomChoice()
+    import fpsim.shared_data as sd
+    import pandas as pd
+    import os
+    methods_df = pd.read_csv(os.path.join(os.path.dirname(sd.__file__), 'methods.csv'))
+    rc = fp.RandomChoice(methods_df=methods_df)
+
     sim = fp.Sim(pars=par_kwargs, location='kenya', contraception_module=rc)
     sim.run()
     print(f'✓ (successfully ran RandomChoice)')
