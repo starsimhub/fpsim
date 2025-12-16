@@ -134,7 +134,7 @@ def test_add_method():
     
     cm = sim.connectors.contraception
     assert new_method.name in cm.methods, f'New method should be in contraception methods'
-    assert cm.n_methods > 9, f'Should have more than default 9 methods after adding one'
+    assert cm.n_methods == 10, f'Should have more than default 9 methods after adding one'
     print(f'  ✓ Basic add_method works')
     
     # Test 2: Late introduction (year before simulation end)
@@ -171,10 +171,10 @@ def test_add_method():
 
 
 if __name__ == '__main__':
-    s0 = test_intervention_fn()
-    s1 = test_change_par()
-    s3 = test_plot()
-    s4, s5, s6 = test_change_people_state()
+    # s0 = test_intervention_fn()
+    # s1 = test_change_par()
+    # s3 = test_plot()
+    # s4, s5, s6 = test_change_people_state()
     s7 = test_add_method()
 
     print('Done.')
