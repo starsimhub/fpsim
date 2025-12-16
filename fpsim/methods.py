@@ -166,7 +166,6 @@ class ContraPars(ss.Pars):
         # Methods
         self.methods = None  # Will be populated from methods_df
         self.methods_df = None  # Store the DataFrame for reference
-        self.method_column_order = None  # Store column order from CSV for validation
 
         # Probabilities and choices
         self.p_use = ss.bernoulli(p=0.5)
@@ -318,10 +317,6 @@ class ContraceptiveChoice(ss.Connector):
         if len(all_indices) != len(set(all_indices)):
             errormsg = f'Duplicate method indices found'
             raise ValueError(errormsg)
-
-        # Store column order if available for future validation
-        if self.pars.method_column_order is not None:
-            self._method_column_order = self.pars.method_column_order
 
         return
 
