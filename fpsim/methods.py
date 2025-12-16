@@ -166,6 +166,7 @@ class ContraPars(ss.Pars):
         # Methods
         self.methods = None  # Will be populated from methods_df
         self.methods_df = None  # Store the DataFrame for reference
+        self.method_column_order = None  # Store column order from CSV for validation
 
         # Probabilities and choices
         self.p_use = ss.bernoulli(p=0.5)
@@ -228,14 +229,8 @@ class ContraceptiveChoice(ss.Connector):
         if self.pars.method_choice_pars is not None:
             self._validate_methods()
 
-        # # Make switching matrix
-        # self.switch = Switching(self.methods, create=True)
-
-        self.init_dist = None
-        self.data = {}
-        
         # Initialize choice distributions for method selection
-        # self._method_choice_dist = ss.choice(a=self.n_methods, p=np.ones(self.n_methods)/self.n_methods)
+        self._method_choice_dist = ss.choice(a=self.n_methods, p=np.ones(self.n_methods)/self.n_methods)
         self._jitter_dist = ss.normal(loc=0, scale=1e-4)
 
         return
@@ -317,6 +312,10 @@ class ContraceptiveChoice(ss.Connector):
         if len(all_indices) != len(set(all_indices)):
             errormsg = f'Duplicate method indices found'
             raise ValueError(errormsg)
+
+        # Store column order if available for future validation
+        if self.pars.method_column_order is not None:
+            self._method_column_order = self.pars.method_column_order
 
         return
 
@@ -1007,15 +1006,14 @@ class RandomChoice(ContraceptiveChoice):
     """ Randomly choose a method of contraception """
     def __init__(self, pars=None, **kwargs):
         super().__init__(pars=pars, **kwargs)
-        self.init_dist = np.array([1/self.n_methods]*self.n_methods)
-        self.method_mix = ss.choice(a=np.arange(1, self.n_methods+1))
+        self._method_choice_dist = ss.choice(a=np.arange(1, self.n_methods+1))
         return
 
     def init_method_dist(self, uids):
         return self.choose_method(uids)
 
     def choose_method(self, uids, event=None):
-        choice_arr = self.method_mix.rvs(uids)
+        choice_arr = self._method_choice_dist.rvs(uids)
         return choice_arr.astype(int)
 
 

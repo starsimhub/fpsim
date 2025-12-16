@@ -611,7 +611,7 @@ class DataLoader:
             methods_df = self.read_data(methods_file)
         except FileNotFoundError:
             # Fall back to shared_data
-            methods_df = pd.read_csv(os.path.join(sd_dir, methods_file))
+            methods_df = pd.read_csv(os.path.join(sd_dir, methods_file), keep_default_na=False, na_values=['NaN'])
 
         # Create lookup dict by csv_name for validation
         methods_dict = {}
@@ -672,8 +672,9 @@ class DataLoader:
         mc = dict()
         init_dist = sc.objdict()
 
-        # Get end index for slicing
-        ei = len(standard_cols) + len(method_columns)
+        # Get start and end index for slicing
+        si = len(standard_cols) - 1
+        ei = len(standard_cols) + len(method_columns) - 1
 
         for pp in df.postpartum.unique():
             mc[pp] = sc.objdict()
@@ -684,7 +685,7 @@ class DataLoader:
                 thisdf = df.loc[(df.age_grp == akey) & (df.postpartum == pp)]
 
                 if pp == 1:  # Different logic for immediately postpartum
-                    mc[pp][akey] = thisdf.values[0][len(standard_cols):ei].astype(float)
+                    mc[pp][akey] = thisdf.values[0][si:ei].astype(float)
                 else:
                     from_methods = thisdf.From.unique()
                     for from_method in from_methods:
@@ -700,11 +701,11 @@ class DataLoader:
                             from_mname = matching.iloc[0]['name']
 
                         row = thisdf.loc[thisdf.From == from_method]
-                        mc[pp][akey][from_mname] = row.values[0][len(standard_cols):ei].astype(float)
+                        mc[pp][akey][from_mname] = row.values[0][si:ei].astype(float)
 
                 # Set initial distributions by age
                 if pp == 0:
-                    init_dist[akey] = thisdf.loc[thisdf.From == 'None'].values[0][len(standard_cols):ei].astype(float)
+                    init_dist[akey] = thisdf.loc[thisdf.From == 'None'].values[0][si:ei].astype(float)
                     init_dist.method_idx = method_idx_array.copy()
 
         return mc, init_dist, method_columns
