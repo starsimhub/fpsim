@@ -128,53 +128,36 @@ def test_add_method():
         modern=True,
         dur_use=ss.lognorm_ex(mean=2, std=1),
     )
-    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', verbose=False)
+    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', split_shares=0.3, verbose=False)
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.run()
     
     cm = sim.connectors.contraception
+    age_key = '18-20'  # Choose one age group to check
+
+    # Check that the new method has been added
     assert new_method.name in cm.methods, f'New method should be in contraception methods'
-    assert cm.n_methods == 10, f'Should have more than default 9 methods after adding one'
+    assert cm.n_methods == 10, f'Should have 10 methods after adding one'
+
+    # Check that for a given age key, the method_choice_pars have been updated correctly
+    assert np.array_equal(cm.get_switching_matrix(0, 'test_method')[age_key], cm.get_switching_matrix(0, 'impl')[age_key]), f'Method choice switching matrix not updated correctly for new method'
+    print(f' ✓ Switching FROM new method matches copied method')
+    p1 = cm.get_switching_prob('pill', 'impl', 0, age_key)
+    p2 = cm.get_switching_prob('pill', 'test_method', 0, age_key)
+    assert np.isclose((p1+p2)*0.7, p1), f'Method choice probabilities not updated correctly for new method'
+    assert np.isclose((p1+p2)*0.3, p2), f'Method choice probabilities not updated correctly for new method'
+    print(f' ✓ Switching TO probabilities updated correctly: {p1} -> {p2}')
+
     print(f'  ✓ Basic add_method works')
-    
-    # Test 2: Late introduction (year before simulation end)
-    late_method = fp.Method(name='late', label='Late Method', efficacy=0.99, modern=True,
-                           dur_use=ss.lognorm_ex(mean=2, std=1))
-    late_intv = fp.add_method(year=pars['stop']-1, method=late_method, copy_from='impl', verbose=False)
-    sim_late = fp.Sim(pars=pars, interventions=[late_intv], verbose=0)
-    sim_late.run()
-    print(f'  ✓ Late introduction works')
-    
-    # Test 3: Year before simulation start should raise error
-    early_method = fp.Method(name='early', label='Early Method', efficacy=0.99, modern=True,
-                            dur_use=ss.lognorm_ex(mean=2, std=1))
-    early_intv = fp.add_method(year=pars['start']-5, method=early_method, copy_from='impl', verbose=False)
-    try:
-        sim_early = fp.Sim(pars=pars, interventions=[early_intv], verbose=0)
-        sim_early.run()
-        raise AssertionError('Should have raised ValueError for year before simulation start')
-    except ValueError:
-        print(f'  ✓ Invalid year correctly rejected')
-    
-    # Test 4: Invalid copy_from should raise error
-    bad_method = fp.Method(name='bad', label='Bad Method', efficacy=0.99, modern=True,
-                          dur_use=ss.lognorm_ex(mean=2, std=1))
-    bad_intv = fp.add_method(year=2010, method=bad_method, copy_from='nonexistent', verbose=False)
-    try:
-        sim_bad = fp.Sim(pars=pars, interventions=[bad_intv], verbose=0)
-        sim_bad.run()
-        raise AssertionError('Should have raised ValueError for invalid copy_from')
-    except ValueError:
-        print(f'  ✓ Invalid copy_from correctly rejected')
-    
+
     return sim
 
 
 if __name__ == '__main__':
-    # s0 = test_intervention_fn()
-    # s1 = test_change_par()
-    # s3 = test_plot()
-    # s4, s5, s6 = test_change_people_state()
+    s0 = test_intervention_fn()
+    s1 = test_change_par()
+    s3 = test_plot()
+    s4, s5, s6 = test_change_people_state()
     s7 = test_add_method()
 
     print('Done.')

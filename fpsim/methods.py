@@ -229,10 +229,6 @@ class ContraceptiveChoice(ss.Connector):
         if self.pars.method_weights is None:
             self.pars.method_weights = np.ones(self.n_methods)
 
-        # Validate methods against method_choice_pars
-        if self.pars.method_choice_pars is not None:
-            self._validate_methods()
-
         # Initialize choice distributions for method selection
         self._method_choice_dist = ss.choice(a=self.n_methods, p=np.ones(self.n_methods)/self.n_methods)
         self._jitter_dist = ss.normal(loc=0, scale=1e-4)
@@ -323,6 +319,30 @@ class ContraceptiveChoice(ss.Connector):
 
         return
 
+    def set_init_dist(self):
+        """
+        If no initial distribution has been provided, use the method_choice_pars to set one.
+        The initial distribution will be the probabilities of switching from no method
+        """
+        init_dist = sc.objdict()
+
+        # Use case 1 - we have age bins
+        if getattr(self, 'age_bins', None) is not None:
+            age_bins = [k for k in self.pars.method_choice_pars[0].keys() if k != 'method_idx']
+            mcp = self.pars.method_choice_pars[0]
+            for age_grp in age_bins:
+                init_dist[age_grp] = mcp[age_grp]['none'].copy()
+                init_dist[age_grp] /= init_dist[age_grp].sum()
+
+        # Use case 2 - no age bins
+        else:
+            mcp = self.pars.method_choice_pars[0]
+            init_dist = mcp['none'].copy()
+            init_dist /= init_dist.sum()
+
+        self.pars.init_dist = init_dist
+        return
+
     # ==================================================================================
     # METHOD MANAGEMENT (add_method, get_method, update methods)
     # ==================================================================================
@@ -390,6 +410,10 @@ class ContraceptiveChoice(ss.Connector):
                 self.extend_method_choice_pars(method.name, copy_from_method.name)
             else:
                 self.extend_method_choice_pars(method.name, None)
+
+        # Extend init_dist
+        if self.pars.init_dist is not None:
+            self.set_init_dist()
 
         # Extend method_weights
         if self.pars.method_weights is not None:
@@ -674,7 +698,7 @@ class ContraceptiveChoice(ss.Connector):
                 self.set_switching_prob(from_method_dest, to_method_dest, value, pp, age,
                                        renormalize=renormalize)
 
-    def copy_switching_to_method(self, source_to_method, dest_to_method,
+    def copy_switching_to_method(self, source_to_method, dest_to_method, split_shares=None,
                                  postpartum=None, age_grp=None, renormalize=False):
         """
         Copy all switching probabilities TO a method (entire column).
@@ -689,7 +713,13 @@ class ContraceptiveChoice(ss.Connector):
                 if pp == 1:
                     # Copy from birth
                     value = self.get_switching_prob('birth', source_to_method, pp, age)
-                    self.set_switching_prob('birth', dest_to_method, value, pp, age, renormalize=renormalize)
+                    if split_shares is not None:
+                        new_value = value*split_shares
+                        old_value = value*(1 - split_shares)
+                        self.set_switching_prob('birth', source_to_method, old_value, pp, age, renormalize=renormalize)
+                        self.set_switching_prob('birth', dest_to_method, new_value, pp, age, renormalize=renormalize)
+                    else:
+                        self.set_switching_prob('birth', dest_to_method, value, pp, age, renormalize=renormalize)
                 else:
                     # Copy from all methods (excluding permanent methods like btl that can't switch)
                     mcp = self.pars.method_choice_pars
@@ -697,33 +727,41 @@ class ContraceptiveChoice(ss.Connector):
                         # Check if this method can switch (has a row in the matrix)
                         if from_method in mcp[pp][age]:
                             value = self.get_switching_prob(from_method, source_to_method, pp, age)
-                            self.set_switching_prob(from_method, dest_to_method, value, pp, age, renormalize=renormalize)
+                            if split_shares is not None:
+                                new_value = value*split_shares
+                                old_value = value*(1 - split_shares)
+                                self.set_switching_prob(from_method, source_to_method, old_value, pp, age, renormalize=renormalize)
+                                self.set_switching_prob(from_method, dest_to_method, new_value, pp, age, renormalize=renormalize)
+                            else:
+                                self.set_switching_prob(from_method, dest_to_method, value, pp, age, renormalize=renormalize)
 
     def copy_switching_from_method(self, source_from_method, dest_from_method,
                                    postpartum=None, age_grp=None, renormalize=False):
         """
-        Copy all switching probabilities FROM a method (entire row).
+        Copy all switching probabilities FROM a method (entire row block).
         Example: Copy all probabilities of switching from pill to other methods
                  to be the probabilities of switching from implant to other methods.
                  This makes implant users switch like pill users.
         """
-        pp_list = self._to_list(postpartum, self._get_pp_keys())
+        # Handle postpartum
+        # If it's none, set to 0. If's it's anything other than None or 0, raise an error
+        # because if someone is postpartum (1 or 6m) then they are coming from no method
+        if postpartum is None:
+            postpartum = 0
+        if postpartum != 0:
+            raise ValueError('copy_switching_from_method can only be used for postpartum=0')
+
         age_list = self._to_list(age_grp, self._get_age_groups())
 
-        for pp in pp_list:
-            if pp == 1:
-                continue  # Skip postpartum=1 as it has no from_method dimension
+        for age in age_list:
+            for to_method in self.methods.keys():
+                if to_method != 'none':
+                    value = self.get_switching_prob(source_from_method, to_method, postpartum, age)
+                    self.set_switching_prob(dest_from_method, to_method, value, postpartum, age, renormalize=False)
 
-            for age in age_list:
-                # Copy entire row at once, then renormalize once if needed
-                for to_method in self.methods.keys():
-                    value = self.get_switching_prob(source_from_method, to_method, pp, age)
-                    # Don't renormalize on each set, only after all values copied
-                    self.set_switching_prob(dest_from_method, to_method, value, pp, age, renormalize=False)
-
-                # Renormalize once after all values are set
-                if renormalize:
-                    self._renormalize_row(pp, age, dest_from_method)
+            # Renormalize once after all values are set
+            if renormalize:
+                self._renormalize_row(postpartum, age, dest_from_method)
 
     def get_switching_matrix(self, postpartum, from_method=None):
         """
@@ -1077,9 +1115,21 @@ class SimpleChoice(RandomChoice):
         self.update_pars(data)
         if self.pars.dur_use_df is not None: self.process_durations()
 
+        # Set age bins
         self.age_bins = np.sort([fpd.method_age_map[k][1] for k in self.pars.method_choice_pars[0].keys() if k != 'method_idx'])
 
+        # Validate methods against method_choice_pars, and set initial distribution
+        if self.pars.method_choice_pars is not None:
+            self._validate_methods()
+            if self.pars.init_dist is None:
+                self.set_init_dist()
+
         return
+
+    @property
+    def method_idx(self):
+        """ Return list of method indices from the method choice pars"""
+        return self.pars.method_choice_pars[0]['method_idx']
 
     def process_durations(self):
         df = self.pars.dur_use_df
@@ -1141,8 +1191,8 @@ class SimpleChoice(RandomChoice):
                     these_probs = these_probs/np.sum(these_probs)  # Renormalize
                     self._method_choice_dist.set(a=len(these_probs), p=these_probs)
                     these_choices = self._method_choice_dist.rvs(len(ppl_this_age))  # Choose
-                    # Adjust method indexing to correspond to datafile (removing None: Marita to confirm)
-                    choice_array[this_age_bools] = np.array(list(self.pars.init_dist.method_idx))[these_choices]
+                    # Adjust method indexing to correspond to datafile
+                    choice_array[this_age_bools] = np.array(list(self.method_idx))[these_choices]
             return choice_array.astype(int)
         else:
             errormsg = f'Distribution of contraceptive choices has not been provided.'

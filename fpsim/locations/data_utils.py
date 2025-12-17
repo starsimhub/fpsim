@@ -105,9 +105,8 @@ class DataLoader:
         contra_data.methods_df = methods_df
 
         # Load switching data with validation against methods
-        mc, init_dist, method_column_order = self.load_method_switching(methods_df=methods_df)
+        mc, method_column_order = self.load_method_switching(methods_df=methods_df)
         contra_data.method_choice_pars = mc
-        contra_data.init_dist = init_dist
         contra_data.method_column_order = method_column_order
 
         # Load other data
@@ -637,7 +636,6 @@ class DataLoader:
 
         Returns:
             mc: Method choice parameters
-            init_dist: Initial distribution
             method_column_order: List of method csv_names in column order
         """
 
@@ -670,7 +668,6 @@ class DataLoader:
         method_idx_array = np.array([csv_to_idx[col] for col in method_columns])
 
         mc = dict()
-        init_dist = sc.objdict()
 
         # Get start and end index for slicing
         si = len(standard_cols) - 1
@@ -703,12 +700,7 @@ class DataLoader:
                         row = thisdf.loc[thisdf.From == from_method]
                         mc[pp][akey][from_mname] = row.values[0][si:ei].astype(float)
 
-                # Set initial distributions by age
-                if pp == 0:
-                    init_dist[akey] = thisdf.loc[thisdf.From == 'None'].values[0][si:ei].astype(float)
-                    init_dist.method_idx = method_idx_array.copy()
-
-        return mc, init_dist, method_columns
+        return mc, method_columns
 
     def load_dur_use(self):
         """ Process duration of use parameters"""
