@@ -175,7 +175,8 @@ class add_method(ss.Intervention):
             self.method = sc.dcp(source_method)
             for mp, mpar in self.method_pars.items():
                 setattr(self.method, mp, mpar)
-            self.method.name += '_copy'
+            if 'name' not in self.method_pars:
+                self.method.name += '_copy'
 
         # Resolve copy_from to method name (supports both name and label)
         cm = sim.connectors.contraception

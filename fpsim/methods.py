@@ -1263,6 +1263,8 @@ class SimpleChoice(RandomChoice):
                     errormsg = 'Unrecognized type for duration of use: expecting a Starsim distribution or a number'
                     raise ValueError(errormsg)
 
+                dur_method[user_idxs] *= method.rel_dur_use  # Scale if needed
+
         dt = self.t.dt.months
         timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].years)  # Include a maximum. Durs seem way too high
 
