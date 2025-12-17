@@ -102,7 +102,7 @@ def test_method_changes():
 
     # Test method efficacy
     methods = fp.make_methods()
-    for method in methods: method.efficacy = 1  # Make all methods totally effective
+    for method in methods.values(): method.efficacy = 1  # Make all methods totally effective
     choice = fp.RandomChoice(pars=dict(p_use=1), methods=methods)
     s3 = fp.Sim(test=True, contraception_module=choice)
     s3.run()
