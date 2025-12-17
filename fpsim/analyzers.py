@@ -346,7 +346,8 @@ class lifeof_recorder(ss.Analyzer):
         self.max_agents = 0  # maximum number of agents this analyzer tracks
         self.time = []
         self.trajectories = {}  # Store education trajectories
-        methods = fp.make_methods()
+        contra_pars = fp.make_contra_pars()
+        methods = fp.make_method_list(contra_pars.methods_df)
         self.method_map = {idx: method.label for idx, method in enumerate(methods.values())}
 
         return
