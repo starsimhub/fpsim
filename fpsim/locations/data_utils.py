@@ -73,7 +73,6 @@ class DataLoader:
         fp_data.debut_age = self.debut_age()
         fp_data.spacing_pref = self.birth_spacing_pref()
         fp_data.abortion_prob, fp_data.twins_prob = self.scalar_probs()
-        fp_data.age_partnership = self.age_partnership()
         fp_data.maternal_mortality = self.maternal_mortality()
         fp_data.infant_mortality = self.infant_mortality()
         fp_data.miscarriage_rates = self.miscarriage()
@@ -128,6 +127,7 @@ class DataLoader:
         people_data.wealth_quintile = self.wealth()
         people_data.urban_prop = self.urban_proportion()
         people_data.age_pyramid = self.age_pyramid()
+        people_data.age_partnership = self.age_partnership()
         if return_data:
             return people_data
         else:
@@ -232,7 +232,7 @@ class DataLoader:
             "age": age_partnership_data["age_partner"].to_numpy(),
             "partnership_probs": age_partnership_data["percent"].to_numpy(),
         }
-        return  partnership_dict
+        return partnership_dict
 
     def wealth(self):
         """ Process percent distribution of people in each wealth quintile"""

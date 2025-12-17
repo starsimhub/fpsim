@@ -192,17 +192,6 @@ class FPmod(ss.Module):
 
         return
 
-    def start_partnership(self, uids):
-        """
-        Decide if an agent has reached their age at first partnership. Age-based data from DHS.
-        """
-        ppl = self.sim.people
-        is_not_partnered = self.partnered[uids] == 0
-        reached_partnership_age = ppl.age[uids] >= self.partnership_age[uids]
-        first_timers = uids[is_not_partnered & reached_partnership_age]
-        self.partnered[first_timers] = True
-        return
-
     def update_time_to_choose(self, uids=None):
         """
         Initialise the counter to determine when girls/women will have to first choose a method.
@@ -570,9 +559,6 @@ class FPmod(ss.Module):
         # Get women eligible to become pregnant
         fecund = (ppl.female & (ppl.age < self.pars['age_limit_fecundity'])).uids
         nonpreg = fecund[~self.pregnant[fecund]]
-
-        # # Check who has reached their age at first partnership and set partnered attribute to True.
-        self.start_partnership(ppl.female.uids)
 
         # Progress pregnancy, advancing gestation and handling miscarriage
         self.progress_pregnancy(self.pregnant.uids)
