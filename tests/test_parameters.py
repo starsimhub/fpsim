@@ -91,11 +91,13 @@ def test_method_changes():
     ok(f'Methods had expected length after addition ({n+1})')
 
     # Test remove method
+    # Note that this will only work with the RandomChoice module since others have complex switching matrices
+    # that depend on specific methods being present
     method_list = [m for m in fp.make_methods().values() if m.label != 'Injectables']
     choice = fp.RandomChoice(methods=method_list)
     s2 = fp.Sim(test=True, contraception_module=choice)
     s2.run()
-    assert len(s2.connectors.contraception.methods) == len(methods), 'Methods was not removed'
+    assert len(s2.connectors.contraception.methods) == len(method_list), 'Method was not removed'
     ok(f'Methods have expected length after removal ({n})')
 
     # Test method efficacy
