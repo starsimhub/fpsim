@@ -22,7 +22,7 @@ __all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'make
 
 # %% Base definition of contraceptive methods -- can be overwritten by locations
 class Method:
-    def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, csv_name=None):
+    def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, rel_dur_use=1, csv_name=None):
         self.name = name
         self.label = label or name
         self.csv_name = csv_name or label or name
@@ -30,6 +30,7 @@ class Method:
         self.efficacy = efficacy
         self.modern = modern
         self.dur_use = dur_use
+        self.rel_dur_use = rel_dur_use
 
     def gamma_scale_callback(self, sim, uids):
         """ Sample from gamma distribution with age factors """
@@ -1261,6 +1262,8 @@ class SimpleChoice(RandomChoice):
                 else:
                     errormsg = 'Unrecognized type for duration of use: expecting a Starsim distribution or a number'
                     raise ValueError(errormsg)
+
+                dur_method[user_idxs] *= method.rel_dur_use  # Scale if needed
 
         dt = self.t.dt.months
         timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].years)  # Include a maximum. Durs seem way too high

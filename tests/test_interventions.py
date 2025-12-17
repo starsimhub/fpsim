@@ -119,24 +119,24 @@ def test_add_method():
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
-    
+
     # Test 1: Basic add_method functionality
-    new_method = fp.Method(
+    method_pars = dict(
         name='test_method',
         label='Test Method',
-        efficacy=0.99,
-        modern=True,
-        dur_use=ss.lognorm_ex(mean=2, std=1),
+        efficacy=0.999,
+        dur_use=ss.lognorm_ex(ss.years(2), ss.years(0.5)),  # TODO - should not need this, but fails without it!
+        rel_dur_use=1.5,  # 50% longer
     )
-    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', split_shares=0.3, verbose=False)
+    intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='impl', split_shares=0.3, verbose=False)
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.run()
-    
+
     cm = sim.connectors.contraception
     age_key = '18-20'  # Choose one age group to check
 
     # Check that the new method has been added
-    assert new_method.name in cm.methods, f'New method should be in contraception methods'
+    assert method_pars['name'] in cm.methods, f'New method should be in contraception methods'
     assert cm.n_methods == 10, f'Should have 10 methods after adding one'
 
     # Check that for a given age key, the method_choice_pars have been updated correctly
