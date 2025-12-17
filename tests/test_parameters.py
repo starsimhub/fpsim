@@ -91,8 +91,8 @@ def test_method_changes():
     ok(f'Methods had expected length after addition ({n+1})')
 
     # Test remove method
-    methods = [m for m in fp.make_method_list() if m.label != 'Injectables']
-    choice = fp.RandomChoice(methods=methods)
+    method_list = [m for m in fp.make_methods().values() if m.label != 'Injectables']
+    choice = fp.RandomChoice(methods=method_list)
     s2 = fp.Sim(test=True, contraception_module=choice)
     s2.run()
     assert len(s2.connectors.contraception.methods) == len(methods), 'Methods was not removed'

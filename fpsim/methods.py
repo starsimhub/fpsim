@@ -17,7 +17,7 @@ from . import defaults as fpd
 import fpsim.locations.data_utils as fpld
 import pandas as pd
 
-__all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
+__all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'make_methods', 'ContraceptiveChoice', 'RandomChoice', 'SimpleChoice', 'StandardChoice']
 
 
 # %% Base definition of contraceptive methods -- can be overwritten by locations
