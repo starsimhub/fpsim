@@ -127,4 +127,6 @@ if __name__ == '__main__':
         calib = test_calibration()
         snap  = test_snapshot()
         ap    = test_age_pyramids()
+        lrec = test_lifeof_recorder_analyzer()
         mmba  = test_method_mix_by_age()
+    print('Done all tests')
