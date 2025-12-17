@@ -304,8 +304,8 @@ def plot_results(sim):
 if __name__ == '__main__':
 
     sc.options(interactive=False)
-    # s1 = test_pregnant_women()
-    # s2 = test_contraception()
+    s1 = test_pregnant_women()
+    s2 = test_contraception()
     s6 = test_method_selection_dependencies()
     s7, s8 = test_education_preg()
     print("All tests passed!")
