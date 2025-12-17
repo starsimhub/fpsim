@@ -212,13 +212,13 @@ class ContraceptiveChoice(ss.Connector):
         self.define_pars(**default_pars)
         self.update_pars(pars, **kwargs)
 
-        # Create methods from DataFrame or use default
-        if self.pars.methods_df is not None:
-            method_list = make_method_list(self.pars.methods_df)
-        elif self.pars.methods is not None:
+        # Create methods. Use directly if supplied, otherwise create from DataFrame or use default
+        if self.pars.methods is not None:
             method_list = self.pars.methods
+        elif self.pars.methods_df is not None:
+            method_list = make_method_list(self.pars.methods_df)
         else:
-            raise ValueError('A methods_df must be provided to define contraceptive methods.')
+            raise ValueError('Methods must be provided to define contraceptive methods.')
 
         # Store methods. Note that these can be updated over the course of a simulation, in which case
         # self.methods will change but self.pars.methods_df will not. Always refer to self.methods for

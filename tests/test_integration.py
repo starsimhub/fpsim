@@ -34,9 +34,10 @@ def test_pregnant_women():
     sc.heading('Test pregnancy and birth outcomes... ')
 
     # start out 24f, no contra, no pregnancy, active, fertile, has_intent
+    def ln(): return ss.lognorm_ex(ss.years(2), ss.years(1))
     methods = ss.ndict([
-        fpm.Method(name='none', efficacy=0, modern=False, dur_use=fpm.ln(2, 3), label='None'),
-        fpm.Method(name='test', efficacy=0.0, modern=True,  dur_use=fpm.ln(2, 3), label='Test'),
+        fpm.Method(name='none', efficacy=0, modern=False, dur_use=ln(), label='None'),
+        fpm.Method(name='test', efficacy=0.0, modern=True,  dur_use=ln(), label='Test'),
     ])
     contra_mod = fpm.RandomChoice(methods=methods)
 
@@ -304,9 +305,9 @@ if __name__ == '__main__':
 
     sc.options(interactive=False)
     s1 = test_pregnant_women()
-    s2 = test_contraception()
-    s6 = test_method_selection_dependencies()
-    s7, s8 = test_education_preg()
+    # s2 = test_contraception()
+    # s6 = test_method_selection_dependencies()
+    # s7, s8 = test_education_preg()
     print("All tests passed!")
 
 
