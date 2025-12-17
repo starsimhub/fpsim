@@ -101,7 +101,7 @@ def test_method_changes():
     ok(f'Methods have expected length after removal ({n})')
 
     # Test method efficacy
-    methods = fp.make_method_list()
+    methods = fp.make_methods()
     for method in methods: method.efficacy = 1  # Make all methods totally effective
     choice = fp.RandomChoice(pars=dict(p_use=1), methods=methods)
     s3 = fp.Sim(test=True, contraception_module=choice)
