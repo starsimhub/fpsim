@@ -153,6 +153,15 @@ def make_method_list(methods_df):
     return method_list
 
 
+def make_methods(method_list=None, method_df=None):
+    if method_list is None:
+        if method_df is None:
+            cpars = fp.make_contra_pars()
+            method_df = cpars.methods_df
+        method_list = make_method_list(method_df)
+    return ss.ndict(method_list, type=Method)
+
+
 class Fisk(ss.Dist):
     """ Wrapper for scipy's fisk distribution to make it compatible with starsim """
     def __init__(self, c=0.0, scale=1.0, **kwargs):
@@ -223,7 +232,7 @@ class ContraceptiveChoice(ss.Connector):
         # Store methods. Note that these can be updated over the course of a simulation, in which case
         # self.methods will change but self.pars.methods_df will not. Always refer to self.methods for
         # the current methods.
-        self.methods = ss.ndict(method_list, type=Method)
+        self.methods = make_methods(method_list)
 
         # Process pars
         if self.pars.method_weights is None:
