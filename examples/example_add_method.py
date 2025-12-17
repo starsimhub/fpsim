@@ -43,6 +43,7 @@ def main():
         year=introduction_year,
         method=new_injectable,
         copy_from='inj',
+        split_shares=0.99,
         verbose=True,
     )
     

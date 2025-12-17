@@ -138,19 +138,18 @@ class add_method(ss.Intervention):
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
     """
     
-    def __init__(self, year=None, method=None, copy_from=None, split_shares=None, verbose=True, **kwargs):
+    def __init__(self, year=None, method=None, method_pars=None, copy_from=None, split_shares=None, verbose=True, **kwargs):
         super().__init__(**kwargs)
         
         # Validate inputs
         if year is None:
             raise ValueError('Year must be specified for add_method intervention')
-        if method is None:
-            raise ValueError('A Method object must be provided')
         if copy_from is None:
             raise ValueError('copy_from must specify an existing method name to copy switching behavior from')
         
         self.year = year
         self.method = method
+        self.method_pars = method_pars
         self.copy_from = copy_from
         self.verbose = verbose
         self.split_shares = split_shares
@@ -169,7 +168,15 @@ class add_method(ss.Intervention):
         # Validate year is within simulation range
         if not (sim.pars.start <= self.year <= sim.pars.stop):
             raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
-        
+
+        # If method is not provided, create a copy of the source method
+        if self.method is None:
+            source_method = sim.connectors.contraception.get_method(self.copy_from)
+            self.method = sc.dcp(source_method)
+            for mp, mpar in self.method_pars.items():
+                setattr(self.method, mp, mpar)
+            self.method.name += '_copy'
+
         # Resolve copy_from to method name (supports both name and label)
         cm = sim.connectors.contraception
         source_method = cm.get_method(self.copy_from)

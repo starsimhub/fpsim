@@ -119,19 +119,18 @@ def test_add_method():
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
-    
+
     # Test 1: Basic add_method functionality
-    new_method = fp.Method(
+    method_pars = dict(
         name='test_method',
         label='Test Method',
         efficacy=0.99,
-        modern=True,
-        dur_use=ss.lognorm_ex(mean=2, std=1),
+        rel_dur_use=1.2,
     )
-    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', split_shares=0.3, verbose=False)
+    intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='impl', split_shares=0.3, verbose=False)
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.run()
-    
+
     cm = sim.connectors.contraception
     age_key = '18-20'  # Choose one age group to check
 
