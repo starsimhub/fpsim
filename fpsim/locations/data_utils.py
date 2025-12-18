@@ -674,6 +674,7 @@ class DataLoader:
             return {}
 
     def contra_intent_coefs(self):
+        """Load regression coefficients to update intent to use contraception"""
         try:
             raw_pars = pd.read_csv(os.path.join(self.data_path, 'contra_intent_coef.csv'))
             pars = sc.objdict()
@@ -690,7 +691,7 @@ class DataLoader:
             return {}
 
     def process_contra_intent(self):
-        """Load regression coefficients to update intent to use contraception"""
+        """Load all the intent data from CSV"""
         contra_intent_pars = dict()
         contra_intent_pars['contra_intent_coefs'] = self.contra_intent_coefs()
         contra_intent_pars['contra_intent'] = self.contraception_intent()
