@@ -645,10 +645,7 @@ class FPmod(ss.Module):
         self.check_sexually_active(nonpreg)
 
         # Update intent to use on birthday for any non-preg or >1m pp
-        pp1 = self.ti - ppl.fp.ti_delivery[nonpreg] <= 1
-        nonpp1 = nonpreg[~pp1]  # Delivered last timestep
-        bday = nonpp1[(ppl.age[nonpp1] - ppl.int_age(nonpp1)) <= self.t.dt_year]
-        self.sim.connectors.contraception.update_intent_to_use(bday)
+        self.sim.connectors.contraception.update_intent_to_use(nonpreg)
 
         # Update methods for those who are eligible
         ready = nonpreg[self.ti_contra[nonpreg] <= self.ti]

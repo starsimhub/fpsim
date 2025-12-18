@@ -501,6 +501,10 @@ class ContraceptiveChoice(ss.Connector):
 
         return
 
+    def update_intent_to_use(self, uids):
+        """Intent is optional, so pass if not implemented for a given ContraceptiveChoice"""
+        pass
+
 
 class RandomChoice(ContraceptiveChoice):
     """ Randomly choose a method of contraception """
@@ -829,12 +833,18 @@ class StandardChoice(SimpleChoice):
         
         ppl = self.sim.people
         fp_connector = self.sim.connectors.fp
+
+        pp1 = self.ti - ppl.fp.ti_delivery <= 1
+        nonpp1 = ~pp1  # Delivered last timestep
+        bday = (ppl.age - ppl.int_age) <= self.t.dt_year
         
         # Filter to eligible women (15-49, alive, female, not on contraception)
         eligible_mask = ((ppl.age >= fpd.min_age) & 
                         (ppl.age < fpd.max_age_preg) & 
                         ppl.female & 
                         ppl.alive &
+                        nonpp1 &
+                        bday &
                         ~fp_connector.on_contra)  # Only update for women not currently on contraception
         eligible_uids = uids[eligible_mask[uids]] if len(uids) > 0 else eligible_mask.uids
         
