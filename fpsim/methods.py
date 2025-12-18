@@ -178,6 +178,7 @@ class ContraPars(ss.Pars):
         self.methods = make_method_list()  # Default methods
 
         # Probabilities and choices
+        self.p_intent = ss.bernoulli(p=1)
         self.p_use = ss.bernoulli(p=0.5)
         self.force_choose = False  # Whether to force non-users to choose a method
         self.method_mix = 'uniform'  #np.array([1/self.n_methods]*self.n_methods)
@@ -194,6 +195,7 @@ class ContraPars(ss.Pars):
         self.dur_use_df = None
         self.contra_use_pars = None
         self.method_choice_pars = None
+        self.intent_pars = None
 
         # Settings and other misc
         self.max_dur = ss.years(100)  # Maximum duration of use in years
@@ -815,4 +817,73 @@ class StandardChoice(SimpleChoice):
         # Finish
         prob_use = expit(rhs)
         self.pars.p_use.set(p=prob_use)
+        return
+
+    def update_intent_to_use(self, uids):
+        """
+        Update intent to use contraception based on regression coefficients
+        """
+        # Check if we have the necessary data
+        if not self.pars.get('intent_pars'):
+            return  # Skip if no coefficients available
+        
+        ppl = self.sim.people
+        fp_connector = self.sim.connectors.fp
+        
+        # Filter to eligible women (15-49, alive, female, not on contraception)
+        eligible_mask = ((ppl.age >= fpd.min_age) & 
+                        (ppl.age < fpd.max_age_preg) & 
+                        ppl.female & 
+                        ppl.alive &
+                        ~fp_connector.on_contra)  # Only update for women not currently on contraception
+        eligible_uids = uids[eligible_mask[uids]] if len(uids) > 0 else eligible_mask.uids
+        
+        if len(eligible_uids) == 0:
+            return
+        
+        # Get coefficients for intent_to_use
+        lhs = "intent_to_use"
+        if lhs not in self.pars.intent_pars['contra_intent_coefs']:
+            return  # Skip if no coefficients for intent_to_use
+            
+        p = self.pars.intent_pars['contra_intent_coefs'][lhs]
+        
+        # Initialize with intercept
+        rhs = np.full(len(eligible_uids), fill_value=p.get('intercept', 0.0))
+        
+        # Add predictor terms
+        for predictor, beta_p in p.items():
+            if predictor == 'intercept':
+                continue
+            elif predictor == "edu_attainment":
+                # Education data is in the education connector
+                rhs += beta_p * ppl.edu.attainment[eligible_uids]
+            elif predictor in ["parity", "urban", "wealthquintile"]:
+                rhs += beta_p * ppl[predictor][eligible_uids]
+        
+        # Handle fertility intent predictor (special case with different coefficients for yes/no)
+        if "fertility_intentno" in p and "fertility_intentyes" in p:
+            # Start with the "no" coefficient for all
+            fertility_coeff = np.full(len(eligible_uids), p["fertility_intentno"])
+            # Update to "yes" coefficient where fertility_intent is True
+            fertility_coeff[fp_connector.fertility_intent[eligible_uids]] = p["fertility_intentyes"]
+            rhs += fertility_coeff * fp_connector.fertility_intent[eligible_uids].astype(float)
+        
+        # Apply logistic transformation
+        prob_t = expit(rhs)
+        
+        # Sample new values using the p_intent distribution
+        self.pars.p_intent.set(p=prob_t)
+        new_vals = self.pars.p_intent.rvs(eligible_uids)
+        
+        # Update the intent_to_use state
+        old_vals = fp_connector.intent_to_use[eligible_uids]
+        changers = eligible_uids[new_vals != old_vals]  # People whose intent changes
+        
+        if len(changers) > 0:
+            # Trigger update to contraceptive choices if intent changes
+            fp_connector.ti_contra[changers] = self.t.ti
+        
+        # Update the state
+        fp_connector.intent_to_use[eligible_uids] = new_vals
         return

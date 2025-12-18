@@ -86,6 +86,67 @@ class FPmod(ss.Module):
             uids = within_age.uids
             return uids
 
+    def init_intent_states(self, uids):
+        """
+        Initialize intent_to_use and fertility_intent states for women aged 15-49
+        
+        Arguments:
+            uids: array of user IDs to initialize
+        """
+        ppl = self.sim.people
+        
+        # Filter eligible women (15-49, alive, female)
+        eligible_mask = ((ppl.age >= fpd.min_age) & 
+                        (ppl.age < fpd.max_age_preg) & 
+                        ppl.female & 
+                        ppl.alive)
+        eligible_uids = uids[eligible_mask[uids]]
+        
+        if len(eligible_uids) == 0:
+            return
+        
+        # Load data if available from contraception connector
+        contra_connector = self.sim.connectors.contraception
+        fertility_data = contra_connector.pars.intent_pars.get('fertility_intent', {})
+        contraception_data = contra_connector.pars.intent_pars.get('contra_intent', {})
+        
+        # If no data available, use defaults
+        if not fertility_data or not contraception_data:
+            # Set default values
+            self.fertility_intent[eligible_uids] = False
+            self.intent_to_use[eligible_uids] = False
+            return
+        
+        # Transform ages to integers for indexing
+        from . import utils as fpu
+        ages = fpu.digitize_ages_1yr(ppl.age[eligible_uids])
+        
+        # Initialize fertility_intent
+        for i, uid in enumerate(eligible_uids):
+            age = int(ages[i])
+            if age in fertility_data:
+                # Sample from the distribution
+                choices = list(fertility_data[age].keys())
+                probs = list(fertility_data[age].values())
+                choice = np.random.choice(choices, p=probs)
+                self.fertility_intent[uid] = (choice == 'yes')
+            else:
+                # Default if age not in data
+                self.fertility_intent[uid] = False
+        
+        # Initialize intent_to_use
+        for i, uid in enumerate(eligible_uids):
+            age = int(ages[i])
+            if age in contraception_data:
+                # Sample from the distribution  
+                choices = list(contraception_data[age].keys())
+                probs = list(contraception_data[age].values())
+                choice = np.random.choice(choices, p=probs)
+                self.intent_to_use[uid] = (choice == '1')
+            else:
+                # Default if age not in data
+                self.intent_to_use[uid] = False
+
     def set_states(self, uids=None, upper_age=None):
         ppl = self.sim.people
         if uids is None: uids = self._get_uids(upper_age=upper_age)
@@ -102,6 +163,9 @@ class FPmod(ss.Module):
 
         # Fecundity variation
         self.personal_fecundity[uids] = self.pars.fecundity.rvs(uids)
+        
+        # Intent states
+        self.init_intent_states(uids)
         return
 
     def init_post(self):
@@ -579,6 +643,12 @@ class FPmod(ss.Module):
 
         # Check if agents are sexually active, and update their intent to use contraception
         self.check_sexually_active(nonpreg)
+
+        # Update intent to use on birthday for any non-preg or >1m pp
+        pp1 = self.ti - ppl.fp.ti_delivery[nonpreg] <= 1
+        nonpp1 = nonpreg[~pp1]  # Delivered last timestep
+        bday = nonpp1[(ppl.age[nonpp1] - ppl.int_age(nonpp1)) <= self.t.dt_year]
+        self.sim.connectors.contraception.update_intent_to_use(bday)
 
         # Update methods for those who are eligible
         ready = nonpreg[self.ti_contra[nonpreg] <= self.ti]
