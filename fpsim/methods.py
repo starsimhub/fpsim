@@ -836,7 +836,7 @@ class StandardChoice(SimpleChoice):
 
         pp1 = self.ti - ppl.fp.ti_delivery <= 1
         nonpp1 = ~pp1  # Delivered last timestep
-        bday = (ppl.age - ppl.int_age) <= self.t.dt_year
+        bday = (ppl.age - ppl.int_age()) <= self.t.dt_year
         
         # Filter to eligible women (15-49, alive, female, not on contraception)
         eligible_mask = ((ppl.age >= fpd.min_age) & 
