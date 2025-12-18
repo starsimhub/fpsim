@@ -107,11 +107,14 @@ class FPmod(ss.Module):
         
         # Load data if available from contraception connector
         contra_connector = self.sim.connectors.contraception
-        fertility_data = contra_connector.pars.intent_pars.get('fertility_intent', {})
-        contraception_data = contra_connector.pars.intent_pars.get('contra_intent', {})
+        intent_pars = contra_connector.pars.get('intent_pars', None)
+
+        if intent_pars:
+            fertility_data = intent_pars.get('fertility_intent', {})
+            contraception_data = intent_pars.get('contra_intent', {})
         
         # If no data available, use defaults
-        if not fertility_data or not contraception_data:
+        if not intent_pars or not fertility_data or not contraception_data:
             # Set default values
             self.fertility_intent[eligible_uids] = False
             self.intent_to_use[eligible_uids] = False
