@@ -73,7 +73,6 @@ class DataLoader:
         fp_data.debut_age = self.debut_age()
         fp_data.spacing_pref = self.birth_spacing_pref()
         fp_data.abortion_prob, fp_data.twins_prob = self.scalar_probs()
-        fp_data.age_partnership = self.age_partnership()
         fp_data.maternal_mortality = self.maternal_mortality()
         fp_data.infant_mortality = self.infant_mortality()
         fp_data.miscarriage_rates = self.miscarriage()
@@ -99,11 +98,20 @@ class DataLoader:
     def load_contra_data(self, contra_mod='mid', return_data=False):
         """ Load data used within the Contraception module """
         contra_data = sc.objdict()
-        contra_data.contra_use_pars = self.process_contra_use(contra_mod)
-        mc, init_dist = self.load_method_switching()
+
+        # Load methods first
+        methods_df, methods_dict = self.load_methods()
+        contra_data.methods_df = methods_df
+
+        # Load switching data with validation against methods
+        mc, method_column_order = self.load_method_switching(methods_df=methods_df)
         contra_data.method_choice_pars = mc
-        contra_data.init_dist = init_dist
+        contra_data.method_column_order = method_column_order
+
+        # Load other data
+        contra_data.contra_use_pars = self.process_contra_use(contra_mod)
         contra_data.dur_use_df = self.load_dur_use()
+
         if contra_mod == 'mid':
             contra_data.age_spline = self.age_spline('25_40')
         if return_data:
@@ -128,6 +136,7 @@ class DataLoader:
         people_data.wealth_quintile = self.wealth()
         people_data.urban_prop = self.urban_proportion()
         people_data.age_pyramid = self.age_pyramid()
+        people_data.age_partnership = self.age_partnership()
         if return_data:
             return people_data
         else:
@@ -232,7 +241,7 @@ class DataLoader:
             "age": age_partnership_data["age_partner"].to_numpy(),
             "partnership_probs": age_partnership_data["percent"].to_numpy(),
         }
-        return  partnership_dict
+        return partnership_dict
 
     def wealth(self):
         """ Process percent distribution of people in each wealth quintile"""
@@ -587,50 +596,111 @@ class DataLoader:
 
         return contra_use_pars
 
-    def load_method_switching(self, df=None, methods=None):
-        """ Choice of method is age and previous method """
+    def load_methods(self, methods_file='methods.csv'):
+        """
+        Load method definitions from CSV.
+        This is the authoritative source for method definitions.
+
+        Returns:
+            methods_df (pd.DataFrame): DataFrame with method definitions
+            methods_dict (dict): Dictionary mapping csv_name -> method info
+        """
+        # Try location-specific methods file first, fall back to shared_data
+        try:
+            methods_df = self.read_data(methods_file)
+        except FileNotFoundError:
+            # Fall back to shared_data
+            methods_df = pd.read_csv(os.path.join(sd_dir, methods_file), keep_default_na=False, na_values=['NaN'])
+
+        # Create lookup dict by csv_name for validation
+        methods_dict = {}
+        for idx, row in methods_df.iterrows():
+            methods_dict[row['csv_name']] = {
+                'name': row['name'],
+                'label': row['label'],
+                'idx': idx,  # Use DataFrame index as method index
+                'efficacy': row['efficacy'],
+                'modern': row['modern'],
+            }
+
+        return methods_df, methods_dict
+
+    def load_method_switching(self, df=None, methods_df=None):
+        """
+        Load method switching matrix.
+        Now validates against methods_df to ensure consistency.
+
+        Args:
+            df: Optional switching data DataFrame
+            methods_df: Optional methods definition DataFrame
+
+        Returns:
+            mc: Method choice parameters
+            method_column_order: List of method csv_names in column order
+        """
 
         if df is None:
             df = self.read_data('method_mix_matrix_switch.csv', keep_default_na=False, na_values=['NaN'])
 
-        # Get default methods - TODO, think of something better
-        if methods is None:
-            methods = fp.make_methods()
+        if methods_df is None:
+            methods_df, _ = self.load_methods()
 
-        csv_map = {method.csv_name: method.name for method in methods.values()}
-        idx_map = {method.csv_name: method.idx for method in methods.values()}
-        idx_df = {}
-        for col in df.columns:
-            if col in csv_map.keys():
-                idx_df[col] = idx_map[col]
+        # Extract method columns (everything after 'age_grp')
+        standard_cols = ['postpartum', 'From', 'n', 'age_grp', 'group']
+        method_columns = [col for col in df.columns if col not in standard_cols]
 
-        mc = dict()  # This one is a dict because it will be keyed with numbers
-        init_dist = sc.objdict()  # Initial distribution of method choice
+        # Validate that all method columns exist in methods_df
+        methods_csv_names = set(methods_df['csv_name'].values)
+        missing_methods = set(method_columns) - methods_csv_names
+        if missing_methods:
+            errormsg = (f'Methods in switching data not found in methods.csv: {missing_methods}\n'
+                       f'Available methods: {methods_csv_names}')
+            raise ValueError(errormsg)
 
-        # Get end index
-        ei = 4+len(methods)-1
+        extra_methods = methods_csv_names - set(method_columns) - {'None'}  # 'None' is not in switching
+        if extra_methods:
+            print(f"Warning: Methods defined in methods.csv but not in switching data: {extra_methods}")
+
+        # Create index mapping: csv_name -> idx
+        csv_to_idx = {row['csv_name']: idx for idx, row in methods_df.iterrows() if row['name'] != 'none'}
+
+        # Build method_idx array in the order methods appear in CSV columns
+        method_idx_array = np.array([csv_to_idx[col] for col in method_columns])
+
+        mc = dict()
+
+        # Get start and end index for slicing
+        si = len(standard_cols) - 1
+        ei = len(standard_cols) + len(method_columns) - 1
 
         for pp in df.postpartum.unique():
             mc[pp] = sc.objdict()
-            mc[pp].method_idx = np.array(list(idx_df.values()))
+            mc[pp].method_idx = method_idx_array.copy()
+
             for akey in df.age_grp.unique():
                 mc[pp][akey] = sc.objdict()
                 thisdf = df.loc[(df.age_grp == akey) & (df.postpartum == pp)]
+
                 if pp == 1:  # Different logic for immediately postpartum
-                    mc[pp][akey] = thisdf.values[0][4:ei].astype(float)  # If this is going to be standard practice, should make it more robust
+                    mc[pp][akey] = thisdf.values[0][si:ei].astype(float)
                 else:
                     from_methods = thisdf.From.unique()
                     for from_method in from_methods:
-                        from_mname = csv_map[from_method]
+                        # Map csv_name to method name
+                        if from_method == 'None':
+                            from_mname = 'none'
+                        else:
+                            # Find the method with this csv_name
+                            matching = methods_df[methods_df['csv_name'] == from_method]
+                            if len(matching) == 0:
+                                errormsg = f'Method {from_method} in switching data not found in methods.csv'
+                                raise ValueError(errormsg)
+                            from_mname = matching.iloc[0]['name']
+
                         row = thisdf.loc[thisdf.From == from_method]
-                        mc[pp][akey][from_mname] = row.values[0][4:ei].astype(float)
+                        mc[pp][akey][from_mname] = row.values[0][si:ei].astype(float)
 
-                # Set initial distributions by age
-                if pp == 0:
-                    init_dist[akey] = thisdf.loc[thisdf.From == 'None'].values[0][4:ei].astype(float)
-                    init_dist.method_idx = np.array(list(idx_df.values()))
-
-        return mc, init_dist
+        return mc, method_columns
 
     def load_dur_use(self):
         """ Process duration of use parameters"""

@@ -6,7 +6,6 @@ Define defaults for use throughout FPsim
 import numpy as np
 import sciris as sc
 import starsim as ss
-import fpsim
 import fpsim.arrays as fpa
 
 
@@ -78,6 +77,7 @@ def get_calib_pars(location, verbose=1):
         sc.printv(f'No calibration parameters found for {location}', thisverbose=0, verbose=verbose)
         return None
     return calib_pars
+
 
 def get_test_defaults():
     """ Return the test defaults """

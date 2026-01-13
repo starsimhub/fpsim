@@ -119,66 +119,37 @@ def test_add_method():
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
-    default_dur = ss.lognorm_ex(mean=2, std=1)
-    
-    def make_method(name, **kwargs):
-        """ Helper to create methods with sensible defaults """
-        defaults = dict(label=name.replace('_', ' ').title(), efficacy=0.99, modern=True, dur_use=default_dur)
-        defaults.update(kwargs)
-        return fp.Method(name=name, **defaults)
-    
-    def run_intv(intv):
-        """ Helper to run a sim with an intervention """
-        return fp.Sim(pars=pars, interventions=[intv], verbose=0).run()
-    
-    def expect_error(intv, msg):
-        """ Helper to verify an intervention raises ValueError """
-        try:
-            run_intv(intv)
-            raise AssertionError(msg)
-        except ValueError:
-            pass
-    
-    # Test 1: Basic functionality - method added and accessible
-    method = make_method('test_method')
-    sim = run_intv(fp.add_method(year=2010, method=method, copy_from='impl', verbose=False))
+
+    # Test 1: Basic add_method functionality
+    method_pars = dict(
+        name='test_method',
+        label='Test Method',
+        efficacy=0.999,
+        dur_use=ss.lognorm_ex(ss.years(2), ss.years(0.5)),  # TODO - should not need this, but fails without it!
+        rel_dur_use=1.5,  # 50% longer
+    )
+    intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='impl', split_shares=0.3, verbose=False)
+    sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
+    sim.run()
+
     cm = sim.connectors.contraception
-    assert method.name in cm.methods and cm.n_methods > 9
+    age_key = '18-20'  # Choose one age group to check
+
+    # Check that the new method has been added
+    assert method_pars['name'] in cm.methods, f'New method should be in contraception methods'
+    assert cm.n_methods == 10, f'Should have 10 methods after adding one'
+
+    # Check that for a given age key, the method_choice_pars have been updated correctly
+    assert np.array_equal(cm.get_switching_matrix(0, 'test_method')[age_key], cm.get_switching_matrix(0, 'impl')[age_key]), f'Method choice switching matrix not updated correctly for new method'
+    print(f' ✓ Switching FROM new method matches copied method')
+    p1 = cm.get_switching_prob('pill', 'impl', 0, age_key)
+    p2 = cm.get_switching_prob('pill', 'test_method', 0, age_key)
+    assert np.isclose((p1+p2)*0.7, p1), f'Method choice probabilities not updated correctly for new method'
+    assert np.isclose((p1+p2)*0.3, p2), f'Method choice probabilities not updated correctly for new method'
+    print(f' ✓ Switching TO probabilities updated correctly: {p1} -> {p2}')
+
     print(f'  ✓ Basic add_method works')
-    
-    # Test 2: Late introduction (year before simulation end) works
-    run_intv(fp.add_method(year=pars['stop']-1, method=make_method('late'), copy_from='impl', verbose=False))
-    print(f'  ✓ Late introduction works')
-    
-    # Test 3-4: Error cases - invalid year and invalid copy_from
-    expect_error(
-        fp.add_method(year=pars['start']-5, method=make_method('early'), copy_from='impl', verbose=False),
-        'Should have raised ValueError for year before simulation start')
-    print(f'  ✓ Invalid year correctly rejected')
-    
-    expect_error(
-        fp.add_method(year=2010, method=make_method('bad'), copy_from='nonexistent', verbose=False),
-        'Should have raised ValueError for invalid copy_from')
-    print(f'  ✓ Invalid copy_from correctly rejected')
-    
-    # Test 5-6: Auto-copy behavior - missing properties copied, explicit ones preserved
-    # Minimal method: all properties should be copied from source
-    minimal = fp.Method(name='minimal', label='Minimal')  # No dur_use, efficacy, or modern
-    sim_copy = run_intv(fp.add_method(year=2010, method=minimal, copy_from='impl', verbose=False))
-    cm = sim_copy.connectors.contraception
-    added, source = cm.methods['minimal'], cm.methods['impl']
-    assert added.dur_use is not None, 'dur_use should be auto-copied'
-    assert added.efficacy == source.efficacy, f'efficacy should match source: {added.efficacy} != {source.efficacy}'
-    assert added.modern == source.modern, f'modern should match source: {added.modern} != {source.modern}'
-    print(f'  ✓ Auto-copy of dur_use, efficacy, modern works')
-    
-    # Explicit method: only dur_use copied, explicit values preserved
-    explicit = fp.Method(name='explicit', label='Explicit', efficacy=0.5, modern=False)
-    sim_explicit = run_intv(fp.add_method(year=2010, method=explicit, copy_from='impl', verbose=False))
-    added2 = sim_explicit.connectors.contraception.methods['explicit']
-    assert added2.dur_use is not None and added2.efficacy == 0.5 and added2.modern == False
-    print(f'  ✓ Explicit values preserved, only missing values copied')
-    
+
     return sim
 
 

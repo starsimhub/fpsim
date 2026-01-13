@@ -238,8 +238,8 @@ class add_method(ss.Intervention):
     Args:
         year (float): The year at which to activate the new method
         method (Method): A Method object defining the new contraceptive method
-        copy_from (str): Name of the existing method to copy switching probabilities from.
-            Also copies dur_use, efficacy, and modern flag if not set on the new method.
+        copy_from (str): Name of the existing method to copy switching probabilities from
+        split_shares (float): if provided, % who would have chosen the 'copy_from' method and now choose the new method
         verbose (bool): Whether to print messages when method is activated (default True)
     
     **Examples**::
@@ -254,21 +254,21 @@ class add_method(ss.Intervention):
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
     """
     
-    def __init__(self, year=None, method=None, copy_from=None, verbose=True, **kwargs):
+    def __init__(self, year=None, method=None, method_pars=None, copy_from=None, split_shares=None, verbose=True, **kwargs):
         super().__init__(**kwargs)
         
         # Validate inputs
         if year is None:
             raise ValueError('Year must be specified for add_method intervention')
-        if method is None:
-            raise ValueError('A Method object must be provided')
         if copy_from is None:
             raise ValueError('copy_from must specify an existing method name to copy switching behavior from')
         
         self.year = year
         self.method = method
+        self.method_pars = method_pars
         self.copy_from = copy_from
         self.verbose = verbose
+        self.split_shares = split_shares
         self.activated = False
         self._method_idx = None  # Will be set after method is added
         
@@ -292,13 +292,23 @@ class add_method(ss.Intervention):
         # Validate year is within simulation range
         if not (sim.pars.start <= self.year <= sim.pars.stop):
             raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
-        
+
+        # If method is not provided, create a copy of the source method
+        if self.method is None:
+            source_method = sim.connectors.contraception.get_method(self.copy_from)
+            self.method = sc.dcp(source_method)
+            for mp, mpar in self.method_pars.items():
+                setattr(self.method, mp, mpar)
+            if 'name' not in self.method_pars:
+                self.method.name += '_copy'
+
         # Resolve copy_from to method name (supports both name and label)
         cm = sim.connectors.contraception
         source_method = cm.get_method(self.copy_from)
         self._copy_from_name = source_method.name  # Store resolved name for use in step()
         
-        # Add the new method to the contraception module (this also extends the switching matrix)
+        # Add the new method to the contraception module, extending the switching probabilities
+        # with zeros and resetting init_dist and method_weights
         cm.add_method(self.method)
         self._method_idx = cm.methods[self.method.name].idx
         
@@ -337,34 +347,19 @@ class add_method(ss.Intervention):
             if self.verbose:
                 print(f'Activating new contraceptive method "{self.method.name}" in year {sim.t.year:.1f}')
             
+            # Copy switching probabilities
             cm = sim.connectors.contraception
-            sw = cm.switch
-            
-            # Extend method_choice_pars with probabilities copied from source method
-            cm.extend_method_choice_pars(self.method.name, self._copy_from_name)
-            
-            # Copy switching probabilities in the Switching matrix
-            for pp in [0, 6]:  # Non-postpartum and 6+ months postpartum
-                sw.copy_from_method_column(
-                    source_to_method=self._copy_from_name,
-                    dest_to_method=self.method.name,
-                    postpartum=pp
-                )
-                sw.copy_from_method_row(
-                    source_from_method=self._copy_from_name,
-                    dest_from_method=self.method.name,
-                    postpartum=pp
-                )
-            
-            # Handle postpartum=1 separately (different structure - no from_method dimension)
-            sw.copy_from_method_column(
+            cm.copy_switching_to_method(
                 source_to_method=self._copy_from_name,
                 dest_to_method=self.method.name,
-                postpartum=1
+                split_shares=self.split_shares
             )
-            
+            cm.copy_switching_from_method(
+                source_from_method=self._copy_from_name,
+                dest_from_method=self.method.name,
+            )
+
             # Renormalize all probabilities
-            sw.renormalize_all()
             cm.renormalize_method_choice_pars()
         
         return
