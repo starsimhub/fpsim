@@ -237,21 +237,36 @@ class add_method(ss.Intervention):
    
     Args:
         year (float): The year at which to activate the new method
-        method (Method): A Method object defining the new contraceptive method
+        method (Method, optional): A Method object defining the new contraceptive method. 
+            Either ``method`` or ``method_pars`` must be provided (not both None).
+        method_pars (dict, optional): Dictionary of parameters to create or modify a Method object.
+            Either ``method`` or ``method_pars`` must be provided (not both None).
+            If ``method`` is provided, ``method_pars`` will override corresponding attributes.
+            If ``method`` is None, a new Method will be created from ``method_pars``.
         copy_from (str): Name of the existing method to copy switching probabilities from
-        split_shares (float): if provided, % who would have chosen the 'copy_from' method and now choose the new method
+        split_shares (float, optional): If provided, % who would have chosen the 'copy_from' method 
+            and now choose the new method
         verbose (bool): Whether to print messages when method is activated (default True)
     
     **Examples**::
     
-        # Full specification
+        # Case 1: Using a Method object (method_pars=None)
         new_method = fp.Method(name='new_impl', label='New Implant', efficacy=0.999, 
                                dur_use=ss.lognorm_ex(ss.years(3), ss.years(0.5)), modern=True)
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
         
-        # Minimal specification - copies dur_use, efficacy, modern from source
-        new_method = fp.Method(name='new_impl', label='New Implant')
-        intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
+        # Case 2: Using method_pars to create a new Method (method=None)
+        method_pars = dict(name='new_inj', label='New Injectable', efficacy=0.995, modern=True)
+        intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='inj')
+        
+        # Case 3: Using method with method_pars to override properties
+        base_method = fp.Method(name='new_method', efficacy=0.90)
+        intv = fp.add_method(year=2010, method=base_method, 
+                            method_pars={'efficacy': 0.998}, copy_from='impl')
+        
+        # Case 4: Using partial method_pars (missing properties copied from source)
+        intv = fp.add_method(year=2010, method_pars={'name': 'partial_method', 'efficacy': 0.97}, 
+                            copy_from='impl')
     """
     
     def __init__(self, year=None, method=None, method_pars=None, copy_from=None, split_shares=None, verbose=True, **kwargs):
