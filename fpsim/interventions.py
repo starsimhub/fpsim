@@ -263,6 +263,10 @@ class add_method(ss.Intervention):
         if copy_from is None:
             raise ValueError('copy_from must specify an existing method name to copy switching behavior from')
         
+        # Case 1: Neither 'method' nor 'method_pars' are passed --> failure
+        if method is None and method_pars is None:
+            raise ValueError('Either "method" or "method_pars" must be provided to add_method')
+        
         self.year = year
         self.method = method
         self.method_pars = method_pars
@@ -293,14 +297,20 @@ class add_method(ss.Intervention):
         if not (sim.pars.start <= self.year <= sim.pars.stop):
             raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
 
-        # If method is not provided, create a copy of the source method
-        if self.method is None:
-            source_method = sim.connectors.contraception.get_method(self.copy_from)
-            self.method = sc.dcp(source_method)
-            for mp, mpar in self.method_pars.items():
-                setattr(self.method, mp, mpar)
-            if 'name' not in self.method_pars:
-                self.method.name += '_copy'
+        # Handle the 4 cases:
+        # Case 2: method=fp.Method is valid and method_pars=None --> use only values in method, nothing else to do
+        # Case 3: method=fp.Method and method_pars!=None --> method_pars values replace those in fp.Method
+        # Case 4: method=None and method_pars!=None --> try to build a new fp.Method from the values passed from the method_pars
+        
+        if self.method is not None:
+            # Case 2 or 3: We have a method object
+            if self.method_pars is not None:
+                # Case 3: Update method with method_pars values
+                for mp, mpar in self.method_pars.items():
+                    setattr(self.method, mp, mpar)
+        else:
+            # Case 4: method=None and method_pars!=None --> build a new fp.Method from method_pars
+            self.method = fpm.Method(**self.method_pars)
 
         # Resolve copy_from to method name (supports both name and label)
         cm = sim.connectors.contraception

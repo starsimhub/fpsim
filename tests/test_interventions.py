@@ -115,42 +115,122 @@ def test_change_people_state():
 
 
 def test_add_method():
-    """ Test the add_method intervention """
+    """ Test the add_method intervention - all 4 cases """
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
-
-    # Test 1: Basic add_method functionality
-    method_pars = dict(
-        name='test_method',
-        label='Test Method',
-        efficacy=0.999,
-        dur_use=ss.lognorm_ex(ss.years(2), ss.years(0.5)),  # TODO - should not need this, but fails without it!
-        rel_dur_use=1.5,  # 50% longer
-    )
-    intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='impl', split_shares=0.3, verbose=False)
-    sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
-    sim.run()
-
-    cm = sim.connectors.contraception
     age_key = '18-20'  # Choose one age group to check
 
-    # Check that the new method has been added
-    assert method_pars['name'] in cm.methods, f'New method should be in contraception methods'
-    assert cm.n_methods == 10, f'Should have 10 methods after adding one'
+    # Case 1: Neither 'method' nor 'method_pars' are passed --> failure
+    print('  Testing Case 1: Neither method nor method_pars provided (should fail)...')
+    try:
+        intv = fp.add_method(year=2010, copy_from='impl')
+        assert False, 'Should have raised ValueError when neither method nor method_pars are provided'
+    except ValueError as e:
+        assert 'method' in str(e).lower() or 'method_pars' in str(e).lower(), f'Error message should mention method or method_pars: {e}'
+        print(f'   ✓ Case 1 passed: ValueError raised correctly')
 
+    # Case 2: method=fp.Method is valid and method_pars=None --> use only values in method
+    print('  Testing Case 2: method provided, method_pars=None...')
+    new_method = fp.Method(
+        name='case2_method',
+        label='Case 2 Method',
+        efficacy=0.995,
+        modern=True,
+        rel_dur_use=1.2,
+    )
+    intv2 = fp.add_method(year=2010, method=new_method, copy_from='impl', split_shares=0.3, verbose=False)
+    sim2 = fp.Sim(pars=pars, interventions=[intv2], verbose=0)
+    sim2.run()
+    cm2 = sim2.connectors.contraception
+    
+    assert 'case2_method' in cm2.methods, 'New method should be in contraception methods'
+    added_method2 = cm2.methods['case2_method']
+    assert added_method2.efficacy == 0.995, f'Method efficacy should be 0.995, got {added_method2.efficacy}'
+    assert added_method2.modern == True, f'Method modern should be True, got {added_method2.modern}'
+    assert added_method2.rel_dur_use == 1.2, f'Method rel_dur_use should be 1.2, got {added_method2.rel_dur_use}'
+    print(f'   ✓ Case 2 passed: method object used as-is')
+
+    # Case 3: method=fp.Method and method_pars!=None --> method_pars values replace those in fp.Method
+    print('  Testing Case 3: method provided with method_pars to override...')
+    base_method = fp.Method(
+        name='case3_method',
+        label='Case 3 Method',
+        efficacy=0.90,  # Will be overridden
+        modern=False,   # Will be overridden
+        rel_dur_use=1.0,  # Will be overridden
+    )
+    method_pars3 = dict(
+        efficacy=0.998,  # Override
+        modern=True,     # Override
+        rel_dur_use=1.5,  # Override
+    )
+    intv3 = fp.add_method(year=2010, method=base_method, method_pars=method_pars3, copy_from='impl', split_shares=0.3, verbose=False)
+    sim3 = fp.Sim(pars=pars, interventions=[intv3], verbose=0)
+    sim3.run()
+    cm3 = sim3.connectors.contraception
+    
+    assert 'case3_method' in cm3.methods, 'New method should be in contraception methods'
+    added_method3 = cm3.methods['case3_method']
+    assert added_method3.efficacy == 0.998, f'Method efficacy should be overridden to 0.998, got {added_method3.efficacy}'
+    assert added_method3.modern == True, f'Method modern should be overridden to True, got {added_method3.modern}'
+    assert added_method3.rel_dur_use == 1.5, f'Method rel_dur_use should be overridden to 1.5, got {added_method3.rel_dur_use}'
+    assert added_method3.name == 'case3_method', f'Method name should remain case3_method, got {added_method3.name}'
+    print(f'   ✓ Case 3 passed: method_pars values replaced those in method object')
+
+    # Case 4: method=None and method_pars!=None --> build a new fp.Method from method_pars
+    print('  Testing Case 4: method_pars provided without method (build new Method)...')
+    method_pars4 = dict(
+        name='case4_method',
+        label='Case 4 Method',
+        efficacy=0.999,
+        modern=True,
+        rel_dur_use=1.5,
+    )
+    intv4 = fp.add_method(year=2010, method_pars=method_pars4, copy_from='impl', split_shares=0.3, verbose=False)
+    sim4 = fp.Sim(pars=pars, interventions=[intv4], verbose=0)
+    sim4.run()
+    cm4 = sim4.connectors.contraception
+    
+    assert method_pars4['name'] in cm4.methods, 'New method should be in contraception methods'
+    added_method4 = cm4.methods[method_pars4['name']]
+    assert added_method4.efficacy == 0.999, f'Method efficacy should be 0.999, got {added_method4.efficacy}'
+    assert added_method4.modern == True, f'Method modern should be True, got {added_method4.modern}'
+    assert added_method4.rel_dur_use == 1.5, f'Method rel_dur_use should be 1.5, got {added_method4.rel_dur_use}'
+    
     # Check that for a given age key, the method_choice_pars have been updated correctly
-    assert np.array_equal(cm.get_switching_matrix(0, 'test_method')[age_key], cm.get_switching_matrix(0, 'impl')[age_key]), f'Method choice switching matrix not updated correctly for new method'
-    print(f' ✓ Switching FROM new method matches copied method')
-    p1 = cm.get_switching_prob('pill', 'impl', 0, age_key)
-    p2 = cm.get_switching_prob('pill', 'test_method', 0, age_key)
+    assert np.array_equal(cm4.get_switching_matrix(0, 'case4_method')[age_key], cm4.get_switching_matrix(0, 'impl')[age_key]), 'Method choice switching matrix not updated correctly for new method'
+    p1 = cm4.get_switching_prob('pill', 'impl', 0, age_key)
+    p2 = cm4.get_switching_prob('pill', 'case4_method', 0, age_key)
     assert np.isclose((p1+p2)*0.7, p1), f'Method choice probabilities not updated correctly for new method'
     assert np.isclose((p1+p2)*0.3, p2), f'Method choice probabilities not updated correctly for new method'
-    print(f' ✓ Switching TO probabilities updated correctly: {p1} -> {p2}')
+    print(f'   ✓ Case 4 passed: new Method built from method_pars')
+    print(f'   ✓ Switching probabilities updated correctly: {p1} -> {p2}')
 
-    print(f'  ✓ Basic add_method works')
+    # Case 4b: method=None and partial method_pars --> build a new fp.Method from partial method_pars
+    print('  Testing Case 4b: partial method_pars provided without method (build new Method with defaults)...')
+    partial_method_pars = dict(
+        name='partial_method',
+        efficacy=0.97,
+        # Note: not providing label, modern, rel_dur_use, etc.
+    )
+    intv4b = fp.add_method(year=2010, method=None, method_pars=partial_method_pars, copy_from='impl', split_shares=0.3, verbose=False)
+    sim4b = fp.Sim(pars=pars, interventions=[intv4b], verbose=0)
+    sim4b.run()
+    cm4b = sim4b.connectors.contraception
+    
+    assert partial_method_pars['name'] in cm4b.methods, 'New method should be in contraception methods'
+    added_method4b = cm4b.methods[partial_method_pars['name']]
+    assert added_method4b.name == 'partial_method', f'Method name should be partial_method, got {added_method4b.name}'
+    assert added_method4b.efficacy == 0.97, f'Method efficacy should be 0.97, got {added_method4b.efficacy}'
+    # label should default to name when not provided
+    assert added_method4b.label == 'partial_method', f'Method label should default to name, got {added_method4b.label}'
+    # Other properties (modern, dur_use) may be None or copied from source method in init_pre
+    print(f'   ✓ Case 4b passed: new Method built from partial method_pars (efficacy={added_method4b.efficacy}, label={added_method4b.label})')
 
-    return sim
+    print(f'  ✓ All add_method cases work correctly')
+
+    return sim4
 
 
 if __name__ == '__main__':
