@@ -238,11 +238,19 @@ class add_method(ss.Intervention):
     Args:
         year (float): The year at which to activate the new method
         method (Method): A Method object defining the new contraceptive method
-        copy_from (str): Name of the existing method to copy switching probabilities from
+        copy_from (str): Name of the existing method to copy switching probabilities from.
+            Also copies dur_use, efficacy, and modern flag if not set on the new method.
         verbose (bool): Whether to print messages when method is activated (default True)
     
-    **Example**::
+    **Examples**::
     
+        # Full specification
+        new_method = fp.Method(name='new_impl', label='New Implant', efficacy=0.999, 
+                               dur_use=ss.lognorm_ex(ss.years(3), ss.years(0.5)), modern=True)
+        intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
+        
+        # Minimal specification - copies dur_use, efficacy, modern from source
+        new_method = fp.Method(name='new_impl', label='New Implant')
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
     """
     
@@ -293,6 +301,16 @@ class add_method(ss.Intervention):
         # Add the new method to the contraception module (this also extends the switching matrix)
         cm.add_method(self.method)
         self._method_idx = cm.methods[self.method.name].idx
+        
+        # Copy properties from source method if not explicitly set on the new method
+        # Note: cm.add_method() creates a copy, so we update the copy in cm.methods
+        added_method = cm.methods[self.method.name]
+        if added_method.dur_use is None:
+            added_method.dur_use = source_method.dur_use
+        if added_method.efficacy is None:
+            added_method.efficacy = source_method.efficacy
+        if added_method.modern is None:
+            added_method.modern = source_method.modern
         
         # Resize the method_mix array in fpmod to accommodate the new method
         fp_mod = sim.connectors.fp

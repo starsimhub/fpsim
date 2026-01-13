@@ -119,53 +119,65 @@ def test_add_method():
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
+    default_dur = ss.lognorm_ex(mean=2, std=1)
     
-    # Test 1: Basic add_method functionality
-    new_method = fp.Method(
-        name='test_method',
-        label='Test Method',
-        efficacy=0.99,
-        modern=True,
-        dur_use=ss.lognorm_ex(mean=2, std=1),
-    )
-    intv = fp.add_method(year=2010, method=new_method, copy_from='impl', verbose=False)
-    sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
-    sim.run()
+    def make_method(name, **kwargs):
+        """ Helper to create methods with sensible defaults """
+        defaults = dict(label=name.replace('_', ' ').title(), efficacy=0.99, modern=True, dur_use=default_dur)
+        defaults.update(kwargs)
+        return fp.Method(name=name, **defaults)
     
+    def run_intv(intv):
+        """ Helper to run a sim with an intervention """
+        return fp.Sim(pars=pars, interventions=[intv], verbose=0).run()
+    
+    def expect_error(intv, msg):
+        """ Helper to verify an intervention raises ValueError """
+        try:
+            run_intv(intv)
+            raise AssertionError(msg)
+        except ValueError:
+            pass
+    
+    # Test 1: Basic functionality - method added and accessible
+    method = make_method('test_method')
+    sim = run_intv(fp.add_method(year=2010, method=method, copy_from='impl', verbose=False))
     cm = sim.connectors.contraception
-    assert new_method.name in cm.methods, f'New method should be in contraception methods'
-    assert cm.n_methods > 9, f'Should have more than default 9 methods after adding one'
+    assert method.name in cm.methods and cm.n_methods > 9
     print(f'  ✓ Basic add_method works')
     
-    # Test 2: Late introduction (year before simulation end)
-    late_method = fp.Method(name='late', label='Late Method', efficacy=0.99, modern=True,
-                           dur_use=ss.lognorm_ex(mean=2, std=1))
-    late_intv = fp.add_method(year=pars['stop']-1, method=late_method, copy_from='impl', verbose=False)
-    sim_late = fp.Sim(pars=pars, interventions=[late_intv], verbose=0)
-    sim_late.run()
+    # Test 2: Late introduction (year before simulation end) works
+    run_intv(fp.add_method(year=pars['stop']-1, method=make_method('late'), copy_from='impl', verbose=False))
     print(f'  ✓ Late introduction works')
     
-    # Test 3: Year before simulation start should raise error
-    early_method = fp.Method(name='early', label='Early Method', efficacy=0.99, modern=True,
-                            dur_use=ss.lognorm_ex(mean=2, std=1))
-    early_intv = fp.add_method(year=pars['start']-5, method=early_method, copy_from='impl', verbose=False)
-    try:
-        sim_early = fp.Sim(pars=pars, interventions=[early_intv], verbose=0)
-        sim_early.run()
-        raise AssertionError('Should have raised ValueError for year before simulation start')
-    except ValueError:
-        print(f'  ✓ Invalid year correctly rejected')
+    # Test 3-4: Error cases - invalid year and invalid copy_from
+    expect_error(
+        fp.add_method(year=pars['start']-5, method=make_method('early'), copy_from='impl', verbose=False),
+        'Should have raised ValueError for year before simulation start')
+    print(f'  ✓ Invalid year correctly rejected')
     
-    # Test 4: Invalid copy_from should raise error
-    bad_method = fp.Method(name='bad', label='Bad Method', efficacy=0.99, modern=True,
-                          dur_use=ss.lognorm_ex(mean=2, std=1))
-    bad_intv = fp.add_method(year=2010, method=bad_method, copy_from='nonexistent', verbose=False)
-    try:
-        sim_bad = fp.Sim(pars=pars, interventions=[bad_intv], verbose=0)
-        sim_bad.run()
-        raise AssertionError('Should have raised ValueError for invalid copy_from')
-    except ValueError:
-        print(f'  ✓ Invalid copy_from correctly rejected')
+    expect_error(
+        fp.add_method(year=2010, method=make_method('bad'), copy_from='nonexistent', verbose=False),
+        'Should have raised ValueError for invalid copy_from')
+    print(f'  ✓ Invalid copy_from correctly rejected')
+    
+    # Test 5-6: Auto-copy behavior - missing properties copied, explicit ones preserved
+    # Minimal method: all properties should be copied from source
+    minimal = fp.Method(name='minimal', label='Minimal')  # No dur_use, efficacy, or modern
+    sim_copy = run_intv(fp.add_method(year=2010, method=minimal, copy_from='impl', verbose=False))
+    cm = sim_copy.connectors.contraception
+    added, source = cm.methods['minimal'], cm.methods['impl']
+    assert added.dur_use is not None, 'dur_use should be auto-copied'
+    assert added.efficacy == source.efficacy, f'efficacy should match source: {added.efficacy} != {source.efficacy}'
+    assert added.modern == source.modern, f'modern should match source: {added.modern} != {source.modern}'
+    print(f'  ✓ Auto-copy of dur_use, efficacy, modern works')
+    
+    # Explicit method: only dur_use copied, explicit values preserved
+    explicit = fp.Method(name='explicit', label='Explicit', efficacy=0.5, modern=False)
+    sim_explicit = run_intv(fp.add_method(year=2010, method=explicit, copy_from='impl', verbose=False))
+    added2 = sim_explicit.connectors.contraception.methods['explicit']
+    assert added2.dur_use is not None and added2.efficacy == 0.5 and added2.modern == False
+    print(f'  ✓ Explicit values preserved, only missing values copied')
     
     return sim
 
