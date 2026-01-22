@@ -115,29 +115,50 @@ def test_change_people_state():
 
 
 def test_add_method():
-    """ Test the add_method intervention - all 4 cases """
+    """ Test the add_method intervention """
     sc.heading('Testing add_method()...')
     
     pars = dict(n_agents=500, start=2000, stop=2015, verbose=0, location='kenya')
     age_key = '18-20'  # Choose one age group to check
 
-    # Case 1: Neither 'method' nor 'method_pars' are passed --> failure
-    print('  Testing Case 1: Neither method nor method_pars provided (should fail)...')
-    try:
-        intv = fp.add_method(year=2010, copy_from='impl')
-        assert False, 'Should have raised ValueError when neither method nor method_pars are provided'
-    except ValueError as e:
-        assert 'method' in str(e).lower() or 'method_pars' in str(e).lower(), f'Error message should mention method or method_pars: {e}'
-        print(f'   ✓ Case 1 passed: ValueError raised correctly')
+    # Case 1: Neither 'method' nor 'method_pars' are passed --> copies from source method
+    print('  Testing Case 1: Neither method nor method_pars provided (copies from source)...')
+    intv1 = fp.add_method(year=2010, copy_from='impl', verbose=False)
+    
+    # Create a sim to trigger init_pre and verify the method is copied correctly
+    sim1 = fp.Sim(pars=pars, interventions=[intv1], verbose=0)
+    sim1.init()
+    cm1 = sim1.connectors.contraception
+    
+    # Verify the new method exists - it should be 'impl_copy'
+    assert 'impl_copy' in cm1.methods, 'New method should be named impl_copy'
+    new_method = cm1.methods['impl_copy']
+    source_method = cm1.get_method('impl')
+    
+    # Verify the new method is the same as the source method, only the name differs
+    assert new_method.name == 'impl_copy', f'Method name should be impl_copy, got {new_method.name}'
+    assert new_method.efficacy == source_method.efficacy, 'Method efficacy should match source method'
+    assert new_method.modern == source_method.modern, 'Method modern should match source method'
+    assert new_method.rel_dur_use == source_method.rel_dur_use, 'Method rel_dur_use should match source method'
+    
+    # Note: dur_use might be a distribution object, so we check it exists rather than exact equality
+    assert (new_method.dur_use is not None) == (source_method.dur_use is not None), 'Method dur_use presence should match source method'
+    print(f'   ✓ Case 1 passed: method copied from source (same properties, name={new_method.name})')
 
     # Case 2: method=fp.Method is valid and method_pars=None --> use only values in method
     print('  Testing Case 2: method provided, method_pars=None...')
+    
+    # Get source method to copy dur_use for the test
+    temp_sim = fp.Sim(pars=pars, verbose=0)
+    temp_sim.init()
+    source_method = temp_sim.connectors.contraception.get_method('impl')
     new_method = fp.Method(
         name='case2_method',
         label='Case 2 Method',
         efficacy=0.995,
         modern=True,
         rel_dur_use=1.2,
+        dur_use=source_method.dur_use,  # Copy dur_use from source for test
     )
     intv2 = fp.add_method(year=2010, method=new_method, copy_from='impl', split_shares=0.3, verbose=False)
     sim2 = fp.Sim(pars=pars, interventions=[intv2], verbose=0)
@@ -151,21 +172,24 @@ def test_add_method():
     assert added_method2.rel_dur_use == 1.2, f'Method rel_dur_use should be 1.2, got {added_method2.rel_dur_use}'
     print(f'   ✓ Case 2 passed: method object used as-is')
 
-    # Case 3: method=fp.Method and method_pars!=None --> method_pars values replace those in fp.Method
     print('  Testing Case 3: method provided with method_pars to override...')
+    temp_sim3 = fp.Sim(pars=pars, verbose=0)
+    temp_sim3.init()
+    source_method3 = temp_sim3.connectors.contraception.get_method('impl')
     base_method = fp.Method(
         name='case3_method',
         label='Case 3 Method',
         efficacy=0.90,  # Will be overridden
         modern=False,   # Will be overridden
         rel_dur_use=1.0,  # Will be overridden
+        dur_use=source_method3.dur_use,  # Copy dur_use from source for test
     )
-    method_pars3 = dict(
+    method_pars_overrides = dict(
         efficacy=0.998,  # Override
         modern=True,     # Override
         rel_dur_use=1.5,  # Override
     )
-    intv3 = fp.add_method(year=2010, method=base_method, method_pars=method_pars3, copy_from='impl', split_shares=0.3, verbose=False)
+    intv3 = fp.add_method(year=2010, method=base_method, method_pars=method_pars_overrides, copy_from='impl', split_shares=0.3, verbose=False)
     sim3 = fp.Sim(pars=pars, interventions=[intv3], verbose=0)
     sim3.run()
     cm3 = sim3.connectors.contraception
@@ -180,12 +204,17 @@ def test_add_method():
 
     # Case 4: method=None and method_pars!=None --> build a new fp.Method from method_pars
     print('  Testing Case 4: method_pars provided without method (build new Method)...')
+    # Get source method to copy dur_use for the test
+    temp_sim4 = fp.Sim(pars=pars, verbose=0)
+    temp_sim4.init()
+    source_method4 = temp_sim4.connectors.contraception.get_method('impl')
     method_pars4 = dict(
         name='case4_method',
         label='Case 4 Method',
         efficacy=0.999,
         modern=True,
         rel_dur_use=1.5,
+        dur_use=source_method4.dur_use,  # Copy dur_use from source for test
     )
     intv4 = fp.add_method(year=2010, method_pars=method_pars4, copy_from='impl', split_shares=0.3, verbose=False)
     sim4 = fp.Sim(pars=pars, interventions=[intv4], verbose=0)
@@ -209,9 +238,14 @@ def test_add_method():
 
     # Case 4b: method=None and partial method_pars --> build a new fp.Method from partial method_pars
     print('  Testing Case 4b: partial method_pars provided without method (build new Method with defaults)...')
+    # Get source method to copy dur_use for the test
+    temp_sim4b = fp.Sim(pars=pars, verbose=0)
+    temp_sim4b.init()
+    source_method4b = temp_sim4b.connectors.contraception.get_method('impl')
     partial_method_pars = dict(
         name='partial_method',
         efficacy=0.97,
+        dur_use=source_method4b.dur_use,  # Copy dur_use from source for test
         # Note: not providing label, modern, rel_dur_use, etc.
     )
     intv4b = fp.add_method(year=2010, method=None, method_pars=partial_method_pars, copy_from='impl', split_shares=0.3, verbose=False)
@@ -223,9 +257,11 @@ def test_add_method():
     added_method4b = cm4b.methods[partial_method_pars['name']]
     assert added_method4b.name == 'partial_method', f'Method name should be partial_method, got {added_method4b.name}'
     assert added_method4b.efficacy == 0.97, f'Method efficacy should be 0.97, got {added_method4b.efficacy}'
-    # label should default to name when not provided
-    assert added_method4b.label == 'partial_method', f'Method label should default to name, got {added_method4b.label}'
-    # Other properties (modern, dur_use) may be None or copied from source method in init_pre
+    # When copying from source, label comes from source unless explicitly overridden in method_pars
+    # Since we're copying from 'impl' (Implants), label will be 'Implants' unless overridden
+    assert added_method4b.label == 'Implants', f'Method label should be copied from source (Implants), got {added_method4b.label}'
+    # Other properties (modern, dur_use) are copied from source method
+    assert added_method4b.modern == source_method4b.modern, f'Method modern should be copied from source'
     print(f'   ✓ Case 4b passed: new Method built from partial method_pars (efficacy={added_method4b.efficacy}, label={added_method4b.label})')
 
     print(f'  ✓ All add_method cases work correctly')

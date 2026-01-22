@@ -237,36 +237,36 @@ class add_method(ss.Intervention):
    
     Args:
         year (float): The year at which to activate the new method
-        method (Method, optional): A Method object defining the new contraceptive method. 
-            Either ``method`` or ``method_pars`` must be provided (not both None).
-        method_pars (dict, optional): Dictionary of parameters to create or modify a Method object.
-            Either ``method`` or ``method_pars`` must be provided (not both None).
-            If ``method`` is provided, ``method_pars`` will override corresponding attributes.
-            If ``method`` is None, a new Method will be created from ``method_pars``.
-        copy_from (str): Name of the existing method to copy switching probabilities from
+        method (Method, optional): A Method object defining the new contraceptive method.
+            If None, the method will be copied from the source method (specified by ``copy_from``).
+        method_pars (dict, optional): Dictionary of parameters to update the method attributes.
+            If provided, these values will override corresponding attributes in the method object
+            (whether it was provided directly or copied from source). If None, defaults to empty dict.
+        copy_from (str): Name of the existing method to copy switching probabilities from.
+            Also used as the source method when ``method=None``.
         split_shares (float, optional): If provided, % who would have chosen the 'copy_from' method 
             and now choose the new method
         verbose (bool): Whether to print messages when method is activated (default True)
     
     **Examples**::
     
-        # Case 1: Using a Method object (method_pars=None)
+        # Using a Method object directly
         new_method = fp.Method(name='new_impl', label='New Implant', efficacy=0.999, 
                                dur_use=ss.lognorm_ex(ss.years(3), ss.years(0.5)), modern=True)
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
         
-        # Case 2: Using method_pars to create a new Method (method=None)
-        method_pars = dict(name='new_inj', label='New Injectable', efficacy=0.995, modern=True)
-        intv = fp.add_method(year=2010, method_pars=method_pars, copy_from='inj')
+        # Copying from source method (method=None, method_pars=None)
+        # Creates a copy of 'impl' with name 'impl_copy'
+        intv = fp.add_method(year=2010, copy_from='impl')
         
-        # Case 3: Using method with method_pars to override properties
+        # Copying from source and overriding properties
+        intv = fp.add_method(year=2010, method_pars={'name': 'new_inj', 'efficacy': 0.995}, 
+                            copy_from='inj')
+        
+        # Using method object and overriding properties with method_pars
         base_method = fp.Method(name='new_method', efficacy=0.90)
         intv = fp.add_method(year=2010, method=base_method, 
                             method_pars={'efficacy': 0.998}, copy_from='impl')
-        
-        # Case 4: Using partial method_pars (missing properties copied from source)
-        intv = fp.add_method(year=2010, method_pars={'name': 'partial_method', 'efficacy': 0.97}, 
-                            copy_from='impl')
     """
     
     def __init__(self, year=None, method=None, method_pars=None, copy_from=None, split_shares=None, verbose=True, **kwargs):
@@ -278,13 +278,10 @@ class add_method(ss.Intervention):
         if copy_from is None:
             raise ValueError('copy_from must specify an existing method name to copy switching behavior from')
         
-        # Case 1: Neither 'method' nor 'method_pars' are passed --> failure
-        if method is None and method_pars is None:
-            raise ValueError('Either "method" or "method_pars" must be provided to add_method')
-        
         self.year = year
         self.method = method
-        self.method_pars = method_pars
+        # Convert None to empty dict to simplify logic later
+        self.method_pars = method_pars if method_pars is not None else {}
         self.copy_from = copy_from
         self.verbose = verbose
         self.split_shares = split_shares
@@ -295,10 +292,25 @@ class add_method(ss.Intervention):
 
     def __repr__(self):
         """Return a recreatable string representation."""
-        method_repr = f"<Method '{self.method.name}'>" if self.method else None
-        parts = [f"year={self.year}", f"method={method_repr}", f"copy_from='{self.copy_from}'"]
+        parts = [f"year={self.year}", f"copy_from='{self.copy_from}'"]
+        
+        # Include method if provided
+        if self.method is not None:
+            method_repr = f"<Method '{self.method.name}'>"
+            parts.append(f"method={method_repr}")
+        
+        # Include method_pars if provided (not empty)
+        if self.method_pars:
+            parts.append(f"method_pars={self.method_pars!r}")
+        
+        # Include split_shares if provided
+        if self.split_shares is not None:
+            parts.append(f"split_shares={self.split_shares}")
+        
+        # Include verbose only if False (default is True)
         if not self.verbose:
             parts.append("verbose=False")
+        
         return f"fp.add_method({', '.join(parts)})"
 
     def init_pre(self, sim):
@@ -312,40 +324,34 @@ class add_method(ss.Intervention):
         if not (sim.pars.start <= self.year <= sim.pars.stop):
             raise ValueError(f'Intervention year {self.year} must be between {sim.pars.start} and {sim.pars.stop}')
 
-        # Handle the 4 cases:
-        # Case 2: method=fp.Method is valid and method_pars=None --> use only values in method, nothing else to do
-        # Case 3: method=fp.Method and method_pars!=None --> method_pars values replace those in fp.Method
-        # Case 4: method=None and method_pars!=None --> try to build a new fp.Method from the values passed from the method_pars
-        
-        if self.method is not None:
-            # Case 2 or 3: We have a method object
-            if self.method_pars is not None:
-                # Case 3: Update method with method_pars values
-                for mp, mpar in self.method_pars.items():
-                    setattr(self.method, mp, mpar)
-        else:
-            # Case 4: method=None and method_pars!=None --> build a new fp.Method from method_pars
-            self.method = fpm.Method(**self.method_pars)
-
         # Resolve copy_from to method name (supports both name and label)
+        # Get source_method first so it's available for copying below
         cm = sim.connectors.contraception
         source_method = cm.get_method(self.copy_from)
         self._copy_from_name = source_method.name  # Store resolved name for use in step()
+        
+        # Handle the 2 cases:
+        # Case 1: method=None --> copy source method
+        # Case 2: method!=None --> use provided method
+        if self.method is None:
+            # Case 1: Copy source method to create base method
+            self.method = sc.dcp(source_method)
+            # If name not provided in method_pars, append '_copy' to make it unique
+            if 'name' not in self.method_pars:
+                self.method.name += '_copy'
+        
+        # Case 2: method!=None, use it as-is (no action needed)
+        
+        # Update method attributes with method_pars
+        # This works whether or not method_pars were provided (empty dict if None in __init__)
+        # If method_pars contains attributes, they will override corresponding method attributes
+        for mp, mpar in self.method_pars.items():
+            setattr(self.method, mp, mpar)
         
         # Add the new method to the contraception module, extending the switching probabilities
         # with zeros and resetting init_dist and method_weights
         cm.add_method(self.method)
         self._method_idx = cm.methods[self.method.name].idx
-        
-        # Copy properties from source method if not explicitly set on the new method
-        # Note: cm.add_method() creates a copy, so we update the copy in cm.methods
-        added_method = cm.methods[self.method.name]
-        if added_method.dur_use is None:
-            added_method.dur_use = source_method.dur_use
-        if added_method.efficacy is None:
-            added_method.efficacy = source_method.efficacy
-        if added_method.modern is None:
-            added_method.modern = source_method.modern
         
         # Resize the method_mix array in fpmod to accommodate the new method
         fp_mod = sim.connectors.fp
