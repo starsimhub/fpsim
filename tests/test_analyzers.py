@@ -118,6 +118,19 @@ def test_method_mix_by_age():
 
     return sim.analyzers.method_mix_by_age
 
+def test_state_tracker():
+    sc.heading('Testing state tracker...')
+
+    # Create a sim with the state tracker analyzer, testing with and without a module name included
+    sta1 = fp.state_tracker("alive", name="sta1", label="sta1")
+    sta2 = fp.state_tracker(module_name="fp", state_name="on_contra", name="sta2", label="sta2")
+    sim = fp.Sim(test=True, analyzers=[sta1, sta2])
+    sim.init()
+    sim.run()
+
+    return sim
+
+
 
 
 if __name__ == '__main__':

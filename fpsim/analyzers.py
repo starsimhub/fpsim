@@ -708,11 +708,12 @@ class state_tracker(ss.Analyzer):
     living women who live in rural settings)
     '''
 
-    def __init__(self, state_name=None, min_age=fpd.min_age, max_age=fpd.max_age):
+    def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
         """
         Initializes bins and data variables
         """
-        super().__init__()
+        super().__init__(**kwargs)
+        self.module_name = module_name
         self.state_name = state_name
         self.data_num = None
         self.data_perc = None
@@ -730,7 +731,6 @@ class state_tracker(ss.Analyzer):
         self.data_num = np.full((sim.t.npts,), np.nan)
         self.data_perc = np.full((sim.t.npts,), np.nan)
         self.data_n_female = np.full((sim.t.npts,), np.nan)
-        self.tvec = np.full((sim.t.npts,), np.nan)
         return
 
     def step(self):
@@ -741,10 +741,13 @@ class state_tracker(ss.Analyzer):
         sim = self.sim
         ppl = sim.people
         living_women = (ppl.alive & ppl.female & (ppl.age >= self.min_age) & (ppl.age < self.max_age)).uids
-        self.data_num[sim.ti] = ppl[self.state_name][living_women].sum()
+
+        if self.module_name is not None:
+            self.data_num[sim.ti] = ppl[self.module_name][self.state_name][living_women].sum()
+        else:
+            self.data_num[sim.ti] = ppl[self.state_name][living_women].sum()
         self.data_n_female[sim.ti] = len(living_women)
         self.data_perc[sim.ti] = (self.data_num[sim.ti] / self.data_n_female[sim.ti])*100.0
-        self.tvec[sim.ti] = sim.y
 
     def plot(self, style=None):
         """
@@ -772,9 +775,9 @@ class state_tracker(ss.Analyzer):
             ax3.tick_params(axis="y", labelcolor=colors[2])
 
 
-            ax1.plot(self.tvec, self.data_num, color=colors[0])
-            ax2.plot(self.tvec, self.data_perc, color=colors[1])
-            ax3.plot(self.tvec, self.data_n_female, color=colors[2])
+            ax1.plot(self.t.tvec, self.data_num, color=colors[0])
+            ax2.plot(self.t.tvec, self.data_perc, color=colors[1])
+            ax3.plot(self.t.tvec, self.data_n_female, color=colors[2])
 
             ax1.set_xlabel('Year')
             ax1.set_ylabel(f'Number of women who are {self.state_name}', color=colors[0])
