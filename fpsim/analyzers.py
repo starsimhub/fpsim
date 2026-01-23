@@ -711,6 +711,13 @@ class state_tracker(ss.Analyzer):
     def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
         """
         Initializes bins and data variables
+
+        params:
+            state_name: state name to track
+            module_name: module name for state (if needed, e.g. 'fp', 'edu')
+            min_age: minimum age to track
+            max_age: maximum age to track
+            **kwargs: additional keyword arguments
         """
         super().__init__(**kwargs)
         self.module_name = module_name
