@@ -667,15 +667,15 @@ class method_mix_over_time(ss.Analyzer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)   # Initialize the Analyzer object
-        self.results = None
+        self.data = None
         self.n_methods = None
         return
 
     def init_post(self):
         super().init_post()
-        self.methods = self.sim.contraception_module.methods.keys()
+        self.methods = self.sim.connectors.contraception.methods.keys()
         self.n_methods = len(self.methods)
-        self.results = {k: np.zeros(self.sim.t.npts) for k in self.methods}
+        self.data = {k: np.zeros(self.sim.t.npts) for k in self.methods}
         return
 
     def step(self):
@@ -683,7 +683,7 @@ class method_mix_over_time(ss.Analyzer):
         ppl = sim.people
         for m_idx, method in enumerate(self.methods):
             eligible = ppl.female & ppl.alive & (ppl.fp.method == m_idx)
-            self.results[method][sim.ti] = np.count_nonzero(eligible)
+            self.data[method][sim.ti] = np.count_nonzero(eligible)
         return
 
     def plot(self, style=None):
@@ -691,7 +691,7 @@ class method_mix_over_time(ss.Analyzer):
             fig, ax = plt.subplots(figsize=(10, 5))
 
             for method in self.methods:
-                ax.plot(self.t.tvec, self.results[method][:], label=method)
+                ax.plot(self.t.tvec, self.data[method][:], label=method)
 
             ax.set_xlabel("Year")
             ax.set_ylabel(f"Number of living women on method 'x'")
