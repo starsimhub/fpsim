@@ -669,15 +669,13 @@ class method_mix_over_time(ss.Analyzer):
         super().__init__(**kwargs)   # Initialize the Analyzer object
         self.results = None
         self.n_methods = None
-        self.tvec = None
         return
 
     def init_post(self):
-        super().initialize()
+        super().init_post()
         self.methods = self.sim.contraception_module.methods.keys()
         self.n_methods = len(self.methods)
         self.results = {k: np.zeros(self.sim.t.npts) for k in self.methods}
-        self.tvec = self.sim.tvec
         return
 
     def step(self):
@@ -693,7 +691,7 @@ class method_mix_over_time(ss.Analyzer):
             fig, ax = plt.subplots(figsize=(10, 5))
 
             for method in self.methods:
-                ax.plot(self.tvec, self.results[method][:], label=method)
+                ax.plot(self.t.tvec, self.results[method][:], label=method)
 
             ax.set_xlabel("Year")
             ax.set_ylabel(f"Number of living women on method 'x'")
