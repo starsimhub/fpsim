@@ -105,6 +105,7 @@ class DataLoader:
         contra_data.dur_use_df = self.load_dur_use()
         if contra_mod == 'mid':
             contra_data.age_spline = self.age_spline('25_40')
+        contra_data.intent_pars = self.process_contra_intent()
         if return_data:
             return contra_data
         else:
@@ -641,6 +642,64 @@ class DataLoader:
         d = pd.read_csv(os.path.join(sd_dir, f'splines_{which}.csv'))
         d.index = d.age  # Set the age as the index
         return d
+
+    def fertility_intent(self):
+        """Load fertility intent distribution from CSV data"""
+        try:
+            df = pd.read_csv(os.path.join(self.data_path, 'fertility_intent.csv'))
+            data = {}
+            for row in df.itertuples(index=False):
+                intent = row.fertility_intent
+                age = row.age
+                freq = row.freq
+                data.setdefault(age, {})[intent] = freq
+            return data
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def contraception_intent(self):
+        """Load contraception intent distribution from CSV data"""
+        try:
+            df = pd.read_csv(os.path.join(self.data_path, 'contra_intent.csv'))
+            data = {}
+            for row in df.itertuples(index=False):
+                intent = row.intent_contra
+                age = row.age
+                freq = row.freq
+                data.setdefault(age, {})[intent] = freq
+            return data
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def contra_intent_coefs(self):
+        """Load regression coefficients to update intent to use contraception"""
+        try:
+            raw_pars = pd.read_csv(os.path.join(self.data_path, 'contra_intent_coef.csv'))
+            pars = sc.objdict()
+            metrics = raw_pars.lhs.unique()
+            for metric in metrics:
+                pars[metric] = sc.objdict()
+                thisdf = raw_pars.loc[raw_pars.lhs == metric]
+                for var_dict in thisdf.to_dict('records'):
+                    var_name = var_dict['rhs'].replace('_0', '').replace('(', '').replace(')', '').lower()
+                    pars[metric][var_name] = var_dict['Estimate']
+            return pars
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def process_contra_intent(self):
+        """Load all the intent data from CSV"""
+        contra_intent_pars = dict()
+        contra_intent_pars['contra_intent_coefs'] = self.contra_intent_coefs()
+        contra_intent_pars['contra_intent'] = self.contraception_intent()
+        contra_intent_pars['fertility_intent'] = self.fertility_intent()
+
+        return contra_intent_pars
+
+
 
 
 
