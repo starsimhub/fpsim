@@ -56,7 +56,7 @@ def process_cpr(data, method_value, method_code = 'v313'):
     """
     data = data.reset_index()
     method = data[data[method_code]==method_value]
-    method.reset_index(drop=True, inplace=True)
+    method = method.reset_index(drop=True)
 
     return method
 
