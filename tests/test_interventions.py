@@ -114,11 +114,61 @@ def test_change_people_state():
     return s0, s1, s2
 
 
+def test_change_initiation():
+    """ Testing that change_initiation() increases contraception use """
+    sc.heading('Testing change_initiation()...')
+
+    pars = dict(n_agents=1000, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
+    ms = fp.SimpleChoice(location='kenya')
+
+    # Create intervention to increase contraception initiation by 10% annually starting in 2005
+    ci_annual = fp.change_initiation(years=[2005, 2010], perc=0.1, annual=True)
+
+    # Create intervention with single year specification (should run until end of sim)
+    ci_single = fp.change_initiation(years=2005, perc=0.1, annual=True)
+
+    # Create intervention with force_theoretical option
+    ci_forced = fp.change_initiation(years=[2005, 2010], perc=0.1, annual=True, force_theoretical=True)
+
+    # Make and run sims
+    s0 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), label="Baseline")
+    s1 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), interventions=ci_annual, label="10% annual increase (2005-2010)")
+    s2 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), interventions=ci_single, label="10% annual increase (2005-end)")
+    s3 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), interventions=ci_forced, label="10% annual increase (forced)")
+
+    msim = ss.parallel(s0, s1, s2, s3, parallel=parallel)
+    s0, s1, s2, s3 = msim.sims
+
+    # Test contraception use at the end of simulation
+    s0_on_contra = np.sum(s0.people.fp.on_contra & s0.people.alive)
+    s1_on_contra = np.sum(s1.people.fp.on_contra & s1.people.alive)
+    s2_on_contra = np.sum(s2.people.fp.on_contra & s2.people.alive)
+    s3_on_contra = np.sum(s3.people.fp.on_contra & s3.people.alive)
+
+    print(f"Baseline contraception users at end: {s0_on_contra}")
+    print(f"With intervention (2005-2010): {s1_on_contra}")
+    print(f"With intervention (2005-end): {s2_on_contra}")
+    print(f"With intervention (forced): {s3_on_contra}")
+
+    # Check that intervention increased contraception use
+    assert s1_on_contra > s0_on_contra, f'Intervention should increase contraception use, but {s1_on_contra} is not greater than baseline {s0_on_contra}'
+    assert s2_on_contra > s0_on_contra, f'Intervention should increase contraception use, but {s2_on_contra} is not greater than baseline {s0_on_contra}'
+    assert s3_on_contra > s0_on_contra, f'Forced intervention should increase contraception use, but {s3_on_contra} is not greater than baseline {s0_on_contra}'
+
+    # Check that intervention with longer duration has more impact
+    assert s2_on_contra >= s1_on_contra, f'Longer intervention should have equal or more impact, but {s2_on_contra} < {s1_on_contra}'
+
+    print(f"change_initiation() successfully increased contraception use")
+
+    return s0, s1, s2, s3
+
+
 if __name__ == '__main__':
     s0 = test_intervention_fn()
     s1 = test_change_par()
     s3 = test_plot()
     s4, s5, s6 = test_change_people_state()
+    s7, s8, s9, s10 = test_change_initiation()
 
     print('Done.')
 
