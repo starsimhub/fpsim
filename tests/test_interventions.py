@@ -9,12 +9,7 @@ import sciris as sc
 import starsim as ss
 import numpy as np
 import pytest
-
-# Ensure we import fpsim from this repo (workspace may contain another fpsim checkout)
-_repo_root = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(_repo_root))
 import fpsim as fp  # noqa: E402
-assert str(fp.__file__).startswith(str(_repo_root)), f"Imported fpsim from {fp.__file__}, expected within {_repo_root}"
 
 parallel   = 1 # Whether to run in serial (for debugging)
 do_plot  = 1 # Whether to do plotting in interactive mode
