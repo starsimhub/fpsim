@@ -692,42 +692,6 @@ class ContraceptiveChoice(ss.Connector):
                 raise ValueError(f"from_method '{from_method}' not found")
             return mcp[postpartum][age_grp][from_method][to_idx]
 
-    def scale_entry(self, from_method, to_method, factor, postpartum=None,
-                    age_grp=None, renormalize=False):
-        """
-        Scale switching probability by a factor (multiply existing value).
-        
-        Args:
-            from_method: Source method (use 'birth' for postpartum=1)
-            to_method: Destination method
-            factor: Multiplicative factor to apply
-            postpartum: Postpartum state(s) - None for all, or int/list
-            age_grp: Age group(s) - None for all, or str/list
-            renormalize: Whether to renormalize rows after scaling
-        """
-        if to_method not in self.methods:
-            raise ValueError(f"to_method '{to_method}' not found")
-
-        to_idx = self.methods[to_method].idx - 1
-        pp_list = self._to_list(postpartum, self._get_pp_keys())
-        age_list = self._to_list(age_grp, self._get_age_groups())
-
-        for pp in pp_list:
-            for age in age_list:
-                if pp == 1:
-                    if from_method != 'birth':
-                        raise ValueError(f"For postpartum=1, from_method must be 'birth', got '{from_method}'")
-                    self.matrix[pp][age][to_idx] *= factor
-                    if renormalize:
-                        self._renormalize_row(pp, age, from_method)
-                else:
-                    if from_method not in self.methods:
-                        raise ValueError(f"from_method '{from_method}' not found")
-                    self.matrix[pp][age][from_method][to_idx] *= factor
-                    if renormalize:
-                        self._renormalize_row(pp, age, from_method)
-
-
     def copy_switching_probs(self, from_method_source, to_method_source,
                             from_method_dest, to_method_dest,
                             postpartum=None, age_grp=None, renormalize=False):
