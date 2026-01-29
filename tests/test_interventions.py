@@ -2,9 +2,6 @@
 Run tests on the interventions.
 """
 
-import sys
-from pathlib import Path
-
 import sciris as sc
 import starsim as ss
 import numpy as np
@@ -118,12 +115,12 @@ def test_change_people_state():
     return s0, s1, s2
 
 
-# def _pick_age_group(cm, preferred='18-20'):
-#     """Pick a stable age group key from method_choice_pars."""
-#     mcp0 = cm.pars.method_choice_pars[0]
-#     if preferred in mcp0:
-#         return preferred
-#     return next(k for k in mcp0.keys() if k != 'method_idx')
+def _pick_age_group(cm, preferred='18-20'):
+    """Pick a stable age group key from method_choice_pars."""
+    mcp0 = cm.pars.method_choice_pars[0]
+    if preferred in mcp0:
+        return preferred
+    return next(k for k in mcp0.keys() if k != 'method_idx')
 
 
 def test_copy_method():
@@ -131,7 +128,7 @@ def test_copy_method():
     sc.heading('Testing that add_method() can be used to directly copy a method...')
 
     pars = dict(n_agents=200, start=2000, stop=2002, verbose=0, location='kenya')
-    intv = fp.add_method(year=2001, method=None, method_pars=None, copy_from='impl', verbose=False)
+    intv = fp.add_method(year=2001, copy_from='impl', verbose=False)
 
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.init()  # triggers init_pre()
@@ -154,7 +151,7 @@ def test_copy_method():
     return sim
 
 
-def test_add_method_overrides_attributes_via_method_pars():
+def test_add_method_pars():
     """Core: method_pars overrides attributes on the copied (or provided) method."""
     sc.heading('Testing add_method() method_pars overrides...')
 
@@ -163,60 +160,30 @@ def test_add_method_overrides_attributes_via_method_pars():
         name='new_implant',
         label='New Implant (test)',
         efficacy=0.999,
-        modern=True,
         rel_dur_use=1.25,
     )
-    intv = fp.add_method(year=2001, method=None, method_pars=method_pars, copy_from='impl', verbose=False)
+    intv = fp.add_method(year=2001, method_pars=method_pars, copy_from='impl', verbose=False)
 
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.init()
     cm = sim.connectors.contraception
 
+    # Check that any newly specified values for the method have been set
     assert method_pars['name'] in cm.methods
     m = cm.methods[method_pars['name']]
     assert m.label == method_pars['label']
     assert m.efficacy == method_pars['efficacy']
-    assert m.modern == method_pars['modern']
     assert m.rel_dur_use == method_pars['rel_dur_use']
 
-    return sim
-
-
-def test_add_method_partial_method_pars_copies_rest_from_source():
-    """Core: partial method_pars should override only provided keys; rest is copied from source."""
-    sc.heading('Testing add_method() with partial method_pars...')
-
-    pars = dict(n_agents=200, start=2000, stop=2002, verbose=0, location='kenya')
-    new_name = 'partial_method'
-    intv = fp.add_method(
-        year=2001,
-        method=None,
-        method_pars=dict(name=new_name, efficacy=0.97),  # intentionally partial
-        copy_from='impl',
-        verbose=False,
-    )
-
-    sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
-    sim.init()
-    cm = sim.connectors.contraception
-
+    # Check that any values for the method that weren't specified have been copied from the source method
     src = cm.get_method('impl')
-    assert new_name in cm.methods
-    m = cm.methods[new_name]
-
-    # Overridden
-    assert m.name == new_name
-    assert m.efficacy == 0.97
-
-    # Copied from source
-    assert m.label == src.label
     assert m.modern == src.modern
-    assert m.rel_dur_use == src.rel_dur_use
+    assert np.array_equal(m.dur_use.pars.scale(sim, sim.people.uid), src.dur_use.pars.scale(sim, sim.people.uid))
 
     return sim
 
 
-def test_add_method_activation_splits_switching_probabilities():
+def test_add_method_split():
     """Core: split_shares splits probability to the new method (postpartum=0)."""
     sc.heading('Testing add_method() activation splits switching probabilities...')
 
@@ -352,19 +319,18 @@ def test_add_method_year_boundaries(year_offset):
 
 
 if __name__ == '__main__':
-    # s0 = test_intervention_fn()
-    # s1 = test_change_par()
-    # s3 = test_update_methods()
-    # s4, s5, s6 = test_change_people_state()
+    s0 = test_intervention_fn()
+    s1 = test_change_par()
+    s3 = test_update_methods()
+    s4, s5, s6 = test_change_people_state()
     s7 = test_copy_method()
-    # s8 = test_add_method_overrides_attributes_via_method_pars()
-    # s8b = test_add_method_partial_method_pars_copies_rest_from_source()
-    # s9 = test_add_method_activation_splits_switching_probabilities()
-    # test_add_method_negative_errors()
-    # s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
-    # s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
-    # s12 = test_add_method_year_boundaries(0)
-    # s13 = test_add_method_year_boundaries(2)
+    s8 = test_add_method_pars()
+    s9 = test_add_method_split()
+    test_add_method_negative_errors()
+    s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
+    s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
+    s12 = test_add_method_year_boundaries(0)
+    s13 = test_add_method_year_boundaries(2)
 
     print('Done.')
 
