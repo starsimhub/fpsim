@@ -77,8 +77,8 @@ def test_change_par():
     return m
 
 
-def test_plot():
-    sc.heading('Testing intervention plotting...')
+def test_update_methods():
+    sc.heading('Testing updates for methods...')
 
     cp = fp.change_par(par='exposure_factor', years=2002, vals=2.0) # Reduce exposure factor
     um1 = fp.update_methods(year=2005, eff={'Injectables': 1.0}, name='um1')
@@ -123,17 +123,17 @@ def test_change_people_state():
     return s0, s1, s2
 
 
-def _pick_age_group(cm, preferred='18-20'):
-    """Pick a stable age group key from method_choice_pars."""
-    mcp0 = cm.pars.method_choice_pars[0]
-    if preferred in mcp0:
-        return preferred
-    return next(k for k in mcp0.keys() if k != 'method_idx')
+# def _pick_age_group(cm, preferred='18-20'):
+#     """Pick a stable age group key from method_choice_pars."""
+#     mcp0 = cm.pars.method_choice_pars[0]
+#     if preferred in mcp0:
+#         return preferred
+#     return next(k for k in mcp0.keys() if k != 'method_idx')
 
 
-def test_add_method_registers_copy_on_init():
-    """Core: when method=None, add_method copies from copy_from during init()."""
-    sc.heading('Testing add_method() registers a copied method...')
+def test_copy_method():
+    """ Test that using add_method with just copy_from works as intended. """
+    sc.heading('Testing that add_method() can be used to directly copy a method...')
 
     pars = dict(n_agents=200, start=2000, stop=2002, verbose=0, location='kenya')
     intv = fp.add_method(year=2001, method=None, method_pars=None, copy_from='impl', verbose=False)
@@ -357,19 +357,19 @@ def test_add_method_year_boundaries(year_offset):
 
 
 if __name__ == '__main__':
-    s0 = test_intervention_fn()
-    s1 = test_change_par()
-    s3 = test_plot()
-    s4, s5, s6 = test_change_people_state()
-    s7 = test_add_method_registers_copy_on_init()
-    s8 = test_add_method_overrides_attributes_via_method_pars()
-    s8b = test_add_method_partial_method_pars_copies_rest_from_source()
-    s9 = test_add_method_activation_splits_switching_probabilities()
-    test_add_method_negative_errors()
-    s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
-    s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
-    s12 = test_add_method_year_boundaries(0)
-    s13 = test_add_method_year_boundaries(2)
+    # s0 = test_intervention_fn()
+    # s1 = test_change_par()
+    # s3 = test_update_methods()
+    # s4, s5, s6 = test_change_people_state()
+    s7 = test_copy_method()
+    # s8 = test_add_method_overrides_attributes_via_method_pars()
+    # s8b = test_add_method_partial_method_pars_copies_rest_from_source()
+    # s9 = test_add_method_activation_splits_switching_probabilities()
+    # test_add_method_negative_errors()
+    # s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
+    # s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
+    # s12 = test_add_method_year_boundaries(0)
+    # s13 = test_add_method_year_boundaries(2)
 
     print('Done.')
 
