@@ -17,7 +17,20 @@ import numpy as np
 
 
 def main():
-    # Configuration
+    """
+    Run two sims:
+    - Baseline (no new method)
+    - With a new method introduced at a given year
+
+    Then plot key outcomes and (optionally) compare alternative duration-of-use
+    distributions for the *new* method.
+    """
+
+    # --- User-editable knobs ---
+    do_save = True
+    do_show = True
+    do_compare_duration_distributions = True  # optional "Part B"
+
     pars = dict(
         n_agents=2000,
         start=2000,
@@ -25,83 +38,91 @@ def main():
         location='kenya',
         verbose=0,
     )
-    
     introduction_year = 2010
-    
-    # Define a new injectable with improved properties
-    new_injectable = fp.Method(
-        name='new_inj',
-        label='New Injectable',
-        csv_name='New Injectable',
+
+    # --- Part A: add a single new method and compare to baseline ---
+    # Define the method we want to introduce
+    new_method = fp.Method(
+        name='new_inj',                 # internal identifier (must be unique)
+        label='New Injectable',         # human-readable name (used in plots)
+        csv_name='New Injectable',      # name used if exporting / matching CSVs
         efficacy=0.995,
         modern=True,
         dur_use=ss.lognorm_ex(mean=3, std=1.5),
     )
-    
-    # Create the intervention
+
+    # Define the intervention:
+    # - "copy_from" is an existing method whose switching behavior is copied
+    # - "split_shares" controls how much share is carved out for the new method
     intv = fp.add_method(
         year=introduction_year,
-        method=new_injectable,
+        method=new_method,
         copy_from='inj',
         split_shares=0.99,
         verbose=True,
     )
-    
-    # Run simulations
-    sim_baseline = fp.Sim(pars=pars, label='Baseline')
-    sim_baseline.run()
-    
-    sim_with_method = fp.Sim(pars=pars, interventions=[intv], label='With New Injectable')
-    sim_with_method.run()
-    
-    # Plot results
-    fig, stats = add_method_results(sim_baseline, sim_with_method, new_injectable.name, introduction_year, pars)
-  
-    # Compare different duration distributions
-    duration_distributions = {
-        'Lognormal': ss.lognorm_ex(mean=3, std=1.5),
-        'Gamma': ss.gamma(a=4, scale=0.75),
-        'Weibull': ss.weibull(c=2.5, scale=3),
-        'Exponential': ss.expon(scale=3),
-    }
-    
-    dist_sims = {'Baseline': sim_baseline}
-    for dist_name, dur_dist in duration_distributions.items():
-        test_method = fp.Method(
-            name=f'dist_{dist_name.lower()[:4]}',
-            label=f'{dist_name} Duration',
-            efficacy=0.995,
-            modern=True,
-            dur_use=dur_dist,
-        )
-        test_intv = fp.add_method(
-            year=introduction_year,
-            method=test_method,
-            copy_from='impl',
-            verbose=False,
-        )
-        sim = fp.Sim(pars=pars, interventions=[test_intv], verbose=0, label=dist_name)
-        sim.run()
-        dist_sims[dist_name] = sim
-    
-    # Plot comparisons
-    distribution_comparison(dist_sims, introduction_year)
-    fig_summary, sorted_diffs, births_averted = summary(dist_sims, sim_baseline)
-    
-    print(f"\nDuration distribution impacts (mCPR change from baseline):")
-    for label, diff in sorted_diffs.items():
-        print(f"  {label:12s}: {diff:+.1f}pp")
-    
-    plt.show()
 
-@staticmethod
-def add_method_results(sim_baseline, sim_with_method, new_method_name, introduction_year, pars, save=True):
+    # Run baseline vs intervention sims
+    sim_baseline = fp.Sim(pars=pars, label='Baseline').run()
+    sim_with_method = fp.Sim(pars=pars, interventions=[intv], label='With new method').run()
+
+    fig, stats = add_method_results(
+        sim_baseline=sim_baseline,
+        sim_with_method=sim_with_method,
+        new_method_name=new_method.name,
+        introduction_year=introduction_year,
+        pars=pars,
+        do_save=do_save,
+    )
+
+    # --- Part B (optional): compare different duration-of-use distributions ---
+    if do_compare_duration_distributions:
+        duration_distributions = {
+            'Lognormal': ss.lognorm_ex(mean=3, std=1.5),
+            'Gamma': ss.gamma(a=4, scale=0.75),
+            'Weibull': ss.weibull(c=2.5, scale=3),
+            'Exponential': ss.expon(scale=3),
+        }
+
+        dist_sims = {'Baseline': sim_baseline}
+        for dist_name, dur_dist in duration_distributions.items():
+            test_method = fp.Method(
+                name=f'dist_{dist_name.lower()[:4]}',
+                label=f'{dist_name} duration',
+                efficacy=new_method.efficacy,
+                modern=True,
+                dur_use=dur_dist,
+            )
+            test_intv = fp.add_method(
+                year=introduction_year,
+                method=test_method,
+                copy_from='impl',
+                verbose=False,
+            )
+            dist_sims[dist_name] = fp.Sim(pars=pars, interventions=[test_intv], label=dist_name).run()
+
+        distribution_comparison(dist_sims, introduction_year, do_save=do_save)
+        _, sorted_diffs, _ = summary(dist_sims, sim_baseline, do_save=do_save)
+
+        print("\nDuration distribution impacts (mCPR change from baseline):")
+        for label, diff in sorted_diffs.items():
+            print(f"  {label:12s}: {diff:+.1f}pp")
+
+    if do_show:
+        plt.show()
+
+
+def _get_years(sim):
+    """Convert Starsim time vector to numeric years for plotting."""
+    return np.array([float(t) for t in sim.results.timevec.to_float()])
+
+def add_method_results(sim_baseline, sim_with_method, new_method_name, introduction_year, pars, do_save=True):
     """Plot the impact of adding a new contraceptive method."""
     cm_new = sim_with_method.connectors.contraception
     fp_new = sim_with_method.connectors.fp
     new_method_idx = cm_new.methods[new_method_name].idx
     
-    years = np.array([float(t) for t in sim_with_method.results.timevec.to_float()])
+    years = _get_years(sim_with_method)
     mcpr_baseline = sim_baseline.results.contraception.mcpr * 100
     mcpr_new = sim_with_method.results.contraception.mcpr * 100
     method_mix = fp_new.method_mix
@@ -182,14 +203,20 @@ def add_method_results(sim_baseline, sim_with_method, new_method_name, introduct
     ax.set_xlim(pars['start'], pars['stop'])
     
     plt.tight_layout()
-    if save:
+    if do_save:
         plt.savefig('add_method_results.png', dpi=150, bbox_inches='tight')
     
-    return fig, {'diff': diff, 'pct_diff': pct_diff, 'mcpr_baseline': mcpr_baseline[-1], 
-                    'mcpr_new': mcpr_new[-1], 'new_method_usage': new_method_usage[-1]}
+    stats = {
+        'mcpr_baseline': float(mcpr_baseline[-1]),
+        'mcpr_new': float(mcpr_new[-1]),
+        'new_method_usage': float(new_method_usage[-1]),
+        'births_averted': float(diff),
+        'births_averted_pct': float(pct_diff),
+    }
+    return fig, stats
 
-@staticmethod
-def distribution_comparison(dist_sims, introduction_year, colors=None, save=True):
+
+def distribution_comparison(dist_sims, introduction_year, colors=None, do_save=True):
     """Plot comparison of different duration distributions."""
     if colors is None:
         colors = {'Baseline': 'black', 'Lognormal': '#e41a1c', 'Gamma': '#377eb8', 
@@ -202,7 +229,7 @@ def distribution_comparison(dist_sims, introduction_year, colors=None, save=True
     ax = axes[0, 0]
     for label, sim in dist_sims.items():
         mcpr = sim.results.contraception.mcpr * 100
-        years_plot = np.array([float(t) for t in sim.results.timevec.to_float()])
+        years_plot = _get_years(sim)
         linestyle = '--' if label == 'Baseline' else '-'
         ax.plot(years_plot, mcpr, color=colors[label], linestyle=linestyle, linewidth=2, label=label, alpha=0.8)
     ax.axvline(x=introduction_year, color='gray', linestyle=':', alpha=0.5)
@@ -222,7 +249,7 @@ def distribution_comparison(dist_sims, introduction_year, colors=None, save=True
         if method_name in cm.methods:
             method_idx = cm.methods[method_name].idx
             usage = sim.connectors.fp.method_mix[method_idx, :] * 100
-            years_plot = np.array([float(t) for t in sim.results.timevec.to_float()])
+            years_plot = _get_years(sim)
             ax.plot(years_plot, usage, color=colors[label], linewidth=2, label=label, alpha=0.8)
     ax.axvline(x=introduction_year, color='gray', linestyle=':', alpha=0.5)
     ax.set_xlabel('Year')
@@ -235,7 +262,7 @@ def distribution_comparison(dist_sims, introduction_year, colors=None, save=True
     ax = axes[1, 0]
     for label, sim in dist_sims.items():
         births = sim.results.fp.cum_births
-        years_plot = np.array([float(t) for t in sim.results.timevec.to_float()])
+        years_plot = _get_years(sim)
         linestyle = '--' if label == 'Baseline' else '-'
         ax.plot(years_plot, births, color=colors[label], linestyle=linestyle, linewidth=2, label=label, alpha=0.8)
     ax.axvline(x=introduction_year, color='gray', linestyle=':', alpha=0.5)
@@ -267,13 +294,13 @@ def distribution_comparison(dist_sims, introduction_year, colors=None, save=True
                 f'{val:.1f}%', ha='center', va='bottom', fontsize=10)
     
     plt.tight_layout()
-    if save:
+    if do_save:
         plt.savefig('distribution_comparison.png', dpi=150, bbox_inches='tight')
     
     return fig
 
-@staticmethod
-def summary(dist_sims, sim_baseline, save=True):
+
+def summary(dist_sims, sim_baseline, do_save=True):
     """Plot summary comparison of distribution impacts."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle('Summary: Impact of Duration Distributions', fontsize=14, fontweight='bold')
@@ -313,7 +340,7 @@ def summary(dist_sims, sim_baseline, save=True):
     ax.grid(True, alpha=0.3, axis='x')
     
     plt.tight_layout()
-    if save:
+    if do_save:
         plt.savefig('summary_comparison.png', dpi=150, bbox_inches='tight')
     
     return fig, sorted_diffs, births_averted
