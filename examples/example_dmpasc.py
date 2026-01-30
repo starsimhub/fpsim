@@ -29,14 +29,21 @@ import fpsim as fp
 
 def make_baseline_inj_growth(pars, *, name):
     """
-    Baseline: 2% annual mCPR growth via increased injectable initiation.
+    Create baseline intervention: 2% annual mCPR growth via increased injectable initiation.
     
     Simplified implementation: uniform 2% initiation increase across all ages,
     targeting injectable method. Method mix stays constant (no new products).
     
-    Full specification (table): age-specific baseline initiation rates derived
-    from DHS contraceptive calendars (Under 18: 0.17%, Ages 18-19: 1.04%).
-    This simplified version uses a single 2% rate for demonstration purposes.
+    Full specification (from requirements table): age-specific baseline initiation
+    rates from DHS contraceptive calendars (Under 18: 0.17%, Ages 18-19: 1.04%).
+    This simplified version uses uniform 2% for demonstration.
+    
+    Args:
+        pars (dict): Simulation parameters
+        name (str): Intervention name
+        
+    Returns:
+        fp.change_initiation: Configured baseline intervention
     """
     return fp.change_initiation(
         years=[pars['start'], pars['stop']],
@@ -49,7 +56,13 @@ def make_baseline_inj_growth(pars, *, name):
 
 
 def main(do_save=True, do_show=True):
-    """Run all DMPA-SC scenarios and generate comparison plots."""
+    """
+    Run all DMPA-SC scenarios and generate comparison plots.
+    
+    Args:
+        do_save (bool): Save dashboard PNG to dmpasc_dashboard.png
+        do_show (bool): Display plots interactively (blocks on plt.show())
+    """
     
     pars = dict(
         n_agents=5000,
@@ -189,7 +202,12 @@ def main(do_save=True, do_show=True):
 
 
 def run_baseline(pars):
-    """Baseline: 2% annual increase in injectable users."""
+    """
+    Run baseline scenario: 2% annual mCPR growth via increased injectable initiation.
+    
+    Returns:
+        fp.Sim: Completed simulation with baseline interventions.
+    """
     intv = make_baseline_inj_growth(pars, name='baseline_inj_growth')
     sim = fp.Sim(pars=pars, interventions=[intv], label='Baseline')
     sim.run()
@@ -198,16 +216,15 @@ def run_baseline(pars):
 
 def run_scenario_1(pars):
     """
-    Scenario 1: 3-month DMPA-SC scale-up (women <20).
+    Run Scenario 1: 3-month DMPA-SC scale-up in women under 20.
     
     Intervention components:
     - Initiation: gradual increase from 1.5% (2025) to 5% (2040) in women <20
-    - Switching: same as baseline (no additional switching intervention)
-    - Discontinuation: same as baseline (placeholder: matches injectable duration)
+    - Switching: same as baseline (no additional switching)
+    - Discontinuation: rel_dur_use=2.0 (placeholder: 2x injectable duration)
     
-    Implementation uses:
-    - add_method() to introduce DMPA-SC 3-month with rel_dur_use=2.0 (placeholder)
-    - change_initiation() with age_range=(0,20), linear scale-up via final_perc
+    Returns:
+        fp.Sim: Completed simulation with Scenario 1 interventions.
     """
     baseline_intv = make_baseline_inj_growth(pars, name='baseline_s1')
     
@@ -246,20 +263,18 @@ def run_scenario_1(pars):
 
 def run_scenario_2(pars):
     """
-    Scenario 2: 6-month DMPA-SC with 3-month scale-up and switching.
+    Run Scenario 2: 6-month DMPA-SC with 3-month scale-up and switching.
     
     Intervention components:
     - Initiation: 3-month from 1.5% (2025)→5% (2040), 6-month from 1% (2030)→5% (2040), both <20
     - Switching: 26% from 3mo→6mo, 20% from traditional→6mo (applied in 2030)
-    - Discontinuation: no change from baseline (placeholder: same as 3-month)
+    - Discontinuation: rel_dur_use=2.0 (3-month), 2.5 (6-month) - placeholders
     
-    Implementation uses:
-    - add_method() for both 3-month (2025) and 6-month (2030) DMPA-SC
-    - change_initiation() for each method with age_range=(0,20), linear scale-up
-    - method_switching() for 3mo→6mo and traditional→6mo transitions
+    All rates are placeholders to be replaced with data-driven estimates from
+    DHS/PMA/clinical trials.
     
-    Placeholders: initiation rates, switching rates, rel_dur_use values to be replaced
-    with data-driven estimates from DHS/PMA/clinical trials.
+    Returns:
+        fp.Sim: Completed simulation with Scenario 2 interventions.
     """
     baseline_intv = make_baseline_inj_growth(pars, name='baseline_s2')
     
@@ -313,12 +328,28 @@ def run_scenario_2(pars):
 
 
 def _get_years(sim):
-    """Convert time vector to years."""
+    """
+    Convert Starsim time vector to numeric years for plotting.
+    
+    Args:
+        sim (fp.Sim): Simulation object
+        
+    Returns:
+        np.ndarray: Array of years as floats
+    """
     return np.array([float(t) for t in sim.results.timevec.to_float()])
 
 
 def print_summary_statistics(scenarios):
-    """Print summary statistics."""
+    """
+    Print summary statistics for all scenarios.
+    
+    Displays mCPR, change in mCPR vs baseline, births averted, and
+    DMPA-SC method uptake by scenario.
+    
+    Args:
+        scenarios (dict): Dictionary of {label: sim} for all scenarios
+    """
     print("\n" + "=" * 80)
     print("SUMMARY STATISTICS (Final Timestep)")
     print("=" * 80)
