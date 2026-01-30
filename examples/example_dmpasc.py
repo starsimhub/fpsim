@@ -86,16 +86,32 @@ def main(do_save=True, do_show=True):
         'Scenario 2: 6-month DMPA-SC': '#377eb8',
         'Scenario 3: Combined': '#4daf4a',
     }
+    
+    markers = {
+        'Baseline': 'o',
+        'Scenario 1: 3-month DMPA-SC': 's',
+        'Scenario 2: 6-month DMPA-SC': '^',
+        'Scenario 3: Combined': 'D',
+    }
 
     fig, (ax_mcpr, ax_dmpasc) = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
 
-    # mCPR: plot non-baseline first, baseline last (with markers) so it's always visible
+    # mCPR: plot non-baseline first, baseline last so it's always visible
     for label, sim in scenarios.items():
         if label == 'Baseline':
             continue
         years = _get_years(sim)
         mcpr = sim.results.contraception.mcpr * 100
-        ax_mcpr.plot(years, mcpr, color=colors.get(label, 'gray'), lw=2, label=label, alpha=0.9)
+        ax_mcpr.plot(
+            years, mcpr,
+            color=colors.get(label, 'gray'),
+            lw=2,
+            marker=markers.get(label, 'o'),
+            markersize=4,
+            markevery=24,
+            label=label,
+            alpha=0.9
+        )
 
     base = scenarios['Baseline']
     years = _get_years(base)
@@ -140,7 +156,16 @@ def main(do_save=True, do_show=True):
 
         if len(total):
             max_y = max(max_y, float(np.nanmax(total)))
-        ax_dmpasc.plot(years, total, color=colors.get(label, 'gray'), lw=2, label=label, alpha=0.9)
+        ax_dmpasc.plot(
+            years, total,
+            color=colors.get(label, 'gray'),
+            lw=2,
+            marker=markers.get(label, 'o'),
+            markersize=4,
+            markevery=24,
+            label=label,
+            alpha=0.9
+        )
 
     ax_dmpasc.set_title('Total DMPA-SC uptake (method mix)', fontweight='bold')
     ax_dmpasc.set_ylabel('DMPA-SC usage (%)')
