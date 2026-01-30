@@ -323,7 +323,7 @@ class change_people_state(ss.Intervention):
         if self.pars.annual:
             # per timestep/monthly growth rate or perc of eligible women who will be made to choose contraception
             self.annual_perc = self.pars.prop
-            self.pars.prop = ((1 + self.annual_perc) ** sim.dt)-1
+            self.pars.prop = ((1 + self.annual_perc) ** float(sim.dt))-1
         # Validate years and values
         if self.pars.years is None:
             # f'Intervention start and end years not provided. Will use sim start an end years'
@@ -581,6 +581,12 @@ class change_initiation(ss.Intervention):
         # Theoretical number of women on contraception we should have by the end of the intervention period, if
         # nothing else affected the dynamics of the contraception. Tracked for validation.
         self.expected_women_oncontra = None
+
+        # Bernoulli distribution for selecting women to initiate on contraception
+        self._p_initiate = ss.bernoulli(p=0)
+
+        # Flag to track if we've initialized the tracking variables
+        self._tracking_initialized = False
         return
 
 
@@ -591,22 +597,25 @@ class change_initiation(ss.Intervention):
         if self.annual:
             # per timestep/monthly growth rate or perc of eligible women who will be made to choose contraception
             self.annual_perc = self.perc
-            self.perc = ((1 + self.annual_perc) ** sim.dt)-1
+            self.perc = ((1 + self.annual_perc) ** float(sim.dt))-1
         # Validate years and values
         if self.years is None:
             # f'Intervention start and end years not provided. Will use sim start an end years'
             self.years = [sim.pars['start'], sim.pars['stop']]
-        if sc.isnumber(self.years) or len(self.years) == 1:
+        if sc.isnumber(self.years):
             self.years = sc.promotetolist(self.years)
+            # Assumes that start year has been specified, append end of the simulation as end year of the intervention
+            self.years.append(sim.pars['stop'])
+        elif isinstance(self.years, list) and len(self.years) == 1:
             # Assumes that start year has been specified, append end of the simulation as end year of the intervention
             self.years.append(sim.pars['stop'])
 
         min_year = min(self.years)
         max_year = max(self.years)
-        if min_year < sim['start']:
+        if min_year < sim.pars['start']:
             errormsg = f'Intervention start {min_year} is before the start of the simulation.'
             raise ValueError(errormsg)
-        if max_year > sim['stop']:
+        if max_year > sim.pars['stop']:
             errormsg = f'Intervention end {max_year} is after the end of the simulation.'
             raise ValueError(errormsg)
         if self.years != sorted(self.years):
@@ -629,12 +638,12 @@ class change_initiation(ss.Intervention):
         # TODO: do we care whether women people have ti_contra > 0? For instance postpartum women could be made to choose earlier?
         # Though it is trickier because we need to reset many postpartum-related attributes
         ppl = self.sim.people
-        eligible = ((ppl.sex == 0) & (ppl.alive) &                 # living women
+        eligible = ((ppl.female) & (ppl.alive) &                   # living women
                               (ppl.age < self.sim.pars.fp['age_limit_fecundity']) &  # who are fecund
-                              (ppl.sexual_debut) &                           # who already had their sexual debut
-                              (~ppl.pregnant)    &                           # who are not currently pregnant
-                              (~ppl.postpartum)  &                           # who are not in postpartum
-                              (~ppl.on_contra)                               # who are not already on contra
+                              (ppl.fp.sexual_debut) &                        # who already had their sexual debut
+                              (~ppl.fp.pregnant)    &                        # who are not currently pregnant
+                              (~ppl.fp.postpartum)  &                        # who are not in postpartum
+                              (~ppl.fp.on_contra)                            # who are not already on contra
                               ).uids
 
         return eligible
@@ -643,13 +652,14 @@ class change_initiation(ss.Intervention):
         sim = self.sim
         ti = sim.ti
         # Save theoretical number based on the value of women on contraception at start of intervention
-        if self.years[0] == sim.t.year:
-            self.expected_women_oncontra = (sim.people.alive & sim.people.on_contra).sum()
+        if not self._tracking_initialized and sim.t.year >= self.years[0]:
+            self.expected_women_oncontra = (sim.people.alive & sim.people.fp.on_contra).sum()
             self.init_women_oncontra = self.expected_women_oncontra
+            self._tracking_initialized = True
 
         # Apply intervention within this time range
         if self.years[0] <= sim.t.year <= self.years[1]:  # Inclusive range
-            self.current_women_oncontra = (sim.people.alive & sim.people.on_contra).sum()
+            self.current_women_oncontra = (sim.people.alive & sim.people.fp.on_contra).sum()
 
             # Save theoretical number based on the value of women on contraception at start of intervention
             nnew_on_contra = self.perc * self.expected_women_oncontra
@@ -685,12 +695,13 @@ class change_initiation(ss.Intervention):
                     new_on_contra = n_eligible
                 # Of eligible women, select who will be asked to choose contraception
                 p_selected = new_on_contra * np.ones(n_eligible) / n_eligible
-                sim.people.on_contra[can_choose_contra_uids] = fpu.binomial_arr(p_selected)
-                new_users_uids = sim.people.on_contra[can_choose_contra_uids].uids
-                sim.people.method[new_users_uids] = sim.people.contraception_module.init_method_dist(new_users_uids)
-                sim.people.ever_used_contra[new_users_uids] = 1
-                method_dur = sim.people.contraception_module.set_dur_method(new_users_uids)
-                sim.people.ti_contra[new_users_uids] = ti + method_dur
+                self._p_initiate.set(p=p_selected)
+                new_users_uids = self._p_initiate.filter(can_choose_contra_uids)
+                sim.people.fp.on_contra[new_users_uids] = True
+                sim.people.fp.method[new_users_uids] = sim.connectors.contraception.init_method_dist(new_users_uids)
+                sim.people.fp.ever_used_contra[new_users_uids] = 1
+                method_dur = sim.connectors.contraception.set_dur_method(new_users_uids)
+                sim.people.fp.ti_contra[new_users_uids] = ti + method_dur
             else:
                 print(f"Ran out of eligible women to initiate")
         return

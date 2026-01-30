@@ -356,6 +356,84 @@ def test_add_method_year_boundaries(year_offset):
     return sim
 
 
+def test_change_initiation_basic():
+    """Test basic functionality including the key bug fixes (dt conversion, attribute access)."""
+    sc.heading('Testing change_initiation() basic functionality...')
+
+    pars = dict(n_agents=500, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
+
+    # Baseline without intervention
+    s0 = fp.Sim(pars=pars, label='Baseline')
+    s0.run()
+    baseline_on_contra = s0.people.fp.on_contra.sum()
+
+    # With intervention to increase contraception usage (tests annual=True dt conversion)
+    intv = fp.change_initiation(years=[2005, 2010], perc=0.1, annual=True)
+    s1 = fp.Sim(pars=pars, interventions=[intv], label='With change_initiation')
+    s1.run()
+    intv_on_contra = s1.people.fp.on_contra.sum()
+
+    # Should have more women on contraception with the intervention
+    assert intv_on_contra > baseline_on_contra, \
+        f'change_initiation should increase contraception usage, but got {intv_on_contra} vs baseline {baseline_on_contra}'
+
+    print(f"✓ (contraception usage increased: {intv_on_contra} > {baseline_on_contra})")
+    return s0, s1
+
+
+def test_change_initiation_invalid_years():
+    """Test validation for invalid year ranges."""
+    sc.heading('Testing change_initiation() invalid years...')
+
+    pars = dict(n_agents=300, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
+
+    # Year before sim start
+    intv_before = fp.change_initiation(years=[1995, 2005], perc=0.1, annual=True)
+    with pytest.raises(ValueError, match='before the start'):
+        fp.Sim(pars=pars, interventions=[intv_before], verbose=-1).run()
+
+    # Year after sim stop
+    intv_after = fp.change_initiation(years=[2005, 2015], perc=0.1, annual=True)
+    with pytest.raises(ValueError, match='after the end'):
+        fp.Sim(pars=pars, interventions=[intv_after], verbose=-1).run()
+
+    # Non-monotonic years
+    intv_reverse = fp.change_initiation(years=[2010, 2005], perc=0.1, annual=True)
+    with pytest.raises(ValueError, match='monotonically increasing'):
+        fp.Sim(pars=pars, interventions=[intv_reverse], verbose=-1).run()
+
+    print("✓ (invalid years raise appropriate errors)")
+    return
+
+
+def test_change_initiation_edge_cases():
+    """Test edge cases: single year input, default years (None), and zero percentage."""
+    sc.heading('Testing change_initiation() edge cases...')
+
+    pars = dict(n_agents=300, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
+
+    # Single year - should extend to sim stop internally
+    intv1 = fp.change_initiation(years=2005, perc=0.05, annual=True)
+    s1 = fp.Sim(pars=pars, interventions=[intv1], label='Single year')
+    s1.run()
+    assert s1.complete, 'Sim with single year should complete'
+
+    # No years specified - should use sim start and stop
+    intv2 = fp.change_initiation(years=None, perc=0.05, annual=True)
+    s2 = fp.Sim(pars=pars, interventions=[intv2], label='Default years')
+    s2.run()
+    assert s2.complete, 'Sim with default years should complete'
+
+    # With zero percentage, should raise ValueError
+    intv3 = fp.change_initiation(years=[2005, 2010], perc=0.0, annual=True)
+    s3 = fp.Sim(pars=pars, interventions=[intv3], label='Zero perc')
+    with pytest.raises(ValueError, match="we won't see an effect"):
+        s3.run()
+
+    print("✓ (edge cases handled correctly)")
+    return s1, s2
+
+
 if __name__ == '__main__':
     s0 = test_intervention_fn()
     s1 = test_change_par()
@@ -370,6 +448,12 @@ if __name__ == '__main__':
     s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
     s12 = test_add_method_year_boundaries(0)
     s13 = test_add_method_year_boundaries(2)
+
+    # Test change_initiation
+    print('\n=== Testing change_initiation intervention ===')
+    c0, c1 = test_change_initiation_basic()
+    test_change_initiation_invalid_years()
+    c2, c3 = test_change_initiation_edge_cases()
 
     print('Done.')
 
