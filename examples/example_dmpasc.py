@@ -55,13 +55,14 @@ def make_baseline_inj_growth(pars, *, name):
     )
 
 
-def main(do_save=True, do_show=True):
+def main(do_save=True, do_show=True, parallel=True):
     """
     Run all DMPA-SC scenarios and generate comparison plots.
     
     Args:
         do_save (bool): Save dashboard PNG to dmpasc_dashboard.png
         do_show (bool): Display plots interactively (blocks on plt.show())
+        parallel (bool): Run simulations in parallel (default True)
     """
     
     pars = dict(
@@ -76,17 +77,27 @@ def main(do_save=True, do_show=True):
     print("Running DMPA-SC scenarios...")
     print("=" * 60)
     
-    scenarios = {}
-    print("\n1. Baseline (2% annual injectable growth)...")
-    scenarios['Baseline'] = run_baseline(pars)
+    # Create all sims (without running)
+    print("\nCreating simulations...")
+    sims = [
+        make_baseline_sim(pars),
+        make_scenario_1_sim(pars),
+        make_scenario_2_sim(pars),
+    ]
     
-    print("2. Scenario 1 (3-month DMPA-SC)...")
-    scenarios['Scenario 1: 3-month DMPA-SC'] = run_scenario_1(pars)
+    # Run in parallel
+    print(f"\nRunning {len(sims)} simulations {'in parallel' if parallel else 'sequentially'}...")
+    msim = ss.parallel(*sims, parallel=parallel)
     
-    print("3. Scenario 2 (6-month DMPA-SC)...")
-    scenarios['Scenario 2: 6-month DMPA-SC'] = run_scenario_2(pars)
+    # Map results to scenario labels
+    scenario_labels = [
+        'Baseline',
+        'Scenario 1: 3-month DMPA-SC',
+        'Scenario 2: 6-month DMPA-SC',
+    ]
+    scenarios = {label: sim for label, sim in zip(scenario_labels, msim.sims)}
     
-    print("4. Scenario 3 (Combined, reusing Scenario 2)...")
+    # Scenario 3 is identical to Scenario 2
     scenarios['Scenario 3: Combined'] = scenarios['Scenario 2: 6-month DMPA-SC']
     
     print("\n" + "=" * 60)
@@ -201,22 +212,21 @@ def main(do_save=True, do_show=True):
         plt.close(fig)
 
 
-def run_baseline(pars):
+def make_baseline_sim(pars):
     """
-    Run baseline scenario: 2% annual mCPR growth via increased injectable initiation.
+    Create baseline scenario sim: 2% annual mCPR growth via increased injectable initiation.
     
     Returns:
-        fp.Sim: Completed simulation with baseline interventions.
+        fp.Sim: Simulation configured with baseline interventions (not yet run).
     """
     intv = make_baseline_inj_growth(pars, name='baseline_inj_growth')
     sim = fp.Sim(pars=pars, interventions=[intv], label='Baseline')
-    sim.run()
     return sim
 
 
-def run_scenario_1(pars):
+def make_scenario_1_sim(pars):
     """
-    Run Scenario 1: 3-month DMPA-SC scale-up in women under 20.
+    Create Scenario 1 sim: 3-month DMPA-SC scale-up in women under 20.
     
     Intervention components:
     - Initiation: gradual increase from 1.5% (2025) to 5% (2040) in women <20
@@ -224,7 +234,7 @@ def run_scenario_1(pars):
     - Discontinuation: rel_dur_use=2.0 (placeholder: 2x injectable duration)
     
     Returns:
-        fp.Sim: Completed simulation with Scenario 1 interventions.
+        fp.Sim: Simulation configured with Scenario 1 interventions (not yet run).
     """
     baseline_intv = make_baseline_inj_growth(pars, name='baseline_s1')
     
@@ -238,7 +248,7 @@ def run_scenario_1(pars):
             'rel_dur_use': 2.0,  # Placeholder: 2x duration vs injectables
         },
         copy_from='inj',
-        split_shares=0.0,
+        # split_shares=0.0,
         verbose=False,
         name='add_dmpasc3_s1'
     )
@@ -257,13 +267,12 @@ def run_scenario_1(pars):
     
     interventions = [baseline_intv, add_method_intv, initiation_intv]
     sim = fp.Sim(pars=pars, interventions=interventions, label='Scenario 1')
-    sim.run()
     return sim
 
 
-def run_scenario_2(pars):
+def make_scenario_2_sim(pars):
     """
-    Run Scenario 2: 6-month DMPA-SC with 3-month scale-up and switching.
+    Create Scenario 2 sim: 6-month DMPA-SC with 3-month scale-up and switching.
     
     Intervention components:
     - Initiation: 3-month from 1.5% (2025)→5% (2040), 6-month from 1% (2030)→5% (2040), both <20
@@ -274,7 +283,7 @@ def run_scenario_2(pars):
     DHS/PMA/clinical trials.
     
     Returns:
-        fp.Sim: Completed simulation with Scenario 2 interventions.
+        fp.Sim: Simulation configured with Scenario 2 interventions (not yet run).
     """
     baseline_intv = make_baseline_inj_growth(pars, name='baseline_s2')
     
@@ -283,7 +292,6 @@ def run_scenario_2(pars):
         method_pars={'name': 'dmpasc3', 'label': 'DMPA-SC 3-month', 
                      'dur_use': ss.lognorm_ex(mean=2, std=1), 'rel_dur_use': 2.0},
         copy_from='inj',
-        split_shares=0.0,
         verbose=False,
         name='add_dmpasc3_s2'
     )
@@ -293,7 +301,6 @@ def run_scenario_2(pars):
         method_pars={'name': 'dmpasc6', 'label': 'DMPA-SC 6-month',
                      'dur_use': ss.lognorm_ex(mean=2, std=1), 'rel_dur_use': 2.5},
         copy_from='inj',
-        split_shares=0.0,
         verbose=False,
         name='add_dmpasc6_s2'
     )
@@ -323,7 +330,6 @@ def run_scenario_2(pars):
     interventions = [baseline_intv, add_3month_intv, init_3month_intv,
                      add_6month_intv, init_6month_intv, switching_intv]
     sim = fp.Sim(pars=pars, interventions=interventions, label='Scenario 2')
-    sim.run()
     return sim
 
 
