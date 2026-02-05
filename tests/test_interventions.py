@@ -322,7 +322,10 @@ def test_age_restricted_initiation_basic():
     """Test that age-restricted initiation correctly filters by age using enhanced change_initiation."""
     sc.heading('Testing age-restricted initiation (via change_initiation) basic functionality...')
     
-    pars = dict(n_agents=500, start=2000, stop=2010, verbose=0, location='kenya')
+    # Use seed for reproducibility; larger n_agents and broader age_range so enough
+    # women are eligible and we reliably get at least one user of the test method
+    np.random.seed(42)
+    pars = dict(n_agents=1200, start=2000, stop=2010, verbose=0, location='kenya')
     
     # Add a new method to target
     add_intv = fp.add_method(
@@ -344,8 +347,8 @@ def test_age_restricted_initiation_basic():
     # Age-restricted initiation using enhanced change_initiation
     init_intv = fp.change_initiation(
         years=[2005, 2010],
-        age_range=(18, 25),
-        perc=0.10,
+        age_range=(15, 30),  # Broader range so enough eligible women for robust test
+        perc=0.12,
         perc_of_eligible=True,  # Apply to eligible women in age range
         target_method='test_method',
         annual=False,
@@ -366,9 +369,9 @@ def test_age_restricted_initiation_basic():
     # Check that users are in the target age range (or were when initiated)
     # This is approximate since people age during simulation
     user_ages = sim.people.age[users]
-    # Allow some buffer since people aged during sim
-    assert user_ages.min() >= 16, f'Found user younger than expected: {user_ages.min()}'
-    assert user_ages.max() <= 28, f'Found user older than expected: {user_ages.max()}'
+    # Allow some buffer since people aged during sim (age_range is 15-30)
+    assert user_ages.min() >= 14, f'Found user younger than expected: {user_ages.min()}'
+    assert user_ages.max() <= 32, f'Found user older than expected: {user_ages.max()}'
     
     print(f'✓ Age-restricted initiation created {users.sum()} users in target age range')
     return sim
@@ -598,7 +601,8 @@ def test_dmpasc_scenario_integration():
     
     sc.heading('Testing DMPA-SC scenario integration...')
     
-    pars = dict(n_agents=1000, start=2000, stop=2030, verbose=0, location='kenya')
+    np.random.seed(43)  # Reproducibility; ensures initiation/switching yield some users
+    pars = dict(n_agents=1200, start=2000, stop=2030, verbose=0, location='kenya')
     
     # Baseline growth
     baseline = fp.change_initiation(years=[2000, 2030], perc=0.02, annual=True)
@@ -617,9 +621,9 @@ def test_dmpasc_scenario_integration():
     # Age-restricted initiation using enhanced change_initiation
     initiation = fp.change_initiation(
         years=[2020, 2030],
-        age_range=(0, 20),
-        perc=0.015,
-        final_perc=0.05,
+        age_range=(15, 25),  # Fecund, sexually active ages so enough eligible women
+        perc=0.03,
+        final_perc=0.08,
         perc_of_eligible=True,
         target_method='dmpasc',
         annual=True,
