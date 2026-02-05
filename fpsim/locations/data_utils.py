@@ -279,11 +279,11 @@ class DataLoader:
             raise ValueError(error_msg)
 
         mortality = {
-            'ages': mortality_data['age'].to_numpy(),
-            'm': mortality_data['male'].to_numpy(),
-            'f': mortality_data['female'].to_numpy(),
-            'year': mortality_trend['year'].to_numpy(),
-            'probs': mortality_trend['crude_death_rate'].to_numpy(),
+            'ages': mortality_data['age'].to_numpy(copy=True),
+            'm': mortality_data['male'].to_numpy(copy=True),
+            'f': mortality_data['female'].to_numpy(copy=True),
+            'year': mortality_trend['year'].to_numpy(copy=True),
+            'probs': mortality_trend['crude_death_rate'].to_numpy(copy=True),
         }
 
         trend_ind = np.where(mortality['year'] == data_year)
