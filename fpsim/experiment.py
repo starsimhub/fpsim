@@ -1080,13 +1080,7 @@ def diff_summaries(sim1, sim2, skip_key_diffs=False, output=False, die=False):
             sim1_val = sim1[key] if key in sim1 else 'not present'
             sim2_val = sim2[key] if key in sim2 else 'not present'
             both_nan = sc.isnumber(sim1_val, isnan=True) and sc.isnumber(sim2_val, isnan=True)
-            if both_nan:
-                continue
-            if sim1_val != sim2_val:
-                # Treat numeric values as equal if within floating-point tolerance
-                if sc.isnumber(sim1_val) and sc.isnumber(sim2_val):
-                    if np.isclose(sim1_val, sim2_val, rtol=1e-9, atol=1e-12, equal_nan=True):
-                        continue
+            if sim1_val != sim2_val and not both_nan:
                 mismatches[key] = {'sim1': sim1_val, 'sim2': sim2_val}
 
     if len(mismatches): # pragma: nocover
@@ -1099,7 +1093,7 @@ def diff_summaries(sim1, sim2, skip_key_diffs=False, output=False, die=False):
         for mdict in mismatches.values():
             old = mdict['sim1']
             new = mdict['sim2']
-            numeric = sc.isnumber(old) and sc.isnumber(new)
+            numeric = sc.isnumber(sim1_val) and sc.isnumber(sim2_val)
             if numeric and old>0:
                 this_diff  = new - old
                 this_ratio = new/old
