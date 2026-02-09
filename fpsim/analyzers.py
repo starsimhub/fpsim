@@ -672,17 +672,15 @@ class method_mix_over_time(ss.Analyzer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)   # Initialize the Analyzer object
-        self.results = None
+        self.data = None
         self.n_methods = None
-        self.tvec = None
         return
 
     def init_post(self):
-        super().initialize()
-        self.methods = self.sim.contraception_module.methods.keys()
+        super().init_post()
+        self.methods = self.sim.connectors.contraception.methods.keys()
         self.n_methods = len(self.methods)
-        self.results = {k: np.zeros(self.sim.t.npts) for k in self.methods}
-        self.tvec = self.sim.tvec
+        self.data = {k: np.zeros(self.sim.t.npts) for k in self.methods}
         return
 
     def step(self):
@@ -690,7 +688,7 @@ class method_mix_over_time(ss.Analyzer):
         ppl = sim.people
         for m_idx, method in enumerate(self.methods):
             eligible = ppl.female & ppl.alive & (ppl.fp.method == m_idx)
-            self.results[method][sim.ti] = np.count_nonzero(eligible)
+            self.data[method][sim.ti] = np.count_nonzero(eligible)
         return
 
     def plot(self, style=None):
@@ -698,7 +696,7 @@ class method_mix_over_time(ss.Analyzer):
             fig, ax = plt.subplots(figsize=(10, 5))
 
             for method in self.methods:
-                ax.plot(self.tvec, self.results[method][:], label=method)
+                ax.plot(self.t.tvec, self.data[method][:], label=method)
 
             ax.set_xlabel("Year")
             ax.set_ylabel(f"Number of living women on method 'x'")
@@ -713,11 +711,19 @@ class state_tracker(ss.Analyzer):
     living women who live in rural settings)
     '''
 
-    def __init__(self, state_name=None, min_age=fpd.min_age, max_age=fpd.max_age):
+    def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
         """
         Initializes bins and data variables
+
+        params:
+            state_name: state name to track
+            module_name: module name for state (if needed, e.g. 'fp', 'edu')
+            min_age: minimum age to track
+            max_age: maximum age to track
+            **kwargs: additional keyword arguments
         """
-        super().__init__()
+        super().__init__(**kwargs)
+        self.module_name = module_name
         self.state_name = state_name
         self.data_num = None
         self.data_perc = None
@@ -735,7 +741,6 @@ class state_tracker(ss.Analyzer):
         self.data_num = np.full((sim.t.npts,), np.nan)
         self.data_perc = np.full((sim.t.npts,), np.nan)
         self.data_n_female = np.full((sim.t.npts,), np.nan)
-        self.tvec = np.full((sim.t.npts,), np.nan)
         return
 
     def step(self):
@@ -746,10 +751,13 @@ class state_tracker(ss.Analyzer):
         sim = self.sim
         ppl = sim.people
         living_women = (ppl.alive & ppl.female & (ppl.age >= self.min_age) & (ppl.age < self.max_age)).uids
-        self.data_num[sim.ti] = ppl[self.state_name][living_women].sum()
+
+        if self.module_name is not None:
+            self.data_num[sim.ti] = ppl[self.module_name][self.state_name][living_women].sum()
+        else:
+            self.data_num[sim.ti] = ppl[self.state_name][living_women].sum()
         self.data_n_female[sim.ti] = len(living_women)
         self.data_perc[sim.ti] = (self.data_num[sim.ti] / self.data_n_female[sim.ti])*100.0
-        self.tvec[sim.ti] = sim.y
 
     def plot(self, style=None):
         """
@@ -777,9 +785,9 @@ class state_tracker(ss.Analyzer):
             ax3.tick_params(axis="y", labelcolor=colors[2])
 
 
-            ax1.plot(self.tvec, self.data_num, color=colors[0])
-            ax2.plot(self.tvec, self.data_perc, color=colors[1])
-            ax3.plot(self.tvec, self.data_n_female, color=colors[2])
+            ax1.plot(self.t.tvec, self.data_num, color=colors[0])
+            ax2.plot(self.t.tvec, self.data_perc, color=colors[1])
+            ax3.plot(self.t.tvec, self.data_n_female, color=colors[2])
 
             ax1.set_xlabel('Year')
             ax1.set_ylabel(f'Number of women who are {self.state_name}', color=colors[0])
@@ -932,7 +940,7 @@ class track_as(ss.Analyzer):
         ppl_uids = ppl.alive.uids
 
         # Pregnancies
-        preg_uids = (ppl.ti_pregnant == self.sim.ti).uids
+        preg_uids = (ppl.fp.ti_pregnant == self.sim.ti).uids
         pregnant_boolean = np.full(len(ppl), False)
         pregnant_boolean[np.searchsorted(ppl_uids, preg_uids)] = True
         pregnant_age_split = self.log_age_split(binned_ages_t=[self.age_by_group], channel='pregnancies',
@@ -941,14 +949,14 @@ class track_as(ss.Analyzer):
             self.results[key] = pregnant_age_split[key]
 
         # Stillborns
-        stillborn_uids = (ppl.ti_stillbirth == self.sim.ti).uids
+        stillborn_uids = (ppl.fp.ti_stillbirth == self.sim.ti).uids
         stillbirth_boolean = np.full(len(ppl), False)
         stillbirth_boolean[np.searchsorted(ppl_uids, stillborn_uids)] = True
         self.results['stillbirth_ages'] = self.age_by_group
         self.results['as_stillbirths'] = stillbirth_boolean
 
         # Live births
-        live_uids = (ppl.ti_live_birth == self.sim.ti).uids
+        live_uids = (ppl.fp.ti_live_birth == self.sim.ti).uids
         total_women_delivering = np.full(len(ppl), False)
         total_women_delivering[np.searchsorted(ppl_uids, live_uids)] = True
         self.results['mmr_age_by_group'] = self.age_by_group
@@ -959,29 +967,29 @@ class track_as(ss.Analyzer):
             self.results[key] = live_births_age_split[key]
 
         # MCPR
-        modern_methods_num = [idx for idx, m in enumerate(ppl.contraception_module.methods.values()) if m.modern]
-        method_age = (sim.fp_pars['method_age'] <= ppl.age)
-        fecund_age = ppl.age < sim.fp_pars['age_limit_fecundity']
+        modern_methods_num = [idx for idx, m in enumerate(sim.connectors.contraception.methods.values()) if m.modern]
+        method_age = (sim.pars.fp['method_age'] <= ppl.age)
+        fecund_age = ppl.age < sim.pars.fp['age_limit_fecundity']
         denominator = method_age * fecund_age * ppl.female * ppl.alive
-        numerator = np.isin(ppl.method, modern_methods_num)
+        numerator = np.isin(ppl.fp.method, modern_methods_num)
         as_result_dict = self.log_age_split(binned_ages_t=[self.age_by_group], channel='mcpr',
                                             numerators=[numerator], denominators=[denominator])
         for key in as_result_dict:
             self.results[key] = as_result_dict[key]
 
         # CPR
-        denominator = ((sim.fp_pars['method_age'] <= ppl.age) * (ppl.age < sim.fp_pars['age_limit_fecundity']) * (
+        denominator = ((sim.pars.fp['method_age'] <= ppl.age) * (ppl.age < sim.pars.fp['age_limit_fecundity']) * (
                 ppl.female * ppl.alive))
-        numerator = ppl.method != 0
+        numerator = ppl.fp.method != 0
         as_result_dict = self.log_age_split(binned_ages_t=[self.age_by_group], channel='cpr',
                                             numerators=[numerator], denominators=[denominator])
         for key in as_result_dict:
             self.results[key] = as_result_dict[key]
 
         # ACPR
-        denominator = ((sim.fp_pars['method_age'] <= ppl.age) * (ppl.age < sim.fp_pars['age_limit_fecundity']) * (
-                ppl.female) * (ppl.pregnant == 0) * (ppl.sexually_active == 1) * ppl.alive)
-        numerator = ppl.method != 0
+        denominator = ((sim.pars.fp['method_age'] <= ppl.age) * (ppl.age < sim.pars.fp['age_limit_fecundity']) * (
+                ppl.female) * (ppl.fp.pregnant == 0) * (ppl.fp.sexually_active == 1) * ppl.alive)
+        numerator = ppl.fp.method != 0
 
         as_result_dict = self.log_age_split(binned_ages_t=[self.age_by_group], channel='acpr',
                                             numerators=[numerator], denominators=[denominator])

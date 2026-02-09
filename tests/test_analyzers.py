@@ -118,6 +118,44 @@ def test_method_mix_by_age():
 
     return sim.analyzers.method_mix_by_age
 
+def test_state_tracker():
+    sc.heading('Testing state tracker...')
+
+    # Create a sim with the state tracker analyzer, testing with and without a module name included
+    sta1 = fp.state_tracker("alive", name="sta1", label="sta1")
+    sta2 = fp.state_tracker(module_name="fp", state_name="on_contra", name="sta2", label="sta2")
+    sim = fp.Sim(test=True, analyzers=[sta1, sta2])
+    sim.init()
+    sim.run()
+
+    return sim
+
+
+def test_method_mix_over_time():
+    sc.heading('Testing method mix over time analyzer...')
+
+    # Create a sim with the method mix over time analyzer
+    mmot = fp.method_mix_over_time()
+    sim = fp.Sim(test=True, analyzers=[mmot])
+    sim.init()
+    sim.run()
+
+    # Check that the analyzer has been populated correctly
+    assert sim.analyzers.method_mix_over_time.data is not None, 'Method mix over time data should not be empty'
+    assert sim.analyzers.method_mix_over_time.n_methods is not None, 'Number of methods should be set'
+    assert len(sim.analyzers.method_mix_over_time.data) > 0, 'Data should contain method data'
+
+    # Check that data have the right structure
+    for method, data in sim.analyzers.method_mix_over_time.data.items():
+        assert len(data) == sim.t.npts, f'Data for {method} should have data for all timesteps'
+        assert data.sum() >= 0, f'Data for {method} should be non-negative'
+
+    if do_plot:
+        sim.analyzers.method_mix_over_time.plot()
+
+    return sim.analyzers.method_mix_over_time
+
+
 
 def test_education_recorder():
     ''' Test that the education_recorder analyzer runs and records data '''
@@ -192,5 +230,7 @@ if __name__ == '__main__':
         ap    = test_age_pyramids()
         lrec = test_lifeof_recorder_analyzer()
         mmba  = test_method_mix_by_age()
+        sta   = test_state_tracker()
+        mmot  = test_method_mix_over_time()
         erec  = test_education_recorder()
     print('Done all tests')
