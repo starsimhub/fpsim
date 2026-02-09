@@ -6,7 +6,6 @@ Define defaults for use throughout FPsim
 import numpy as np
 import sciris as sc
 import starsim as ss
-import fpsim
 import fpsim.arrays as fpa
 
 
@@ -79,6 +78,7 @@ def get_calib_pars(location, verbose=1):
         return None
     return calib_pars
 
+
 def get_test_defaults():
     """ Return the test defaults """
     defaults = {
@@ -99,6 +99,8 @@ fpmod_states = [
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
     ss.FloatArr('barrier', default=0),
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
+    ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
+    ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
     ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
     # Sexual and reproductive states, all False by default and set during simulation

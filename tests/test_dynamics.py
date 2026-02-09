@@ -64,7 +64,9 @@ def test_mcpr(location='senegal', do_plot=False):
 
     # Create interventions and sims
     sims = sc.autolist()
-    def select_women(sim): return sim.people.female.uids
+    def select_women(sim):
+        sim.people.female.uids
+        return
 
     def make_zeros():
         zero_states = sc.autolist()

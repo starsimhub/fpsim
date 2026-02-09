@@ -1,0 +1,11 @@
+name,label,csv_name,efficacy,modern
+none,None,None,0,FALSE
+pill,Pill,Pill,0.945,TRUE
+iud,IUDs,IUD,0.986,TRUE
+inj,Injectables,Injectable,0.983,TRUE
+cond,Condoms,Condom,0.946,TRUE
+btl,BTL,F.sterilization,0.995,TRUE
+wdraw,Withdrawal,Withdrawal,0.866,FALSE
+impl,Implants,Implant,0.994,TRUE
+othtrad,Other traditional,Other.trad,0.861,FALSE
+othmod,Other modern,Other.mod,0.88,TRUE
