@@ -149,7 +149,8 @@ class education_recorder(ss.Analyzer):
             self.snapshots = sc.odict()  # Store the actual snapshots
             self.edu_keys = ['objective', 'attainment', 'completed',
                          'dropped', 'interrupted']
-            self.ppl_keys = ['pregnant', 'alive', 'age']
+            self.fp_keys = ['pregnant']
+            self.ppl_keys = ['alive', 'age']
             self.max_agents = 0     # maximum number of agents this analyzer tracks
             self.time = []
             self.trajectories = {}  # Store education trajectories
@@ -165,8 +166,10 @@ class education_recorder(ss.Analyzer):
             self.snapshots[str(sim.ti)] = {}
             for key in self.edu_keys:
                 self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.edu[key][females])  # Take snapshot!
+            for key in self.fp_keys:
+                self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.fp[key][females])
             for key in self.ppl_keys:
-                self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people[key][females])  # Take snapshot!
+                self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people[key][females])
             self.max_agents = max(self.max_agents, len(females))
             return
 
@@ -179,11 +182,13 @@ class education_recorder(ss.Analyzer):
             self.finalized = True
             # Process data so we can plot it easily
             self.time = np.array([key for key in self.snapshots.keys()], dtype=int)
-            for state in self.edu_keys + self.ppl_keys:
+            for state in self.edu_keys + self.fp_keys + self.ppl_keys:
                 self.trajectories[state] = np.full((len(self.time), self.max_agents), np.nan)
                 for ti, t in enumerate(self.time):
                     stop_idx = len(self.snapshots[t][state])
                     self.trajectories[state][ti, 0:stop_idx] = self.snapshots[t][state]
+
+            super().finalize()
             return
 
         def plot(self, index=0, fig_args=None, pl_args=None):
