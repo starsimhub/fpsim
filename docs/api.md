@@ -22,9 +22,38 @@ Documentation is generated from the `fpsim` package using [mkdocstrings](https:/
 
 ::: fpsim.calibration
 
-## Package contents
+## Parameters
 
-::: fpsim
-    options:
-      show_submodules: true
-      members_order: source
+::: fpsim.parameters
+
+## Methods
+
+::: fpsim.methods
+
+## People
+
+::: fpsim.people
+
+## Demographics
+
+::: fpsim.demographics
+
+## Education
+
+::: fpsim.education
+
+## Plotting
+
+::: fpsim.plotting
+
+## Experiment
+
+::: fpsim.experiment
+
+## Defaults
+
+::: fpsim.defaults
+
+## Utilities
+
+::: fpsim.utils

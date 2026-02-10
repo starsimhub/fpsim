@@ -2,8 +2,6 @@
 Set the parameters for a location-specific FPsim model.
 """
 import numpy as np
-from fpsim import defaults as fpd
-import fpsim as fp
 import fpsim.locations.data_utils as fpld
 
 
