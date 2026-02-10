@@ -339,7 +339,7 @@ To support this new feature, this PR also introduces several new items:
 
 ## Version 0.26.3 (2023-9-27)
 
-- Updates Senegal files in locations/senegal to be in the same format as Kenya for standardization purposes
+- Updates Senegal files in locations/senegal_data to be in the same format as Kenya for standardization purposes
 - Minor updates to calibrate_manual.py to be able to run with Senegal data (in addition to Kenya and other contexts)
 - *GitHub info*: PR [165](https://github.com/fpsim/fpsim/pull/165)
 

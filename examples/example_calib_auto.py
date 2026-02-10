@@ -29,7 +29,7 @@ mix.csv'  # Contraceptive method mix
 tfr.csv'  # Total fertility rate data
 popsize.csv'  # Population by year
 
-4. Ensure that the data in the aforementioned files are formatted properly (see files in locations/kenya/data for reference)
+4. Ensure that the data in the aforementioned files are formatted properly (see files in locations/kenya_data/data for reference)
 
 5. Verify desired settings in calibration.py (i.e. number of trials)
 '''
