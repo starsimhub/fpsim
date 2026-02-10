@@ -15,10 +15,13 @@ authors = [
   { name = "Michelle O'Brien", email = "info@fpsim.org" },
   { name = "Annie Valente" },
   { name = "Cliff Kerr" },
-  { name = "Sam Buxton" },
+  { name = "Robyn Stuart" },
+  { name = "Paula Sanz-Leon" },
+  { name = "Aasli Nur" },
+  { name = "Ryan Hull" },
   { name = "Daniel Klein" },
-  { name = "Marita Zimmermann" },
   { name = "Emily Driano" },
+  { name = "Marita Zimmermann" },  
 ]
 
 classifiers = [
@@ -26,14 +29,9 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "License :: Other/Proprietary License",
   "Operating System :: OS Independent",
-  "Programming Language :: Python",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Development Status :: 5 - Production/Stable",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3",
 ]
 
 dependencies = [
