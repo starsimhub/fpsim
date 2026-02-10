@@ -1,4 +1,4 @@
-name: Publish STIsim docs
+name: Publish FPsim docs
 
 on:
   workflow_dispatch:

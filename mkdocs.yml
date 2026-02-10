@@ -1,15 +1,15 @@
-# MkDocs configuration for STIsim
+# MkDocs configuration for FPsim
 # https://www.mkdocs.org/user-guide/configuration/
 
-site_name: STIsim
-site_description: Agent-based modeling framework for sexually-transmitted infections
-site_url: https://docs.idmod.org/projects/stisim
+site_name: FPsim
+site_description: Agent-based model for family planning research
+site_url: https://docs.fpsim.org
 
-repo_name: starsimhub/stisim
-repo_url: https://github.com/starsimhub/stisim
+repo_name: fpsim/fpsim
+repo_url: https://github.com/fpsim/fpsim
 edit_uri: edit/main/docs/
 
-copyright: "1999 &ndash; 2025 Gates Foundation. All rights reserved."
+copyright: Copyright &copy; 2025 Gates Foundation. All rights reserved.
 
 theme:
   name: material
@@ -74,7 +74,7 @@ plugins:
   - mkdocstrings: # process docstrings to generate API reference
       handlers:
         python:
-          paths: [src] # path to source code
+          paths: [.] # path to source code
           options:
             docstring_style: google
             show_source: false
@@ -85,8 +85,6 @@ plugins:
             show_root_toc_entry: true
             show_object_full_path: true
 
-copyright: Copyright &copy; 2025 Gates Foundation. All rights reserved.
-
 extra:
   generator: false
   footer_links:
@@ -96,13 +94,13 @@ extra:
       href: "https://www.gatesfoundation.org/Terms-of-Use"
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/starsimhub/stisim
+      link: https://github.com/fpsim/fpsim
     - icon: fontawesome/regular/envelope
       link: mailto:info@starsim.org
     - icon: fontawesome/brands/slack
       link: https://starsim-idm.slack.com
     - icon: octicons/globe-24
-      link: https://starsim.org
+      link: https://fpsim.org
 
   analytics:
     property: GTM-NK4K647
