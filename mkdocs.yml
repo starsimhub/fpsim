@@ -76,7 +76,7 @@ extra_css:
 plugins:
   # Process notebooks first so they are converted and included in the build
   - mkdocs-jupyter:
-      include: ["**/*.ipynb", "**/*.py", "**/*.md"]
+      include: ["**/*.ipynb"]
       execute: true
       allow_errors: true
       include_source: true
