@@ -38,14 +38,8 @@ cd tests && python update_baseline
 
 ### Documentation
 ```bash
-# Build documentation (copies docs to .docs_build, executes notebooks there, then builds; repo notebooks are never modified)
-cd docs && ./build_docs
-
-# Build docs without executing notebooks (quick)
-cd docs && ./build_docs never
-
-# Build docs in debug mode (serial)
-cd docs && ./build_docs debug
+# Build documentation (from repo root; executes notebooks)
+mkdocs build
 ```
 
 ### Installation

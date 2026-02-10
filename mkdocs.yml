@@ -41,11 +41,20 @@ theme:
 nav:
   - Home: index.md
   - Overview: overview.md
-  - Tutorials: tutorials.md
+  - Tutorials:
+      - Tutorials index: tutorials.md
+      - T1 Introduction: tutorials/T1_intro.ipynb
+      - T2 New features: tutorials/T2_intro_to_new_features.ipynb
+      - T3 Interventions and methods: tutorials/T3_interventions_methods.ipynb
+      - T4 Intervention eligibility: tutorials/T4_intervention_eligibility.ipynb
+      - T5 Adding a new method: tutorials/T5_new_method.ipynb
   - What's new: whatsnew.md
   - Code of conduct: code_of_conduct.md
   - Contributing: contributing.md
   - API reference: api.md
+
+# docs_dir is implicit default "docs"
+docs_dir: docs
 
 # icons, semantic markup, emojis
 markdown_extensions:
@@ -63,15 +72,19 @@ extra_javascript:
 
 extra_css:
   - customization/css/extra.css # custom CSS for footer spacing
+
 plugins:
-  - search # search functionality
-  - autorefs # automatically create linkable references
-  - include-markdown # include other files, such as READMEs
-  - mkdocs-jupyter: # enables Jupyter notebooks to be rendered
-      execute: false
+  # Process notebooks first so they are converted and included in the build
+  - mkdocs-jupyter:
+      include: ["**/*.ipynb", "**/*.py", "**/*.md"]
+      execute: true
       allow_errors: true
       include_source: true
-  - mkdocstrings: # process docstrings to generate API reference
+      kernel_name: python3
+  - search
+  - autorefs
+  - include-markdown
+  - mkdocstrings:
       handlers:
         python:
           paths: [.] # path to source code
