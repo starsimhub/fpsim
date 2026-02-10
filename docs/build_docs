@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Build FPsim docs. Notebooks are run in a cache copy only; repo notebooks are never modified.
+#
+#   ./build_docs       - Copy docs to .docs_build, execute notebooks there, build to site/
+#   ./build_docs never - Build without executing notebooks (fast; uses mkdocs.yml, execute: false)
+
+set -e
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+if [ "${1:-}" = "never" ]; then
+  echo "Building docs without executing notebooks (quick build)..."
+  mkdocs build
+  echo "Done. Output in site/"
+  exit 0
+fi
+
+echo "Copying docs to .docs_build (notebooks will be executed there only)..."
+rm -rf .docs_build
+cp -a docs .docs_build
+
+echo "Building docs with notebook execution..."
+mkdocs build -f mkdocs.build.yml
+
+echo "Done. Output in site/. Notebooks in docs/ were not modified."

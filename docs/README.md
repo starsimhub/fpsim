@@ -15,6 +15,9 @@ To build the docs, follow these steps:
     pip install -r requirements.txt
     ```
 
-2.  Make the documents; there are many build options. In most cases, running `./build_docs` (to rerun the tutorials; takes 2 min) or `./build_docs never` (does not rebuild the tutorials; takes 15 s) is best. Alternatively, one can call `make html` directly.
+2.  Make the documents; run from the `docs` folder:
+    - `./build_docs` — copy docs to a cache (`.docs_build`), execute notebooks there, then build. Notebooks in the repo are never modified. Takes a few minutes.
+    - `./build_docs never` — build without executing notebooks (quick, ~15 s). Uses `mkdocs build` with `execute: false`.
+    Or from the repo root: `mkdocs build` (no notebook execution).
 
-3.  The built documents will be in `./_build/html`.
+3.  The built site is in `site/` at the repo root.

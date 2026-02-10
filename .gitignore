@@ -156,6 +156,8 @@ ENV/
 
 # mkdocs documentation
 /site
+# Cache for doc build: copy of docs where notebooks are executed (repo notebooks never modified)
+.docs_build
 
 # mypy
 .mypy_cache/
