@@ -17,4 +17,3 @@ def make_calib_pars():
 
 def dataloader(location='senegal'):
     return fpld.DataLoader(location=location)
-
