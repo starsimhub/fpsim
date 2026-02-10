@@ -1,8 +1,0 @@
-include LICENSE
-global-include requirements*.txt
-global-include *.rst
-recursive-include fpsim *.py
-recursive-include fpsim *.csv
-recursive-include fpsim *.obj
-recursive-include fpsim *.yaml
-global-exclude *.py[cod] __pycache__

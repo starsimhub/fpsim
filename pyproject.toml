@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fpsim"
+dynamic = ["version"]
+description = "FPsim: Family Planning Simulator"
+readme = "README.rst"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+keywords = ["family planning", "women's health", "agent-based model", "simulation"]
+
+authors = [
+  { name = "Michelle O'Brien", email = "info@fpsim.org" },
+  { name = "Annie Valente" },
+  { name = "Cliff Kerr" },
+  { name = "Sam Buxton" },
+  { name = "Daniel Klein" },
+  { name = "Marita Zimmermann" },
+  { name = "Emily Driano" },
+]
+
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "License :: Other/Proprietary License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+
+dependencies = [
+    "numpy",
+    "numba",
+    "scipy",
+    "starsim>=3.0.2",
+    "pandas>=1.3",
+    "sciris>=2.1.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.9",
+    "optuna",
+    "plotnine",
+    "pyarrow",
+    "pyyaml",
+]
+
+[project.urls]
+"Website" = "http://fpsim.org"
+"Source" = "https://github.com/fpsim/fpsim/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fpsim*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "fpsim.version.__version__"}
