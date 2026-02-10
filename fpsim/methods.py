@@ -1443,13 +1443,15 @@ class StandardChoice(SimpleChoice):
             elif predictor in ["parity", "urban", "wealthquintile"]:
                 rhs += beta_p * ppl[predictor][eligible_uids]
         
-        # Handle fertility intent predictor (special case with different coefficients for yes/no)
+        # Handle fertility intent predictor (3-category: "yes", "no", "cannot-get-pregnant")
+        # Reference category is "cannot-get-pregnant" (coefficient = 0)
+        # fertility_intent_cat: 0=cannot-get-pregnant, 1=no, 2=yes
         if "fertility_intentno" in p and "fertility_intentyes" in p:
-            # Start with the "no" coefficient for all
-            fertility_coeff = np.full(len(eligible_uids), p["fertility_intentno"])
-            # Update to "yes" coefficient where fertility_intent is True
-            fertility_coeff[fp_connector.fertility_intent[eligible_uids]] = p["fertility_intentyes"]
-            rhs += fertility_coeff * fp_connector.fertility_intent[eligible_uids].astype(float)
+            cat_intent = fp_connector.fertility_intent_cat[eligible_uids]
+            fi_contrib = np.zeros(len(eligible_uids))
+            fi_contrib[cat_intent == 1] = p["fertility_intentno"]
+            fi_contrib[cat_intent == 2] = p["fertility_intentyes"]
+            rhs += fi_contrib
         
         # Apply logistic transformation
         prob_t = expit(rhs)
