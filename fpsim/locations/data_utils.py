@@ -280,7 +280,7 @@ class DataLoader:
         trend_ind = np.where(mortality['year'] == data_year)
         trend_val = mortality['probs'][trend_ind]
 
-        mortality['probs'] /= trend_val  # Normalize around data year for trending
+        mortality['probs'] = mortality['probs'] / trend_val  # Normalize around data year for trending
         m_mortality_spline_model = si.splrep(x=mortality['ages'],
                                              y=mortality['m'])  # Create a spline of mortality along known age bins
         f_mortality_spline_model = si.splrep(x=mortality['ages'], y=mortality['f'])
