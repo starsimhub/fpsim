@@ -46,7 +46,6 @@ class FPmod(ss.Pregnancy):
 
         # All other distributions
         self._fated_debut = ss.choice(a=self.pars['debut_age']['ages'], p=self.pars['debut_age']['probs'])
-        self.choose_slots_twins = None # Initialized in init_pre
 
         # Deal with exposure parameters
         if isinstance(self.pars['exposure_age'], dict):
@@ -65,12 +64,24 @@ class FPmod(ss.Pregnancy):
 
         return
 
+    @property
+    def postpartum(self):
+        """
+        Within a pre-defined postpartum window, as specified by the dur_postpartum par
+        This does not directly affect any other functionality within this module, but is
+        provided for convenience for modules that need to know which women are X timesteps
+        postpartum.
+        """
+        timesteps_since_birth = self.ti - self.ti_delivery
+        pp_timesteps = int(self.pars.dur_postpartum/self.t.dt)
+        pp_bools = ~self.pregnant & (timesteps_since_birth >= 0) & (timesteps_since_birth <= pp_timesteps)
+        return pp_bools
+
     def init_pre(self, sim):
         super().init_pre(sim)
         low = sim.pars.n_agents + 1
         high = int(self.pars.slot_scale*sim.pars.n_agents)
         high = np.maximum(high, self.pars.min_slots) # Make sure there are at least min_slots slots to avoid artifacts related to small populations
-        self.choose_slots_twins = ss.randint(low=low, high=high, sim=sim, module=self)
 
     def _get_uids(self, upper_age=None, female_only=True):
         people = self.sim.people
@@ -408,13 +419,13 @@ class FPmod(ss.Pregnancy):
             self.dur_breastfeed_total[stopping] += self.dur_breastfeed[stopping]
         return
 
-    def process_delivery(self, uids, newborn_uids):
+    def process_delivery(self, mother_uids, newborn_uids):
         """
         Enhanced delivery processing with stillbirths, neonatal mortality, twins,
         and tracking of ages at events.
         """
         # Call parent to handle standard delivery processing
-        uids, newborn_uids = super().process_delivery(uids, newborn_uids)
+        super().process_delivery(mother_uids, newborn_uids)
 
         ppl = self.sim.people
         fp_pars = self.pars  # Shorten
@@ -422,16 +433,16 @@ class FPmod(ss.Pregnancy):
         # Extract probability of stillbirth adjusted for age
         still_prob = self.mortality_probs['stillbirth']
         rate_ages = fp_pars['stillbirth_rate']['ages']
-        age_ind = np.searchsorted(rate_ages, ppl.age[uids], side="left")
+        age_ind = np.searchsorted(rate_ages, ppl.age[mother_uids], side="left")
         prev_idx_is_less = ((age_ind == len(rate_ages)) | (
-                np.fabs(ppl.age[uids] - rate_ages[np.maximum(age_ind - 1, 0)]) < np.fabs(
-            ppl.age[uids] - rate_ages[np.minimum(age_ind, len(rate_ages) - 1)])))
+                np.fabs(ppl.age[mother_uids] - rate_ages[np.maximum(age_ind - 1, 0)]) < np.fabs(
+            ppl.age[mother_uids] - rate_ages[np.minimum(age_ind, len(rate_ages) - 1)])))
         age_ind[prev_idx_is_less] -= 1  # adjusting for quirks of np.searchsorted
         still_prob = still_prob * (fp_pars['stillbirth_rate']['age_probs'][age_ind]) if len(self) > 0 else 0
 
         # Sort into stillbirths and live births (single and twin) and record times
         self._p_stillbirth.set(p=still_prob)
-        stillborn, live = self._p_stillbirth.split(uids)
+        stillborn, live = self._p_stillbirth.split(mother_uids)
 
         # Sort mothers into single and multiple births
         twins = live & self.carrying_multiple.uids
@@ -457,7 +468,7 @@ class FPmod(ss.Pregnancy):
         self.results['infant_deaths'][self.ti] += len(nnds)
 
         # Calculate mothers of live babies
-        mothers = uids - stillborn - mothers_of_nnds
+        mothers = mother_uids - stillborn - mothers_of_nnds
         live_babies = self.find_unborn_children(mothers)
 
         return live, live_babies
@@ -638,39 +649,12 @@ class FPmod(ss.Pregnancy):
 
         return
 
-    def _make_twin_uids(self, conceive_uids):
-        """ Helper method to link embryos to mothers """
-        # Choose slots for the unborn agents
-        new_slots = self.choose_slots_twins.rvs(conceive_uids)
-        new_uids = self.sim.people.grow(len(new_slots), new_slots)
-        return new_uids, new_slots
-
-    def make_embryos(self, conceive_uids):
-        """ Create new embryos """
-        # Super call handles most things, but we need to adjust for twins
-        new_uids = super().make_embryos(conceive_uids)
-
-        # Determine who is having twins
-        self._p_twins.set(p=self.pars.twins_prob)
-        twin_uids, single_uids = self._p_twins.split(conceive_uids)
-        self.carrying_multiple[twin_uids] = True
-
-        # Grow the population and assign properties to twins
-        new_twin_uids, new_twin_slots = self._make_twin_uids(twin_uids)
-        self._set_embryo_states(twin_uids, new_twin_uids, new_twin_slots)
-
-        # Handle burn-in (aging embryos to ti=0)
-        if self.ti < 0:
-            self.sim.people.age[new_twin_uids] += -self.ti * self.sim.t.dt_year
-
-        return new_uids | new_twin_uids
-
     def make_pregnancies(self, uids):
         """ Create new pregnancies """
-        super().make_pregnancies(uids)
+        embryo_counts = super().make_pregnancies(uids)
         self.on_contra[uids] = False  # Not using contraception during pregnancy
         self.method[uids] = 0  # Method zero due to non-use
-        return
+        return embryo_counts
 
     def update_results(self):
         super().update_results()

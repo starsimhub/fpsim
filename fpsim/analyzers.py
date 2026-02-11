@@ -711,11 +711,7 @@ class state_tracker(ss.Analyzer):
     living women who live in rural settings)
     '''
 
-<<<<<<< HEAD
-    def __init__(self, state_name=None, min_age=None, max_age=None):
-=======
     def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
->>>>>>> rc3.5
         """
         Initializes bins and data variables
 
