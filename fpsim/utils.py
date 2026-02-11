@@ -199,3 +199,99 @@ class DuplicateNameException(Exception):
         msg = f"A {type(obj)} with name `{obj.name}` has already been added."
         super().__init__(msg)
         return
+    
+#%% Helper functions for INTERVENTIONS ***
+
+def make_recreatable_intervention_repr(obj, skip_none=True, skip_defaults=None):
+    """
+    Create a recreatable string representation of an intervention.
+
+    The returned string is a constructor-like call, e.g. ``fp.update_methods(year=2020, ...)``.
+    """
+    skip_defaults = skip_defaults or {}
+    class_name = obj.__class__.__name__
+    
+    # Get parameters from the object
+    if hasattr(obj, 'pars') and obj.pars is not None:
+        pars = dict(obj.pars)
+    else:
+        pars = {}
+    
+    # Also check for direct attributes that aren't in pars
+    for attr in ['par', 'years', 'vals', 'verbose', 'year', 'method', 'copy_from']:
+        if hasattr(obj, attr) and attr not in pars:
+            pars[attr] = getattr(obj, attr)
+    
+    # Build parameter string
+    par_strs = []
+    for k, v in pars.items():
+        # Skip None values if requested
+        if skip_none and v is None:
+            continue
+        # Skip default values
+        if k in skip_defaults and v == skip_defaults[k]:
+            continue
+        # Format the value
+        if isinstance(v, str):
+            par_strs.append(f"{k}='{v}'")
+        else:
+            par_strs.append(f"{k}={v!r}")
+    
+    return f"fp.{class_name}({', '.join(par_strs)})"
+
+
+# Backwards-compatible alias (older code may import/use fpsim.utils.make_repr)
+make_repr = make_recreatable_intervention_repr
+
+
+def intervention_from_json(json_data, module=None):
+    """
+    Recreate an intervention from JSON data.
+    
+    Args:
+        json_data: A dict or objdict from to_json(), or a JSON string
+        module: The module containing intervention classes (default: fpsim.interventions)
+        
+    Returns:
+        An intervention object
+        
+    **Example**::
+    
+        intv = fp.update_methods(year=2020, eff={'Injectables': 0.99})
+        json_data = intv.to_json()
+        intv2 = fp.intervention_from_json(json_data)
+    """
+    import json as json_module
+    
+    # Parse JSON string if needed
+    if isinstance(json_data, str):
+        json_data = json_module.loads(json_data)
+    
+    # Convert to dict if it's an objdict
+    if hasattr(json_data, 'to_dict'):
+        json_data = dict(json_data)
+    
+    # Get the intervention type
+    intv_type = json_data.get('type') or json_data.get('which')
+    if intv_type is None:
+        raise ValueError("JSON data must have 'type' or 'which' key specifying the intervention class")
+    
+    # Get the parameters
+    pars = json_data.get('pars', {})
+    if hasattr(pars, 'to_dict'):
+        pars = dict(pars)
+    
+    # Filter out None values
+    pars = {k: v for k, v in pars.items() if v is not None}
+    
+    # Get the intervention class
+    if module is None:
+        import fpsim.interventions as module
+    
+    if not hasattr(module, intv_type):
+        raise ValueError(f"Unknown intervention type: {intv_type}")
+    
+    intv_class = getattr(module, intv_type)
+    
+    # Create and return the intervention
+    return intv_class(**pars)
