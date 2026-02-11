@@ -78,12 +78,6 @@ class FPmod(ss.Pregnancy):
         pp_bools = ~self.pregnant & (timesteps_since_birth >= 0) & (timesteps_since_birth <= pp_timesteps)
         return pp_bools
 
-    def init_pre(self, sim):
-        super().init_pre(sim)
-        low = sim.pars.n_agents + 1
-        high = int(self.pars.slot_scale*sim.pars.n_agents)
-        high = np.maximum(high, self.pars.min_slots) # Make sure there are at least min_slots slots to avoid artifacts related to small populations
-
     def _get_uids(self, upper_age=None, female_only=True):
         people = self.sim.people
         if upper_age is None: upper_age = 1000
@@ -98,9 +92,6 @@ class FPmod(ss.Pregnancy):
     def init_intent_states(self, uids):
         """
         Initialize intent_to_use and fertility_intent states for women aged 15-49
-        
-        Arguments:
-            uids: array of user IDs to initialize
         """
         ppl = self.sim.people
         
@@ -158,6 +149,7 @@ class FPmod(ss.Pregnancy):
             else:
                 # Default if age not in data
                 self.intent_to_use[uid] = False
+        return
 
     def set_states(self, uids=None, upper_age=None):
         ppl = self.sim.people
@@ -353,16 +345,6 @@ class FPmod(ss.Pregnancy):
         self.check_sexually_active(self.fecund.uids)  # Check for all women of childbearing age
         self.update_time_to_choose(uids)
 
-        # TODO get this working 
-        # # Update intent to use on birthday for any non-preg or >1m pp
-        # self.sim.connectors.contraception.update_intent_to_use(nonpreg)
-
-        # # Update methods for those who are eligible
-        # ready = nonpreg[self.ti_contra[nonpreg] <= self.ti]
-        # if len(ready):
-        #     self.sim.connectors.contraception.update_contra(ready)
-        #     self.results['switchers'][self.ti] = len(ready)  # Track how many people switch methods (incl on/off)
-
         # Update methods for those who are eligible
         method_updaters = ((self.ti_contra <= self.ti) & self.fecund & ~self.pregnant).uids
         if len(method_updaters):
@@ -428,8 +410,9 @@ class FPmod(ss.Pregnancy):
         # Call parent to handle standard delivery processing
         super().process_delivery(mother_uids, newborn_uids)
 
+        # Shorten 
         ppl = self.sim.people
-        fp_pars = self.pars  # Shorten
+        fp_pars = self.pars
 
         # Extract probability of stillbirth adjusted for age
         still_prob = self.mortality_probs['stillbirth']
@@ -443,36 +426,41 @@ class FPmod(ss.Pregnancy):
 
         # Sort into stillbirths and live births (single and twin) and record times
         self._p_stillbirth.set(p=still_prob)
-        stillborn, live = self._p_stillbirth.split(mother_uids)
+        mothers_of_stillborns, mothers_of_live = self._p_stillbirth.split(mother_uids)
 
         # Sort mothers into single and multiple births
-        twins = live & self.carrying_multiple.uids
-        single = live - twins
+        twins = mothers_of_live & self.carrying_multiple.uids
+        single = mothers_of_live - twins
         self.parity[twins] += 1  # Increment parity for twins
-        self.n_births[live] += 1
+        self.n_births[mothers_of_live] += 1
         self.n_twinbirths[twins] += 1
-        self.record_ages(stillborn, single, twins)
+        self.record_ages(mothers_of_stillborns, single, twins)
         self.carrying_multiple[twins] = False
 
         # Update states for mothers of stillborns
-        self.n_stillbirths[stillborn] += 1  # Track number of stillbirths for each woman
-        self.handle_loss(stillborn)  # State updates for mothers of stillborns
-        self.results['stillbirths'][self.ti] = len(stillborn)
+        self.n_stillbirths[mothers_of_stillborns] += 1  # Track number of stillbirths for each woman
+        self.handle_loss(mothers_of_stillborns)  # State updates for mothers of stillborns
+        self.results['stillbirths'][self.ti] = len(mothers_of_stillborns)
 
         # Update times
-        self.ti_stillbirth[stillborn] = self.ti
-        self.ti_live_birth[live] = self.ti
+        self.ti_stillbirth[mothers_of_stillborns] = self.ti
+        self.ti_live_birth[mothers_of_live] = self.ti
 
         # Handle infant mortality
-        mothers_of_nnds, nnds = self.check_infant_mortality(live)
+        mothers_of_nnds, nnds = self.check_infant_mortality(mothers_of_live)
         self.handle_loss(mothers_of_nnds)  # State updates for mothers of NNDs
         self.results['infant_deaths'][self.ti] += len(nnds)
 
         # Calculate mothers of live babies
-        mothers = mother_uids - stillborn - mothers_of_nnds
-        live_babies = self.find_unborn_children(mothers)
+        mothers_of_live = mother_uids - mothers_of_stillborns - mothers_of_nnds
+        live_babies = self.find_unborn_children(mothers_of_live)
 
-        return live, live_babies
+        # Trigger update to contraceptive choices for all women who deliver live babies
+        # Note that ti_contra is also typically triggered for mothers of stillborns or
+        # neonatal deaths, but this is handled in the handle_loss method
+        self.ti_contra[mothers_of_live] = self.ti + 1
+
+        return mothers_of_live, live_babies
 
     def record_ages(self, stillborn, single, twin):
         """
@@ -656,6 +644,12 @@ class FPmod(ss.Pregnancy):
         self.on_contra[uids] = False  # Not using contraception during pregnancy
         self.method[uids] = 0  # Method zero due to non-use
         return embryo_counts
+
+    def process_prenatal_deaths(self, death_uids):
+        """
+        Skip this logic since FPsim handles prenatal deaths via other functions
+        """
+        return
 
     def update_results(self):
         super().update_results()

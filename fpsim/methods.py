@@ -863,17 +863,16 @@ class ContraceptiveChoice(ss.Connector):
     def init_post(self):
         """
          Decide who will start using contraception, when, which contraception method and the
-         duration on that method. This method is called by the simulation to initialise the
+         duration on that method. This method is called by the simulation to initialize the
          people object at the beginning of the simulation and new people born during the simulation.
          """
         super().init_post()
-        ppl = self.sim.people
-        fecund = ppl.female & (ppl.age < self.sim.pars.fp['age_limit_fecundity'])
-        fecund_uids = fecund.uids
+        fpppl = self.sim.people.fp
+        
+        # Get people who might use contraception
+        eligible_contra = fpppl.fecund & ~fpppl.pregnant & (fpppl.ti_contra == self.ti)
+        self.init_contraception(eligible_contra.uids)
 
-        # Look for women who have reached the time to choose
-        time_to_set_contra_uids = fecund_uids[(ppl.fp.ti_contra[fecund_uids] == 0)]
-        self.init_contraception(time_to_set_contra_uids)
         return
 
     def init_contraception(self, uids):
@@ -1405,7 +1404,6 @@ class StandardChoice(SimpleChoice):
             return  # Skip if no coefficients available
         
         ppl = self.sim.people
-        fp_connector = self.sim.connectors.fp
 
         pp1 = self.ti - ppl.fp.ti_delivery <= 1
         nonpp1 = ~pp1  # Delivered last timestep
@@ -1418,7 +1416,7 @@ class StandardChoice(SimpleChoice):
                         ppl.alive &
                         nonpp1 &
                         bday &
-                        ~fp_connector.on_contra)  # Only update for women not currently on contraception
+                        ~ppl.fp.on_contra)  # Only update for women not currently on contraception
         eligible_uids = uids[eligible_mask[uids]] if len(uids) > 0 else eligible_mask.uids
         
         if len(eligible_uids) == 0:
@@ -1449,8 +1447,8 @@ class StandardChoice(SimpleChoice):
             # Start with the "no" coefficient for all
             fertility_coeff = np.full(len(eligible_uids), p["fertility_intentno"])
             # Update to "yes" coefficient where fertility_intent is True
-            fertility_coeff[fp_connector.fertility_intent[eligible_uids]] = p["fertility_intentyes"]
-            rhs += fertility_coeff * fp_connector.fertility_intent[eligible_uids].astype(float)
+            fertility_coeff[ppl.fp.fertility_intent[eligible_uids]] = p["fertility_intentyes"]
+            rhs += fertility_coeff * ppl.fp.fertility_intent[eligible_uids].astype(float)
         
         # Apply logistic transformation
         prob_t = expit(rhs)

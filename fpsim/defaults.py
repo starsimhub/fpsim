@@ -14,6 +14,7 @@ useSI          = True
 eps            = 1e-9 # To avoid divide-by-zero
 min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
 max_age        = 99   # Maximum age (inclusive)
+max_age_preg   = 50   # Maximum age for pregnancy
 spline_max_age  = 99   # Maximum age of agents (inclusive)
 spline_max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
@@ -116,7 +117,6 @@ fpmod_states = [
     # Counts of events
     ss.FloatArr('n_births', default=0),         # Number of live births
     ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
-    ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
     ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
