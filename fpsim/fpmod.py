@@ -71,6 +71,101 @@ class FPmod(ss.Pregnancy):
         high = int(self.pars.slot_scale*sim.pars.n_agents)
         high = np.maximum(high, self.pars.min_slots) # Make sure there are at least min_slots slots to avoid artifacts related to small populations
         self.choose_slots_twins = ss.randint(low=low, high=high, sim=sim, module=self)
+
+    def _get_uids(self, upper_age=None, female_only=True):
+        people = self.sim.people
+        if upper_age is None: upper_age = 1000
+        within_age = people.age <= upper_age
+        if female_only:
+            f_uids = (within_age & people.female).uids
+            return f_uids
+        else:
+            uids = within_age.uids
+            return uids
+
+    def init_intent_states(self, uids):
+        """
+        Initialize intent_to_use and fertility_intent states for women aged 15-49
+        
+        Arguments:
+            uids: array of user IDs to initialize
+        """
+        ppl = self.sim.people
+        
+        # Filter eligible women (15-49, alive, female)
+        eligible_mask = ((ppl.age >= fpd.min_age) & 
+                        (ppl.age < fpd.max_age_preg) & 
+                        ppl.female & 
+                        ppl.alive)
+        eligible_uids = uids[eligible_mask[uids]]
+        
+        if len(eligible_uids) == 0:
+            return
+        
+        # Load data if available from contraception connector
+        contra_connector = self.sim.connectors.contraception
+        intent_pars = contra_connector.pars.get('intent_pars', None)
+
+        if intent_pars:
+            fertility_data = intent_pars.get('fertility_intent', {})
+            contraception_data = intent_pars.get('contra_intent', {})
+        
+        # If no data available, use defaults
+        if not intent_pars or not fertility_data or not contraception_data:
+            # Set default values
+            self.fertility_intent[eligible_uids] = False
+            self.intent_to_use[eligible_uids] = False
+            return
+        
+        # Transform ages to integers for indexing
+        from . import utils as fpu
+        ages = fpu.digitize_ages_1yr(ppl.age[eligible_uids])
+        
+        # Initialize fertility_intent
+        for i, uid in enumerate(eligible_uids):
+            age = int(ages[i])
+            if age in fertility_data:
+                # Sample from the distribution
+                choices = list(fertility_data[age].keys())
+                probs = list(fertility_data[age].values())
+                choice = np.random.choice(choices, p=probs)
+                self.fertility_intent[uid] = (choice == 'yes')
+            else:
+                # Default if age not in data
+                self.fertility_intent[uid] = False
+        
+        # Initialize intent_to_use
+        for i, uid in enumerate(eligible_uids):
+            age = int(ages[i])
+            if age in contraception_data:
+                # Sample from the distribution  
+                choices = list(contraception_data[age].keys())
+                probs = list(contraception_data[age].values())
+                choice = np.random.choice(choices, p=probs)
+                self.intent_to_use[uid] = (choice == '1')
+            else:
+                # Default if age not in data
+                self.intent_to_use[uid] = False
+
+    def set_states(self, uids=None, upper_age=None):
+        ppl = self.sim.people
+        if uids is None: uids = self._get_uids(upper_age=upper_age)
+
+        # Fertility
+        self.fertile[uids] = self._p_fertile.rvs(uids)
+
+        # Sexual activity
+        # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
+        self.fated_debut[uids] = self._fated_debut.rvs(uids)
+        fecund = ppl.female & (ppl.age < self.pars['age_limit_fecundity'])
+        self.check_sexually_active(uids[fecund[uids]])
+        self.update_time_to_choose(uids)
+
+        # Fecundity variation
+        self.personal_fecundity[uids] = self.pars.fecundity.rvs(uids)
+        
+        # Intent states
+        self.init_intent_states(uids)
         return
 
     @property
@@ -245,6 +340,16 @@ class FPmod(ss.Pregnancy):
         self.fated_debut[uids] = self._fated_debut.rvs(uids)
         self.check_sexually_active(self.fecund.uids)  # Check for all women of childbearing age
         self.update_time_to_choose(uids)
+
+        # TODO get this working 
+        # # Update intent to use on birthday for any non-preg or >1m pp
+        # self.sim.connectors.contraception.update_intent_to_use(nonpreg)
+
+        # # Update methods for those who are eligible
+        # ready = nonpreg[self.ti_contra[nonpreg] <= self.ti]
+        # if len(ready):
+        #     self.sim.connectors.contraception.update_contra(ready)
+        #     self.results['switchers'][self.ti] = len(ready)  # Track how many people switch methods (incl on/off)
 
         # Update methods for those who are eligible
         method_updaters = ((self.ti_contra <= self.ti) & self.fecund & ~self.pregnant).uids
@@ -581,7 +686,10 @@ class FPmod(ss.Pregnancy):
         max_age = self.pars.max_age
         bool_list_uids = ppl.female & (ppl.age >= min_age) * (ppl.age <= max_age)
         filtered_methods = self.method[bool_list_uids]
-        m_counts, _ = np.histogram(filtered_methods, bins=self.sim.connectors.contraception.n_options)
+        # Use explicit bin edges to ensure each method index gets its own bin
+        # bins=n creates n evenly-spaced bins from min to max, which doesn't align with method indices
+        n_options = self.sim.connectors.contraception.n_options
+        m_counts, _ = np.histogram(filtered_methods, bins=np.arange(n_options + 1))
         self.method_mix[:, self.ti] = m_counts / np.sum(m_counts) if np.sum(m_counts) > 0 else 0
         return
 

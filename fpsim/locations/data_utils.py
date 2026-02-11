@@ -99,13 +99,23 @@ class DataLoader:
     def load_contra_data(self, contra_mod='mid', return_data=False):
         """ Load data used within the Contraception module """
         contra_data = sc.objdict()
-        contra_data.contra_use_pars = self.process_contra_use(contra_mod)
-        mc, init_dist = self.load_method_switching()
+
+        # Load methods first
+        methods_df, methods_dict = self.load_methods()
+        contra_data.methods_df = methods_df
+
+        # Load switching data with validation against methods
+        mc, method_column_order = self.load_method_switching(methods_df=methods_df)
         contra_data.method_choice_pars = mc
-        contra_data.init_dist = init_dist
+        contra_data.method_column_order = method_column_order
+
+        # Load other data
+        contra_data.contra_use_pars = self.process_contra_use(contra_mod)
         contra_data.dur_use_df = self.load_dur_use()
+
         if contra_mod == 'mid':
             contra_data.age_spline = self.age_spline('25_40')
+        contra_data.intent_pars = self.process_contra_intent()
         if return_data:
             return contra_data
         else:
@@ -271,11 +281,11 @@ class DataLoader:
             raise ValueError(error_msg)
 
         mortality = {
-            'ages': mortality_data['age'].to_numpy(),
-            'm': mortality_data['male'].to_numpy(),
-            'f': mortality_data['female'].to_numpy(),
-            'year': mortality_trend['year'].to_numpy(),
-            'probs': mortality_trend['crude_death_rate'].to_numpy(),
+            'ages': mortality_data['age'].to_numpy(copy=True),
+            'm': mortality_data['male'].to_numpy(copy=True),
+            'f': mortality_data['female'].to_numpy(copy=True),
+            'year': mortality_trend['year'].to_numpy(copy=True),
+            'probs': mortality_trend['crude_death_rate'].to_numpy(copy=True),
         }
 
         trend_ind = np.where(mortality['year'] == data_year)
@@ -588,49 +598,111 @@ class DataLoader:
 
         return contra_use_pars
 
-    def load_method_switching(self, methods=None):
-        """ Choice of method is age and previous method """
+    def load_methods(self, methods_file='methods.csv'):
+        """
+        Load method definitions from CSV.
+        This is the authoritative source for method definitions.
 
-        df = self.read_data('method_mix_matrix_switch.csv', keep_default_na=False, na_values=['NaN'])
+        Returns:
+            methods_df (pd.DataFrame): DataFrame with method definitions
+            methods_dict (dict): Dictionary mapping csv_name -> method info
+        """
+        # Try location-specific methods file first, fall back to shared_data
+        try:
+            methods_df = self.read_data(methods_file)
+        except FileNotFoundError:
+            # Fall back to shared_data
+            methods_df = pd.read_csv(os.path.join(sd_dir, methods_file), keep_default_na=False, na_values=['NaN'])
 
-        # Get default methods - TODO, think of something better
-        if methods is None:
-            methods = fp.make_methods()
+        # Create lookup dict by csv_name for validation
+        methods_dict = {}
+        for idx, row in methods_df.iterrows():
+            methods_dict[row['csv_name']] = {
+                'name': row['name'],
+                'label': row['label'],
+                'idx': idx,  # Use DataFrame index as method index
+                'efficacy': row['efficacy'],
+                'modern': row['modern'],
+            }
 
-        csv_map = {method.csv_name: method.name for method in methods.values()}
-        idx_map = {method.csv_name: method.idx for method in methods.values()}
-        idx_df = {}
-        for col in df.columns:
-            if col in csv_map.keys():
-                idx_df[col] = idx_map[col]
+        return methods_df, methods_dict
 
-        mc = dict()  # This one is a dict because it will be keyed with numbers
-        init_dist = sc.objdict()  # Initial distribution of method choice
+    def load_method_switching(self, df=None, methods_df=None):
+        """
+        Load method switching matrix.
+        Now validates against methods_df to ensure consistency.
 
-        # Get end index
-        ei = 4+len(methods)-1
+        Args:
+            df: Optional switching data DataFrame
+            methods_df: Optional methods definition DataFrame
+
+        Returns:
+            mc: Method choice parameters
+            method_column_order: List of method csv_names in column order
+        """
+
+        if df is None:
+            df = self.read_data('method_mix_matrix_switch.csv', keep_default_na=False, na_values=['NaN'])
+
+        if methods_df is None:
+            methods_df, _ = self.load_methods()
+
+        # Extract method columns (everything after 'age_grp')
+        standard_cols = ['postpartum', 'From', 'n', 'age_grp', 'group']
+        method_columns = [col for col in df.columns if col not in standard_cols]
+
+        # Validate that all method columns exist in methods_df
+        methods_csv_names = set(methods_df['csv_name'].values)
+        missing_methods = set(method_columns) - methods_csv_names
+        if missing_methods:
+            errormsg = (f'Methods in switching data not found in methods.csv: {missing_methods}\n'
+                       f'Available methods: {methods_csv_names}')
+            raise ValueError(errormsg)
+
+        extra_methods = methods_csv_names - set(method_columns) - {'None'}  # 'None' is not in switching
+        if extra_methods:
+            print(f"Warning: Methods defined in methods.csv but not in switching data: {extra_methods}")
+
+        # Create index mapping: csv_name -> idx
+        csv_to_idx = {row['csv_name']: idx for idx, row in methods_df.iterrows() if row['name'] != 'none'}
+
+        # Build method_idx array in the order methods appear in CSV columns
+        method_idx_array = np.array([csv_to_idx[col] for col in method_columns])
+
+        mc = dict()
+
+        # Get start and end index for slicing
+        si = len(standard_cols) - 1
+        ei = len(standard_cols) + len(method_columns) - 1
 
         for pp in df.postpartum.unique():
             mc[pp] = sc.objdict()
-            mc[pp].method_idx = np.array(list(idx_df.values()))
+            mc[pp].method_idx = method_idx_array.copy()
+
             for akey in df.age_grp.unique():
                 mc[pp][akey] = sc.objdict()
                 thisdf = df.loc[(df.age_grp == akey) & (df.postpartum == pp)]
+
                 if pp == 1:  # Different logic for immediately postpartum
-                    mc[pp][akey] = thisdf.values[0][4:ei].astype(float)  # If this is going to be standard practice, should make it more robust
+                    mc[pp][akey] = thisdf.values[0][si:ei].astype(float)
                 else:
                     from_methods = thisdf.From.unique()
                     for from_method in from_methods:
-                        from_mname = csv_map[from_method]
+                        # Map csv_name to method name
+                        if from_method == 'None':
+                            from_mname = 'none'
+                        else:
+                            # Find the method with this csv_name
+                            matching = methods_df[methods_df['csv_name'] == from_method]
+                            if len(matching) == 0:
+                                errormsg = f'Method {from_method} in switching data not found in methods.csv'
+                                raise ValueError(errormsg)
+                            from_mname = matching.iloc[0]['name']
+
                         row = thisdf.loc[thisdf.From == from_method]
-                        mc[pp][akey][from_mname] = row.values[0][4:ei].astype(float)
+                        mc[pp][akey][from_mname] = row.values[0][si:ei].astype(float)
 
-                # Set initial distributions by age
-                if pp == 0:
-                    init_dist[akey] = thisdf.loc[thisdf.From == 'None'].values[0][4:ei].astype(float)
-                    init_dist.method_idx = np.array(list(idx_df.values()))
-
-        return mc, init_dist
+        return mc, method_columns
 
     def load_dur_use(self):
         """ Process duration of use parameters"""
@@ -642,6 +714,64 @@ class DataLoader:
         d = pd.read_csv(os.path.join(sd_dir, f'splines_{which}.csv'))
         d.index = d.age  # Set the age as the index
         return d
+
+    def fertility_intent(self):
+        """Load fertility intent distribution from CSV data"""
+        try:
+            df = pd.read_csv(os.path.join(self.data_path, 'fertility_intent.csv'))
+            data = {}
+            for row in df.itertuples(index=False):
+                intent = row.fertility_intent
+                age = row.age
+                freq = row.freq
+                data.setdefault(age, {})[intent] = freq
+            return data
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def contraception_intent(self):
+        """Load contraception intent distribution from CSV data"""
+        try:
+            df = pd.read_csv(os.path.join(self.data_path, 'contra_intent.csv'))
+            data = {}
+            for row in df.itertuples(index=False):
+                intent = row.intent_contra
+                age = row.age
+                freq = row.freq
+                data.setdefault(age, {})[intent] = freq
+            return data
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def contra_intent_coefs(self):
+        """Load regression coefficients to update intent to use contraception"""
+        try:
+            raw_pars = pd.read_csv(os.path.join(self.data_path, 'contra_intent_coef.csv'))
+            pars = sc.objdict()
+            metrics = raw_pars.lhs.unique()
+            for metric in metrics:
+                pars[metric] = sc.objdict()
+                thisdf = raw_pars.loc[raw_pars.lhs == metric]
+                for var_dict in thisdf.to_dict('records'):
+                    var_name = var_dict['rhs'].replace('_0', '').replace('(', '').replace(')', '').lower()
+                    pars[metric][var_name] = var_dict['Estimate']
+            return pars
+        except FileNotFoundError:
+            # Return empty dict if file doesn't exist
+            return {}
+
+    def process_contra_intent(self):
+        """Load all the intent data from CSV"""
+        contra_intent_pars = dict()
+        contra_intent_pars['contra_intent_coefs'] = self.contra_intent_coefs()
+        contra_intent_pars['contra_intent'] = self.contraception_intent()
+        contra_intent_pars['fertility_intent'] = self.fertility_intent()
+
+        return contra_intent_pars
+
+
 
 
 

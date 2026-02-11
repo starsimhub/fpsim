@@ -76,6 +76,7 @@ def get_calib_pars(location, verbose=1):
         return None
     return calib_pars
 
+
 def get_test_defaults():
     """ Return the test defaults """
     defaults = {
@@ -95,6 +96,12 @@ fpmod_states = [
     ss.IntArr('method', default=0),  # Which method to use. 0 used for those on no method
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
+<<<<<<< HEAD
+=======
+    ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
+    ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
+    ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
+>>>>>>> rc3.5
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),

@@ -31,9 +31,8 @@ class Scenario(sc.prettyobj, sc.dictobj):
     '''
     Store the specification for a single scenario (which may consist of multiple interventions).
 
-    This function is intended to be as flexible as possible; as a result, it may
-    be somewhat confusing. There are five different ways to call it -- method efficacy,
-    method probability, method initiation/discontinuation, parameter, and custom intervention.
+    Note, this class may be deprecated. See the scripts in the examples folder and the tests in test_interventions
+    for examples of how to define simulations with different parameters or interventions and run them in parallel.
 
     Args (shared):
         spec   (dict): a pre-made specification of a scenario; see keyword explanations below (optional)
@@ -41,39 +40,10 @@ class Scenario(sc.prettyobj, sc.dictobj):
         label  (str): the sim label to use for this scenario
         pars   (dict): optionally supply additional sim parameters to use with this scenario (that take effect at the beginning of the sim, not at the point of intervention)
         year   (float): the year at which to activate efficacy and probability scenarios
-        matrix (str): which set of probabilities to modify for probability scenarios (e.g. annual or postpartum)
-        ages   (str/list): the age groups to modify the probabilities for
-
-    Args (efficacy):
-        year (float): as above
         eff  (dict): a dictionary of method names and new efficacy values
-
-    Args (probablity):
-        year   (float): as above
-        matrix (str): as above
-        ages   (str): as above
-        source (str): the method to switch from
-        dest   (str): the method to switch to
-        factor (float): if supplied, multiply the [source, dest] probability by this amount
-        value  (float): if supplied, instead of factor, replace the [source, dest] probability by this value
-        copy_from (str): if supplied, copy probabilities from a different method
-
-    Args (initiation/discontinuation):
-        year   (float): as above
-        matrix (str): as above
-        ages   (str): as above
-        method (str): the method for initiation/discontinuation
-        init_factor    (float): as with "factor" above, for initiation (None → method)
-        discont_factor (float): as with "factor" above, for discontinuation (method → None)
-        init_value     (float): as with "value" above, for initiation (None → method)
-        discont_value  (float): as with "value" above, for discontinuation (method → None)
-
-    Args (parameter):
         par (str): the parameter to modify
         par_years (float/list): the year(s) at which to apply the modifications
         par_vals (float/list): the value(s) of the parameter for each year
-
-    Args (custom):
         interventions (Intervention/list): any custom intervention(s) to be applied to the scenario
 
     Congratulations on making it this far.
@@ -83,29 +53,19 @@ class Scenario(sc.prettyobj, sc.dictobj):
         # Basic efficacy scenario
         s1 = fp.make_scen(eff={'Injectables':0.99}, year=2020)
 
-        # Double rate of injectables initiation -- alternate approach
-        s3 = fp.make_scen(method='Injectables', init_factor=2)
-
         # Parameter scenario: halve exposure
-        s5 = fp.make_scen(par='exposure_factor', years=2010, vals=0.5)
+        s2 = fp.make_scen(par='exposure_factor', par_years=2010, par_vals=0.5)
 
         # Custom scenario
         def update_sim(sim): sim.updated = True
-        s6 = fp.make_scen(interventions=update_sim)
+        s3 = fp.make_scen(interventions=update_sim)
 
-        # Combining multiple scenarios: change probabilities and exposure factor
-        s7 = fp.make_scen(
-            dict(method='Injectables', init_value=0.1, discont_value=0.02, create=True),
-            dict(par='exposure_factor', years=2010, vals=0.5)
-        )
-
-        # Scenarios can be combined
-        s8 = s1 + s2
+        # Scenarios can be combined (although this is not necessarily recommended)
+        s4 = s1 + s2
     '''
     def __init__(self, spec=None, label=None, pars=None, year=None, # Basic settings
-                 eff=None, dur_use=None, p_use=None, method_mix=None, # Option 1
-                 par=None, par_years=None, par_vals=None, # Option 4
-                 interventions=None, # Option 5
+                 eff=None, dur_use=None, p_use=None, par=None, par_years=None, par_vals=None,
+                 interventions=None,
                  ):
 
         # Handle input specification
@@ -120,8 +80,8 @@ class Scenario(sc.prettyobj, sc.dictobj):
         par_spec   = None
         intv_specs = None
 
-        # It's a scenario related to changing the contraceptive mix parameters
-        for scentype, input in {'eff': eff, 'dur_use': dur_use, 'p_use': p_use, 'method_mix': method_mix}.items():
+        # It's a scenario related to changing the contraceptive method parameters
+        for scentype, input in {'eff': eff, 'dur_use': dur_use, 'p_use': p_use}.items():
             if input is not None:
                 contraceptive_spec = sc.objdict({
                     'which': scentype,
@@ -313,7 +273,7 @@ class Scenarios(sc.prettyobj):
                     which = spec.pop('which')
 
                 # Handle interventions
-                if which in ['eff', 'dur_use', 'p_use', 'method_mix']:
+                if which in ['eff', 'dur_use', 'p_use']:
                     pardict  = spec.pop(which)
                     year = spec.pop('year')
                     interventions += fpi.update_methods(**{which: pardict, 'year': year})

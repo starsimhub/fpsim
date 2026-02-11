@@ -188,8 +188,8 @@ if get_cpr:
     df_mcpr = df.loc[(df['category'] == 'All women') & (df['variantLabel'] == 'Median') & (df['indicatorId'] == mcpr_ind)]
     df_cpr = df_cpr.filter(['timeLabel', 'value'])
     df_mcpr = df_mcpr.filter(['timeLabel', 'value'])
-    df_cpr.rename(columns={'timeLabel': 'year', 'value': 'cpr'}, inplace=True)
-    df_mcpr.rename(columns={'timeLabel': 'year', 'value': 'mcpr'}, inplace=True)
+    df_cpr = df_cpr.rename(columns={'timeLabel': 'year', 'value': 'cpr'})
+    df_mcpr = df_mcpr.rename(columns={'timeLabel': 'year', 'value': 'mcpr'})
     df2 = pd.merge(df_cpr, df_mcpr, on='year')
 
     # Save file
@@ -208,7 +208,7 @@ if get_asfr:
 
     # Reformat data
     df = df.loc[(df['variantLabel'] == 'Median')]
-    df.rename(columns={'timeLabel': 'year'}, inplace=True)
+    df = df.rename(columns={'timeLabel': 'year'})
     df = df.pivot(index='year', columns='ageLabel', values='value')
     df = df.round(decimals=3).drop('50-54', axis=1)
 
@@ -228,7 +228,7 @@ if get_mortality_trend:
 
     # Reformat data
     df = df.filter(['timeLabel', 'value'])
-    df.rename(columns={'timeLabel': 'year', 'value': 'crude_death_rate'}, inplace=True)
+    df = df.rename(columns={'timeLabel': 'year', 'value': 'crude_death_rate'})
 
     # Save file
     logger.info(f'Writing {country_dir}/mortality_trend.csv')
@@ -247,13 +247,13 @@ if get_mortality_prob:
     df = pd.read_csv(f'{filesdir}/{female_mort_stem}.csv')
     df_female = df.loc[(df['Location']==country) & (df['Time']==endYear)]
     df_female = df_female.filter(["AgeGrpStart", "qx"])
-    df_female.rename(columns={'AgeGrpStart': 'age', 'qx': 'female'}, inplace=True)
+    df_female = df_female.rename(columns={'AgeGrpStart': 'age', 'qx': 'female'})
 
     # Load male data from scraped data
     df = pd.read_csv(f'{filesdir}/{male_mort_stem}.csv')
     df_male = df.loc[(df['Location']==country) & (df['Time']==endYear)]
     df_male = df_male.filter(["AgeGrpStart", "qx"])
-    df_male.rename(columns={'AgeGrpStart': 'age', 'qx': 'male'}, inplace=True)
+    df_male = df_male.rename(columns={'AgeGrpStart': 'age', 'qx': 'male'})
 
     # Combine two dataframes
     df_combined = pd.merge(df_female, df_male, on="age")
@@ -273,7 +273,7 @@ if get_pop:
     df = pd.read_csv(f'{filesdir}/{pop_stem}.csv')
     filtered_df = df.loc[(df['Location']==country) & (df['Time']==endYear)]
     filtered_df = filtered_df.filter(["AgeGrpStart", "PopMale", "PopFemale"])
-    filtered_df.rename(columns={'AgeGrpStart': 'age', 'PopMale': 'male', 'PopFemale': 'female'}, inplace=True)
+    filtered_df = filtered_df.rename(columns={'AgeGrpStart': 'age', 'PopMale': 'male', 'PopFemale': 'female'})
     filtered_df[['male', 'female']] = (filtered_df[['male', 'female']] * 1000).astype(int)
 
     # Save file
