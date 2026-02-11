@@ -17,7 +17,7 @@ theme:
     text: Raleway
     code: Roboto Mono
   logo: assets/starsim-logo.png
-  favicon: images/favicon.ico
+  favicon: assets/favicon.ico
   features:
     - navigation.footer # include a footer with links to privacy, terms, etc.
     - content.code.copy # enable copy buttons for code blocks
