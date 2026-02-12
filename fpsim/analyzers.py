@@ -162,7 +162,7 @@ class education_recorder(ss.Analyzer):
             save result at snapshot[str(timestep)]
             """
             sim = self.sim
-            females = sim.people.female.uids
+            females = (sim.people.female & (sim.people.age>0)).uids
             self.snapshots[str(sim.ti)] = {}
             for key in self.edu_keys:
                 self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.edu[key][females])  # Take snapshot!
