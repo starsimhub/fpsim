@@ -44,26 +44,24 @@ def make_sim_pars(**kwargs):
     return SimPars(**kwargs)
 
 
-class FPPars(ss.Pars):
+class FPPars(ss.PregnancyPars):
     def __init__(self, location=None, **kwargs):
         super().__init__()
 
         # Age limits (in years)
         self.method_age = 15
         self.age_limit_fecundity = 50
-        self.max_age = 99
+        self.min_age = 10  # Minimum age for pregnancy
+        self.max_age = 50  # Maximum age for pregnancy
+        self.max_sim_age = 99  # Maximum age for agents in the sim
 
         # Durations (in months)
-        self.end_first_tri = 3      # Months
-        self.dur_pregnancy = ss.uniform(low=ss.months(9), high=ss.months(9))
-        self.dur_breastfeeding = ss.normal(loc=ss.months(24), scale=ss.months(6))
-        self.dur_postpartum = None      # Updated by data, do not modify
         self.max_lam_dur = 5            # Duration of lactational amenorrhea (months)
         self.short_int = ss.months(24)  # Duration of a short birth interval between live births (months)
+        self.dur_postpartum = ss.months(6)  # Duration of postpartum period, used to reduce sexual activity
 
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
-        self.primary_infertility = 0.05
 
         # Parameters typically tuned during calibration
         self.maternal_mortality_factor = 1

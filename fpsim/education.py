@@ -127,7 +127,7 @@ class Education(ss.Connector):
             return
         else:
             ppl = self.sim.people
-            f_uids = self.sim.people.female.uids
+            f_uids = (self.sim.people.female & (self.sim.people.age > 0)).uids
             if isinstance(self.attainment_data, pd.DataFrame):
                 edu = self.attainment_data['edu']
                 f_ages = np.floor(ppl.age[f_uids]).astype(int)
@@ -207,9 +207,9 @@ class Education(ss.Connector):
         Interrupt education due to pregnancy. This method hinders education progression if a
         woman is pregnant and towards the end of the first trimester
         """
-        ppl = self.sim.people
+        fp = self.sim.demographics.fp
         # Hinder education progression if a woman is pregnant and towards the end of the first trimester
-        pregnant_students = self.in_school & ppl.fp.pregnant & (ppl.fp.gestation == self.sim.pars.fp['end_first_tri'])
+        pregnant_students = fp.end_tri1_uids[self.in_school[fp.end_tri1_uids]]
         self.interrupted[pregnant_students] = True
         return
 
@@ -255,14 +255,14 @@ class Education(ss.Connector):
         # If education was interrupted due to pregnancy, resume after 9 months pospartum ()
         # TODO: check if there's any evidence supporting this assumption
         """
-        ppl = self.sim.people
+        fp = self.sim.demographics.fp
         # Basic mechanism to resume education post-pregnancy:
         # If education was interrupted due to pregnancy, resume after 9 months pospartum
-        postpartum_students = (ppl.fp.postpartum &
+        postpartum_students = (fp.postpartum &
                                 self.interrupted &
                                 ~self.completed &
                                 ~self.dropped &
-                                ((self.ti - ppl.fp.ti_delivery) > 9)  # 9 months postpartum
+                                ((self.ti - fp.ti_delivery) > 9)  # 9 months postpartum
                                 )
         self.interrupted[postpartum_students] = False
         return

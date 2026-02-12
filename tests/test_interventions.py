@@ -146,7 +146,7 @@ def test_copy_method():
     assert (new_method.dur_use is None) == (src_method.dur_use is None)
 
     # The FP module's method_mix array must be resized to match the new number of options
-    assert sim.connectors.fp.method_mix.shape[0] == cm.n_options
+    assert sim.demographics.fp.method_mix.shape[0] == cm.n_options
 
     return sim
 
@@ -526,7 +526,6 @@ def test_method_switching_multiple_sources():
 
     add_target = fp.add_method(
         year=2005,
-        method=None,
         method_pars={
             'name': 'target',
             'label': 'Target Method',
@@ -535,7 +534,6 @@ def test_method_switching_multiple_sources():
             'dur_use': ss.lognorm_ex(mean=2, std=1)
         },
         copy_from='pill',
-        split_shares=0,
         verbose=False,
         name='add_target'
     )

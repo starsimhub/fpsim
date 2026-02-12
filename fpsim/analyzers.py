@@ -162,7 +162,7 @@ class education_recorder(ss.Analyzer):
             save result at snapshot[str(timestep)]
             """
             sim = self.sim
-            females = sim.people.female.uids
+            females = (sim.people.female & (sim.people.age>0)).uids
             self.snapshots[str(sim.ti)] = {}
             for key in self.edu_keys:
                 self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.edu[key][females])  # Take snapshot!
@@ -738,6 +738,10 @@ class state_tracker(ss.Analyzer):
         """
         sim = self.sim
         super().init_post()
+        if self.min_age is None:
+            self.min_age = self.sim.pars.fp.min_age
+        if self.max_age is None:
+            self.max_age = self.sim.pars.fp.max_age
         self.data_num = np.full((sim.t.npts,), np.nan)
         self.data_perc = np.full((sim.t.npts,), np.nan)
         self.data_n_female = np.full((sim.t.npts,), np.nan)
@@ -795,6 +799,55 @@ class state_tracker(ss.Analyzer):
             ax3.set_ylabel(f'Number of women alive, aged {self.min_age}-{self.max_age}', color=colors[2])
         fig.tight_layout()
         return fig
+
+
+class track_parity(ss.Analyzer):
+    """
+    Analyzer for binning parity
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.parity_bins = np.array([1, 3, 5, 100])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.parity_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of parity """
+        fpmod = self.sim.demographics.fp
+        self.results[self.ti, :], _ = np.histogram(fpmod.parity, bins=self.parity_bins)
+        return
+
+
+class track_postpartum(ss.Analyzer):
+    """
+    Analyzer for tracking postpartum status, binned by months
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.pp_bins = np.array([0, 6, 12, 24, 1000])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.pp_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of postpartum status """
+        fpmod = self.sim.demographics.fp
+        timesteps_since_birth = fpmod.ti - fpmod.ti_delivery
+        self.results[self.ti, :], _ = np.histogram(timesteps_since_birth[fpmod.postpartum], bins=self.pp_bins)
+        return
 
 
 class track_as(ss.Analyzer):
