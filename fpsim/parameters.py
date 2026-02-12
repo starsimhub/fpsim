@@ -58,6 +58,7 @@ class FPPars(ss.PregnancyPars):
         # Durations (in months)
         self.max_lam_dur = 5            # Duration of lactational amenorrhea (months)
         self.short_int = ss.months(24)  # Duration of a short birth interval between live births (months)
+        self.dur_postpartum = ss.months(6)  # Duration of postpartum period, used to reduce sexual activity
 
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/

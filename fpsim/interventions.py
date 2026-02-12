@@ -226,7 +226,7 @@ class add_method(ss.Intervention):
         # Cache the method index for later use (e.g., reporting and activation).
         self._method_idx = cm.methods[self.method.name].idx
 
-        fp_mod = sim.connectors.fp
+        fp_mod = sim.demographics.fp
         old_mix = fp_mod.method_mix
         # The FP module tracks method mix as an array of shape (n_methods, n_timepoints).
         # Adding a method increases the number of options, so we need to resize this array
@@ -816,7 +816,6 @@ class method_switching(ss.Intervention):
         age_groups (list): Age group names to apply switching. If None, applies to all age groups.
             Use None for all, or list like ['<18', '18-20', '20-25', '25-35', '>35']
         postpartum (int/list): Postpartum states to modify (0, 1, 6). If None, modifies all states.
-        annual (bool): If True, switch_prob is annual and converted to per-timestep
         verbose (bool): Print detailed information
 
     **Example**::
@@ -827,7 +826,6 @@ class method_switching(ss.Intervention):
             from_methods='inj',
             to_method='dmpasc',
             switch_prob=0.10,
-            annual=False
         )
 
         # Different rates for different methods
@@ -836,7 +834,6 @@ class method_switching(ss.Intervention):
             from_methods=['dmpasc3', 'withdrawal', 'other_trad'],
             to_method='dmpasc6',
             switch_prob={'dmpasc3': 0.26, 'withdrawal': 0.20, 'other_trad': 0.20},
-            annual=False
         )
     """
 
@@ -850,7 +847,6 @@ class method_switching(ss.Intervention):
         self.age_groups = age_groups
         self.postpartum = postpartum if postpartum is not None else [0, 1, 6]
         self.postpartum = sc.promotetolist(self.postpartum)
-        self.annual = annual
         self.verbose = verbose
         self.applied = False
         return
@@ -915,12 +911,6 @@ class method_switching(ss.Intervention):
             self.switch_prob_dict = {name: self.switch_prob for name in self.from_method_names}
         else:
             self.switch_prob_dict = self.switch_prob
-
-        # Convert annual to per-timestep if needed
-        if self.annual:
-            for key in self.switch_prob_dict:
-                annual_prob = self.switch_prob_dict[key]
-                self.switch_prob_dict[key] = ((1 + annual_prob) ** float(sim.dt)) - 1
 
         # Determine age groups to modify
         if self.age_groups is None:

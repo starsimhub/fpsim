@@ -236,8 +236,9 @@ def test_education_preg():
         sim.people.female[:] = True
         uids = sim.people.female.uids
         if pregnant:
+            embryo_counts = np.ones(len(uids))
             sim.demographics.fp.make_pregnancies(uids)
-            sim.demographics.fp.make_embryos(uids)
+            sim.demographics.fp.make_embryos(uids, embryo_counts)
         return sim
 
     sim_base = make_sim()

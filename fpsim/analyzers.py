@@ -162,7 +162,7 @@ class education_recorder(ss.Analyzer):
             save result at snapshot[str(timestep)]
             """
             sim = self.sim
-            females = sim.people.female.uids
+            females = (sim.people.female & (sim.people.age>0)).uids
             self.snapshots[str(sim.ti)] = {}
             for key in self.edu_keys:
                 self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.edu[key][females])  # Take snapshot!
@@ -711,11 +711,7 @@ class state_tracker(ss.Analyzer):
     living women who live in rural settings)
     '''
 
-<<<<<<< HEAD
-    def __init__(self, state_name=None, min_age=None, max_age=None):
-=======
     def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
->>>>>>> rc3.5
         """
         Initializes bins and data variables
 

@@ -12,6 +12,9 @@ import fpsim.arrays as fpa
 #%% Global defaults
 useSI          = True
 eps            = 1e-9 # To avoid divide-by-zero
+min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
+max_age        = 99   # Maximum age (inclusive)
+max_age_preg   = 50   # Maximum age for pregnancy
 spline_max_age  = 99   # Maximum age of agents (inclusive)
 spline_max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
@@ -88,24 +91,21 @@ def get_test_defaults():
     return defaults
 
 
+
 # Defaults states and values of any new(born) agent unless initialized with data or other strategy
 # or updated during the course of a simulation.
 fpmod_states = [
+
     # Contraception
     ss.BoolState('on_contra', default=False),  # whether she's on contraception
     ss.IntArr('method', default=0),  # Which method to use. 0 used for those on no method
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
-<<<<<<< HEAD
-=======
     ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
     ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
-    ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
->>>>>>> rc3.5
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
-    ss.BoolState('carrying_multiple'),
     ss.BoolState('sexually_active'),
     ss.BoolState('sexual_debut'),
 
@@ -117,7 +117,6 @@ fpmod_states = [
     # Counts of events
     ss.FloatArr('n_births', default=0),         # Number of live births
     ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
-    ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
     ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
@@ -222,7 +221,6 @@ people_counts = sc.autolist(
 )
 
 sim_results = sc.autolist(
-    'n_urban',
     'n_wq1',
     'n_wq2',
     'n_wq3',

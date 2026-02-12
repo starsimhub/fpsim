@@ -127,7 +127,7 @@ class Education(ss.Connector):
             return
         else:
             ppl = self.sim.people
-            f_uids = self.sim.people.female.uids
+            f_uids = (self.sim.people.female & (self.sim.people.age > 0)).uids
             if isinstance(self.attainment_data, pd.DataFrame):
                 edu = self.attainment_data['edu']
                 f_ages = np.floor(ppl.age[f_uids]).astype(int)
