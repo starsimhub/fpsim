@@ -6,7 +6,6 @@ Define defaults for use throughout FPsim
 import numpy as np
 import sciris as sc
 import starsim as ss
-import fpsim
 import fpsim.arrays as fpa
 
 
@@ -79,6 +78,7 @@ def get_calib_pars(location, verbose=1):
         return None
     return calib_pars
 
+
 def get_test_defaults():
     """ Return the test defaults """
     defaults = {
@@ -99,6 +99,9 @@ fpmod_states = [
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
     ss.FloatArr('barrier', default=0),
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
+    ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
+    ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
+    ss.IntArr('fertility_intent_cat', default=0),  # Categorical fertility intent: 0=cannot-get-pregnant, 1=no, 2=yes
     ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
     # Sexual and reproductive states, all False by default and set during simulation
@@ -161,8 +164,6 @@ fpmod_states = [
 
     ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
     ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
-    # ss.State('urban', default=True),  # Urban/rural
-    # ss.FloatArr('wealthquintile', default=3),  # Wealth quintile
 ]
 
 # Postpartum keys to months
@@ -252,7 +253,6 @@ people_counts = sc.autolist(
 )
 
 sim_results = sc.autolist(
-    'n_urban',
     'n_wq1',
     'n_wq2',
     'n_wq3',

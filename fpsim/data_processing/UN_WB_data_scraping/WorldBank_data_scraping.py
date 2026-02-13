@@ -121,7 +121,7 @@ if get_pop:
     # Process data to correct format
     df = df.filter(['date', 'value'])
     df = df.rename(columns={'date': 'year', 'value': 'population'})
-    df.dropna(subset=['population'], inplace=True)
+    df = df.dropna(subset=['population'])
     df = df.sort_values('year')
 
     # Write data to csv
@@ -139,7 +139,7 @@ if get_tfr:
     # Process data to correct format
     df = df.filter(['date', 'value'])
     df = df.rename(columns={'date': 'year', 'value': 'tfr'})
-    df.dropna(subset=['tfr'], inplace=True)
+    df = df.dropna(subset=['tfr'])
     df = df.sort_values('year')
 
     # Write data to csv
@@ -157,7 +157,7 @@ if get_maternal_mortality:
     # Process data to correct format
     df = df.filter(['date', 'value'])
     df = df.rename(columns={'date': 'year', 'value': 'probs'})
-    df.dropna(subset=['probs'], inplace=True)
+    df = df.dropna(subset=['probs'])
     df['probs'] = df['probs'].astype(int)
     df = df.sort_values('year')
 
@@ -176,7 +176,7 @@ if get_infant_mortality:
     # Process data to correct format
     df = df.filter(['date', 'value'])
     df = df.rename(columns={'date': 'year', 'value': 'probs'})
-    df.dropna(subset=['probs'], inplace=True)
+    df = df.dropna(subset=['probs'])
     df = df.sort_values('year')
 
     # Write data to csv
