@@ -163,8 +163,6 @@ fpmod_states = [
 
     ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
     ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
-    # ss.State('urban', default=True),  # Urban/rural
-    # ss.FloatArr('wealthquintile', default=3),  # Wealth quintile
 ]
 
 # Postpartum keys to months
@@ -254,7 +252,6 @@ people_counts = sc.autolist(
 )
 
 sim_results = sc.autolist(
-    'n_urban',
     'n_wq1',
     'n_wq2',
     'n_wq3',
