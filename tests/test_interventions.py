@@ -192,12 +192,10 @@ def test_add_method_split():
     new_name = 'impl_new'
     intv = fp.add_method(
         year=2001,
-        method=None,
         method_pars=dict(name=new_name),
         copy_from='impl',
         split_shares=split,
-        verbose=False,
-    )
+        )
 
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.init()
@@ -663,27 +661,27 @@ def test_dmpasc_scenario_integration():
 
 
 if __name__ == '__main__':
-    # s0 = test_intervention_fn()
-    # s1 = test_change_par()
-    # s3 = test_update_methods()
-    # s4, s5, s6 = test_change_people_state()
-    # s7 = test_copy_method()
-    # s8 = test_add_method_pars()
+    s0 = test_intervention_fn()
+    s1 = test_change_par()
+    s3 = test_update_methods()
+    s4, s5, s6 = test_change_people_state()
+    s7 = test_copy_method()
+    s8 = test_add_method_pars()
     s9 = test_add_method_split()
-    # test_add_method_negative_errors()
-    # s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
-    # s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
-    # s12 = test_add_method_year_boundaries(0)
-    # s13 = test_add_method_year_boundaries(2)
+    test_add_method_negative_errors()
+    s10 = test_add_method_split_shares_boundaries(0.0, 1.0, 0.0)
+    s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
+    s12 = test_add_method_year_boundaries(0)
+    s13 = test_add_method_year_boundaries(2)
 
-    # # New intervention tests
-    # s14 = test_age_restricted_initiation_basic()
-    # s15 = test_age_restricted_initiation_time_varying()
-    # test_age_restricted_initiation_errors()
-    # s16 = test_method_switching_basic()
-    # s17 = test_method_switching_multiple_sources()
-    # test_method_switching_errors()
-    # s18 = test_dmpasc_scenario_integration()
+    # New intervention tests
+    s14 = test_age_restricted_initiation_basic()
+    s15 = test_age_restricted_initiation_time_varying()
+    test_age_restricted_initiation_errors()
+    s16 = test_method_switching_basic()
+    s17 = test_method_switching_multiple_sources()
+    test_method_switching_errors()
+    s18 = test_dmpasc_scenario_integration()
 
     print('Done.')
 
