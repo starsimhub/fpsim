@@ -56,7 +56,7 @@ def test_mcpr(location='senegal', do_plot=False):
 
     covars = [
         Covar('edu.attainment', 0, 15, 'edu.mean_attainment'),
-        # Covar('urban', False, True, 'n_urban'),
+        Covar('urban', False, True, 'n_urban'),
         # Covar('parity', 2, 'parity2to3'),  # Unfortunately this will not work
         Covar('wealthquintile', 1, 5, 'n_wq5'),
         Covar('fp.ever_used_contra', False, True, 'fp.ever_used_contra'),
@@ -64,9 +64,7 @@ def test_mcpr(location='senegal', do_plot=False):
 
     # Create interventions and sims
     sims = sc.autolist()
-    def select_women(sim):
-        sim.people.female.uids
-        return
+    def select_women(sim): return sim.people.female.uids
 
     def make_zeros():
         zero_states = sc.autolist()

@@ -17,15 +17,13 @@ __all__ = ['People', 'PeoplePars', 'make_people_pars']
 # %% Define classes
 class PeoplePars(ss.Pars):
     """
-    Parameters for the people - includes demographic parameters such as age pyramid,
-    urban proportion, wealth quintile distribution, and partnership parameters.
+    Parameters for the deaths module.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.age_pyramid = None
         self.urban_prop = None
         self.wealth_quintile = None
-        self.age_partnership = None
         self.update(kwargs)
         return
 
@@ -49,7 +47,8 @@ class People(ss.People):
 
         # Person defaults
         self.person_defaults = [
-            ss.FloatArr('partnership_age', default=ss.choice(a=100)),  # If no data, set to high age so everyone is unpartnered by default
+            ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
+            ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
             ss.BoolState('urban', default=ss.bernoulli(p=0.5)),  # Urban/rural
             ss.FloatArr('wealthquintile', default=ss.choice(a=5)),  # Wealth quintile
         ]
@@ -68,13 +67,25 @@ class People(ss.People):
         self.female.default.set(p=f_frac)
         self.set_urban(pars)
         self.set_wealthquintile(pars)
-        self.set_partnership(pars)
 
         return
 
     def init_vals(self, uids=None):
         super().init_vals()
+
+        sim = self.sim
+        fp_pars = sim.pars.fp
+
+        if uids is None:
+            uids = self.alive.uids
+
+        # Partnership
+        if fp_pars['use_partnership']:
+            fpdmg.init_partnership_states(uids)
+
+        # Store keys
         self._keys = [s.name for s in self.states.values()]
+
         return
 
     @property
@@ -84,10 +95,6 @@ class People(ss.People):
     @property
     def parity(self):
         return self.sim.connectors.fp.parity  # TODO, fix
-
-    @property
-    def partnered(self):
-        return self.age >= self.partnership_age
 
     def set_urban(self, pars):
         """ Get initial distribution of urban """
@@ -104,15 +111,6 @@ class People(ss.People):
         wq_quintiles = wq['quintile']
         wq_probs = wq['percent']
         self.wealthquintile.default.set(p=wq_probs, a=wq_quintiles)
-        return
-
-    def set_partnership(self, pars):
-        if pars.get('age_partnership') is None:
-            return
-        pship = pars['age_partnership']
-        pship_age = pship['age']
-        pship_probs = pship['partnership_probs']
-        self.partnership_age.default.set(p=pship_probs, a=pship_age)
         return
 
     def update_age_bin_totals(self, uids):

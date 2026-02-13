@@ -186,5 +186,3 @@ if __name__ == '__main__':
     exp = test_senegal()
 
     print('Done.')
-
-

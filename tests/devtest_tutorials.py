@@ -5,7 +5,6 @@ Test running tutorials
 
 def run_t1():
     import fpsim as fp
-    location = 'kenya'
 
     sim = fp.Sim(location=location)
     sim.run()
@@ -158,7 +157,7 @@ def run_t5():
     new_method = fp.Method(name='new', efficacy=0.96,  modern=True,  dur_use=15, label='New method')
     my_methods += new_method
     # Note: if we do not define this method mix, the contraception module will use 1/(number of methods) for every method.
-    method_choice = fp.RandomChoice(methods=my_methods)
+    method_choice = fp.RandomChoice(methods=my_methods, pars={'method_mix': [0.25, 0.25, 0, 0, 0, 0, 0, 0, 0, 0.5]})
 
     pars = dict(
         n_agents   = 10_000,
@@ -278,7 +277,7 @@ if __name__ == '__main__':
     # run_t2()
     # run_t3()
     # run_t4()
-    run_t5()
-    # run_t6()
+    # run_t5()
+    run_t6()
 
     print('Done.')
