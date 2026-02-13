@@ -9,6 +9,35 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :depth: 1
 
 
+Version 3.6 (2026-02-XX)
+---------------------------
+Refactors pregnancy logic to inherit from Starsim's Pregnancy module and improves tracking of pregnancy outcomes and postpartum status.
+
+* **Pregnancy module refactor**
+  * FPmod now inherits from ``ss.Pregnancy`` instead of ``ss.Module``, enabling better integration with Starsim's pregnancy handling
+  * Reorganized pregnancy progression logic with explicit trimester support
+  * Improved tracking of pregnancy outcomes including births, stillbirths, miscarriages, and abortions
+
+* **Twins and multiple births**
+  * Implemented twins probability via ``twins_prob`` parameter using Starsim's ``embryos_per_pregnancy`` distribution
+  * Twins are now properly handled in pregnancy loss calculations
+
+* **Method failures and contraception**
+  * Added support for tracking contraceptive method failures
+  * Improved lactational amenorrhea (LAM) calculations
+
+* **Results and analyzers**
+  * Updated result initialization to use improved Starsim patterns with proper summarization
+
+* **Parameter changes**
+  * Renamed ``primary_infertility`` parameter to ``p_infertile`` for consistency with Starsim naming conventions
+
+* **Bug fixes**
+  * Fixed overflow issues in sigmoid function calculations
+  * Fixed ``education_recorder`` analyzer to correctly filter by age
+  * Improved handling of birth intervals and parity tracking
+
+
 Version 3.5 (2025-11-XX)
 ---------------------------
   TBC - placeholder for intervention wrappers
