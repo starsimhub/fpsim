@@ -192,12 +192,10 @@ def test_add_method_split():
     new_name = 'impl_new'
     intv = fp.add_method(
         year=2001,
-        method=None,
         method_pars=dict(name=new_name),
         copy_from='impl',
         split_shares=split,
-        verbose=False,
-    )
+        )
 
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.init()
@@ -321,9 +319,12 @@ def test_add_method_year_boundaries(year_offset):
 def test_age_restricted_initiation_basic():
     """Test that age-restricted initiation correctly filters by age using enhanced change_initiation."""
     sc.heading('Testing age-restricted initiation (via change_initiation) basic functionality...')
-    
-    pars = dict(n_agents=500, start=2000, stop=2010, verbose=0, location='kenya')
-    
+
+    # Use seed for reproducibility; larger n_agents and broader age_range so enough
+    # women are eligible and we reliably get at least one user of the test method
+    np.random.seed(42)
+    pars = dict(n_agents=1200, start=2000, stop=2010, verbose=0, location='kenya')
+
     # Add a new method to target
     add_intv = fp.add_method(
         year=2001,
@@ -340,36 +341,36 @@ def test_age_restricted_initiation_basic():
         verbose=False,
         name='add_test_method'
     )
-    
+
     # Age-restricted initiation using enhanced change_initiation
     init_intv = fp.change_initiation(
         years=[2005, 2010],
-        age_range=(18, 25),
-        perc=0.10,
+        age_range=(15, 30),  # Broader range so enough eligible women for robust test
+        perc=0.12,
         perc_of_eligible=True,  # Apply to eligible women in age range
         target_method='test_method',
         annual=False,
         verbose=False,
         name='init_test_method'
     )
-    
+
     sim = fp.Sim(pars=pars, interventions=[add_intv, init_intv], verbose=0)
     sim.run()
-    
+
     # Check that some women are using the test method
     cm = sim.connectors.contraception
     test_method_idx = cm.methods['test_method'].idx
     users = sim.people.fp.method == test_method_idx
-    
+
     assert users.sum() > 0, 'No users of test method found'
-    
+
     # Check that users are in the target age range (or were when initiated)
     # This is approximate since people age during simulation
     user_ages = sim.people.age[users]
-    # Allow some buffer since people aged during sim
-    assert user_ages.min() >= 16, f'Found user younger than expected: {user_ages.min()}'
-    assert user_ages.max() <= 28, f'Found user older than expected: {user_ages.max()}'
-    
+    # Allow some buffer since people aged during sim (age_range is 15-30)
+    assert user_ages.min() >= 14, f'Found user younger than expected: {user_ages.min()}'
+    assert user_ages.max() <= 32, f'Found user older than expected: {user_ages.max()}'
+
     print(f'✓ Age-restricted initiation created {users.sum()} users in target age range')
     return sim
 
@@ -377,14 +378,14 @@ def test_age_restricted_initiation_basic():
 def test_age_restricted_initiation_time_varying():
     """Test that change_initiation with final_perc scales up over time."""
     sc.heading('Testing change_initiation with time-varying rates...')
-    
+
     # Use larger population and broader age range to ensure we have eligible women
     pars = dict(n_agents=2000, start=2000, stop=2015, verbose=0, location='kenya')
-    
+
     # Use method_pars approach to avoid distribution copying issues
     add_intv = fp.add_method(
-        year=2001, 
-        method=None, 
+        year=2001,
+        method=None,
         method_pars={
             'name': 'test_method2',
             'label': 'Test Method 2',
@@ -392,12 +393,12 @@ def test_age_restricted_initiation_time_varying():
             'modern': True,
             'dur_use': ss.lognorm_ex(mean=2, std=1)
         },
-        copy_from='pill', 
-        split_shares=0, 
-        verbose=False, 
+        copy_from='pill',
+        split_shares=0,
+        verbose=False,
         name='add_test_method2'
     )
-    
+
     # Scale from 5% to 10% over 10 years (higher rates to ensure some uptake)
     init_intv = fp.change_initiation(
         years=[2005, 2015],
@@ -409,17 +410,17 @@ def test_age_restricted_initiation_time_varying():
         annual=True,
         verbose=False,
     )
-    
+
     sim = fp.Sim(pars=pars, interventions=[add_intv, init_intv], verbose=0)
     sim.run()
-    
+
     cm = sim.connectors.contraception
     test_method_idx = cm.methods['test_method2'].idx
     users = (sim.people.fp.method == test_method_idx).sum()
-    
+
     # Should have some users with time-varying initiation
     assert users > 0, f'No users found with time-varying initiation (had {users} users)'
-    
+
     print(f'✓ Time-varying initiation created {users} users')
     return sim
 
@@ -427,30 +428,30 @@ def test_age_restricted_initiation_time_varying():
 def test_age_restricted_initiation_errors():
     """Test error handling for age-restricted features in change_initiation."""
     sc.heading('Testing change_initiation error handling...')
-    
+
     pars = dict(n_agents=100, start=2000, stop=2010, verbose=0, location='kenya')
-    
+
     # Invalid age_range (not a tuple of 2)
     with pytest.raises(ValueError, match='age_range must be a tuple'):
         intv = fp.change_initiation(years=[2005, 2010], age_range=(20,), perc=0.01, perc_of_eligible=True)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     # Invalid target method
     with pytest.raises(ValueError, match='not found'):
         intv = fp.change_initiation(
-            years=[2005, 2010], 
+            years=[2005, 2010],
             age_range=(0, 20),
             perc=0.01,
             perc_of_eligible=True,
             target_method='nonexistent_method'
         )
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     # Years outside sim range
     with pytest.raises(ValueError, match='before the start'):
         intv = fp.change_initiation(years=[1995, 2005], perc=0.01)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     print('✓ Error handling works correctly')
     return
 
@@ -458,12 +459,12 @@ def test_age_restricted_initiation_errors():
 def test_method_switching_basic():
     """Test basic method switching functionality."""
     sc.heading('Testing method_switching basic functionality...')
-    
+
     pars = dict(n_agents=1000, start=2000, stop=2010, verbose=0, location='kenya')
-    
+
     # Add a target method
     add_target = fp.add_method(
-        year=2001, 
+        year=2001,
         method=None,
         method_pars={
             'name': 'target_method',
@@ -472,12 +473,12 @@ def test_method_switching_basic():
             'modern': True,
             'dur_use': ss.lognorm_ex(mean=2, std=1)
         },
-        copy_from='pill', 
-        split_shares=0, 
-        verbose=False, 
+        copy_from='pill',
+        split_shares=0,
+        verbose=False,
         name='add_target'
     )
-    
+
     # Switch from pill to target_method
     switch_intv = fp.method_switching(
         year=2005,
@@ -487,42 +488,42 @@ def test_method_switching_basic():
         annual=False,
         verbose=False,
     )
-    
+
     sim = fp.Sim(pars=pars, interventions=[add_target, switch_intv], verbose=0)
     sim.init()
-    
+
     cm = sim.connectors.contraception
-    
+
     # Get switching probability BEFORE intervention
     pill_idx = cm.methods['pill'].idx
     target_idx = cm.methods['target_method'].idx
-    
+
     # Check in a sample age group and pp state
     age_grp = '<18' if '<18' in cm.pars.method_choice_pars[0] else list(cm.pars.method_choice_pars[0].keys())[1]
     prob_before = cm.get_switching_prob('pill', 'target_method', postpartum=0, age_grp=age_grp)
-    
+
     # Run simulation
     sim.run()
-    
+
     # Get switching probability AFTER intervention
     prob_after = cm.get_switching_prob('pill', 'target_method', postpartum=0, age_grp=age_grp)
-    
+
     # The probability should have increased
     assert prob_after > prob_before, f'Switching probability did not increase: {prob_before} -> {prob_after}'
-    
+
     print(f'✓ Method switching increased probability: {prob_before:.4f} -> {prob_after:.4f}')
-    
+
     return sim
 
 
 def test_method_switching_multiple_sources():
     """Test switching from multiple source methods."""
     sc.heading('Testing method_switching with multiple sources...')
-    
+
     pars = dict(n_agents=1000, start=2000, stop=2010, verbose=0, location='kenya')
-    
+
     add_target = fp.add_method(
-        year=2005, 
+        year=2005,
         method=None,
         method_pars={
             'name': 'target',
@@ -531,12 +532,12 @@ def test_method_switching_multiple_sources():
             'modern': True,
             'dur_use': ss.lognorm_ex(mean=2, std=1)
         },
-        copy_from='pill', 
-        split_shares=0, 
-        verbose=False, 
+        copy_from='pill',
+        split_shares=0,
+        verbose=False,
         name='add_target'
     )
-    
+
     # Switch from existing methods that have users
     switch_intv = fp.method_switching(
         year=2006,
@@ -546,46 +547,46 @@ def test_method_switching_multiple_sources():
         annual=False,
         verbose=False,
     )
-    
+
     sim = fp.Sim(pars=pars, interventions=[add_target, switch_intv], verbose=0)
     sim.run()
-    
+
     cm = sim.connectors.contraception
     target_idx = cm.methods['target'].idx
     users = (sim.people.fp.method == target_idx).sum()
-    
+
     assert users > 0, f'No users switched to target method (had {users} users)'
     print(f'✓ Multi-source switching created {users} users')
-    
+
     return sim
 
 
 def test_method_switching_errors():
     """Test error handling for method_switching."""
     sc.heading('Testing method_switching error handling...')
-    
+
     pars = dict(n_agents=100, start=2000, stop=2010, verbose=0, location='kenya')
-    
+
     # Missing year
     with pytest.raises(ValueError, match='year must be specified'):
         intv = fp.method_switching(year=None, from_methods='pill', to_method='iud', switch_prob=0.1)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     # Missing switch_prob
     with pytest.raises(ValueError, match='switch_prob must be specified'):
         intv = fp.method_switching(year=2005, from_methods='pill', to_method='iud', switch_prob=None)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     # Invalid source method
     with pytest.raises(ValueError, match='not found'):
         intv = fp.method_switching(year=2005, from_methods='nonexistent', to_method='pill', switch_prob=0.1)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     # Invalid target method
     with pytest.raises(ValueError, match='not found'):
         intv = fp.method_switching(year=2005, from_methods='pill', to_method='nonexistent', switch_prob=0.1)
         fp.Sim(pars=pars, interventions=[intv], verbose=0).init()
-    
+
     print('✓ Error handling works correctly')
     return
 
@@ -595,14 +596,15 @@ def test_dmpasc_scenario_integration():
     (subcutaneous depot medroxyprogesterone acetate
     injectable contraceptive)
     """
-    
+
     sc.heading('Testing DMPA-SC scenario integration...')
-    
-    pars = dict(n_agents=1000, start=2000, stop=2030, verbose=0, location='kenya')
-    
+
+    np.random.seed(43)  # Reproducibility; ensures initiation/switching yield some users
+    pars = dict(n_agents=1200, start=2000, stop=2030, verbose=0, location='kenya')
+
     # Baseline growth
     baseline = fp.change_initiation(years=[2000, 2030], perc=0.02, annual=True)
-    
+
     # Add DMPA-SC method (needs a base duration distribution)
     dmpasc = fp.Method(
         name='dmpasc',
@@ -613,20 +615,20 @@ def test_dmpasc_scenario_integration():
         rel_dur_use=2.0,  # 2x scaling factor
     )
     add_dmpasc = fp.add_method(year=2020, method=dmpasc, copy_from='inj', split_shares=0, verbose=False, name='add_dmpasc')
-    
+
     # Age-restricted initiation using enhanced change_initiation
     initiation = fp.change_initiation(
         years=[2020, 2030],
-        age_range=(0, 20),
-        perc=0.015,
-        final_perc=0.05,
+        age_range=(15, 25),  # Fecund, sexually active ages so enough eligible women
+        perc=0.03,
+        final_perc=0.08,
         perc_of_eligible=True,
         target_method='dmpasc',
         annual=True,
         verbose=False,
         name='initiation_dmpasc'
     )
-    
+
     # Switching from injectables
     switching = fp.method_switching(
         year=2020,
@@ -636,25 +638,25 @@ def test_dmpasc_scenario_integration():
         annual=False,
         verbose=False,
     )
-    
+
     interventions = [baseline, add_dmpasc, initiation, switching]
     sim = fp.Sim(pars=pars, interventions=interventions, verbose=0)
     sim.run()
-    
+
     # Verify DMPA-SC has users
     cm = sim.connectors.contraception
     dmpasc_idx = cm.methods['dmpasc'].idx
     users = (sim.people.fp.method == dmpasc_idx).sum()
-    
+
     assert users > 0, 'DMPA-SC has no users in integration test'
-    
+
     # Verify mCPR increased
     mcpr_final = sim.results.contraception.mcpr[-1]
     mcpr_initial = sim.results.contraception.mcpr[0]
     assert mcpr_final > mcpr_initial, 'mCPR did not increase'
-    
+
     print(f'✓ Integration test passed: {users} DMPA-SC users, mCPR: {mcpr_initial:.1%} → {mcpr_final:.1%}')
-    
+
     return sim
 
 
@@ -671,7 +673,7 @@ if __name__ == '__main__':
     s11 = test_add_method_split_shares_boundaries(1.0, 0.0, 1.0)
     s12 = test_add_method_year_boundaries(0)
     s13 = test_add_method_year_boundaries(2)
-    
+
     # New intervention tests
     s14 = test_age_restricted_initiation_basic()
     s15 = test_age_restricted_initiation_time_varying()

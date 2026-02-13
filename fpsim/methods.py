@@ -22,7 +22,7 @@ __all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'make
 
 # %% Base definition of contraceptive methods -- can be overwritten by locations
 class Method:
-    def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, rel_dur_use=1, csv_name=None):
+    def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, rel_dur_use=1, csv_name=None, _source_dur=None):
         self.name = name
         self.label = label or name
         self.csv_name = csv_name or label or name
@@ -31,6 +31,7 @@ class Method:
         self.modern = modern
         self.dur_use = dur_use
         self.rel_dur_use = rel_dur_use
+        self._source_dur = _source_dur
 
     def gamma_scale_callback(self, sim, uids):
         """ Sample from gamma distribution with age factors """
@@ -1253,8 +1254,9 @@ class SimpleChoice(RandomChoice):
         dur_method = np.zeros(len(uids), dtype=float)
         if method_used is None: method_used = ppl.fp.method[uids]
 
-        for mname, method in self.methods.items():
-            dur_use = method.dur_use
+        for method in self.methods.values():
+            if method._source_dur is None: dur_use = method.dur_use
+            else: dur_use = self.methods[method._source_dur].dur_use
             user_idxs = np.nonzero(method_used == method.idx)[-1]
             users = uids[user_idxs]  # Get the users of this method
             n_users = len(users)
@@ -1443,13 +1445,15 @@ class StandardChoice(SimpleChoice):
             elif predictor in ["parity", "urban", "wealthquintile"]:
                 rhs += beta_p * ppl[predictor][eligible_uids]
         
-        # Handle fertility intent predictor (special case with different coefficients for yes/no)
+        # Handle fertility intent predictor (3-category: "yes", "no", "cannot-get-pregnant")
+        # Reference category is "cannot-get-pregnant" (coefficient = 0)
+        # fertility_intent_cat: 0=cannot-get-pregnant, 1=no, 2=yes
         if "fertility_intentno" in p and "fertility_intentyes" in p:
-            # Start with the "no" coefficient for all
-            fertility_coeff = np.full(len(eligible_uids), p["fertility_intentno"])
-            # Update to "yes" coefficient where fertility_intent is True
-            fertility_coeff[fp_connector.fertility_intent[eligible_uids]] = p["fertility_intentyes"]
-            rhs += fertility_coeff * fp_connector.fertility_intent[eligible_uids].astype(float)
+            cat_intent = fp_connector.fertility_intent_cat[eligible_uids]
+            fi_contrib = np.zeros(len(eligible_uids))
+            fi_contrib[cat_intent == 1] = p["fertility_intentno"]
+            fi_contrib[cat_intent == 2] = p["fertility_intentyes"]
+            rhs += fi_contrib
         
         # Apply logistic transformation
         prob_t = expit(rhs)
