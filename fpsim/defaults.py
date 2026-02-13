@@ -103,6 +103,7 @@ fpmod_states = [
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
     ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
     ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
+    ss.IntArr('fertility_intent_cat', default=0),  # Categorical fertility intent: 0=cannot-get-pregnant, 1=no, 2=yes
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
@@ -143,6 +144,8 @@ fpmod_states = [
     fpa.TwoDimensionalArr('miscarriage_ages', ncols=max_parity),  # Ages at time of miscarriages
     fpa.TwoDimensionalArr('abortion_ages', ncols=max_parity),  # Ages at time of abortions
 
+    ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
+    ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
 ]
 
 # Postpartum keys to months
