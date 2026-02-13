@@ -691,15 +691,57 @@ class method_mix_over_time(ss.Analyzer):
             self.data[method][sim.ti] = np.count_nonzero(eligible)
         return
 
-    def plot(self, style=None):
+    def plot(self, style=None, share=False, methods=None, stacked=False):
+        """
+        Plot method mix over time
+
+        Args:
+            style (str): plotting style
+            share (bool): if True, plot share (%) instead of absolute numbers
+            methods (list): list of method names to plot; if None, plots all methods
+            stacked (bool): if True, create a stacked area plot
+        """
         with fpo.with_style(style):
             fig, ax = plt.subplots(figsize=(10, 5))
 
-            for method in self.methods:
-                ax.plot(self.t.tvec, self.data[method][:], label=method)
+            # Convert tvec to numeric array for plotting
+            tvec = np.array(self.t.tvec, dtype=float)
+
+            # Determine which methods to plot
+            methods_to_plot = methods if methods is not None else self.methods
+
+            # Calculate data to plot
+            if share:
+                # Calculate total users at each timepoint for percentage calculation
+                total_users = np.zeros(self.sim.t.npts)
+                for method in self.methods:
+                    total_users += self.data[method][:]
+
+                # Calculate share for each method
+                plot_data = {}
+                for method in methods_to_plot:
+                    with np.errstate(divide='ignore', invalid='ignore'):
+                        plot_data[method] = np.where(total_users > 0,
+                                                     (self.data[method][:] / total_users) * 100,
+                                                     0)
+            else:
+                plot_data = {method: self.data[method][:] for method in methods_to_plot}
+
+            # Create the plot
+            if stacked:
+                # Prepare data for stacked area plot - ensure proper numpy arrays
+                y_data = [np.asarray(plot_data[method], dtype=float) for method in methods_to_plot]
+                ax.stackplot(tvec, *y_data, labels=list(methods_to_plot), alpha=0.8)
+            else:
+                # Create line plot
+                for method in methods_to_plot:
+                    ax.plot(tvec, plot_data[method], label=method)
 
             ax.set_xlabel("Year")
-            ax.set_ylabel(f"Number of living women on method 'x'")
+            if share:
+                ax.set_ylabel("Share of method mix (%)")
+            else:
+                ax.set_ylabel("Number of living women on method")
             ax.legend()
         fig.tight_layout()
         return fig
