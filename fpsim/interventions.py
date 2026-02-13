@@ -220,9 +220,13 @@ class add_method(ss.Intervention):
             # Apply user-specified overrides (e.g., rename, label, rel_dur_use, dur_use, etc.)
             setattr(self.method, mp, mpar)
 
+        # Extra logic to handle copying of distributions, which isn't currently well-supported
+        self.method._source_dur = source_method.name
+
         # Register the method in the contraception connector so it exists in `cm.methods`
         # and can be referenced by name/index from other interventions.
         cm.add_method(self.method)
+
         # Cache the method index for later use (e.g., reporting and activation).
         self._method_idx = cm.methods[self.method.name].idx
 

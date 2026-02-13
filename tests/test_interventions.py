@@ -192,12 +192,10 @@ def test_add_method_split():
     new_name = 'impl_new'
     intv = fp.add_method(
         year=2001,
-        method=None,
         method_pars=dict(name=new_name),
         copy_from='impl',
         split_shares=split,
-        verbose=False,
-    )
+        )
 
     sim = fp.Sim(pars=pars, interventions=[intv], verbose=0)
     sim.init()

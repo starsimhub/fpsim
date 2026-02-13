@@ -124,6 +124,10 @@ class FPmod(ss.Module):
         from . import utils as fpu
         ages = fpu.digitize_ages_1yr(ppl.age[eligible_uids])
         
+        # Mapping from fertility intent category string to integer code
+        # 0=cannot-get-pregnant (reference), 1=no, 2=yes
+        fi_cat_map = {'cannot-get-pregnant': 0, 'no': 1, 'yes': 2}
+
         # Initialize fertility_intent
         for i, uid in enumerate(eligible_uids):
             age = int(ages[i])
@@ -133,9 +137,11 @@ class FPmod(ss.Module):
                 probs = list(fertility_data[age].values())
                 choice = np.random.choice(choices, p=probs)
                 self.fertility_intent[uid] = (choice == 'yes')
+                self.fertility_intent_cat[uid] = fi_cat_map.get(choice, 0)
             else:
                 # Default if age not in data
                 self.fertility_intent[uid] = False
+                self.fertility_intent_cat[uid] = 0
         
         # Initialize intent_to_use
         for i, uid in enumerate(eligible_uids):
@@ -632,6 +638,11 @@ class FPmod(ss.Module):
 
         # Check if agents are sexually active, and update their intent to use contraception
         self.check_sexually_active(nonpreg)
+
+        # Initialize fertility intent for women who just turned 15 (entered the 15-49 age range this timestep)
+        just_15 = nonpreg[(ppl.age[nonpreg] > fpd.min_age) & (ppl.age[nonpreg] <= fpd.min_age + self.t.dt_year)]
+        if len(just_15) > 0:
+            self.init_intent_states(just_15)
 
         # Update intent to use on birthday for any non-preg or >1m pp
         self.sim.connectors.contraception.update_intent_to_use(nonpreg)

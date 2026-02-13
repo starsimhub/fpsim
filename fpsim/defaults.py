@@ -101,6 +101,7 @@ fpmod_states = [
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
     ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
     ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
+    ss.IntArr('fertility_intent_cat', default=0),  # Categorical fertility intent: 0=cannot-get-pregnant, 1=no, 2=yes
     ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
     # Sexual and reproductive states, all False by default and set during simulation
