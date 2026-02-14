@@ -3,8 +3,6 @@ FPsim: Family Planning Simulator
 
 This repository contains the code for the Institute for Disease Modeling's family planning simulator, FPsim. 
 
-**FPsim is currently under development**.
-
 User guide
 ------------
 FPsim is designed as an open-source tool for family planning research. 
@@ -27,7 +25,7 @@ The structure is as follows:
 
 - FPsim, in the folder ``fpsim``, is a standalone Python library for performing family planning analyses.
 - Within ``fpsim``, the ``locations`` folder contains parameters and input data for all countries currently calibrated.
-- Docs are in the ``docs`` folder.
+- Docs, including tutorials, are in the ``docs`` folder.
 - Examples are in the ``examples`` folder.
 - Tests are in the ``tests`` folder.
 
@@ -35,7 +33,8 @@ The structure is as follows:
 Installation
 ------------
 
-Run ``pip install fpsim`` to install and its dependencies from PyPI. Alternatively, clone the repository and run ``pip install -e .`` (including the final dot!).
+If you are working with the main branch, you can run ``pip install fpsim`` to install FPsim and its dependencies from PyPI.
+Alternatively, clone the repository and run ``pip install -e .`` (including the final dot!). This is particularly useful if you want to collaborate on a branch that has not yet been merged. 
 
 
 Documentation
@@ -65,8 +64,8 @@ Issues
 Pull requests
 `````````````
 
-* ALL PRs should be linked to at least one issue. As above, if you're working on a PR and there's no issue associated with it, you can create an issue. However, before doing so, ask yourself if the changes in the PR really need to be done. 
-* All PRs should have another person assigned for review. If assigned to more than one person, use the comment section to assign an issue owner/main reviewer. Use your best judgement here, as roles shift, but in general: 
+* ALL PRs should be linked to at least one issue. As above, if you're working on a PR and there's no issue associated with it, you can create an issue.  
+* All PRs should have a non-author assigned for review. If the PR review is assigned to more than one person, use the comment section to assign a main reviewer. Use your best judgement here, as roles shift, but in general: 
 
    - @MOBrien-IDM as FPsim lead (approval required to merge)
    - Anyone you've worked with on this issue 1:1
