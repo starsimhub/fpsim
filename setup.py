@@ -40,7 +40,7 @@ setup(
         'numpy',
         'numba',
         'scipy',
-        'starsim>=3.0.2',
+        'starsim>=3.1.0',
         'pandas>=1.3', 
         'sciris>=2.1.0',
         'matplotlib>=3.5.0',
