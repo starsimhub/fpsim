@@ -8,6 +8,10 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :local:
    :depth: 1
 
+Version 3.5.1 (2026-02-17)
+---------------------------
+- Re-enables running a sim without a specified location for a quick FPsim demo.
+
 
 Version 3.5.0 (2026-02-10)
 ---------------------------
