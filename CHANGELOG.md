@@ -3,12 +3,9 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.5.2 (2026-02-18)
-- Switches documentation to `mkdocs` and switches build to `pyproject.toml`.
-
-
 ## Version 3.5.1 (2026-02-17)
 - Re-enables running a sim without a specified location for a quick FPsim demo.
+- Switches documentation to `mkdocs` and switches build to `pyproject.toml`.
 
 
 ## Version 3.5.0 (2026-02-10)
