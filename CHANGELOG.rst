@@ -9,19 +9,40 @@ All notable changes to the codebase are documented in this file. Changes that ma
    :depth: 1
 
 
-Version 3.5 (2025-11-XX)
+Version 3.5.0 (2026-02-10)
 ---------------------------
-  TBC - placeholder for intervention wrappers
+  Adds the ``add_method`` intervention to introduce new contraceptive methods mid-simulation,
+  plus intent states, analyzer updates for Starsim v3, and several bug fixes.
 
+* **New features**
+  * ``add_method`` intervention: introduce a new contraceptive method at a specified year.
+    Supports full Method objects, cloning from existing methods (``copy_from``), ``method_pars``
+    overrides, and ``split_shares`` for market splitting.
+  * ``change_initiation``: new parameters ``age_range``, ``perc_of_eligible``, ``target_method``,
+    ``final_perc`` for age-targeted and scale-up scenarios.
+  * Intent states (``intent_to_use``, ``fertility_intent``) moved into FPsim from kenya_empowerment.
+  * ``method_mix_over_time`` analyzer: ``plot()`` now supports ``share``, ``methods``, ``stacked``.
+  * New ``Switching`` class and ``method_switching`` intervention for modifying switching matrices.
+  * ``state_tracker`` analyzer: new ``module_name`` parameter for module-scoped states.
 
 * **Minor changes**
-  * Fixes a bug with partnership ages. If `use_partnerships` is set to True, then agents will be initialized with a `partnership_age` attribute that records the age at which they have their first partnership. Once beyond that age, then the `partnered` property is set to True. This feature should be used with care, as it does not accurately record whether or not an agent is in a partnership, and it does not currently relate in any way to the various attributes that track whether an agent is sexually active.
-  * All analyzers now work with Starsim v3.
-  * Fixed ``education_recorder`` analyzer to correctly access ``pregnant`` from the fp module, and added tests.
+  * Partnership handling moved to People; ``partnered`` is now a computed property.
+  * Fixed ``education_recorder`` pregnant key access; added tests.
+  * Fixed ``method_mix_over_time`` histogram binning for method indices.
+  * Fixed ``change_initiation`` and ``track_as`` for Starsim v3.
+  * Pandas v3.0.0 compatibility.
+  * Scenario class simplified; probability/matrix options removed.
+  * Removed ``n_urban`` from sim results.
+
+* **Regression information**
+  * ``Scenario`` class simplified: removed ``method_mix``, ``matrix``, ``ages``, ``init_factor``,
+    ``discont_factor``, ``init_value``, ``discont_value``, and ``copy_from``. Use ``update_methods``
+    or custom interventions instead; see examples folder and ``test_interventions``.
+  * ``n_urban`` removed from sim results.
+
 
 Version 3.4.1 (2025-09-22)
 ---------------------------
-
   This release adds several priority regions with preliminary calibrations to FPsim Version 3.3.0. These countries/regions are: Cote d'Ivore, Niger, Pakistan Sindh region, Nigeria with regions Kano, Kaduna, and Lagos.
 
 * **DHS data processing scripts**
@@ -78,11 +99,9 @@ Version 3.2.0 (2025-08-15)
   * `sim.fp_pars` is now `sim.pars.fp`, which will make it consistent with other parameters like `sim.pars.hiv`.
   * Moves the `location` parameter from the `FPPars` class to the `SimPars` class.
 
-
 * **Result tidying**
   * All the `tfr_{by_age}` results have been moved to an age-specific result structure. This means, for instance, that you would access the fertility rate for 20-24yos via `sim.connectors.fp.asfr[4, :]` instead of `sim.results.tfr_20-24`. 
   * All the `{result}_over_year` results have been removed. Annualized results can be easily calculated after a sim has been run, using `sim.results.to_df(resample='year')`. 
-
 
 * **Misc changes**
   * `longitudinal_history` analyzer moved from the fpsim repo to the kenya_empowerment repo
