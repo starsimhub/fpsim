@@ -13,8 +13,9 @@ This folder stores the location-specific files for FPsim models (both the `<mode
    - `dataloader(location='<name>')`: Returns `fpld.DataLoader(location=location)`
    
    Reference existing locations like `locations/cotedivoire/cotedivoire.py` or `locations/senegal/senegal.py` for the exact pattern.
-4. Add `from . import <name>` to `locations/__init__.py`.
-5. At the top of `defaults.py` in the Global Defaults section, add the (lowercase) location name to the `valid_country_locs` array.
+4. Create `<name>/__init__.py` that imports the functions: `from .<name> import make_calib_pars, dataloader`
+5. Add `from . import <name>` to `locations/__init__.py`.
+6. At the top of `defaults.py` in the Global Defaults section, add the (lowercase) location name to the `valid_country_locs` array.
 
 ### To add regional model(s):
 1. Create a new folder with the (lowercase) country name `<country>`, and a subdirectory called `regions`.

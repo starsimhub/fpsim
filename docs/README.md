@@ -15,6 +15,9 @@ To build the docs, follow these steps:
     pip install -r requirements.txt
     ```
 
-2.  Make the documents; there are many build options. In most cases, running `./build_docs` (to rerun the tutorials; takes 2 min) or `./build_docs never` (does not rebuild the tutorials; takes 15 s) is best. Alternatively, one can call `make html` directly.
+2.  Build the documents from the repo root::
+    ```
+    mkdocs build
+    ```
 
-3.  The built documents will be in `./_build/html`.
+3.  The built site is in `site/` at the repo root.
