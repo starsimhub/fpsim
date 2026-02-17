@@ -3,6 +3,43 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.5.1 (2026-02-17)
+
+- Re-enables running a sim without a specified location for a quick FPsim demo.
+
+
+## Version 3.5.0 (2026-02-10)
+
+  Adds the `add_method` intervention to introduce new contraceptive methods mid-simulation,
+  plus intent states, analyzer updates for Starsim v3, and several bug fixes.
+
+* **New features**
+  * `add_method` intervention: introduce a new contraceptive method at a specified year.
+    Supports full Method objects, cloning from existing methods (`copy_from`), `method_pars`
+    overrides, and `split_shares` for market splitting.
+  * `change_initiation`: new parameters `age_range`, `perc_of_eligible`, `target_method`,
+    `final_perc` for age-targeted and scale-up scenarios.
+  * Intent states (`intent_to_use`, `fertility_intent`) moved into FPsim from kenya_empowerment.
+  * `method_mix_over_time` analyzer: `plot()` now supports `share`, `methods`, `stacked`.
+  * New `Switching` class and `method_switching` intervention for modifying switching matrices.
+  * `state_tracker` analyzer: new `module_name` parameter for module-scoped states.
+
+* **Minor changes**
+  * Partnership handling moved to People; `partnered` is now a computed property.
+  * Fixed `education_recorder` pregnant key access; added tests.
+  * Fixed `method_mix_over_time` histogram binning for method indices.
+  * Fixed `change_initiation` and `track_as` for Starsim v3.
+  * Pandas v3.0.0 compatibility.
+  * Scenario class simplified; probability/matrix options removed.
+  * Removed `n_urban` from sim results.
+
+* **Regression information**
+  * `Scenario` class simplified: removed `method_mix`, `matrix`, `ages`, `init_factor`,
+    `discont_factor`, `init_value`, `discont_value`, and `copy_from`. Use `update_methods`
+    or custom interventions instead; see examples folder and `test_interventions`.
+  * `n_urban` removed from sim results.
+
+
 ## Version 3.4.1 (2025-09-22)
 
   This release adds several priority regions with preliminary calibrations to FPsim Version 3.3.0. These countries/regions are: Cote d'Ivore, Niger, Pakistan Sindh region, Nigeria with regions Kano, Kaduna, and Lagos.
