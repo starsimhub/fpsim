@@ -239,8 +239,8 @@ class DataLoader:
         """ Probabilities of being partnered at age X"""
         age_partnership_data = self.read_data('age_partnership.csv')
         partnership_dict = {
-            "age": age_partnership_data["age_partner"].to_numpy(),
-            "partnership_probs": age_partnership_data["percent"].to_numpy(),
+            "age": age_partnership_data["age_partner"].to_numpy(copy=True),
+            "partnership_probs": age_partnership_data["percent"].to_numpy(copy=True),
         }
         return partnership_dict
 
@@ -258,7 +258,7 @@ class DataLoader:
     def age_pyramid(self):
         """Load age pyramid data"""
         df = self.read_data('age_pyramid.csv')
-        pyramid = df.to_numpy()
+        pyramid = df.to_numpy(copy=True)
         return pyramid
 
     # %% Mortality
@@ -552,7 +552,7 @@ class DataLoader:
         for k in df["parity"].unique():
             data[k] = {"age": None, "percent": None}
             data[k]["age"] = df["age"].unique()
-            data[k]["percent"] = df["percent"][df["parity"] == k].to_numpy()
+            data[k]["percent"] = df["percent"][df["parity"] == k].to_numpy(copy=True)
         return data
 
     #%% Contraception

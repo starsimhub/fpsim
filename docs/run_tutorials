@@ -1,0 +1,20 @@
+#!/bin/bash
+# Execute all Jupyter notebooks in docs/tutorials
+
+set -e  # Exit on error
+
+NOTEBOOK_DIR="tutorials"
+
+echo "Executing notebooks in $NOTEBOOK_DIR..."
+echo ""
+
+for notebook in "$NOTEBOOK_DIR"/*.ipynb; do
+    if [ -f "$notebook" ]; then
+        echo "Executing: $notebook"
+        jupyter execute "$notebook"
+        echo "✓ Completed: $notebook"
+        echo ""
+    fi
+done
+
+echo "All notebooks executed successfully!"
