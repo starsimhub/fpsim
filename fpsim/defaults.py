@@ -3,6 +3,7 @@ Define defaults for use throughout FPsim
 """
 
 # Imports
+import warnings
 import numpy as np
 import sciris as sc
 import starsim as ss
@@ -28,19 +29,20 @@ valid_region_locs = {
 
 # Parse locations
 def get_location(location, printmsg=False):
+    default_location = 'kenya'
 
     if not location:
-        print("No location specified. Available locations are: ")
-        print(", ".join(valid_country_locs))
-        print("To use model defaults, set test=True.")
-        print(("To use a custom location, you can construct the sim by passing in a dataloader with a path to where you are keeping your data.\n"
-              "Example:\n"
-              "    import fpsim as fp\n"
-              "    # Load your own data\n"
-              "    my_data = fp.DataLoader(data_path='path-to-my-data')"
-              "    sim = fp.Sim(dataloader=my_data)"))
-
-        raise ValueError('Location must be specified. To use model defaults, set test=True.')
+        location = default_location
+        msg = f"No location specified. Available locations are:\n{sc.newlinejoin(valid_country_locs)}\n"
+        msg += f"\nUsing default location instead: {default_location}\n\n"
+        msg += """To use a custom location, you can construct the sim by passing in a dataloader with a path to where you are keeping your data.
+Example:
+    import fpsim as fp
+    # Load your own data
+    my_data = fp.DataLoader(data_path='path-to-my-data')
+    sim = fp.Sim(dataloader=my_data)"))
+"""
+        warnings.warn(msg, UserWarning, stacklevel=2)
     location = location.lower()  # Ensure it's lowercase
 
     # External locations override internal ones

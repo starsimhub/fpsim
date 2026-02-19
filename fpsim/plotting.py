@@ -494,8 +494,8 @@ def plot_pop_growth(sim, ax=None, legend_kwargs={}):
 
     # Import data
     data_popsize = data_popsize[data_popsize['year'] <= sim.pars['stop']]  # Restrict years to plot
-    data_pop_years = data_popsize['year'].to_numpy()
-    data_population = data_popsize['population'].to_numpy()
+    data_pop_years = data_popsize['year'].to_numpy(copy=True)
+    data_population = data_popsize['population'].to_numpy(copy=True)
 
     # Extract from model
     model_growth_rate = pop_growth_rate(res.timevec, res.n_alive)
@@ -536,8 +536,8 @@ def plot_afb(sim, ax=None, legend_kwargs={}):
 
     # Clean and bin data AFB values
     data_afb_clean = data_afb[data_afb['afb'].apply(np.isfinite)]
-    data_afb_vals = data_afb_clean['afb'].to_numpy()
-    data_afb_weights = data_afb_clean['wt'].to_numpy()
+    data_afb_vals = data_afb_clean['afb'].to_numpy(copy=True)
+    data_afb_weights = data_afb_clean['wt'].to_numpy(copy=True)
 
     # Histogram bins
     bins = np.arange(10, 50, 1)  # From age 10 to 45 in 1-year bins

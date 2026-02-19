@@ -114,8 +114,8 @@ class Experiment(sc.prettyobj):
         # Data
         pop_size = self.load_data('popsize')
         n = self.sim.pars.n_agents
-        self.data['pop_years'] = pop_size.year.to_numpy()
-        self.data['pop_size']  = pop_size.population.to_numpy() / (pop_size.population[0] / n)  # Corrected for # of agents, needs manual adjustment for # agents
+        self.data['pop_years'] = pop_size.year.to_numpy(copy=True)
+        self.data['pop_size']  = pop_size.population.to_numpy(copy=True) / (pop_size.population[0] / n)  # Corrected for # of agents, needs manual adjustment for # agents
         data_growth_rate = np.diff(self.data['pop_size']) / self.data['pop_size'][:-1] * 100  # Percent change
         self.data['pop_growth_rate'] = data_growth_rate
 
@@ -129,14 +129,14 @@ class Experiment(sc.prettyobj):
 
         # Data
         mcpr = self.load_data('mcpr')
-        self.data['mcpr_years'] = mcpr.iloc[:,0].to_numpy()
-        self.data['mcpr'] = mcpr.iloc[:,2].to_numpy()  # Already in percent
+        self.data['mcpr_years'] = mcpr.iloc[:,0].to_numpy(copy=True)
+        self.data['mcpr'] = mcpr.iloc[:,2].to_numpy(copy=True)  # Already in percent
 
         # Filter to matching years
         data_years = self.data['mcpr_years'].tolist()
         filtered_model = model_frame.loc[model_frame.years.isin(data_years)]
-        model_mcpr = filtered_model['mcpr'].to_numpy()
-        mcpr_years = filtered_model['years'].to_numpy()
+        model_mcpr = filtered_model['mcpr'].to_numpy(copy=True)
+        mcpr_years = filtered_model['years'].to_numpy(copy=True)
 
         self.model['mcpr'] = model_mcpr*100 # Since data is in 100
         self.model['mcpr_years'] = mcpr_years
@@ -176,8 +176,8 @@ class Experiment(sc.prettyobj):
     def get_tfr(self, fp_df=None):
         # Extract tfr over time in data - keep here to ignore dhs data if not using tfr for calibration
         tfr = self.load_data('tfr')
-        self.data['tfr_years'] = tfr['year'].to_numpy()
-        self.data['total_fertility_rate'] = tfr['tfr'].to_numpy()
+        self.data['tfr_years'] = tfr['year'].to_numpy(copy=True)
+        self.data['total_fertility_rate'] = tfr['tfr'].to_numpy(copy=True)
         self.model['tfr_years'] = fp_df.index
         self.model['total_fertility_rate'] = fp_df['tfr']
         return

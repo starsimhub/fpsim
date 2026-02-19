@@ -121,8 +121,8 @@ def test_location_validation():
     sc.heading('Test location parameter validation')
 
     # Test 1: No location specified should raise ValueError
-    with pytest.raises(ValueError, match="Location must be specified"):
-        sim = fp.Sim(n_agents=100)
+    with pytest.raises(NotImplementedError, match="not currently supported"):
+        sim = fp.Sim(n_agents=100, location='not_a_location')
 
     # Test 2: Real location should work
     sim_kenya = fp.Sim(n_agents=100, location='kenya')
@@ -133,34 +133,34 @@ def test_location_validation():
     sim_test_param = fp.Sim(n_agents=100, test=True)
     assert sim_test_param.pars.location == 'senegal'  # test mode location
     print('OK (test=True automatically sets location)')
-    
+
     # Test 5: All available locations should load and initialize successfully
     from fpsim.defaults import valid_country_locs, valid_region_locs
-    
+
     # Get all valid locations (country + region locations)
     all_locations = valid_country_locs.copy()
     for region_list in valid_region_locs.values():
         all_locations.extend(region_list)
-    
+
     for location in all_locations:
         try:
             # Test that location can load data and modules
             method_choice = fp.SimpleChoice(location=location)
             edu = fp.Education(location=location)
-            
+
             # Test that sim can be created and initialized (but not run)
             sim = fp.Sim(n_agents=50, location=location, start=2010, stop=2011,
                         contraception_module=method_choice, education_module=edu)
             sim.init()  # Initialize but don't run
-            
+
             print(f'✓ (location="{location}" loads and initializes)')
-            
+
         except Exception as e:
             print(f'✗ (location="{location}" failed: {e})')
             raise AssertionError(f'Location "{location}" should load and initialize successfully') from e
-    
+
     print('✓ (all location validation tests passed)')
-    
+
     return
 
 
@@ -210,6 +210,7 @@ if __name__ == '__main__':
     sims1 = test_simple_choice()
     sims2 = test_mid_choice()
     test_sim_creation()
+    test_location_validation()
     exp = test_senegal()
     sim = test_birth_outcomes()
 
