@@ -1462,13 +1462,13 @@ class StandardChoice(SimpleChoice):
         new_vals = self.pars.p_intent.rvs(eligible_uids)
         
         # Update the intent_to_use state
-        old_vals = fp_connector.intent_to_use[eligible_uids]
+        old_vals = ppl.fp.intent_to_use[eligible_uids]
         changers = eligible_uids[new_vals != old_vals]  # People whose intent changes
-        
+
         if len(changers) > 0:
             # Trigger update to contraceptive choices if intent changes
-            fp_connector.ti_contra[changers] = self.t.ti
-        
+            ppl.fp.ti_contra[changers] = self.t.ti
+
         # Update the state
-        fp_connector.intent_to_use[eligible_uids] = new_vals
+        ppl.fp.intent_to_use[eligible_uids] = new_vals
         return

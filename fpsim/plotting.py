@@ -160,7 +160,7 @@ def plot_asfr(sim, ax=None):
 
     # Extract ASFR from simulation results
     x_labels = [int(i.split('-')[0]) for i in data_agerange_cols]
-    asfr_model = sim.connectors.fp.asfr[2:-1, -1]
+    asfr_model = sim.people.fp.asfr[2:-1, -1]
 
     # Compute mean-normalized RMSE
     rmse_scores['asfr'] = compute_rmse(asfr_model, asfr_data)

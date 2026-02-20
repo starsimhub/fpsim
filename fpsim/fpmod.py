@@ -167,35 +167,14 @@ class FPmod(ss.Pregnancy):
                 self.intent_to_use[uid] = False
         return
 
-    def set_states(self, uids=None, upper_age=None):
-        ppl = self.sim.people
-        if uids is None: uids = self._get_uids(upper_age=upper_age)
-
-        # Fertility
-        self.fertile[uids] = self._p_fertile.rvs(uids)
-
-        # Sexual activity
-        # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
-        self.fated_debut[uids] = self._fated_debut.rvs(uids)
-        fecund = ppl.female & (ppl.age < self.pars['age_limit_fecundity'])
-        self.check_sexually_active(uids[fecund[uids]])
-        self.update_time_to_choose(uids)
-
-        # Fecundity variation
-        self.personal_fecundity[uids] = self.pars.fecundity.rvs(uids)
-        
-        # Intent states
-        self.init_intent_states(uids)
-        return
-
     @property
     def susceptible(self):
         """ Defined as sexually-active fertile women of childbearing age who are not pregnant """
-        return self.fertile & (~self.pregnant) & self.sexually_active
+        return self.fertile & self.sexually_active & ~self.pregnant
 
     @property
     def end_tri1_uids(self):
-        """ Return UIDs of those in their first trimester """
+        """ Return UIDs of those in the final timestep of their first trimester """
         end = (self.dur_gestation <= self.pars.trimesters[0]) & ((self.dur_gestation + self.dt) > self.pars.trimesters[0])
         return self.pregnant.uids[end]
 
@@ -337,7 +316,7 @@ class FPmod(ss.Pregnancy):
         max_lam_dur = self.pars['max_lam_dur']
         over_max = (self.ti - self.ti_delivery) > max_lam_dur
         not_breastfeeding = ~self.breastfeeding
-        not_lam = over_max & not_breastfeeding
+        not_lam = over_max | not_breastfeeding
         self.lam[not_lam] = False
 
         lam_eff = self.pars['LAM_efficacy'] * self.lam
@@ -355,10 +334,10 @@ class FPmod(ss.Pregnancy):
 
     def updates_pre(self, uids=None, upper_age=None):
         """
-        This runs prior at the beginning of each timestep, prior to calculating pregnancy exposure,
-        advancing pregnancies, adding new pregnancies, or determing delivery outcomes. Here we make
-        any updates that affect the risk of pregnancy or pre-term birth on this timestep. We also
-        set the baseline values for newborn agents.
+        This runs at the beginning of each timestep, prior to calculating pregnancy exposure,
+        advancing pregnancies, adding new pregnancies, or determining delivery outcomes. Here we
+        make any updates that affect the risk of pregnancy or pre-term birth on this timestep.
+        We also set the baseline values for newborn agents.
         """
         if uids is None: uids = self._get_uids(upper_age=upper_age)
         super().updates_pre(uids=uids)
@@ -375,6 +354,7 @@ class FPmod(ss.Pregnancy):
 
         # Initialize fertility intent for women who just turned 15 (entered the 15-49 age range this timestep)
         ppl = self.sim.people
+        nonpreg = (self.fecund & ~self.pregnant).uids
         just_15 = nonpreg[(ppl.age[nonpreg] > fpd.min_age) & (ppl.age[nonpreg] <= fpd.min_age + self.t.dt_year)]
         if len(just_15) > 0:
             self.init_intent_states(just_15)
@@ -439,6 +419,11 @@ class FPmod(ss.Pregnancy):
             self.dur_breastfeed_total[stopping] += self.dur_breastfeed[stopping]
         return
 
+    def process_delivery(self, mother_uids, newborn_uids):
+        """ Save twin status before parent resets it, then proceed with delivery """
+        self._twins_at_delivery = mother_uids & self.carrying_multiple.uids
+        super().process_delivery(mother_uids, newborn_uids)
+
     def _do_stillbirths(self, mother_uids):
         """Handle stillbirth outcomes with age-adjusted probability"""
         ppl = self.sim.people
@@ -458,15 +443,14 @@ class FPmod(ss.Pregnancy):
         mothers_of_stillborns, mothers_of_live = self.bsplit(self._p_stillbirth, mother_uids, still_prob)
 
         # Sort by twins and single births
-        twins = mothers_of_live & self.carrying_multiple.uids
+        twins = mothers_of_live & self._twins_at_delivery
         single = mothers_of_live - twins
 
-        # Update counts and states
+        # Update counts and states: n_births counts delivery events (1 per mother, regardless of twins)
         self.parity[twins] += 1
         self.n_births[mothers_of_live] += 1
         self.n_twinbirths[twins] += 1
         self.n_stillbirths[mothers_of_stillborns] += 1
-        self.carrying_multiple[twins] = False
 
         # Record ages and update times
         self.record_ages(mothers_of_stillborns, single, twins)
@@ -539,6 +523,11 @@ class FPmod(ss.Pregnancy):
             latest_ints = np.array([r[~np.isnan(r)][-1] for r in all_ints])
             short_ints = np.count_nonzero(latest_ints < (self.pars['short_int'].years))
             self.results['short_intervals'][self.ti] += short_ints
+
+        # Compute proportion of short interval births among all live births this timestep
+        n_live = len(single) + len(twin)
+        if n_live > 0:
+            self.results['p_short_interval'][self.ti] = self.results['short_intervals'][self.ti] / n_live
 
         return
 
@@ -659,7 +648,7 @@ class FPmod(ss.Pregnancy):
             self.handle_abortion(abort_uids)
 
         # Track method failures for continuing pregnancies
-        if hasattr(self.sim, 'contraception') and len(preg_uids):
+        if hasattr(self.sim.connectors, 'contraception') and len(preg_uids):
             on_method = self.method[preg_uids] != 0
             self.results['method_failures'][self.ti] += on_method.sum()
 

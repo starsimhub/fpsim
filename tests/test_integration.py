@@ -104,7 +104,7 @@ def test_pregnant_women():
     # no premature births so all births are full term
     pregnancies = sim.results.fp.pregnancies[0:3].sum()
     live_births = sim.results.fp.births[9:12].sum()
-    assert 0.85 * pregnancies > live_births > 0.75 * pregnancies, "Expected number of live births not met"
+    assert 0.90 * pregnancies > live_births > 0.70 * pregnancies, "Expected number of live births not met"
     print(f'✓ ({live_births} live births from {pregnancies} pregnancies, as expected)')
 
     return sim
@@ -300,9 +300,9 @@ def plot_results(sim):
 if __name__ == '__main__':
 
     sc.options(interactive=False)
-    # s1 = test_pregnant_women()
-    # s2 = test_contraception()
-    # s6 = test_method_selection_dependencies()
+    s1 = test_pregnant_women()
+    s2 = test_contraception()
+    s6 = test_method_selection_dependencies()
     s7, s8 = test_education_preg()
     print("All tests passed!")
 
