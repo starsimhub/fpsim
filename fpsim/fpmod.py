@@ -230,6 +230,12 @@ class FPmod(ss.Pregnancy):
         end = (self.dur_gestation <= self.pars.trimesters[0]) & ((self.dur_gestation + self.dt) > self.pars.trimesters[0])
         return self.pregnant.uids[end]
 
+    @property
+    def end_tri2_uids(self):
+        """ Return UIDs of those in the final timestep of their second trimester """
+        end = (self.dur_gestation <= self.pars.trimesters[1]) & ((self.dur_gestation + self.dt) > self.pars.trimesters[1])
+        return self.pregnant.uids[end]
+
     # %% Utilities
 
     def _get_uids(self, upper_age=None, female_only=True):
