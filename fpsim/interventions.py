@@ -282,7 +282,7 @@ class add_method(ss.Intervention):
 
         if self.verbose:
             sim = self.sim
-            fp_mod = sim.connectors.fp
+            fp_mod = sim.people.fp
 
             # Get final method usage for the new method
             final_usage = fp_mod.method_mix[self._method_idx, -1] if self._method_idx < fp_mod.method_mix.shape[0] else 0
