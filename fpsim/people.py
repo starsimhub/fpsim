@@ -79,11 +79,11 @@ class People(ss.People):
 
     @property
     def ever_used_contra(self):
-        return self.sim.demographics.fp.ever_used_contra  # TODO, fix
+        return self.sim.people.fp.ever_used_contra  # TODO, fix
 
     @property
     def parity(self):
-        return self.sim.demographics.fp.parity  # TODO, fix
+        return self.sim.people.fp.parity  # TODO, fix
 
     @property
     def partnered(self):

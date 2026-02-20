@@ -208,7 +208,7 @@ class FPmod(ss.Pregnancy):
 
         # Additional results with different formats, stored separately
         # These will not be appended to sim.results, and must be accessed
-        # via eg. sim.connectors.fp.method_mix
+        # via eg. sim.people.fp.method_mix
         self.method_mix = np.zeros((self.sim.connectors.contraception.n_options, self.t.npts))
         return
 

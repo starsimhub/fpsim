@@ -196,7 +196,7 @@ class Experiment(sc.prettyobj):
         # Model extraction
         age_bins = list(fpd.age_bin_map.keys())
         self.model['asfr_bins'] = age_bins
-        self.model['asfr'] = self.sim.demographics.fp.asfr[2:-1, -1]  # TODO fix
+        self.model['asfr'] = self.sim.people.fp.asfr[2:-1, -1]  # TODO fix
 
         # Check
         assert self.data['asfr_bins'] == self.model['asfr_bins'], f'ASFR data age bins do not match sim: {sc.strjoin(age_bins)}'
