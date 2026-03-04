@@ -15,7 +15,7 @@ __all__ = ['FPmod']
 
 # %% Define classes
 
-class FPmod(ss.Module):
+class FPmod(ss.Connector):
     """
     Class for storing and updating FP-related events
     """

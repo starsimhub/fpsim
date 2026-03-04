@@ -14,7 +14,7 @@ FPsim is the Institute for Disease Modeling's family planning simulator, an agen
 - Interventions system for policy modeling in `fpsim/interventions.py`
 - Analysis tools in `fpsim/analyzers.py` for extracting results
 - Scenario management via `Scenarios` class in `fpsim/scenarios.py`
-- Built on top of Starsim >=3.0.2 framework
+- Built on top of Starsim >=3.1.0 framework
 
 ## Development Commands
 
@@ -68,7 +68,7 @@ Country-specific parameters in `fpsim/locations/`:
 - Regional variations supported (e.g., `ethiopia/regions/`)
 
 ### Key Dependencies
-- Starsim >=3.0.2 (underlying simulation framework)
+- Starsim >=3.1.0 (underlying simulation framework)
 - NumPy/SciPy for numerical computation
 - Pandas for data handling
 - Matplotlib/Seaborn for plotting
