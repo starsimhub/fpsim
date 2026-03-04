@@ -124,7 +124,7 @@ class Experiment(sc.prettyobj):
     def get_mcpr(self, sres=None):
         # Model
         df = sres.contraception.to_df(resample='year', use_years=True)
-        model = {'years': df.index, 'mcpr': df['mcpr']}
+        model = {'years': df.index.year, 'mcpr': df['mcpr']}
         model_frame = pd.DataFrame(model)
 
         # Data
