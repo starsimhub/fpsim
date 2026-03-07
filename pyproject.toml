@@ -46,6 +46,19 @@ dependencies = [
     "optuna",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov",
+    "pytest-env", 
+    "pytest-xdist",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "mkdocs-include-markdown-plugin",
+    "mkdocs-jupyter",
+]
+
 [project.urls]
 "Website" = "http://fpsim.org"
 "Source" = "https://github.com/fpsim/fpsim/"
