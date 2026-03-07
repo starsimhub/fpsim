@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "fpsim"
 dynamic = ["version"]
 description = "FPsim: Family Planning Simulator"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["family planning", "women's health", "agent-based model", "simulation"]
@@ -44,9 +44,6 @@ dependencies = [
     "matplotlib>=3.5.0",
     "seaborn>=0.9",
     "optuna",
-    "plotnine",
-    "pyarrow",
-    "pyyaml",
 ]
 
 [project.urls]
