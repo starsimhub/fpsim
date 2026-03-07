@@ -9,7 +9,7 @@ FPsim is a stochastic agent-based model, written in Python, for exploring and an
 - **Country-specific calibrations**: Includes calibrated parameter sets for multiple countries (Senegal, Kenya, Ethiopia, and more).
 - **Contraceptive modeling**: Detailed modeling of contraceptive method choice, switching, and duration of use.
 - **Intervention analysis**: Policy interventions that modify simulation parameters to explore "what-if" scenarios.
-- **Built on Starsim**: Uses the [Starsim](https://starsim.org) framework (v3.0.2+) for simulation architecture.
+- **Built on Starsim**: Uses the [Starsim](https://starsim.org) framework (v3.1.0+) for simulation architecture.
 
 ## Quick start
 
