@@ -25,6 +25,10 @@ Refactors pregnancy logic to inherit from Starsim's Pregnancy module and improve
 * **Parameter changes**
   * Renamed `primary_infertility` parameter to `p_infertile` for consistency with Starsim naming conventions
 
+* **DHS data R script enhancements**
+  * Warnings added for edge cases and missing data
+  * run_all.R works properly
+
 * **Bug fixes**
   * Fixed overflow issues in sigmoid function calculations
   * Fixed `education_recorder` analyzer to correctly filter by age
