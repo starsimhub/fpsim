@@ -64,3 +64,4 @@ if __name__ == '__main__':
 
     sims = plot_simple_choice()
     print('Done.')
+ 

@@ -12,11 +12,12 @@ import fpsim.arrays as fpa
 
 #%% Global defaults
 useSI          = True
-mpy            = 12   # Months per year, to avoid magic numbers
 eps            = 1e-9 # To avoid divide-by-zero
 min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
 max_age        = 99   # Maximum age (inclusive)
-max_age_preg   = 50   # Maximum age to become pregnant
+max_age_preg   = 50   # Maximum age for pregnancy
+spline_max_age  = 99   # Maximum age of agents (inclusive)
+spline_max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
 max_parity_spline = 20   # Used for parity splines
 location_registry = {}  # Registry for external custom locations
@@ -92,66 +93,47 @@ def get_test_defaults():
     return defaults
 
 
+
 # Defaults states and values of any new(born) agent unless initialized with data or other strategy
 # or updated during the course of a simulation.
 fpmod_states = [
+
     # Contraception
     ss.BoolState('on_contra', default=False),  # whether she's on contraception
     ss.IntArr('method', default=0),  # Which method to use. 0 used for those on no method
     ss.FloatArr('ti_contra', default=0),  # time point at which to set method
-    ss.FloatArr('barrier', default=0),
     ss.BoolState('ever_used_contra', default=False),  # Ever been on contraception. 0 for never having used
     ss.BoolState('intent_to_use', default=False),  # Intent to use contraception
     ss.BoolState('fertility_intent', default=False),  # Fertility intent (desire for more children)
     ss.IntArr('fertility_intent_cat', default=0),  # Categorical fertility intent: 0=cannot-get-pregnant, 1=no, 2=yes
-    ss.FloatArr('rel_sus', default=0),  # Relative susceptibility to pregnancy, set to 1 for active fecund women
 
     # Sexual and reproductive states, all False by default and set during simulation
     ss.BoolState('lam'),
-    ss.BoolState('pregnant'),
-    ss.BoolState('fertile'),
     ss.BoolState('sexually_active'),
     ss.BoolState('sexual_debut'),
-    ss.BoolState('lactating'),
-    ss.BoolState('postpartum'),
 
     # Ages of key events
-    ss.FloatArr('sexual_debut_age', default=-1),
-    ss.FloatArr('fated_debut', default=-1),
-    ss.FloatArr('first_birth_age', default=-1),
+    ss.FloatArr('sexual_debut_age'),
+    ss.FloatArr('fated_debut'),
+    ss.FloatArr('first_birth_age'),
 
     # Counts of events
-    ss.FloatArr('parity', default=0),           # Number of births including stillbirths
     ss.FloatArr('n_births', default=0),         # Number of live births
     ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
-    ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
-    ss.FloatArr('n_pregnancies', default=0),    # Number of pregnancies, including miscarriages, stillbirths, abortions
+    ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
-    ss.FloatArr('short_interval', default=0),   # TODO, what does this store?
+    ss.FloatArr('twin_uid', label='UID of second twin, if applicable'),
 
     # Durations and counters
-    ss.FloatArr('gestation', default=0),  # TODO, remove?
-    ss.FloatArr('remainder_months', default=0),  # TODO, remove?
-    ss.FloatArr('dur_pregnancy', default=0),
-    ss.FloatArr('dur_postpartum', default=0),
-    ss.FloatArr('dur_breastfeed', default=0),
     ss.FloatArr('dur_breastfeed_total', default=0),
 
     # Timesteps of significant events
-    ss.FloatArr('ti_conceived'),
-    ss.FloatArr('ti_pregnant'),
-    ss.FloatArr('ti_delivery'),
     ss.FloatArr('ti_last_delivery'),
     ss.FloatArr('ti_live_birth'),
     ss.FloatArr('ti_stillbirth'),
-    ss.FloatArr('ti_postpartum'),
     ss.FloatArr('ti_miscarriage'),
     ss.FloatArr('ti_abortion'),
-    ss.FloatArr('ti_stop_postpartum'),
-    ss.FloatArr('ti_stop_breastfeeding'),
-    ss.FloatArr('ti_debut'),
-    ss.FloatArr('ti_dead'),
 
     # Fecundity
     ss.FloatArr('personal_fecundity', default=0),
@@ -188,8 +170,8 @@ age_bin_map = {
 }
 
 # Age and parity splines
-spline_ages      = np.arange(max_age + 1)
-spline_preg_ages = np.arange(max_age_preg + 1)
+spline_ages      = np.arange(spline_max_age + 1)
+spline_preg_ages = np.arange(spline_max_age_preg + 1)
 spline_parities  = np.arange(max_parity_spline + 1)
 
 # Define allowable keys to select all (all ages, all methods, etc)
@@ -202,7 +184,7 @@ method_age_map = {
     '18-20': [18, 20],
     '20-25': [20, 25],
     '25-35': [25, 35],
-    '>35':   [35, max_age+1], # +1 since we're using < rather than <=
+    '>35':   [35, spline_max_age+1], # +1 since we're using < rather than <=
 }
 
 immutable_method_age_map = {
@@ -211,7 +193,7 @@ immutable_method_age_map = {
     '20-25': [20, 25],
     '25-30': [25, 30],
     '30-35': [30, 35],
-    '>35':   [35, max_age+1], # +1 since we're using < rather than <=
+    '>35':   [35, spline_max_age+1], # +1 since we're using < rather than <=
 }
 
 method_youth_age_map = {
@@ -220,20 +202,17 @@ method_youth_age_map = {
     '18-19': [18, 20],
     '20-22': [20, 23],
     '23-25': [23, 26],
-    '>25': [26, max_age+1]
+    '>25': [26, spline_max_age+1]
 }
 
 # Counts - we compute number of new events each timestep, plus number of cumulative events
 event_counts = sc.autolist(
-    'births',
     'stillbirths',
     'miscarriages',
     'abortions',
     'short_intervals',
     'secondary_births',
-    'pregnancies',
     'total_births',
-    'maternal_deaths',
     'infant_deaths',
     'method_failures',
 )
@@ -243,14 +222,6 @@ people_counts = sc.autolist(
     'new_users',
     'ever_used_contra',
     'switchers',
-    'n_fecund',
-    'pp0to5',
-    'pp6to11',
-    'pp12to23',
-    'parity0to1',
-    'parity2to3',
-    'parity4to5',
-    'parity6plus',
     'nonpostpartum',
 )
 
@@ -260,12 +231,4 @@ sim_results = sc.autolist(
     'n_wq3',
     'n_wq4',
     'n_wq5',
-)
-
-# Rates and other results that aren't scaled
-rate_results = sc.autolist(
-    'tfr',
-    'mmr',
-    'imr',
-    'p_short_interval',
 )

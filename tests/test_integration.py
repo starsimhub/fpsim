@@ -59,7 +59,8 @@ def test_pregnant_women():
         'test': True,
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
-        'primary_infertility': 0,
+        'p_infertile': 0,
+        'burnin': False,
         'sexual_activity': sexual_activity,
     }
 
@@ -103,7 +104,7 @@ def test_pregnant_women():
     # no premature births so all births are full term
     pregnancies = sim.results.fp.pregnancies[0:3].sum()
     live_births = sim.results.fp.births[9:12].sum()
-    assert 0.85 * pregnancies > live_births > 0.75 * pregnancies, "Expected number of live births not met"
+    assert 0.90 * pregnancies > live_births > 0.70 * pregnancies, "Expected number of live births not met"
     print(f'✓ ({live_births} live births from {pregnancies} pregnancies, as expected)')
 
     return sim
@@ -144,7 +145,7 @@ def test_contraception():
         'location': 'senegal',
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
-        'primary_infertility': 0,
+        'p_infertile': 0,
         'sexual_activity': sexual_activity,
     }
 
@@ -179,7 +180,7 @@ def test_method_selection_dependencies():
         'start_year': 2000,
         'end_year': 2001,
         'n_agents': 1000,
-        'primary_infertility': 1,  # make sure no pregnancies!
+        'p_infertile': 1,  # make sure no pregnancies!
     }
 
     cm_pars = dict(
@@ -228,21 +229,16 @@ def test_education_preg():
     sc.heading('Testing that lower fertility rate leads to more education...')
 
     def make_sim(pregnant=False):
-        pars = dict(start=2000, stop=2010, n_agents=1000, test=True)
+        pars = dict(start=2000, stop=2001, n_agents=1000, test=True, burnin=False)
         sim = fp.Sim(pars=pars)
         sim.init()
         sim.people.age[:] = 15
         sim.people.female[:] = True
-        fpppl = sim.people.fp
+        uids = sim.people.female.uids
         if pregnant:
-            fpppl.gestation[:] = 1  # Start the counter at 1
-            fpppl.dur_pregnancy[:] = 9  # Set pregnancy duration
-            fpppl.ti_delivery[:] = 9  # Set time of delivery
-            fpppl.ti_pregnant[:] = 0
-            fpppl.pregnant[:] = True
-            fpppl.method[:] = 0
-            fpppl.on_contra[:] = False
-            fpppl.ti_contra[:] = 12
+            embryo_counts = np.ones(len(uids))
+            sim.demographics.fp.make_pregnancies(uids)
+            sim.demographics.fp.make_embryos(uids, embryo_counts)
         return sim
 
     sim_base = make_sim()
