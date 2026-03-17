@@ -3,6 +3,11 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.6.0
+* **Regression information** 
+ * Fixed birth spacing preference offset to account for pregnancy duration. The `spacing_pref` weights represent desired birth-to-birth intervals, but the bin lookup previously used time-since-last-birth (conception timing) without adding pregnancy duration. A woman 15 months postpartum now correctly looks up the preference for a 24-month birth interval (15 + 9 months pregnancy) instead of a 15-month interval. This may change birth spacing distributions in existing calibrations.
+
+
 ## Version 3.5.2 (2026-03-04)
 - Fixed compatibility with Starsim 3.2.0: changed `FPmod` to inherit from `ss.Connector` instead of `ss.Module` so it is correctly stored in `sim.connectors`.
 - Fixed MCPR year matching in `Experiment.get_mcpr()`: converted Timestamp index to integer years to match data format after Starsim 3.2.0's `to_df()` change.
