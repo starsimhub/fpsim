@@ -7,28 +7,27 @@ import fpsim.locations.data_utils as fpld
 
 def make_calib_pars():
     pars = {}
-    pars['fecundity_low'] = 0.35
-    pars['fecundity_high'] = 1.1
-    pars['exposure_factor'] = 0.75
-    pars['prob_use_year'] = 2020
-    pars['prob_use_trend_par'] = 0.01
-    pars['prob_use_intercept'] = 1.2
-    pars['method_weights'] = np.array([0.0012, 0.07, 3.5, 0.4, 0.5, 0.1, 300, 7, 3])
-    pars['dur_postpartum'] = 23
+    pars['exposure_factor'] = 1.15
+    pars['prob_use_intercept'] = 0.3
+    pars['prob_use_trend_par'] = -0.015
+    pars['fecundity_low'] = 0.8640
+    pars['fecundity_high'] = 1.4105
+    pars['method_weights'] = np.array([3, 1, 3, 3, 0.5, 0.3, 8, 2, 3])
+    pars['dur_postpartum'] = 18
 
-    spacing_pref_array = np.ones(18, dtype=float)  # Size based on n_bins from data files
-    spacing_pref_array[:3] =  1
-    spacing_pref_array[3:6] = 1
-    spacing_pref_array[6:9] = 1
-    spacing_pref_array[9:] =  1
-    
+    spacing_pref_array = np.ones(19, dtype=float)  # Size based on n_bins from data files
+    spacing_pref_array[:4] =  1.0   # 0-12 months
+    spacing_pref_array[4:8] = 1.0   # 12-24 months
+    spacing_pref_array[8:13] = 1.0  # 24-39 months
+    spacing_pref_array[13:] = 0.1   # 39-54+ months — suppress (data: only 9% >48)
+
     pars['spacing_pref'] = {
         'preference': spacing_pref_array
     }
-    pars['exposure_age'] = np.array([[0,     5, 10, 12.5,   15, 18, 20,  25, 30,   35, 40, 45, 50],
-                                        [0.5, 0.5, 0.5, 0.4 , 0.5,  1,  1,  1.1,1.7,  1.7, 0.8,0.5,0.5]])
+    pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
+                                      [1.0, 0.3005, 0.2809, 0.35, 0.5, 0.8, 0.75, 0.75, 0.7, 0.55, 0.4, 0.2, 0.1]])
     pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
-                                           [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
+                                        [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
 
     return pars
 

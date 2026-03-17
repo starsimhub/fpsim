@@ -403,12 +403,12 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
 
     # Import data
     data_cpr = Config.load_validation_data(sim.pars['location'], keys=['mcpr'])['mcpr']
-    data_cpr = data_cpr[data_cpr['year'] <= sim.pars['stop']]  # Restrict years to plot
+    data_cpr = data_cpr[(data_cpr['year'] >= sim.pars['start']) & (data_cpr['year'] <= sim.pars['stop'])]  # Restrict to sim years
     res = sim.results
 
     # Align data for RMSE calculation
     years = data_cpr['year']
-    data_values = data_cpr['cpr'].values
+    data_values = data_cpr['mcpr'].values
     model_values = np.interp(years, res['timevec'].years, res.contraception.mcpr * 100)  # Interpolate model CPR to match data years
 
     # Compute mean-normalized RMSE
@@ -425,7 +425,7 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
         save_individual = True
 
     # Plot
-    ax.plot(plot_data['year'], plot_data['cpr'], label='UN Data Portal', color='black')
+    ax.plot(plot_data['year'], plot_data['mcpr'], label='UN Data Portal', color='black')
     ax.plot(res['timevec'][si:].years, res.contraception.mcpr[si:] * 100, label='FPsim', color='cornflowerblue')
     ax.set_xlabel('Year')
     ax.set_ylabel('Percent')
@@ -450,17 +450,23 @@ def plot_tfr(sim, ax=None, start_year=1990, stop_year=2020, legend_kwargs={}):
     df = res.fp.to_df(resample='year', use_years=True)
     data_tfr = Config.load_validation_data(sim.pars['location'], keys=['tfr'])['tfr']
 
+    # Filter data to sim year range
+    sim_start = sim.pars['start']
+    sim_stop = sim.pars['stop']
+    data_tfr = data_tfr[(data_tfr['year'] >= sim_start) & (data_tfr['year'] <= sim_stop)]
+
     # Align model and data years for RMSE calculation
     data_years = data_tfr['year']
     data_tfr_values = data_tfr['tfr']
-    model_tfr_values = np.interp(data_years, df.index, df.tfr)  # Interpolate to match data years (??)
+    model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
+    model_tfr_values = np.interp(data_years, model_years, df.tfr)  # Interpolate to match data years
 
     # Compute mean-normalized RMSE
     rmse_scores['tfr'] = compute_rmse(model_tfr_values, data_tfr_values)
 
     # Filter data for plotting
     plot_data = data_tfr.loc[(data_tfr['year'] >= start_year) & (data_tfr['year'] <= stop_year)]
-    plot_model = df.loc[(df.index >= start_year) & (df.index <= stop_year)]
+    plot_model = df.loc[(df.index.year >= start_year) & (df.index.year <= stop_year)]
 
     # Determine axis setup
     save_individual = False
@@ -468,9 +474,9 @@ def plot_tfr(sim, ax=None, start_year=1990, stop_year=2020, legend_kwargs={}):
         fig, ax = pl.subplots()
         save_individual = True
 
-    # Plot
+    # Plot using integer years for both so they share the same x-axis
     ax.plot(plot_data['year'], plot_data['tfr'], label='World Bank', color='black')
-    ax.plot(plot_model.index, plot_model.tfr, label='FPsim', color='cornflowerblue')
+    ax.plot(plot_model.index.year, plot_model.tfr, label='FPsim', color='cornflowerblue')
     ax.set_xlabel('Year')
     ax.set_ylabel('Rate')
     ax.set_ylim(bottom=0)

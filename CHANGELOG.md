@@ -3,9 +3,16 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.6.0
+## Version 3.5.3 (2026-03-17)
+
 * **Regression information**
   * Extended `spacing_pref` to apply to all parous women, not just postpartum women. Previously, spacing preference weights at intervals beyond `dur_postpartum` (e.g., 24-48 months) had no effect because women had already exited the postpartum state. Now spacing preferences influence sexual activity for any woman with a prior live birth, using the appropriate base rate (postpartum or age-based). Also switched the time-since-birth calculation from `ti_delivery` to `ti_live_birth` to avoid NaN values caused by miscarriage. This will change birth spacing distributions in existing calibrations.
+  * Recalibrated all 9 non-Ethiopia region locations.
+
+* **Other changes**
+  * `experiment.py`: `age_first_stats` metric now compares 5 percentiles (10th, 25th, 50th, 75th, 90th) instead of 3
+  * `run_calibrated_location.py`: added `--seed` and `--results-dir` options for validation
+  * `plotting.py`: added mean-normalized RMSE display to validation plots
 
 
 ## Version 3.5.2 (2026-03-04)

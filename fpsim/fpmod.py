@@ -251,7 +251,7 @@ class FPmod(ss.Connector):
 
             # Compute spacing preference weights based on time since last live birth
             spacing_bins = time_since_birth / pref['interval']
-            spacing_bins = np.array(np.minimum(spacing_bins, pref['n_bins']), dtype=int)
+            spacing_bins = np.array(np.minimum(spacing_bins, pref['n_bins'] - 1), dtype=int)
             sp_weights = pref['preference'][spacing_bins]
 
             # Compute base sexual activity: PP women use postpartum data, others use age-based data
@@ -349,7 +349,7 @@ class FPmod(ss.Connector):
         raw_probs *= pars['exposure_parity'][np.minimum(self.parity[active_uids], fpd.max_parity).astype(int)]
 
         # Use a single binomial trial to check for conception successes this month
-        raw_probs = np.minimum(raw_probs, 1.0)
+        raw_probs = np.minimum(raw_probs, 1.0 - fpd.eps)
         preg_probs = ss.probperyear(raw_probs).to_prob(self.t.dt)
         self._p_conceive.set(p=preg_probs)
         conceived = self._p_conceive.filter(active_uids)

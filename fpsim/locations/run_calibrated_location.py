@@ -46,16 +46,19 @@ def plot_calib(sim, single_fig=False, fig_kwargs=None, legend_kwargs=None):
     """
     fpplt.plot_calib(sim)
 
-def run_calibrated_sim(location, n_agents=5000, end_year=2020):
+def run_calibrated_sim(location, n_agents=5000, start_year=1960, end_year=2020, seed=None):
     """Run simulation with pre-calibrated parameters for a given location"""
     print(f"Running pre-calibrated simulation for {location}...")
-    
+
     # Create simulation with parameters - uses calibrated parameters from location files
     pars = dict(
         location=location,
         n_agents=n_agents,
+        start_year=start_year,
         end_year=end_year,
     )
+    if seed is not None:
+        pars['rand_seed'] = seed
     
     sim = fp.Sim(pars=pars)
     sim.init()
@@ -92,6 +95,8 @@ def main():
                        help='Load existing simulation results instead of running')
     parser.add_argument('--n-agents', type=int, default=5000,
                        help='Number of agents (default: 5000)')
+    parser.add_argument('--start-year', type=int, default=2000,
+                       help='Start year for simulation (default: 2000)')
     parser.add_argument('--end-year', type=int, default=2020,
                        help='End year for simulation (default: 2020)')
     parser.add_argument('--results-dir', default='calib_results',
@@ -100,6 +105,8 @@ def main():
                        help="Don't save simulation results")
     parser.add_argument('--no-plots', action='store_true',
                        help="Don't generate validation plots")
+    parser.add_argument('--seed', type=int, default=None,
+                       help='Random seed for reproducibility')
     
     args = parser.parse_args()
     
@@ -125,7 +132,7 @@ def main():
             print(f"ERROR: {e}")
             sys.exit(1)
     else:
-        sim = run_calibrated_sim(args.location, args.n_agents, args.end_year)
+        sim = run_calibrated_sim(args.location, args.n_agents, start_year=args.start_year, end_year=args.end_year, seed=args.seed)
         
         if not args.no_save:
             save_results(sim, args.location, args.results_dir)

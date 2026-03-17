@@ -27,7 +27,7 @@ default_flags = sc.objdict(
     popsize     = 1, # Population size and growth over time on whole years, adjusted for n number of agents; 'pop_size'
     ageparity   = 1, # Population distribution of agents in each age/parity bin (age-parity plot); 'ageparity'
     first_birth = 1, # Age at first birth mean with standard deviation; 'age_first_birth'
-    birth_space = 0, # Birth spacing both in bins and mean with standard deviation; 'spacing'
+    birth_space = 1, # Birth spacing both in bins and mean with standard deviation; 'spacing'
     mcpr        = 1, # Modern contraceptive prevalence; 'mcpr'
     methods     = 1, # Overall percentage of method use and method use among users; 'methods'
     mmr         = 1, # Maternal mortality ratio at end of sim in model vs data; 'maternal_mortality_ratio'
@@ -105,42 +105,55 @@ class Experiment(sc.prettyobj):
     def get_pop_size(self, sres=None):
         # Model
         df = sres.to_df(resample='year', use_years=True, sep='_')
-        pop = df['n_alive']
-        self.model['pop_size'] = pop
-        self.model['pop_years'] = df.index
-        model_growth_rate = np.diff(pop) / pop[:-1] * 100  # Percent change
-        self.model['pop_growth_rate'] = model_growth_rate
+        model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
+        model_pop = df['n_alive'].values
 
         # Data
         pop_size = self.load_data('popsize')
         n = self.sim.pars.n_agents
-        self.data['pop_years'] = pop_size.year.to_numpy(copy=True)
-        self.data['pop_size']  = pop_size.population.to_numpy(copy=True) / (pop_size.population[0] / n)  # Corrected for # of agents, needs manual adjustment for # agents
-        data_growth_rate = np.diff(self.data['pop_size']) / self.data['pop_size'][:-1] * 100  # Percent change
-        self.data['pop_growth_rate'] = data_growth_rate
+        data_years = pop_size.year.to_numpy(copy=True)
+        data_pop = pop_size.population.to_numpy(copy=True)
+
+        # Filter to overlapping years
+        common_years = np.intersect1d(data_years, model_years)
+        data_mask = np.isin(data_years, common_years)
+        model_mask = np.isin(model_years, common_years)
+
+        # Scale data population to match agent count
+        first_common_idx = np.searchsorted(data_years, common_years[0])
+        scale_factor = data_pop[first_common_idx] / n
+
+        self.data['pop_years'] = data_years[data_mask]
+        self.data['pop_size'] = data_pop[data_mask] / scale_factor
+        self.model['pop_years'] = model_years[model_mask]
+        self.model['pop_size'] = model_pop[model_mask]
+
+        # Growth rates
+        self.data['pop_growth_rate'] = np.diff(self.data['pop_size']) / self.data['pop_size'][:-1] * 100
+        self.model['pop_growth_rate'] = np.diff(self.model['pop_size']) / self.model['pop_size'][:-1] * 100
 
         return
 
     def get_mcpr(self, sres=None):
         # Model
         df = sres.contraception.to_df(resample='year', use_years=True)
-        years = df.index.year if hasattr(df.index, 'year') else df.index
-        model = {'years': years, 'mcpr': df['mcpr']}
-        model_frame = pd.DataFrame(model)
+        model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
+        model_mcpr = df['mcpr'].values
 
         # Data
         mcpr = self.load_data('mcpr')
-        self.data['mcpr_years'] = mcpr.iloc[:,0].to_numpy(copy=True)
-        self.data['mcpr'] = mcpr.iloc[:,2].to_numpy(copy=True)  # Already in percent
+        data_years = mcpr.iloc[:,0].to_numpy(copy=True)
+        data_mcpr = mcpr.iloc[:,2].to_numpy(copy=True)  # Already in percent
 
-        # Filter to matching years
-        data_years = self.data['mcpr_years'].tolist()
-        filtered_model = model_frame.loc[model_frame.years.isin(data_years)]
-        model_mcpr = filtered_model['mcpr'].to_numpy(copy=True)
-        mcpr_years = filtered_model['years'].to_numpy(copy=True)
+        # Filter to overlapping years
+        common_years = np.intersect1d(data_years, model_years)
+        data_mask = np.isin(data_years, common_years)
+        model_mask = np.isin(model_years, common_years)
 
-        self.model['mcpr'] = model_mcpr*100 # Since data is in 100
-        self.model['mcpr_years'] = mcpr_years
+        self.data['mcpr_years'] = data_years[data_mask]
+        self.data['mcpr'] = data_mcpr[data_mask]
+        self.model['mcpr_years'] = model_years[model_mask]
+        self.model['mcpr'] = model_mcpr[model_mask] * 100  # Since data is in percent
 
         return
 
@@ -177,10 +190,24 @@ class Experiment(sc.prettyobj):
     def get_tfr(self, fp_df=None):
         # Extract tfr over time in data - keep here to ignore dhs data if not using tfr for calibration
         tfr = self.load_data('tfr')
-        self.data['tfr_years'] = tfr['year'].to_numpy(copy=True)
-        self.data['total_fertility_rate'] = tfr['tfr'].to_numpy(copy=True)
-        self.model['tfr_years'] = fp_df.index
-        self.model['total_fertility_rate'] = fp_df['tfr']
+
+        # Model — extract integer years from Timestamp index
+        model_years_int = np.array([t.year if hasattr(t, 'year') else int(t) for t in fp_df.index])
+        model_tfr = fp_df['tfr'].values
+
+        # Data
+        data_years = tfr['year'].to_numpy(copy=True)
+        data_tfr = tfr['tfr'].to_numpy(copy=True)
+
+        # Filter to overlapping years
+        common_years = np.intersect1d(data_years, model_years_int)
+        data_mask = np.isin(data_years, common_years)
+        model_mask = np.isin(model_years_int, common_years)
+
+        self.data['tfr_years'] = data_years[data_mask]
+        self.data['total_fertility_rate'] = data_tfr[data_mask]
+        self.model['tfr_years'] = model_years_int[model_mask]
+        self.model['total_fertility_rate'] = model_tfr[model_mask]
         return
 
     def get_asfr(self, ind=-1):
@@ -294,9 +321,11 @@ class Experiment(sc.prettyobj):
         birth_spacing_cum_weights = np.cumsum(birth_spacing_weights)
         birth_spacing_total_weight = birth_spacing_cum_weights[-1]
 
-        data_age_first_stats = np.array([np.interp((.25 * afb_total_weight), afb_cum_weights, afb_values),
+        data_age_first_stats = np.array([np.interp((.10 * afb_total_weight), afb_cum_weights, afb_values),
+                                       np.interp((.25 * afb_total_weight), afb_cum_weights, afb_values),
                                        np.interp((.50 * afb_total_weight), afb_cum_weights, afb_values),
-                                       np.interp((.75 * afb_total_weight), afb_cum_weights, afb_values)])
+                                       np.interp((.75 * afb_total_weight), afb_cum_weights, afb_values),
+                                       np.interp((.90 * afb_total_weight), afb_cum_weights, afb_values)])
 
         data_spacing_stats = np.array([np.interp((.25 * birth_spacing_total_weight), birth_spacing_cum_weights, birth_spacing_values),
                                        np.interp((.50 * birth_spacing_total_weight), birth_spacing_cum_weights, birth_spacing_values),
@@ -311,9 +340,11 @@ class Experiment(sc.prettyobj):
             model_spacing_stats = np.array([np.percentile(model_spacing, 25),
                                             np.percentile(model_spacing, 50),
                                             np.percentile(model_spacing, 75)])
-            model_age_first_stats = np.array([np.percentile(model_age_first, 25),
+            model_age_first_stats = np.array([np.percentile(model_age_first, 10),
+                                              np.percentile(model_age_first, 25),
                                               np.percentile(model_age_first, 50),
-                                              np.percentile(model_age_first, 75)])
+                                              np.percentile(model_age_first, 75),
+                                              np.percentile(model_age_first, 90)])
         except Exception as E:  # pragma: nocover
             print(f'Could not calculate birth spacing, returning zeros: {E}')
             model_spacing_counts = {k: 0 for k in spacing_bins.keys()}
@@ -887,7 +918,7 @@ class Fit(sc.prettyobj):
             if use_median:
                 self.mismatches[key] = np.median(self.losses[key])
             else:
-                self.mismatches[key] = np.sum(self.losses[key])
+                self.mismatches[key] = np.mean(self.losses[key])
         self.mismatch = self.mismatches[:].sum()
         return self.mismatch
 
@@ -949,7 +980,7 @@ class Fit(sc.prettyobj):
             loss_ax = pl.subplot(n_rows, n_keys, k+2*n_keys+1, sharey=loss_ax)
             pl.bar(days, self.losses[key], width=width, color=colors[k], label='Losses')
             pl.xlabel(daylabel)
-            pl.title(f'Total loss: {self.losses[key].sum():0.3f}')
+            pl.title(f'Mean loss: {self.losses[key].mean():0.3f}')
             if k == 0:
                 pl.ylabel('Losses')
                 pl.legend()
