@@ -3,6 +3,11 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.6.0
+* **Regression information**
+  * Extended `spacing_pref` to apply to all parous women, not just postpartum women. Previously, spacing preference weights at intervals beyond `dur_postpartum` (e.g., 24-48 months) had no effect because women had already exited the postpartum state. Now spacing preferences influence sexual activity for any woman with a prior live birth, using the appropriate base rate (postpartum or age-based). Also switched the time-since-birth calculation from `ti_delivery` to `ti_live_birth` to avoid NaN values caused by miscarriage. This will change birth spacing distributions in existing calibrations.
+
+
 ## Version 3.5.2 (2026-03-04)
 - Fixed compatibility with Starsim 3.2.0: changed `FPmod` to inherit from `ss.Connector` instead of `ss.Module` so it is correctly stored in `sim.connectors`.
 - Fixed MCPR year matching in `Experiment.get_mcpr()`: converted Timestamp index to integer years to match data format after Starsim 3.2.0's `to_df()` change.
