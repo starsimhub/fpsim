@@ -234,13 +234,9 @@ class FPmod(ss.Connector):
         timesteps_since_birth = self.ti - self.ti_delivery[pp]
 
         # Adjust for postpartum women's birth spacing preferences
-        # Spacing preferences represent desired birth-to-birth intervals, so we offset
-        # by pregnancy duration to map conception time to expected birth interval
         if len(pp):
             pref = self.pars['spacing_pref']  # Shorten since used a lot
-            preg_dur_months = float(self.pars.dur_pregnancy.pars['low'])  # Mean pregnancy duration in months
-            adjusted_time = timesteps_since_birth + preg_dur_months  # Project forward to when next birth would occur
-            spacing_bins = adjusted_time / pref['interval']  # Main calculation: divide the projected birth interval by the bin width
+            spacing_bins = timesteps_since_birth / pref['interval']  # Main calculation: divide the duration by the interval
             spacing_bins = np.array(np.minimum(spacing_bins, pref['n_bins']), dtype=int)  # Bound by longest bin
             probs_pp = self.pars['sexual_activity_pp']['percent_active'][timesteps_since_birth.astype(int)]
             # Adjust the probability: check the overall probability with print(pref['preference'][spacing_bins].mean())
