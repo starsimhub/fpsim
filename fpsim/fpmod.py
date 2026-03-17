@@ -227,32 +227,55 @@ class FPmod(ss.Connector):
         if uids is None:
             uids = self.alive.uids
 
-        # Set postpartum probabilities
+        # Categorize women into parous (have had a birth) and nulliparous
         is_pp = self.postpartum[uids]
-        pp = uids[is_pp]
-        non_pp = uids[(ppl.age[uids] >= self.fated_debut[uids]) & ~is_pp]
-        timesteps_since_birth = self.ti - self.ti_delivery[pp]
+        debuted_age = ppl.age[uids] >= self.fated_debut[uids]
+        parous = uids[self.parity[uids] > 0]
+        non_parous = uids[(self.parity[uids] == 0) & debuted_age & ~is_pp]
 
-        # Adjust for postpartum women's birth spacing preferences
-        if len(pp):
-            pref = self.pars['spacing_pref']  # Shorten since used a lot
-            spacing_bins = timesteps_since_birth / pref['interval']  # Main calculation: divide the duration by the interval
-            spacing_bins = np.array(np.minimum(spacing_bins, pref['n_bins']), dtype=int)  # Bound by longest bin
-            probs_pp = self.pars['sexual_activity_pp']['percent_active'][timesteps_since_birth.astype(int)]
-            # Adjust the probability: check the overall probability with print(pref['preference'][spacing_bins].mean())
-            probs_pp *= pref['preference'][spacing_bins]
-            self._p_active.set(p=probs_pp)
-            self.sexually_active[pp] = self._p_active.rvs(pp)
+        # For parous women: compute base sexual activity probability, apply spacing preferences, and draw.
+        # Base probability depends on postpartum status: PP women use postpartum sexual activity data,
+        # non-PP parous women use age-based sexual activity data.
+        # Filter to parous women with a recorded live birth (excludes those initialized
+        # without birth history or whose last pregnancy ended in miscarriage)
+        has_live_birth = parous[~np.isnan(self.ti_live_birth[parous])]
+        no_live_birth = parous[np.isnan(self.ti_live_birth[parous])]
 
-        # Set non-postpartum probabilities
-        if len(non_pp):
-            self.sexually_active[non_pp] = self._p_non_pp_active.rvs(non_pp)
+        # Parous women without a recorded birth get age-based sexual activity
+        if len(no_live_birth):
+            self.sexually_active[no_live_birth] = self._p_non_pp_active.rvs(no_live_birth)
+
+        if len(has_live_birth):
+            pref = self.pars['spacing_pref']
+            time_since_birth = self.ti - self.ti_live_birth[has_live_birth]
+
+            # Compute spacing preference weights based on time since last live birth
+            spacing_bins = time_since_birth / pref['interval']
+            spacing_bins = np.array(np.minimum(spacing_bins, pref['n_bins']), dtype=int)
+            sp_weights = pref['preference'][spacing_bins]
+
+            # Compute base sexual activity: PP women use postpartum data, others use age-based data
+            is_pp_has_birth = self.postpartum[has_live_birth]
+            pp_time = np.minimum(time_since_birth.astype(int), len(self.pars['sexual_activity_pp']['percent_active']) - 1)
+            base_probs = np.where(
+                is_pp_has_birth,
+                self.pars['sexual_activity_pp']['percent_active'][pp_time],
+                self.pars['sexual_activity'][ppl.int_age(has_live_birth)]
+            )
+
+            # Apply spacing preference and draw
+            adjusted_probs = base_probs * sp_weights
+            self._p_active.set(p=adjusted_probs)
+            self.sexually_active[has_live_birth] = self._p_active.rvs(has_live_birth)
+
+        # For non-parous women (nulliparous, not postpartum): use age-based sexual activity
+        if len(non_parous):
+            self.sexually_active[non_parous] = self._p_non_pp_active.rvs(non_parous)
 
             # Set debut to True if sexually active for the first time
-            # Record agent age at sexual debut in their memory
-            never_sex = self.sexual_debut[non_pp] == 0
-            now_active = self.sexually_active[non_pp] == 1
-            first_debut = non_pp[now_active & never_sex]
+            never_sex = self.sexual_debut[non_parous] == 0
+            now_active = self.sexually_active[non_parous] == 1
+            first_debut = non_parous[now_active & never_sex]
             self.sexual_debut[first_debut] = True
             self.sexual_debut_age[first_debut] = ppl.age[first_debut]
 
