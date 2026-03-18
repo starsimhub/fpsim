@@ -396,7 +396,7 @@ def plot_ageparity(sim, ax=None):
     return ax
 
 
-def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
+def plot_cpr(sim, start_year=None, end_year=None, ax=None, legend_kwargs={}):
     '''
     Plot contraceptive prevalence rate for model vs data
     '''
@@ -406,15 +406,18 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
     data_cpr = data_cpr[(data_cpr['year'] >= sim.pars['start']) & (data_cpr['year'] <= sim.pars['stop'])]  # Restrict to sim years
     res = sim.results
 
-    # Align data for RMSE calculation
-    years = data_cpr['year']
-    data_values = data_cpr['mcpr'].values
+    # Align data for RMSE calculation, dropping NaN rows
+    valid = data_cpr['mcpr'].notna()
+    years = data_cpr.loc[valid, 'year']
+    data_values = data_cpr.loc[valid, 'mcpr'].values
     model_values = np.interp(years, res['timevec'].years, res.contraception.mcpr * 100)  # Interpolate model CPR to match data years
 
     # Compute mean-normalized RMSE
     rmse_scores['cpr'] = compute_rmse(model_values, data_values)
 
     # Data to plot
+    if start_year is None:
+        start_year = sim.pars['start']
     plot_data = data_cpr.loc[data_cpr.year >= start_year]
     si = sc.findfirst(res['timevec'] >= start_year)
 
@@ -441,7 +444,7 @@ def plot_cpr(sim, start_year=2005, end_year=None, ax=None, legend_kwargs={}):
     return ax
 
 
-def plot_tfr(sim, ax=None, start_year=1990, stop_year=2020, legend_kwargs={}):
+def plot_tfr(sim, ax=None, start_year=None, stop_year=2020, legend_kwargs={}):
     """
     Plot total fertility rate for model vs data
     """
@@ -465,8 +468,12 @@ def plot_tfr(sim, ax=None, start_year=1990, stop_year=2020, legend_kwargs={}):
     rmse_scores['tfr'] = compute_rmse(model_tfr_values, data_tfr_values)
 
     # Filter data for plotting
+    if start_year is None:
+        start_year = sim.pars['start']
     plot_data = data_tfr.loc[(data_tfr['year'] >= start_year) & (data_tfr['year'] <= stop_year)]
-    plot_model = df.loc[(df.index.year >= start_year) & (df.index.year <= stop_year)]
+    # Exclude last year — incomplete resampling makes TFR appear to cliff
+    last_year = df.index.year.max()
+    plot_model = df.loc[(df.index.year >= start_year) & (df.index.year <= stop_year) & (df.index.year < last_year)]
 
     # Determine axis setup
     save_individual = False

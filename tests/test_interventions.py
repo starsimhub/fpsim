@@ -544,7 +544,7 @@ def test_method_switching_multiple_sources():
         year=2006,
         from_methods=['pill', 'inj'],  # Use methods that exist and have users
         to_method='target',
-        switch_prob={'pill': 0.10, 'inj': 0.10},
+        switch_prob={'pill': 0.50, 'inj': 0.50},
         annual=False,
         verbose=False,
     )

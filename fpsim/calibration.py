@@ -28,6 +28,25 @@ EXPOSURE_AGE_BOUNDS = {
     30: (0.5, 3.0), 35: (0.2, 2.0), 40: (0.1, 1.5), 45: (0.05, 1.0), 50: (0.01, 0.5),
 }
 
+# Exposure parity knots: parities at which we set the exposure multiplier
+EXPOSURE_PARITY_KNOTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20]
+
+# Default bounds for exposure_parity knots (parities 0-6 fixed at 1.0, 7+ calibrated)
+EXPOSURE_PARITY_BOUNDS = {
+    0: (1.0, 1.0), 1: (1.0, 1.0), 2: (1.0, 1.0), 3: (1.0, 1.0),
+    4: (1.0, 1.0), 5: (1.0, 1.0), 6: (1.0, 1.0),
+    7: (0.3, 1.0), 8: (0.1, 0.8), 9: (0.05, 0.6), 10: (0.01, 0.4),
+    11: (0.01, 0.3), 12: (0.01, 0.2), 20: (0.001, 0.1),
+}
+
+# Default bounds for spacing_pref suppression parameters
+# spacing_suppress_start: which 3-month bin to begin suppression (0-indexed, e.g., 12 = 36 months)
+# spacing_suppress_strength: how strongly to suppress at the final bin (0=no suppression, 1=full)
+SPACING_SUPPRESS_DEFAULTS = dict(
+    start_bin = (10, 6, 14),    # [best, low, high] — bin index where suppression begins
+    strength  = (0.8, 0.3, 1.0), # [best, low, high] — suppression at the final bin (1 = fully suppress)
+)
+
 
 class Calibration(sc.prettyobj):
     '''
@@ -93,14 +112,19 @@ class Calibration(sc.prettyobj):
     '''
 
     def __init__(self, pars, calib_pars=None, weights=None, fit_exposure_age=True,
+                 fit_exposure_parity=True, fit_spacing_pref=True,
                  smoothness_weight=0.5, exposure_age_bounds=None,
+                 exposure_parity_bounds=None,
                  verbose=True, keep_db=False, **kwargs):
         self.pars       = pars
         self.calib_pars = calib_pars
         self.weights    = weights
-        self.fit_exposure_age    = fit_exposure_age
-        self.smoothness_weight   = smoothness_weight
-        self.exposure_age_bounds = exposure_age_bounds if exposure_age_bounds is not None else EXPOSURE_AGE_BOUNDS
+        self.fit_exposure_age     = fit_exposure_age
+        self.fit_exposure_parity  = fit_exposure_parity
+        self.fit_spacing_pref     = fit_spacing_pref
+        self.smoothness_weight    = smoothness_weight
+        self.exposure_age_bounds  = exposure_age_bounds if exposure_age_bounds is not None else EXPOSURE_AGE_BOUNDS
+        self.exposure_parity_bounds = exposure_parity_bounds if exposure_parity_bounds is not None else EXPOSURE_PARITY_BOUNDS
         self.verbose    = verbose
         self.keep_db    = keep_db
         self._original_calib = None
@@ -207,8 +231,7 @@ class Calibration(sc.prettyobj):
             return
         self._original_calib = loc_module.make_calib_pars
         def _empty_calib_pars():
-            return {'exposure_parity': np.array([[0,1,2,3,4,5,6,7,8,9,10,11,12,20],
-                                                  [1,1,1,1,1,1,1,0.8,0.5,0.3,0.15,0.10,0.05,0.01]])}
+            return {}
         loc_module.make_calib_pars = _empty_calib_pars
 
     def _restore_calib_pars(self):
@@ -219,6 +242,23 @@ class Calibration(sc.prettyobj):
             if loc_module is not None:
                 loc_module.make_calib_pars = self._original_calib
             self._original_calib = None
+
+    def _get_n_spacing_bins(self):
+        ''' Get the number of spacing_pref bins for the current location '''
+        if not hasattr(self, '_n_spacing_bins'):
+            location = self.pars.get('location')
+            try:
+                dl = fplocs.data_utils.DataLoader(location=location)
+                data = dl.load()
+                sp = data.get('fp', {}).get('spacing_pref', {})
+                pref = sp.get('preference', sp.get('preferences', None))
+                if pref is not None:
+                    self._n_spacing_bins = len(pref)
+                else:
+                    self._n_spacing_bins = 17  # Default fallback
+            except Exception:
+                self._n_spacing_bins = 17
+        return self._n_spacing_bins
 
     def run_exp(self, calib_pars, return_exp=False, **kwargs):
         """ Create and run an experiment """
@@ -232,13 +272,14 @@ class Calibration(sc.prettyobj):
 
     def run_trial(self, trial):
         ''' Define the objective for Optuna. Suggests scalar parameters and optionally
-            exposure_age knots, runs the experiment, and returns mismatch + smoothness penalty. '''
+            exposure_age knots, exposure_parity knots, and spacing_pref suppression. '''
         pars = {}
         for key, (best,low,high) in self.calib_pars.items():
             pars[key] = trial.suggest_float(key, low, high)
 
-        # Optionally fit the exposure_age curve
         smoothness_penalty = 0.0
+
+        # Optionally fit the exposure_age curve
         if self.fit_exposure_age:
             exp_age_vals = []
             for age in EXPOSURE_KNOT_AGES:
@@ -249,7 +290,33 @@ class Calibration(sc.prettyobj):
                     exp_age_vals.append(trial.suggest_float(f'exp_age_{age}', low, high))
             pars['exposure_age'] = np.array([EXPOSURE_KNOT_AGES, exp_age_vals])
             diffs = np.diff(exp_age_vals)
-            smoothness_penalty = self.smoothness_weight * np.mean(diffs**2)
+            smoothness_penalty += self.smoothness_weight * np.mean(diffs**2)
+
+        # Optionally fit the exposure_parity curve
+        if self.fit_exposure_parity:
+            exp_par_vals = []
+            for par in EXPOSURE_PARITY_KNOTS:
+                low, high = self.exposure_parity_bounds[par]
+                if low == high:
+                    exp_par_vals.append(low)
+                else:
+                    exp_par_vals.append(trial.suggest_float(f'exp_par_{par}', low, high))
+            pars['exposure_parity'] = np.array([EXPOSURE_PARITY_KNOTS, exp_par_vals])
+
+        # Optionally fit spacing_pref suppression
+        if self.fit_spacing_pref:
+            defs = SPACING_SUPPRESS_DEFAULTS
+            start_bin = int(round(trial.suggest_float('spacing_suppress_start', defs['start_bin'][1], defs['start_bin'][2])))
+            strength = trial.suggest_float('spacing_suppress_strength', defs['strength'][1], defs['strength'][2])
+
+            # Build spacing_pref array: 1.0 before start_bin, linear ramp down after
+            n_bins = self._get_n_spacing_bins()
+            pref = np.ones(n_bins)
+            if start_bin < n_bins:
+                n_suppress = n_bins - start_bin
+                pref[start_bin:] = np.linspace(1.0, 1.0 - strength, n_suppress)
+                pref = np.clip(pref, 0.01, 1.0)
+            pars['spacing_pref'] = {'preference': pref}
 
         try:
             mismatch = self.run_exp(pars)
@@ -328,6 +395,31 @@ class Calibration(sc.prettyobj):
                     exp_age_vals.append(self.best_pars.pop(f'exp_age_{age}'))
             self.best_exposure_age = np.array([EXPOSURE_KNOT_AGES, exp_age_vals])
             self.best_pars['exposure_age'] = self.best_exposure_age
+
+        # Reconstruct exposure_parity from individual knot params
+        if self.fit_exposure_parity:
+            exp_par_vals = []
+            for par in EXPOSURE_PARITY_KNOTS:
+                low, high = self.exposure_parity_bounds[par]
+                if low == high:
+                    exp_par_vals.append(low)
+                else:
+                    exp_par_vals.append(self.best_pars.pop(f'exp_par_{par}'))
+            self.best_exposure_parity = np.array([EXPOSURE_PARITY_KNOTS, exp_par_vals])
+            self.best_pars['exposure_parity'] = self.best_exposure_parity
+
+        # Reconstruct spacing_pref from suppress params
+        if self.fit_spacing_pref:
+            start_bin = int(round(self.best_pars.pop('spacing_suppress_start')))
+            strength = self.best_pars.pop('spacing_suppress_strength')
+            n_bins = self._get_n_spacing_bins()
+            pref = np.ones(n_bins)
+            if start_bin < n_bins:
+                n_suppress = n_bins - start_bin
+                pref[start_bin:] = np.linspace(1.0, 1.0 - strength, n_suppress)
+                pref = np.clip(pref, 0.01, 1.0)
+            self.best_spacing_pref = pref
+            self.best_pars['spacing_pref'] = {'preference': pref}
 
         print(f'Best trial: mismatch={self.study.best_value:.2f}, time: {T}')
 

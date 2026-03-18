@@ -10,11 +10,11 @@ def make_calib_pars():
     print("INFO: Currently FPsim-Sindh uses PMA data from Rajasthan India as a placeholder. This calibration is not externally validated, and users should proceed with caution in using and interpreting FPsim for Sindh.")
 
     pars = {}
-    pars['exposure_factor'] = 0.9
-    pars['prob_use_intercept'] = -0.3
-    pars['prob_use_trend_par'] = -0.12
-    pars['fecundity_low'] = 0.6881
-    pars['fecundity_high'] = 1.5827
+    pars['exposure_factor'] = 1.0866
+    pars['prob_use_intercept'] = -2.6702
+    pars['prob_use_trend_par'] = 0.0329
+    pars['fecundity_low'] = 0.6889
+    pars['fecundity_high'] = 2.4576
     pars['method_weights'] = np.array([0.44, 2.3, 10, 3, 3, 2, 2, 0.01, 0.01])
     pars['dur_postpartum'] = 18
 
@@ -28,7 +28,7 @@ def make_calib_pars():
         'preference': spacing_pref_array
     }
     pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
-                                      [1.0, 0.1737, 0.2362, 0.4481, 0.6, 0.85, 0.9, 1.0, 1.1, 0.9, 0.7, 0.35, 0.15]])
+                                      [1.0, 0.061, 0.2273, 0.1894, 0.9462, 0.4032, 0.7958, 0.6972, 1.2797, 0.9221, 1.1769, 0.5993, 0.2615]])
     pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
                                         [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
 
