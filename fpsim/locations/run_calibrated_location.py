@@ -8,13 +8,17 @@ Usage:
     python run_calibrated_location.py <location_name>
     python run_calibrated_location.py cotedivoire
     python run_calibrated_location.py nigeria_lagos
-    
+    python run_calibrated_location.py senegal --no-save --seed 1 --results-dir calib_results/senegal_seed1
+
 Options:
-    --load      Load existing simulation results instead of running
-    --n-agents  Number of agents (default: 5000)
-    --end-year  End year for simulation (default: 2020)
-    --no-save   Don't save simulation results
-    --no-plots  Don't generate plots
+    --load          Load existing simulation results instead of running
+    --n-agents      Number of agents (default: 5000)
+    --start-year    Start year for simulation (default: 2000)
+    --end-year      End year for simulation (default: 2020)
+    --no-save       Don't save simulation results
+    --no-plots      Don't generate plots
+    --seed          Random seed for reproducibility
+    --results-dir   Directory for results and figures (default: calib_results)
 """
 
 import argparse
@@ -46,7 +50,7 @@ def plot_calib(sim, single_fig=False, fig_kwargs=None, legend_kwargs=None):
     """
     fpplt.plot_calib(sim)
 
-def run_calibrated_sim(location, n_agents=5000, start_year=1960, end_year=2020, seed=None):
+def run_calibrated_sim(location, n_agents=5000, start_year=2000, end_year=2020, seed=None):
     """Run simulation with pre-calibrated parameters for a given location"""
     print(f"Running pre-calibrated simulation for {location}...")
 
