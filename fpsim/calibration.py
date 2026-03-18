@@ -13,9 +13,20 @@ import starsim as ss
 import optuna as op
 from . import parameters as fpp
 from . import experiment as fpe
+from . import locations as fplocs
 
 
 __all__ = ['Calibration']
+
+# Exposure age knots: ages at which we set the exposure multiplier
+EXPOSURE_KNOT_AGES = [0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50]
+
+# Default bounds for exposure_age knots
+EXPOSURE_AGE_BOUNDS = {
+    0: (1.0, 1.0), 5: (0.01, 0.5), 10: (0.01, 0.5), 12.5: (0.05, 1.0),
+    15: (0.3, 2.0), 18: (0.3, 2.5), 20: (0.5, 3.0), 25: (0.5, 3.0),
+    30: (0.5, 3.0), 35: (0.2, 2.0), 40: (0.1, 1.5), 45: (0.05, 1.0), 50: (0.01, 0.5),
+}
 
 
 class Calibration(sc.prettyobj):
@@ -23,36 +34,76 @@ class Calibration(sc.prettyobj):
     A class to handle calibration of FPsim objects. Uses the Optuna hyperparameter
     optimization library (optuna.org).
 
+    Supports calibration of scalar parameters (e.g. exposure_factor, prob_use_intercept,
+    prob_use_trend_par, fecundity bounds) as well as the exposure_age curve — a 13-knot
+    age-specific exposure multiplier fitted with a smoothness penalty to prevent sharp
+    jumps between adjacent knots.
+
+    During calibration, the location's make_calib_pars() is temporarily neutralized so
+    that the optimizer's trial values take effect instead of being overridden by the
+    location's existing calibrated parameters.
+
     Note: running a calibration does not guarantee a good fit! You must ensure that
     you run for a sufficient number of iterations, have enough free parameters, and
     that the parameters have wide enough bounds. Please see the tutorial on calibration
     for more information.
 
     Args:
-        sim          (Sim)  : the simulation to calibrate
-        calib_pars   (dict) : a dictionary of the parameters to calibrate of the format dict(key1=[best, low, high])
-        weights      (dict) : a custom dictionary of weights for each output
-        n_trials     (int)  : the number of trials per worker
-        n_workers    (int)  : the number of parallel workers (default: maximum)
-        total_trials (int)  : if n_trials is not supplied, calculate by dividing this number by n_workers
-        name         (str)  : the name of the database (default: 'fpsim_calibration')
-        db_name      (str)  : the name of the database file (default: 'fpsim_calibration.db')
-        keep_db      (bool) : whether to keep the database after calibration (default: false)
-        storage      (str)  : the location of the database (default: sqlite)
-        label        (str)  : a label for this calibration object
-        verbose      (bool) : whether to print details of the calibration
-        kwargs       (dict) : passed to cv.Calibration()
+        pars                (dict)  : simulation parameters, should include 'location' and 'n_agents'
+        calib_pars          (dict)  : scalar parameters to calibrate, format dict(key=[best, low, high])
+        weights             (dict)  : a custom dictionary of weights for each calibration target
+        fit_exposure_age    (bool)  : whether to calibrate the exposure_age curve (default: True)
+        smoothness_weight   (float) : weight of the smoothness penalty for exposure_age (default: 0.5)
+        exposure_age_bounds (dict)  : custom bounds per knot age, format {age: (low, high)} (default: EXPOSURE_AGE_BOUNDS)
+        n_trials            (int)   : the number of trials per worker (default: 100)
+        n_workers           (int)   : the number of parallel workers (default: maximum CPUs)
+        total_trials        (int)   : if n_trials is not supplied, calculate by dividing this by n_workers
+        name                (str)   : the name of the database (default: 'fpsim_calibration')
+        db_name             (str)   : the name of the database file (default: 'fpsim_calibration.db')
+        keep_db             (bool)  : whether to keep the database after calibration (default: false)
+        storage             (str)   : the location of the database (default: sqlite)
+        verbose             (bool)  : whether to print details of the calibration
+        kwargs              (dict)  : additional Optuna configuration
 
     Returns:
         A Calibration object
+
+    **Examples**::
+
+        # Calibrate scalar params + exposure_age curve
+        calib_pars = dict(
+            exposure_factor    = [1.0, 0.5, 3.0],
+            prob_use_intercept = [-1.0, -3.0, 0.0],
+            prob_use_trend_par = [0.0, -0.15, 0.05],
+            fecundity_low      = [0.7, 0.5, 0.9],
+            fecundity_high     = [1.5, 1.0, 2.5],
+        )
+        weights = dict(mcpr=3, asfr=3, total_fertility_rate=3, age_first_stats=4)
+        calib = fp.Calibration(
+            pars=dict(location='senegal', n_agents=5000),
+            calib_pars=calib_pars,
+            weights=weights,
+        )
+        calib.calibrate()
+
+        # Scalar-only calibration (no exposure_age curve)
+        calib = fp.Calibration(pars=pars, calib_pars=calib_pars,
+                               weights=weights, fit_exposure_age=False)
+        calib.calibrate()
     '''
 
-    def __init__(self, pars, calib_pars=None, weights=None, verbose=True, keep_db=False, **kwargs):
+    def __init__(self, pars, calib_pars=None, weights=None, fit_exposure_age=True,
+                 smoothness_weight=0.5, exposure_age_bounds=None,
+                 verbose=True, keep_db=False, **kwargs):
         self.pars       = pars
         self.calib_pars = calib_pars
         self.weights    = weights
+        self.fit_exposure_age    = fit_exposure_age
+        self.smoothness_weight   = smoothness_weight
+        self.exposure_age_bounds = exposure_age_bounds if exposure_age_bounds is not None else EXPOSURE_AGE_BOUNDS
         self.verbose    = verbose
         self.keep_db    = keep_db
+        self._original_calib = None
 
         # Configure Optuna
         self.set_optuna_defaults()
@@ -146,6 +197,29 @@ class Calibration(sc.prettyobj):
                 raise ValueError(errormsg) from E
         return
 
+    def _neutralize_calib_pars(self):
+        ''' Temporarily replace the location's make_calib_pars() so trial values take effect '''
+        location = self.pars.get('location')
+        if location is None:
+            return
+        loc_module = getattr(fplocs, location, None)
+        if loc_module is None or not hasattr(loc_module, 'make_calib_pars'):
+            return
+        self._original_calib = loc_module.make_calib_pars
+        def _empty_calib_pars():
+            return {'exposure_parity': np.array([[0,1,2,3,4,5,6,7,8,9,10,11,12,20],
+                                                  [1,1,1,1,1,1,1,0.8,0.5,0.3,0.15,0.10,0.05,0.01]])}
+        loc_module.make_calib_pars = _empty_calib_pars
+
+    def _restore_calib_pars(self):
+        ''' Restore the original make_calib_pars function '''
+        location = self.pars.get('location')
+        if location and self._original_calib is not None:
+            loc_module = getattr(fplocs, location, None)
+            if loc_module is not None:
+                loc_module.make_calib_pars = self._original_calib
+            self._original_calib = None
+
     def run_exp(self, calib_pars, return_exp=False, **kwargs):
         """ Create and run an experiment """
         pars = sc.mergedicts(sc.dcp(self.pars), calib_pars)
@@ -157,12 +231,33 @@ class Calibration(sc.prettyobj):
             return exp.fit.mismatch
 
     def run_trial(self, trial):
-        ''' Define the objective for Optuna '''
+        ''' Define the objective for Optuna. Suggests scalar parameters and optionally
+            exposure_age knots, runs the experiment, and returns mismatch + smoothness penalty. '''
         pars = {}
         for key, (best,low,high) in self.calib_pars.items():
-            pars[key] = trial.suggest_float(key, low, high) # Sample from beta values within this range
-        mismatch = self.run_exp(pars)
-        return mismatch
+            pars[key] = trial.suggest_float(key, low, high)
+
+        # Optionally fit the exposure_age curve
+        smoothness_penalty = 0.0
+        if self.fit_exposure_age:
+            exp_age_vals = []
+            for age in EXPOSURE_KNOT_AGES:
+                low, high = self.exposure_age_bounds[age]
+                if low == high:
+                    exp_age_vals.append(low)
+                else:
+                    exp_age_vals.append(trial.suggest_float(f'exp_age_{age}', low, high))
+            pars['exposure_age'] = np.array([EXPOSURE_KNOT_AGES, exp_age_vals])
+            diffs = np.diff(exp_age_vals)
+            smoothness_penalty = self.smoothness_weight * np.mean(diffs**2)
+
+        try:
+            mismatch = self.run_exp(pars)
+            return mismatch + smoothness_penalty
+        except Exception as e:
+            if self.verbose:
+                print(f'  Trial failed: {e}')
+            return float('inf')
 
 
     def worker(self):
@@ -194,17 +289,21 @@ class Calibration(sc.prettyobj):
         return output
 
     def calibrate(self, calib_pars=None, weights=None, verbose=None, **kwargs):
-        ''' Actually perform calibration '''
+        ''' Actually perform calibration. Neutralizes the location's make_calib_pars(),
+            runs Optuna optimization, reconstructs the exposure_age array if fitted,
+            and restores the original make_calib_pars() when done. '''
 
         # Load and validate calibration parameters
         if calib_pars is not None: self.calib_pars = calib_pars
         if weights    is not None: self.weights    = weights
         if verbose    is not None: self.verbose    = verbose
         if self.calib_pars is None:
-            errormsg = 'You must supply calibration parameters either when creating the calibration object or when calling calibrate().'
-            raise ValueError(errormsg)
+            self.calib_pars = {}
         self.validate_pars()
         self.configure_optuna(**kwargs) # Update optuna settings
+
+        # Neutralize location's make_calib_pars so trial values take effect
+        self._neutralize_calib_pars()
 
         # Run the optimization
         if self.verbose:
@@ -215,9 +314,22 @@ class Calibration(sc.prettyobj):
         self.make_study()
         self.run_workers()
         self.study = op.load_study(storage=self.g.storage, study_name=self.g.name)
-        self.best_pars = self.study.best_params
+        self.best_pars = sc.dcp(self.study.best_params)
         T = sc.toc(t0, output=True)
-        print(f'Output: {self.best_pars}, time: {T}')
+
+        # Reconstruct exposure_age from individual knot params
+        if self.fit_exposure_age:
+            exp_age_vals = []
+            for age in EXPOSURE_KNOT_AGES:
+                low, high = self.exposure_age_bounds[age]
+                if low == high:
+                    exp_age_vals.append(low)
+                else:
+                    exp_age_vals.append(self.best_pars.pop(f'exp_age_{age}'))
+            self.best_exposure_age = np.array([EXPOSURE_KNOT_AGES, exp_age_vals])
+            self.best_pars['exposure_age'] = self.best_exposure_age
+
+        print(f'Best trial: mismatch={self.study.best_value:.2f}, time: {T}')
 
         # Process the results
         self.initial_pars = {k:v[0] for k,v in self.calib_pars.items()}
@@ -225,6 +337,9 @@ class Calibration(sc.prettyobj):
         self.before = self.run_exp(calib_pars=self.initial_pars, label='Before calibration', return_exp=True)
         self.after  = self.run_exp(calib_pars=self.best_pars,    label='After calibration',  return_exp=True)
         self.parse_study()
+
+        # Restore location's original make_calib_pars
+        self._restore_calib_pars()
 
         # Tidy up
         if not self.keep_db:
@@ -253,7 +368,7 @@ class Calibration(sc.prettyobj):
 
     def parse_study(self):
         ''' Parse the study into a data frame '''
-        best = self.best_pars
+        best = self.study.best_params  # Use raw study params (not reconstructed)
 
         print('Making results structure...')
         results = []
