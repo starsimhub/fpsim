@@ -3,6 +3,11 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.5.3 (2026-03-18)
+- `Calibration` class: added `exposure_age` curve fitting with 13 knots and a smoothness penalty (`fit_exposure_age`, `smoothness_weight`, `exposure_age_bounds` parameters). Set `fit_exposure_age=False` to disable.
+- `Calibration` class: location `make_calib_pars()` is now automatically neutralized during calibration so optimizer trial values take effect instead of being overridden.
+
+
 ## Version 3.5.2 (2026-03-04)
 - Fixed compatibility with Starsim 3.2.0: changed `FPmod` to inherit from `ss.Connector` instead of `ss.Module` so it is correctly stored in `sim.connectors`.
 - Fixed MCPR year matching in `Experiment.get_mcpr()`: converted Timestamp index to integer years to match data format after Starsim 3.2.0's `to_df()` change.
