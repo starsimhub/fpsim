@@ -12,7 +12,7 @@ def make_calib_pars():
     pars['prob_use_trend_par'] = -0.015
     pars['fecundity_low'] = 0.9
     pars['fecundity_high'] = 2.0
-    pars['method_weights'] = np.array([0.8, 1, 8, 12, 0.5, 0.5, 0.8, 3, 18])
+    pars['method_weights'] = np.array([0.1, 0.2, 5, 25, 5, 0.01, 0.1, 10, 18])
     pars['dur_postpartum'] = 18
 
     spacing_pref_array = np.ones(19, dtype=float)  # Size based on n_bins from data files
@@ -25,7 +25,7 @@ def make_calib_pars():
         'preference': spacing_pref_array
     }
     pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
-                                      [1.0, 0.4589, 0.333, 0.3, 0.6, 0.85, 0.85, 0.8, 0.75, 0.8, 0.6, 0.15, 0.1]])
+                                      [1.0, 0.4589, 0.333, 0.3, 0.6, 0.85, 0.85, 0.8, 1.0, 1.0, 0.8, 0.3, 0.15]])
     pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
                                         [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
 

@@ -7,12 +7,12 @@ import fpsim.locations.data_utils as fpld
 
 def make_calib_pars():
     pars = {}
-    pars['exposure_factor'] = 1.15
-    pars['prob_use_intercept'] = 0.3
-    pars['prob_use_trend_par'] = -0.015
+    pars['exposure_factor'] = 1.3
+    pars['prob_use_intercept'] = 0.25
+    pars['prob_use_trend_par'] = 0.008
     pars['fecundity_low'] = 0.8640
     pars['fecundity_high'] = 1.4105
-    pars['method_weights'] = np.array([3, 1, 3, 3, 0.5, 0.3, 8, 2, 3])
+    pars['method_weights'] = np.array([0.75, 1, 3, 1.5, 0.5, 0.3, 8, 2, 3])
     pars['dur_postpartum'] = 18
 
     spacing_pref_array = np.ones(19, dtype=float)  # Size based on n_bins from data files
@@ -25,7 +25,7 @@ def make_calib_pars():
         'preference': spacing_pref_array
     }
     pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
-                                      [1.0, 0.3005, 0.2809, 0.35, 0.5, 0.8, 0.75, 0.75, 0.7, 0.55, 0.4, 0.2, 0.1]])
+                                      [1.0, 0.3005, 0.2809, 0.35, 0.5, 0.8, 0.75, 0.75, 1.0, 1.0, 0.8, 0.4, 0.2]])
     pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
                                         [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
 
