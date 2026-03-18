@@ -215,7 +215,7 @@ class Sim(ss.Sim):
         calib_pars = fpd.get_calib_pars(location, verbose=verbose)
         if calib_pars is not None:
             sc.printv(f'Applying calibration parameters for {location}...', veps)
-            all_pars = fp.mergepars(all_pars, calib_pars)  # Use smart merging for calibration parameters
+            all_pars = fp.mergepars(calib_pars, all_pars)  # User pars override calibration pars
 
         # Deal with all module pars in a loop
         module_par_map = {
