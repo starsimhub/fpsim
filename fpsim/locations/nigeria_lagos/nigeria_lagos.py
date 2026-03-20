@@ -6,30 +6,28 @@ import starsim as ss
 import fpsim.locations.data_utils as fpld
 
 def make_calib_pars():
+    """ Make a dictionary of location-specific parameters """
     pars = {}
-    pars['fecundity_low'] = 0.5
-    pars['fecundity_high'] = 1.0
-    pars['exposure_factor'] = 3
-    pars['prob_use_year'] = 2020
-    pars['prob_use_trend_par'] = 0.0001
-    pars['prob_use_intercept'] = -3.4
-    pars['method_weights'] = np.array([0.2, 0.2, 0.1, 0.2, 30, 0.5, 1, 50, 5])
-    pars['dur_postpartum'] = 23
+    pars['exposure_factor'] = 1
+    pars['prob_use_intercept'] = 0.0
+    pars['prob_use_trend_par'] = -0.14
+    pars['fecundity_low'] = 0.6041
+    pars['fecundity_high'] = 1.8852
+    pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
+                                      [1.0000, 0.1000, 0.3400, 0.7000, 0.8000, 1.0000, 1.2000, 1.3000, 1.0000, 1.5000, 1.2000, 0.7000, 0.3500]])
+    pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
+                                        [1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.3783, 0.4045, 0.5020, 0.2438, 0.1445, 0.1725, 0.0263]])
+    pars['method_weights'] = np.array([0.6, 0.4, 0.4, 0.9, 10, 1.5, 1, 10, 8])
+    pars['dur_postpartum'] = 18
+    spacing_pref_array = np.ones(19, dtype=float)
+    spacing_pref_array[:2] =  0.5    # 0-6 months — suppress very short intervals
+    spacing_pref_array[2:5] = 0.7    # 6-15 months — suppress to reduce 12-24mo births
+    spacing_pref_array[5:13] = 1.0   # 15-39 months — normal (maps to 24-48mo births)
+    spacing_pref_array[13:] = 0.5   # 39+ months — suppress >48mo births
 
-    spacing_pref_array = np.ones(18, dtype=float)  # Size based on n_bins from data files
-    spacing_pref_array[:3] =  1
-    spacing_pref_array[3:6] = 0.5
-    spacing_pref_array[6:9] = 0.8
-    spacing_pref_array[9:] =  2
-    
     pars['spacing_pref'] = {
         'preference': spacing_pref_array
     }
-    pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30,  35, 40, 45,  50],
-                                        [1, 1, 1,  2,    2 ,0.3,0.8,1.3,0.4,0.6,0.3,0.4, 0.5]])
-    pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
-                                           [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])
-
     return pars
 
 

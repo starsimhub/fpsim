@@ -8,13 +8,17 @@ Usage:
     python run_calibrated_location.py <location_name>
     python run_calibrated_location.py cotedivoire
     python run_calibrated_location.py nigeria_lagos
-    
+    python run_calibrated_location.py senegal --no-save --seed 1 --results-dir calib_results/senegal_seed1
+
 Options:
-    --load      Load existing simulation results instead of running
-    --n-agents  Number of agents (default: 5000)
-    --end-year  End year for simulation (default: 2020)
-    --no-save   Don't save simulation results
-    --no-plots  Don't generate plots
+    --load          Load existing simulation results instead of running
+    --n-agents      Number of agents (default: 5000)
+    --start-year    Start year for simulation (default: 2000)
+    --end-year      End year for simulation (default: 2020)
+    --no-save       Don't save simulation results
+    --no-plots      Don't generate plots
+    --seed          Random seed for reproducibility
+    --results-dir   Directory for results and figures (default: calib_results)
 """
 
 import argparse
@@ -46,16 +50,19 @@ def plot_calib(sim, single_fig=False, fig_kwargs=None, legend_kwargs=None):
     """
     fpplt.plot_calib(sim)
 
-def run_calibrated_sim(location, n_agents=5000, end_year=2020):
+def run_calibrated_sim(location, n_agents=5000, start_year=1960, end_year=2020, seed=None):
     """Run simulation with pre-calibrated parameters for a given location"""
     print(f"Running pre-calibrated simulation for {location}...")
-    
+
     # Create simulation with parameters - uses calibrated parameters from location files
     pars = dict(
         location=location,
         n_agents=n_agents,
+        start_year=start_year,
         end_year=end_year,
     )
+    if seed is not None:
+        pars['rand_seed'] = seed
     
     sim = fp.Sim(pars=pars)
     sim.init()
@@ -92,6 +99,8 @@ def main():
                        help='Load existing simulation results instead of running')
     parser.add_argument('--n-agents', type=int, default=5000,
                        help='Number of agents (default: 5000)')
+    parser.add_argument('--start-year', type=int, default=1960,
+                       help='Start year for simulation (default: 1960)')
     parser.add_argument('--end-year', type=int, default=2020,
                        help='End year for simulation (default: 2020)')
     parser.add_argument('--results-dir', default='calib_results',
@@ -100,6 +109,8 @@ def main():
                        help="Don't save simulation results")
     parser.add_argument('--no-plots', action='store_true',
                        help="Don't generate validation plots")
+    parser.add_argument('--seed', type=int, default=None,
+                       help='Random seed for reproducibility')
     
     args = parser.parse_args()
     
@@ -125,7 +136,7 @@ def main():
             print(f"ERROR: {e}")
             sys.exit(1)
     else:
-        sim = run_calibrated_sim(args.location, args.n_agents, args.end_year)
+        sim = run_calibrated_sim(args.location, args.n_agents, start_year=args.start_year, end_year=args.end_year, seed=args.seed)
         
         if not args.no_save:
             save_results(sim, args.location, args.results_dir)

@@ -8,32 +8,28 @@ import starsim as ss
 import fpsim.locations.data_utils as fpld
 
 def make_calib_pars():
+    """ Make a dictionary of location-specific parameters """
     pars = {}
-    pars['fecundity_low'] = 0.7
-    pars['fecundity_high'] = 1.1
-    pars['exposure_factor'] = 2
-    pars['prob_use_year'] = 2020
-    pars['prob_use_trend_par'] = 0.01
-    pars['prob_use_intercept'] = 0.5
-    pars['method_weights'] = np.array([8, 4, 5, 20, 2, 2, 0.02, 0.015, 5])
-    pars['dur_postpartum'] = 23
-
-    spacing_pref_array = np.ones(13, dtype=float)  # Size based on n_bins from data files
-    spacing_pref_array[:3] =  1.0  # Spacing of 0-6 months
-    spacing_pref_array[3:4] = 1.0  # Spacing of 9 months
-    spacing_pref_array[4:9] = 0.3  # Spacing of 12-24 months
-    spacing_pref_array[9:17] =  1.1  # Spacing of 27-48 months
-    spacing_pref_array[17:] =  1.0  # Spacing of 51-56 months
+    pars['exposure_factor'] = 0.76
+    pars['prob_use_intercept'] = -0.6357
+    pars['prob_use_trend_par'] = -0.0050
+    pars['fecundity_low'] = 0.8
+    pars['fecundity_high'] = 1.6
+    pars['exposure_age'] = np.array([[0, 5, 10, 12.5, 15, 18, 20, 25, 30, 35, 40, 45, 50],
+                                      [1.0000, 0.3000, 0.3900, 0.4700, 1.0000, 1.3000, 1.65000, 1.7000, 1.6000, 1.9000, 1.4000, 0.8000, 0.4500]])
+    pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
+                                        [1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.7742, 0.4464, 0.2942, 0.3817, 0.2869, 0.1676, 0.0534]])
+    pars['method_weights'] = np.array([8, 4, 4, 20, 2, 2, 2, 3, 5])
+    pars['dur_postpartum'] = 18
+    spacing_pref_array = np.ones(19, dtype=float)
+    spacing_pref_array[:2] =  0.5    # 0-6 months pp — suppress very short intervals
+    spacing_pref_array[2:5] = 0.35    # 6-15 months pp — suppress to reduce 12-24mo births
+    spacing_pref_array[5:13] = 0.4    # 15-24 months pp — slight suppress
+    spacing_pref_array[13:] = 0.2    # 39+ months pp — suppress >48mo births
 
     pars['spacing_pref'] = {
         'preference': spacing_pref_array
     }
-    pars['exposure_age'] = np.array([[0,    5,  10, 12.5, 15, 18, 20, 25,  30,  35, 40, 45, 50],
-                                        [0.1, 0.1, 0.5,  0.1,0.1, 0.6,1.4,0.56,0.5,0.3,0.2,0.5,0.2]])  # <<< USER-EDITABLE: Can be modified for calibration
-    pars['exposure_parity'] = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20],
-                                           [1, 1, 1, 1, 1, 1, 1, 0.8, 0.5, 0.3, 0.15, 0.10, 0.05, 0.01]])  # <<< USER-EDITABLE: Can be modified for calibration
-
-
     return pars
 
 

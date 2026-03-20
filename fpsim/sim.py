@@ -215,7 +215,12 @@ class Sim(ss.Sim):
         calib_pars = fpd.get_calib_pars(location, verbose=verbose)
         if calib_pars is not None:
             sc.printv(f'Applying calibration parameters for {location}...', veps)
-            all_pars = fp.mergepars(all_pars, calib_pars)  # Use smart merging for calibration parameters
+            start = all_pars.get('start', 2000)
+            if start != 2000:
+                import warnings
+                warnings.warn(f'Simulation start year is {start}, but calibration parameters for '
+                              f'{location} are optimized for start year 2000. Results may not be accurate.')
+            all_pars = fp.mergepars(calib_pars, all_pars)  # User pars override calibration pars
 
         # Deal with all module pars in a loop
         module_par_map = {
