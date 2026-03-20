@@ -74,6 +74,7 @@ class Calibration(sc.prettyobj):
         fit_exposure_age    (bool)  : whether to calibrate the exposure_age curve (default: True)
         smoothness_weight   (float) : weight of the smoothness penalty for exposure_age (default: 0.5)
         exposure_age_bounds (dict)  : custom bounds per knot age, format {age: (low, high)} (default: EXPOSURE_AGE_BOUNDS)
+        burn_in             (int)   : number of years from start_year to ignore when computing fit (default: 0)
         n_trials            (int)   : the number of trials per worker (default: 100)
         n_workers           (int)   : the number of parallel workers (default: maximum CPUs)
         total_trials        (int)   : if n_trials is not supplied, calculate by dividing this by n_workers
@@ -114,7 +115,7 @@ class Calibration(sc.prettyobj):
     def __init__(self, pars, calib_pars=None, weights=None, fit_exposure_age=True,
                  fit_exposure_parity=True, fit_spacing_pref=True,
                  smoothness_weight=0.5, exposure_age_bounds=None,
-                 exposure_parity_bounds=None,
+                 exposure_parity_bounds=None, burn_in=0,
                  verbose=True, keep_db=False, **kwargs):
         self.pars       = pars
         self.calib_pars = calib_pars
@@ -125,6 +126,7 @@ class Calibration(sc.prettyobj):
         self.smoothness_weight    = smoothness_weight
         self.exposure_age_bounds  = exposure_age_bounds if exposure_age_bounds is not None else EXPOSURE_AGE_BOUNDS
         self.exposure_parity_bounds = exposure_parity_bounds if exposure_parity_bounds is not None else EXPOSURE_PARITY_BOUNDS
+        self.burn_in    = burn_in
         self.verbose    = verbose
         self.keep_db    = keep_db
         self._original_calib = None
@@ -265,10 +267,45 @@ class Calibration(sc.prettyobj):
         pars = sc.mergedicts(sc.dcp(self.pars), calib_pars)
         exp = fpe.Experiment(pars=pars, **kwargs)
         exp.run(weights=self.weights)
+        if self.burn_in > 0:
+            self._apply_burn_in(exp)
         if return_exp:
             return exp
         else:
             return exp.fit.mismatch
+
+    def _apply_burn_in(self, exp):
+        ''' Trim time-series targets to exclude the burn-in period, then recompute the fit.
+
+        Maps time-series fit keys to their year arrays in the experiment data,
+        filters out points before start_year + burn_in, and recomputes the mismatch. '''
+        start_year = self.pars.get('start_year', 2000)
+        cutoff_year = start_year + self.burn_in
+
+        # Map fit keys to their year arrays in exp.data
+        ts_keys = {
+            'mcpr': 'mcpr_years',
+            'total_fertility_rate': 'tfr_years',
+        }
+
+        fit = exp.fit
+        trimmed = False
+        for key, year_key in ts_keys.items():
+            if key not in fit.pair or year_key not in exp.data:
+                continue
+            years = np.asarray(exp.data[year_key])
+            mask = years >= cutoff_year
+            if mask.all():
+                continue  # Nothing to trim
+            fit.pair[key].sim = fit.pair[key].sim[mask]
+            fit.pair[key].data = fit.pair[key].data[mask]
+            trimmed = True
+
+        if trimmed:
+            fit.compute_diffs()
+            fit.compute_gofs()
+            fit.compute_losses()
+            fit.compute_mismatch()
 
     def run_trial(self, trial):
         ''' Define the objective for Optuna. Suggests scalar parameters and optionally
