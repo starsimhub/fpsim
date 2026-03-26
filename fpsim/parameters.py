@@ -62,6 +62,7 @@ class FPPars(ss.PregnancyPars):
 
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
+        self.p_infertile = ss.bernoulli(p=0.05)  # Primary infertility rate
 
         # Parameters typically tuned during calibration
         self.maternal_mortality_factor = 1

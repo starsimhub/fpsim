@@ -3,17 +3,15 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.6.0 (2026-02-XX)
-Refactors pregnancy logic to inherit from Starsim's Pregnancy module and improves tracking of pregnancy outcomes and postpartum status.
+## Version 3.5.3 (2026-03-18)
 
-* **Pregnancy module refactor**
-  * FPmod now inherits from `ss.Pregnancy` instead of `ss.Module`, enabling better integration with Starsim's pregnancy handling
-  * Reorganized pregnancy progression logic with explicit trimester support
-  * Improved tracking of pregnancy outcomes including births, stillbirths, miscarriages, and abortions
+* **Regression information**
+  * Extended `spacing_pref` to apply to all parous women, not just postpartum women. Previously, spacing preference weights at intervals beyond `dur_postpartum` (e.g., 24-48 months) had no effect because women had already exited the postpartum state. Now spacing preferences influence sexual activity for any woman with a prior live birth, using the appropriate base rate (postpartum or age-based). Also switched the time-since-birth calculation from `ti_delivery` to `ti_live_birth` to avoid NaN values caused by miscarriage. This will change birth spacing distributions in existing calibrations.
+  * Recalibrated all 9 non-Ethiopia region locations.
 
-* **Twins and multiple births**
-  * Implemented twins probability via `twins_prob` parameter using Starsim's `embryos_per_pregnancy` distribution
-  * Twins are now properly handled in pregnancy loss calculations
+* **Calibration improvements**
+  * `Calibration` class: added `exposure_age` curve fitting with 13 knots and a smoothness penalty (`fit_exposure_age`, `smoothness_weight`, `exposure_age_bounds` parameters). Set `fit_exposure_age=False` to disable.
+  * `Calibration` class: location `make_calib_pars()` is now automatically neutralized during calibration so optimizer trial values take effect instead of being overridden.
 
 * **Method failures and contraception**
   * Added support for tracking contraceptive method failures
@@ -33,6 +31,11 @@ Refactors pregnancy logic to inherit from Starsim's Pregnancy module and improve
   * Fixed overflow issues in sigmoid function calculations
   * Fixed `education_recorder` analyzer to correctly filter by age
   * Improved handling of birth intervals and parity tracking
+
+* **Other changes**
+  * `experiment.py`: `age_first_stats` metric now compares 5 percentiles (10th, 25th, 50th, 75th, 90th) instead of 3
+  * `run_calibrated_location.py`: added `--seed` and `--results-dir` options for validation
+  * `plotting.py`: added mean-normalized RMSE display to validation plots
 
 
 ## Version 3.5.2 (2026-03-04)
