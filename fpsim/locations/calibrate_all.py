@@ -45,6 +45,9 @@ def main():
     results = {}
     failed = []
 
+    print(f'Calibrating {len(locations)} locations. Depending upon available compute power and simulation'
+          f' settings, this could take a few minutes to a few hours to complete.')
+
     for loc in locations:
         print(f'\n{"="*60}')
         print(f'  CALIBRATING: {loc}')
