@@ -998,21 +998,20 @@ class FPmod(ss.Pregnancy):
         and updates results. We additionally record ages, update timing states,
         and trigger handle_loss for contraception/breastfeeding updates.
         """
-        # Let parent classify and count miscarriages/stillbirths
+        # Identify prenatal deaths and save gestation BEFORE super clears it via step_die
         is_prenatal = self.sim.people.age[death_uids] < 0
         prenatal_death_uids = death_uids[is_prenatal]
         if not len(prenatal_death_uids):
             return
 
-        super().process_prenatal_deaths(death_uids)
-
-        # FPsim-specific tracking
         ppl = self.sim.people
         mother_uids = ppl.parent[prenatal_death_uids]
-        ga = self.gestation[mother_uids]
+        ga = np.array(self.gestation[mother_uids])  # Copy before super clears it
         threshold = self.pars.loss_threshold.weeks
-
         is_mc = ga < threshold
+
+        # Let parent classify and count miscarriages/stillbirths (calls step_die)
+        super().process_prenatal_deaths(death_uids)
         mc_mothers = mother_uids[is_mc]
         sb_mothers = mother_uids[~is_mc]
 

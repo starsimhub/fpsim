@@ -181,7 +181,9 @@ def test_birth_outcomes():
     sim = fp.Sim(test=True, twins_prob=0.3)
     sim.run()
 
-    # Check that n_pregnancies matches sum of outcomes
+    # Check that n_pregnancies matches sum of outcomes (with allowance for partial twin loss)
+    # A twin pregnancy where one twin dies via p_loss counts as 1 pregnancy but 2 outcomes
+    # (1 miscarriage + 1 live birth), so outcomes can exceed pregnancies by up to n_twinbirths
     fpmod = sim.people.fp
     was_preg_bools = (fpmod.n_pregnancies > 0) & ~fpmod.pregnant
     n_pregnancies = fpmod.n_pregnancies[was_preg_bools]
@@ -191,9 +193,11 @@ def test_birth_outcomes():
         fpmod.n_miscarriages[was_preg_bools] +
         fpmod.n_abortions[was_preg_bools]
     )
-    aa = was_preg_bools.uids[(n_pregnancies != n_outcomes).nonzero()[-1]]
-    assert np.array_equal(n_pregnancies, n_outcomes), f'Birth outcomes do not sum to pregnancies for agents: {aa}'
-    sc.printgreen('✓ (Birth outcomes sum to pregnancies)')
+    excess = n_outcomes - n_pregnancies
+    max_excess = fpmod.n_twinbirths[was_preg_bools]  # Max partial twin losses per agent
+    bad = was_preg_bools.uids[((excess < 0) | (excess > max_excess)).nonzero()[-1]]
+    assert len(bad) == 0, f'Birth outcomes out of range for agents: {bad}'
+    sc.printgreen('✓ (Birth outcomes sum to pregnancies, with partial twin loss allowance)')
 
     # Check that parity increments correctly
     expected_parity = fpmod.n_births + fpmod.n_twinbirths + fpmod.n_stillbirths
