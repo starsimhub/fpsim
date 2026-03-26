@@ -13,6 +13,25 @@ All notable changes to the codebase are documented in this file. Changes that ma
   * `Calibration` class: added `exposure_age` curve fitting with 13 knots and a smoothness penalty (`fit_exposure_age`, `smoothness_weight`, `exposure_age_bounds` parameters). Set `fit_exposure_age=False` to disable.
   * `Calibration` class: location `make_calib_pars()` is now automatically neutralized during calibration so optimizer trial values take effect instead of being overridden.
 
+* **Method failures and contraception**
+  * Added support for tracking contraceptive method failures
+  * Improved lactational amenorrhea (LAM) calculations
+
+* **Results and analyzers**
+  * Updated result initialization to use improved Starsim patterns with proper summarization
+
+* **Parameter changes**
+  * Renamed `primary_infertility` parameter to `p_infertile` for consistency with Starsim naming conventions
+
+* **DHS data R script enhancements**
+  * Warnings added for edge cases and missing data
+  * run_all.R works properly
+
+* **Bug fixes**
+  * Fixed overflow issues in sigmoid function calculations
+  * Fixed `education_recorder` analyzer to correctly filter by age
+  * Improved handling of birth intervals and parity tracking
+
 * **Other changes**
   * `experiment.py`: `age_first_stats` metric now compares 5 percentiles (10th, 25th, 50th, 75th, 90th) instead of 3
   * `run_calibrated_location.py`: added `--seed` and `--results-dir` options for validation
