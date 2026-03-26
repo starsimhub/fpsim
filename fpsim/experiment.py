@@ -293,8 +293,11 @@ class Experiment(sc.prettyobj):
 
         # Extract age at first birth from model
         any_births_uids = ppl.alive.uids[ppl.female & (ppl.fp.parity>0)]
-        model_age_first = np.stack(ppl.fp.birth_ages[any_births_uids])[:,0]
-        model_age_first = model_age_first[~np.isnan(model_age_first)]  # Exclude women with only stillbirths
+        if len(any_births_uids) > 0:
+            model_age_first = np.stack(ppl.fp.birth_ages[any_births_uids])[:,0]
+            model_age_first = model_age_first[~np.isnan(model_age_first)]  # Exclude women with only stillbirths
+        else:
+            model_age_first = np.array([])
 
         # Extract birth spaces and age at first birth from data
         for i, j in data_spaces.iterrows():

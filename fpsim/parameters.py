@@ -60,9 +60,6 @@ class FPPars(ss.PregnancyPars):
         self.short_int = ss.months(24)  # Duration of a short birth interval between live births (months)
         self.dur_postpartum = ss.months(6)  # Duration of postpartum period, used to reduce sexual activity
 
-        # FPmod manages its own initialization; disable Pregnancy's burn-in
-        self.burnin = False
-
         # Parameters related to the likelihood of conception
         self.LAM_efficacy = 0.98   # From Cochrane review: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6823189/
         self.p_infertile = ss.bernoulli(p=0.05)  # Primary infertility rate

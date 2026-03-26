@@ -390,10 +390,10 @@ class FPmod(ss.Pregnancy):
             uids = self.alive.uids
 
         ppl = self.sim.people
-        is_pp = self.postpartum[uids]
-        debuted_age = ppl.age[uids] >= self.fated_debut[uids]
-        parous = uids & (self.parity > 0)
-        non_parous = uids & (self.parity == 0) & debuted_age & ~is_pp
+        is_pp = self.postpartum[uids]  # Positional bool array (not a BoolArr)
+        debuted_age = ppl.age[uids] >= self.fated_debut[uids]  # Positional bool array
+        parous = uids[self.parity[uids] > 0]
+        non_parous = uids[(self.parity[uids] == 0) & debuted_age & ~is_pp]
 
         # Parous women: split by whether they have a recorded live birth
         has_live_birth = parous & self.ti_live_birth.notnan
