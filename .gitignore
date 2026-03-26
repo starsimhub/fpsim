@@ -173,3 +173,6 @@ campaign.json
 .DS_Store
 dropbox/.DS_Store
 .DS_Store
+*.db
+tests/snapshot_*.json
+tests/par_snapshot_*.json
