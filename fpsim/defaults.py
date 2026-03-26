@@ -12,6 +12,7 @@ import fpsim.arrays as fpa
 
 #%% Global defaults
 useSI          = True
+mpy            = 12   # Months per year, to avoid magic numbers
 eps            = 1e-9 # To avoid divide-by-zero
 min_age        = 15   # Minimum age to be considered eligible to use contraceptive methods
 max_age        = 99   # Maximum age (inclusive)
@@ -119,7 +120,7 @@ fpmod_states = [
 
     # Counts of events
     ss.FloatArr('n_births', default=0),         # Number of live births
-    ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
+    # n_stillbirths is defined by the parent Pregnancy class in starsim
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
     ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
     ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
@@ -207,8 +208,7 @@ method_youth_age_map = {
 
 # Counts - we compute number of new events each timestep, plus number of cumulative events
 event_counts = sc.autolist(
-    'stillbirths',
-    'miscarriages',
+    # NB: stillbirths and miscarriages are defined by the parent Pregnancy class in starsim
     'abortions',
     'short_intervals',
     'secondary_births',
