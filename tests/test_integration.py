@@ -61,6 +61,9 @@ def test_pregnant_women():
         'debut_age': debut_age,
         'primary_infertility': 0,
         'sexual_activity': sexual_activity,
+        'exposure_factor': 1,
+        'exposure_age': dict(age=[0, 50], rel_exp=[1, 1]),
+        'exposure_parity': dict(parity=[0, 20], rel_exp=[1, 1]),
     }
 
     sim = fp.Sim(pars=custom_pars, contraception_module=contra_mod)
