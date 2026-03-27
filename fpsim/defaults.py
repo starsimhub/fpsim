@@ -19,6 +19,7 @@ max_age        = 99   # Maximum age (inclusive)
 max_age_preg   = 50   # Maximum age to become pregnant
 max_parity     = 20   # Maximum number of children to track - also applies to abortions, miscarriages, stillbirths
 max_parity_spline = 20   # Used for parity splines
+default_n_spacing_bins = 17  # Default number of birth spacing preference bins (3-month intervals, 0-48 months)
 location_registry = {}  # Registry for external custom locations
 valid_country_locs = ['senegal', 'kenya', 'ethiopia', 'cotedivoire', 'niger', 'nigeria_kano', 'nigeria_kaduna', 'nigeria_lagos', 'pakistan_sindh']
 valid_region_locs = {

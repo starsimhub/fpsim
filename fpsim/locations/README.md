@@ -30,6 +30,43 @@ This folder stores the location-specific files for FPsim models (both the `<mode
 
 > Note: The experiment and calibration class have not been updated to run with regional models as of yet; however, the plotting class can be used to plot model output vs available data. 
 
+## Calibration
+
+The `fp.Calibration` class provides automated calibration using Optuna optimization. It can calibrate scalar parameters (exposure_factor, prob_use_intercept, etc.), the exposure_age curve, exposure_parity curve, and spacing_pref suppression.
+
+### Running calibration for all locations
+
+Use the `calibrate_all.py` script in this directory:
+
+```bash
+python fpsim/locations/calibrate_all.py
+```
+
+This runs calibration sequentially for all 9 supported locations using `fp.Calibration` with parallel Optuna workers. Results are printed as parameter values to paste into each location's `.py` file.
+
+### Calibration features
+
+- **Burn-in period**: The `burn_in` parameter (in years) excludes early simulation years from the fit computation for time-series targets (MCPR, TFR). This allows the model to stabilize before being evaluated. Example: `burn_in=2` with `start=2000` ignores 2000-2001 when computing fit.
+- **Exposure age curve fitting**: Fits a 13-knot age-specific exposure multiplier with a smoothness penalty to prevent sharp jumps between adjacent knots.
+- **Exposure parity curve fitting**: Fits parity-specific exposure multipliers (parities 7+ are calibrated, 0-6 fixed at 1.0).
+- **Spacing preference fitting**: Fits suppression parameters for the birth spacing preference curve.
+
+### Calibration parameters in location files
+
+Each location's `make_calib_pars()` function returns a dictionary with:
+
+| Parameter | Description | Effect |
+|:---|:---|:---|
+| `exposure_factor` | Overall exposure correction factor | Scales all pregnancy probabilities uniformly |
+| `prob_use_intercept` | Logistic model intercept for contraceptive uptake | Controls baseline CPR level |
+| `prob_use_trend_par` | Linear trend in contraceptive uptake | Controls CPR growth rate over time |
+| `fecundity_low` / `fecundity_high` | Personal fecundity distribution bounds | Individual variation in conception probability (uniform distribution) |
+| `exposure_age` | Age-specific exposure multipliers (13 knots) | Shapes the ASFR curve |
+| `exposure_parity` | Parity-specific exposure multipliers | Reduces fertility at high parities |
+| `method_weights` | Relative weights for contraceptive method selection | Controls method mix distribution |
+| `dur_postpartum` | Duration of postpartum period (months) | Affects postpartum sexual activity resumption |
+| `spacing_pref` | Birth spacing preference weights (3-month bins) | Controls time between deliveries by modifying postpartum sexual activity |
+
 ## Running Pre-calibrated Simulations
 
 To run a simulation with pre-calibrated parameters for any location, use the generic run script:

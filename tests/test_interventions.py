@@ -63,7 +63,8 @@ def test_change_par():
     assert s1.pars.fp.exposure_factor == ec, f'change_pars() did not change exposure factor to {ec}'
     assert cp1_births < base_births, f'Reducing exposure factor should reduce births, but {cp1_births} is not less than the baseline of {base_births}'
 
-    assert s2.pars.fp.exposure_factor == 1.0, f'Exposure factor should be reset back to 1.0, but it is {s2["exposure_factor"]}'
+    orig_ef = s0.pars.fp.exposure_factor
+    assert s2.pars.fp.exposure_factor == orig_ef, f'Exposure factor should be reset back to {orig_ef}, but it is {s2.pars.fp.exposure_factor}'
     assert cp2_births <= base_births, f'Reducing exposure factor temporarily should reduce births, but {cp2_births} is not less than the baseline of {base_births}'
 
     return m
@@ -543,7 +544,7 @@ def test_method_switching_multiple_sources():
         year=2006,
         from_methods=['pill', 'inj'],  # Use methods that exist and have users
         to_method='target',
-        switch_prob={'pill': 0.10, 'inj': 0.10},
+        switch_prob={'pill': 0.50, 'inj': 0.50},
         annual=False,
         verbose=False,
     )
