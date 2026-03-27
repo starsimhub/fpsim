@@ -485,7 +485,7 @@ class DataLoader:
             df = self.read_data('birth_spacing_pref.csv')
         except FileNotFoundError:
             print(f"birth_spacing_pref.csv not found for {self.location}, using default weights of 1.")
-            months = np.arange(0, 39, 3)  # 0 to 36 months in 3-month intervals
+            months = np.arange(0, 3 * fpd.default_n_spacing_bins, 3)  # 3-month intervals
             weights = np.ones_like(months, dtype=float)
             df = pd.DataFrame({'month': months, 'weights': weights})
 

@@ -11,6 +11,7 @@ import sciris as sc
 import seaborn as sns
 import starsim as ss
 import optuna as op
+from . import defaults as fpd
 from . import parameters as fpp
 from . import experiment as fpe
 from . import locations as fplocs
@@ -245,22 +246,7 @@ class Calibration(sc.prettyobj):
                 loc_module.make_calib_pars = self._original_calib
             self._original_calib = None
 
-    def _get_n_spacing_bins(self):
-        ''' Get the number of spacing_pref bins for the current location '''
-        if not hasattr(self, '_n_spacing_bins'):
-            location = self.pars.get('location')
-            try:
-                dl = fplocs.data_utils.DataLoader(location=location)
-                data = dl.load()
-                sp = data.get('fp', {}).get('spacing_pref', {})
-                pref = sp.get('preference', sp.get('preferences', None))
-                if pref is not None:
-                    self._n_spacing_bins = len(pref)
-                else:
-                    self._n_spacing_bins = 17  # Default fallback
-            except Exception:
-                self._n_spacing_bins = 17
-        return self._n_spacing_bins
+
 
     def run_exp(self, calib_pars, return_exp=False, **kwargs):
         """ Create and run an experiment """
@@ -347,7 +333,7 @@ class Calibration(sc.prettyobj):
             strength = trial.suggest_float('spacing_suppress_strength', defs['strength'][1], defs['strength'][2])
 
             # Build spacing_pref array: 1.0 before start_bin, linear ramp down after
-            n_bins = self._get_n_spacing_bins()
+            n_bins = fpd.default_n_spacing_bins
             pref = np.ones(n_bins)
             if start_bin < n_bins:
                 n_suppress = n_bins - start_bin
@@ -449,7 +435,7 @@ class Calibration(sc.prettyobj):
         if self.fit_spacing_pref:
             start_bin = int(round(self.best_pars.pop('spacing_suppress_start')))
             strength = self.best_pars.pop('spacing_suppress_strength')
-            n_bins = self._get_n_spacing_bins()
+            n_bins = fpd.default_n_spacing_bins
             pref = np.ones(n_bins)
             if start_bin < n_bins:
                 n_suppress = n_bins - start_bin
