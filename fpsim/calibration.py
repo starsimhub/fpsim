@@ -64,7 +64,7 @@ class Calibration(sc.prettyobj):
 
     Note: running a calibration does not guarantee a good fit! You must ensure that
     you run for a sufficient number of iterations, have enough free parameters, and
-    that the parameters have wide enough bounds. Please see the tutorial on calibration
+    that the parameters have wide enough bounds.
     for more information.
 
     Args:
