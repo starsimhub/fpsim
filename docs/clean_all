@@ -1,0 +1,35 @@
+#!/bin/bash
+# Delete all temporary and build files
+
+# Exit on error
+set -e
+
+start=$SECONDS
+
+# Tidy up
+echo "Tidying tutorials..."
+python quarto_utils.py post
+
+echo "Removing build files..."
+rm -rvf .quarto
+rm -rvf api
+
+rm -rvf _inv/
+rm -rvf _site/
+rm -rvf _freeze/
+rm -rvf site_libs/
+rm -rvf .jupyter_cache/
+rm -rvf .virtual_documents/
+rm -rvf __pycache__/
+rm -vf tutorials/*.html
+rm -rvf tutorials/.ipynb_checkpoints/
+rm -rvf tutorials/.jupyter_cache/
+rm -vf tutorials/*.quarto_ipynb
+rm -rvf tutorials/.virtual_documents/
+rm -vf objects.json
+rm -vf objects.inv
+rm -vf *.html
+
+
+duration=$(( SECONDS - start ))
+echo "Cleaned after $duration seconds."

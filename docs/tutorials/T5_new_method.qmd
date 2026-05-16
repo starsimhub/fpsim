@@ -1,0 +1,186 @@
+---
+jupyter: python3
+---
+
+# Adding a new method
+
+This tutorial shows how to use the **`add_method`** intervention to introduce a new contraceptive method into an FPsim run at a specified year. You can use it in several ways:
+
+- **Brand new method**: Define a full `fp.Method` and add it, copying switching behavior from an existing method.
+- **Quick clone**: Clone an existing method (e.g. implants) with minimal config; useful for generic "copy" scenarios.
+- **Clone + override**: Clone a method and override specific attributes (name, efficacy, duration, etc.) via `method_pars`.
+- **Market splitting**: Introduce a new method that takes a fraction of another method's market share using `split_shares`.
+
+You always specify **when** the method becomes available (`year`) and **which existing method** to copy switching behavior from (`copy_from`). Optionally you can pass a custom `method`, `method_pars`, and/or `split_shares`.
+
+## Setup
+
+Import FPsim, Starsim, and set common simulation parameters. We'll use a small population and short run for quick demos.
+
+```{python}
+import fpsim as fp
+import starsim as ss
+import numpy as np
+import matplotlib.pyplot as plt
+
+pars = dict(
+    n_agents=2000,
+    start=2000,
+    stop=2020,
+    location='kenya',
+    verbose=0,
+    analyzers=fp.method_mix_over_time(),
+)
+intro_year = 2010  # Year when new methods will be introduced
+```
+
+## 1. Basic introduction (new method + market share)
+
+The simplest use case: define a new method with `fp.Method`, introduce it at a given year, copy switching behavior from an existing method, and optionally take part of that method's market share with `split_shares`.
+
+```{python}
+# Define the new method
+new_injectable = fp.Method(
+    name='new_inj',
+    label='New Injectable',
+    efficacy=0.995,
+    modern=True,
+    dur_use=ss.lognorm_ex(mean=3, std=1.5),
+)
+
+# Intervention: introduce in intro_year, copy from injectables, take 50% of their share
+intv_basic = fp.add_method(
+    year=intro_year,
+    method=new_injectable,
+    copy_from='inj',
+    split_shares=0.50,
+    verbose=True,
+)
+
+sim_baseline = fp.Sim(pars=pars, label='Baseline').run()
+sim_basic = fp.Sim(pars=pars, interventions=[intv_basic], label='With New Injectable').run()
+
+print(f"Baseline mCPR: {sim_baseline.results.contraception.mcpr[-1]*100:.1f}%")
+print(f"With new method mCPR: {sim_basic.results.contraception.mcpr[-1]*100:.1f}%")
+```
+
+## 2. Quick clone (copy existing method)
+
+Add a *copy* of an existing method without defining a full `Method`: omit `method` and use `copy_from`. The new method is named `{source}_copy` unless you override it in `method_pars`.
+
+```{python}
+intv_clone = fp.add_method(
+    year=intro_year,
+    copy_from='impl',
+    verbose=True,
+)
+
+sim_clone = fp.Sim(pars=pars, interventions=[intv_clone], label='With Implant Clone').run()
+```
+
+## 3. Clone + override with improved contraceptive technology
+
+Clone an existing method and override specific attributes via `method_pars`. In this next example we introduce an improved injectable with higher efficacy and a 10% longer relative duration of use.
+
+```{python}
+intv_override = fp.add_method(
+    year=intro_year,
+    copy_from='inj',
+    method_pars={
+        'name': 'inj_improved',
+        'label': 'Improved Injectable',
+        'efficacy': 0.998,
+        'rel_dur_use': 1.1
+    },
+)
+
+sim_override = fp.Sim(pars=pars, interventions=[intv_override], label='With Improved Injectable').run()
+```
+
+## 4. Market splitting (`split_shares`)
+
+Model a new product that takes a fixed fraction of an existing method's users (e.g. self-injectable DMPA-SC taking share from clinic injectables). Use `split_shares` between 0 and 1; the new method gets that fraction of users who would have chosen `copy_from`.
+
+```{python}
+dmpasc_pars = dict(
+    name='dmpasc',
+    label='DMPA-SC (Self-Injectable)',
+    efficacy=0.997,
+    dur_use=ss.lognorm_ex(mean=0.25, std=0.1),
+)
+
+intv_split = fp.add_method(
+    year=intro_year,
+    method_pars=dmpasc_pars,
+    copy_from='inj',
+    split_shares=0.40,
+    verbose=True,
+)
+
+sim_split = fp.Sim(pars=pars, interventions=[intv_split], label='With DMPA-SC').run()
+
+# Method-specific usage at end
+cm = sim_split.connectors.contraception
+fp_mod = sim_split.connectors.fp
+inj_usage = fp_mod.method_mix[cm.methods['inj'].idx, -1] * 100
+dmpasc_usage = fp_mod.method_mix[cm.methods['dmpasc'].idx, -1] * 100
+print(f"Injectable: {inj_usage:.1f}%  |  DMPA-SC: {dmpasc_usage:.1f}%")
+```
+
+We can visualize how the market share evolved over time using the `method_mix_over_time` analyzer. The plot below shows the share of injectables and DMPA-SC over time, highlighting how DMPA-SC captured a portion of the injectable market when it was introduced in 2010.
+
+```{python}
+# Plot the method mix over time, focusing on injectables and DMPA-SC
+# The plot shows share (%) and only the two methods involved in the market split
+fig = sim_split.analyzers[0].plot(methods=['inj', 'dmpasc'], share=True)
+plt.show()
+```
+
+## Alternative: Adding methods from simulation startThe examples above use the `add_method` intervention to introduce methods partway through a simulation. If you need a method to be available from the very beginning of the simulation, use the manual method creation approach below.
+
+First, make a copy of the default list of contraceptive methods:
+
+```{python}
+my_methods = fp.make_methods()
+```
+
+Define a new method with its attributes:1. A simple name (used inside the code)2. Efficacy (as a decimal)3. Whether it is a modern method4. Duration of use (in months or as a distribution)5. A label (used in plots)
+
+```{python}
+new_method = fp.Method(name='new', efficacy=0.96, modern=True, dur_use=15, label='New method')
+```
+
+Add the method to the list:
+
+```{python}
+my_methods += new_method
+```
+
+Create a method choice module that includes your new method:
+
+```{python}
+method_choice = fp.RandomChoice(methods=my_methods)
+```
+
+Now run simulations comparing baseline (without the new method) to a scenario with the new method:
+
+```{python}
+pars = dict(
+    n_agents   = 10_000,    
+    location   = 'senegal',    
+    start      = 2000,     
+    stop       = 2012,    
+    exposure_factor = 1.0  # Overall scale factor on probability of becoming pregnant
+)
+s1 = fp.Sim(pars=pars, label='Baseline')
+s2 = fp.Sim(pars=pars, contraception_module=method_choice, label='New Method')
+msim = ss.MultiSim(sims=[s1, s2])
+msim.run()
+```
+
+Compare the contraceptive prevalence rate between the two scenarios:
+
+```{python}
+msim.plot(key='cpr');
+```
+

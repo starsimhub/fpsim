@@ -1,0 +1,184 @@
+project:
+  type: website
+  pre-render: python quarto_utils.py pre
+  post-render: python quarto_utils.py post
+  output-dir: _site
+  title: "FPsim"
+  execute-dir: file
+
+website:
+  title: "FPsim"
+  image: /assets/starsim-logo.png
+  favicon: /assets/favicon.ico
+
+  repo-url: https://github.com/fpsim/fpsim
+  repo-actions: [issue]
+  page-navigation: true
+  search:
+    type: overlay
+
+  page-footer:
+    center: "Docs built for FPsim v{{< var version >}} ({{< var versiondate >}}).<br>© 2025, Gates Foundation. All rights reserved. [Privacy and Cookies Notice](https://www.gatesfoundation.org/Privacy-and-Cookies-Notice) | [Terms of Use](https://www.gatesfoundation.org/Terms-of-Use)"
+    right:
+      - icon: github
+        href: https://github.com/fpsim/fpsim
+        aria-label: GitHub
+      - icon: envelope-at-fill
+        href: mailto:info@starsim.org
+      - icon: globe
+        href: https://fpsim.org/
+
+  navbar:
+    logo: /assets/starsim-logo.png
+    title: false
+    collapse-below: lg
+
+    tools:
+      - icon: github
+        href: https://github.com/fpsim/fpsim
+      - icon: envelope-at-fill
+        href: mailto:info@starsim.org
+      - icon: globe
+        href: https://fpsim.org
+
+    left:
+      - text: Home
+        href: index.md
+      - text: Overview
+        href: overview.md
+      - text: What's new
+        href: whats-new.md
+      - text: Tutorials
+        href: tutorials.md
+      - text: Code of conduct
+        href: conduct.md
+      - text: Contributing
+        href: contributing.md
+      - text: API reference
+        href: api/index.qmd
+
+  sidebar:
+    - id: main
+      collapse-level: 3
+      contents:
+        - text: "**Home**"
+          href: index.md
+        - text: "**Overview**"
+          href: overview.md
+        - text: "**What's new**"
+          href: whats-new.md
+        - section: "**Tutorials**"
+          contents:
+            - tutorials/T1_intro.qmd
+            - tutorials/T2_intro_to_new_features.qmd
+            - tutorials/T3_interventions_methods.qmd
+            - tutorials/T4_intervention_eligibility.qmd
+            - tutorials/T5_new_method.qmd
+        - href: conduct.md
+          text: "**Code of conduct**"
+        - href: contributing.md
+          text: "**Contributing**"
+        - text: "**API reference**"
+          href: api/index.qmd
+    - id: api
+      collapse-level: 3
+      contents:
+        - text: "**Home**"
+          href: index.md
+        - text: "**API reference**"
+          href: api/index.qmd
+        - section: "**Modules**"
+          contents:
+            - api/analyzers.qmd
+            - api/arrays.qmd
+            - api/calibration.qmd
+            - api/defaults.qmd
+            - api/demographics.qmd
+            - api/education.qmd
+            - api/experiment.qmd
+            - api/fpmod.qmd
+            - api/interventions.qmd
+            - api/methods.qmd
+            - api/parameters.qmd
+            - api/people.qmd
+            - api/plotting.qmd
+            - api/scenarios.qmd
+            - api/settings.qmd
+            - api/sim.qmd
+            - api/utils.qmd
+
+format:
+  html:
+    theme:
+      light: [cosmo, ./assets/styles-light.scss]
+      dark: [cosmo, ./assets/styles-dark.scss]
+    css: ./assets/styles.css
+    toc: true
+    toc-expand: 3
+    toc-depth: 5
+    highlight-style: github
+
+filters:
+  - machow/interlinks
+
+interlinks:
+  fast: false
+  sources:
+    python:
+      url: https://docs.python.org/3/
+    numpy:
+      url: https://numpy.org/doc/stable/
+    pandas:
+      url: https://pandas.pydata.org/pandas-docs/stable/
+    scipy:
+      url: https://docs.scipy.org/doc/scipy/
+    matplotlib:
+      url: https://matplotlib.org/stable/
+    sciris:
+      url: https://docs.sciris.org/en/latest/
+    starsim:
+      url: https://docs.starsim.org/
+  autolink: true
+  aliases:
+    numpy: [np]
+    pandas: [pd]
+    matplotlib: [plt]
+    sciris: [sc]
+    starsim: [ss]
+    fpsim: [null, fp]
+
+quartodoc:
+  package: fpsim
+  title: API reference
+  style: pkgdown
+  dir: api
+  parser: google
+  render_interlinks: true
+  sections:
+    - title: API reference
+      desc: Full details on all FPsim classes and functions.
+      contents:
+        - analyzers
+        - arrays
+        - calibration
+        - defaults
+        - demographics
+        - education
+        - experiment
+        - fpmod
+        - interventions
+        - methods
+        - parameters
+        - people
+        - plotting
+        - scenarios
+        - settings
+        - sim
+        - utils
+
+execute:
+  freeze: auto
+  cache: true
+  error: false
+  echo: true
+  warning: true

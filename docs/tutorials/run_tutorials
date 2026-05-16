@@ -1,0 +1,20 @@
+#!/bin/bash
+# Render all Quarto tutorials in docs/tutorials
+
+set -e  # Exit on error
+
+TUTORIAL_DIR="tutorials"
+
+echo "Rendering tutorials in $TUTORIAL_DIR..."
+echo ""
+
+for qmd in "$TUTORIAL_DIR"/*.qmd; do
+    if [ -f "$qmd" ]; then
+        echo "Rendering: $qmd"
+        quarto render "$qmd"
+        echo "✓ Completed: $qmd"
+        echo ""
+    fi
+done
+
+echo "All tutorials rendered successfully!"

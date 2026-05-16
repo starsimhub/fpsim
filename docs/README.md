@@ -1,23 +1,29 @@
-# FPsim docs
+# FPsim docs (Quarto)
 
-## Tutorials
+Published documentation lives at [https://docs.fpsim.org](https://docs.fpsim.org).
 
-Please see the `tutorials` subfolder.
+## Build locally
 
-## Everything else
+1. Install [Quarto](https://quarto.org/docs/get-started/) and Python dependencies:
 
-This folder includes source code for building the docs. Users are unlikely to need to do this themselves. Instead, view the FPsim docs at https://docs.fpsim.org.
+   ```bash
+   pip install -e ..
+   pip install -r requirements.txt
+   quarto add machow/quartodoc --no-prompt
+   ```
 
-To build the docs, follow these steps:
+2. From this directory, render the site:
 
-1.  Make sure dependencies are installed::
-    ```
-    pip install -r requirements.txt
-    ```
+   ```bash
+   quarto render
+   ```
 
-2.  Build the documents from the repo root::
-    ```
-    mkdocs build
-    ```
+   Output is written to `_site/`. The `pre-render` step runs `quarto_utils.py` to refresh API pages (`quartodoc`) and `post-render` cleans temporary tutorial artifacts.
 
-3.  The built site is in `site/` at the repo root.
+3. To preview:
+
+   ```bash
+   quarto preview
+   ```
+
+Notebooks under `tutorials/` are executed during render when Quarto's execute settings allow it.
