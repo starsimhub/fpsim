@@ -455,13 +455,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="select-a-specific-subpopulation-for-an-intervention" class="level1">
 <h1>Select a specific subpopulation for an intervention</h1>
 <p>At this point, you should now be able to run multiple simulations with distinct interventions, using default or custom parameters and plot the results. So far we’ve seen interventions that target a model parameter. Now we will see how we can we specify a function that tells FPsim who will receive the intervention. First, import the model and set your default settings.</p>
-<div id="aab8ea2b" class="cell" data-execution_count="1">
+<div id="140dc1be" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp      <span class="co"># Main FPsim module</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc     <span class="co"># For utilities</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss    <span class="co"># For running multiple sims in parallel</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt  <span class="co"># For plotting</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="33b2ef68" class="cell" data-execution_count="2">
+<div id="ab48ac51" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> <span class="st">'kenya'</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">1_000</span>,</span>
@@ -472,7 +472,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, we will modify a ‘state’ value of all eligible women. To see all the states you can select based on, run this code:</p>
-<div id="3ce9650a" class="cell" data-execution_count="3">
+<div id="a6771d89" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fpsim.defaults <span class="im">import</span> fpmod_states</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, state <span class="kw">in</span> <span class="bu">enumerate</span>(fpmod_states): <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>state<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -535,7 +535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="increase-the-number-of-women-who-have-education">Increase the number of women who have education</h2>
 <p>The <a href="../api/interventions.html#fpsim.interventions.change_people_state" title="0"><code>change_people_state</code></a> intervention can be used to change ‘states’ or attributes of women. The states you can change are the same list of target states from above. Let’s see what would hapen if we increase education. In FPsim, education is defined based on an education objective and education attainment. The education objective is given to each woman when she enters the model. During her school age years, she gains one year of educationl attainment each year until she reaches her objective. This trajectory can be interrupted if she experiences a pregnancy during those years.</p>
 <p>First, we will identify our eligible subpopulation for this intervention. In this case, we are selecting all women who have a goal to achieve at least one year of education.</p>
-<div id="086ccdac" class="cell" data-execution_count="4">
+<div id="20011e14" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> select_undereducated(sim):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" Select women who have a goal to achieve at least 1 year of education """</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    is_eligible <span class="op">=</span> ((sim.people.female) <span class="op">&amp;</span></span>
@@ -544,7 +544,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> is_eligible</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, define a baseline simulation, s0, with no changes.</p>
-<div id="74e66454" class="cell" data-execution_count="5">
+<div id="6dcc2840" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>edu <span class="op">=</span> fp.Education(location<span class="op">=</span>location)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>s0 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, education_module<span class="op">=</span>edu, label<span class="op">=</span><span class="st">'Baseline'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -553,7 +553,7 @@ Applying calibration parameters for kenya...</code></pre>
 </div>
 </div>
 <p>Next, we define our education change intervention. This intervention finds all of the eligible women (those with a goal of achieveing at least 1 year of education), and gives all of them 15 years of education, starting in the year 2010. We define a simulation, s1, with this educaiton intervention.</p>
-<div id="50497e40" class="cell" data-execution_count="6">
+<div id="ce973967" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>change_education <span class="op">=</span> fp.change_people_state(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        <span class="st">'edu.attainment'</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                        eligibility<span class="op">=</span>select_undereducated,</span>
@@ -571,7 +571,7 @@ Applying calibration parameters for kenya...</code></pre>
 </div>
 </div>
 <p>Run a multile simulation run with msim to get the results of both of these simulations.</p>
-<div id="0e034a06" class="cell" data-execution_count="7">
+<div id="7a96525b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> ss.MultiSim(sims<span class="op">=</span>[s0, s1])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>msim.run(parallel<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>s0, s1 <span class="op">=</span> msim.sims</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -584,25 +584,25 @@ Applying calibration parameters for kenya...</code></pre>
 
   Running "Baseline": 2002.01.01 (24/145) (0.31 s)  •••————————————————— 17%
 
-  Running "Baseline": 2003.01.01 (36/145) (0.49 s)  •••••——————————————— 26%
+  Running "Baseline": 2003.01.01 (36/145) (0.48 s)  •••••——————————————— 26%
 
-  Running "Baseline": 2004.01.01 (48/145) (0.67 s)  ••••••—————————————— 34%
+  Running "Baseline": 2004.01.01 (48/145) (0.66 s)  ••••••—————————————— 34%
 
-  Running "Baseline": 2005.01.01 (60/145) (0.86 s)  ••••••••———————————— 42%
+  Running "Baseline": 2005.01.01 (60/145) (0.84 s)  ••••••••———————————— 42%
 
-  Running "Baseline": 2006.01.01 (72/145) (1.05 s)  ••••••••••—————————— 50%
+  Running "Baseline": 2006.01.01 (72/145) (1.03 s)  ••••••••••—————————— 50%
 
-  Running "Baseline": 2007.01.01 (84/145) (1.23 s)  •••••••••••————————— 59%
+  Running "Baseline": 2007.01.01 (84/145) (1.21 s)  •••••••••••————————— 59%
 
-  Running "Baseline": 2008.01.01 (96/145) (1.42 s)  •••••••••••••——————— 67%
+  Running "Baseline": 2008.01.01 (96/145) (1.40 s)  •••••••••••••——————— 67%
 
-  Running "Baseline": 2009.01.01 (108/145) (1.62 s)  •••••••••••••••————— 75%
+  Running "Baseline": 2009.01.01 (108/145) (1.59 s)  •••••••••••••••————— 75%
 
-  Running "Baseline": 2010.01.01 (120/145) (1.80 s)  ••••••••••••••••———— 83%
+  Running "Baseline": 2010.01.01 (120/145) (1.78 s)  ••••••••••••••••———— 83%
 
-  Running "Baseline": 2011.01.01 (132/145) (2.00 s)  ••••••••••••••••••—— 92%
+  Running "Baseline": 2011.01.01 (132/145) (1.97 s)  ••••••••••••••••••—— 92%
 
-  Running "Baseline": 2012.01.01 (144/145) (2.20 s)  •••••••••••••••••••• 100%
+  Running "Baseline": 2012.01.01 (144/145) (2.16 s)  •••••••••••••••••••• 100%
 
 Initializing sim "Increased education" with 1000 agents
 
@@ -610,32 +610,32 @@ Initializing sim "Increased education" with 1000 agents
 
   Running "Increased education": 2001.01.01 (12/145) (0.13 s)  •——————————————————— 9%
 
-  Running "Increased education": 2002.01.01 (24/145) (0.32 s)  •••————————————————— 17%
+  Running "Increased education": 2002.01.01 (24/145) (0.31 s)  •••————————————————— 17%
 
-  Running "Increased education": 2003.01.01 (36/145) (0.49 s)  •••••——————————————— 26%
+  Running "Increased education": 2003.01.01 (36/145) (0.48 s)  •••••——————————————— 26%
 
-  Running "Increased education": 2004.01.01 (48/145) (0.67 s)  ••••••—————————————— 34%
+  Running "Increased education": 2004.01.01 (48/145) (0.66 s)  ••••••—————————————— 34%
 
-  Running "Increased education": 2005.01.01 (60/145) (0.86 s)  ••••••••———————————— 42%
+  Running "Increased education": 2005.01.01 (60/145) (0.85 s)  ••••••••———————————— 42%
 
-  Running "Increased education": 2006.01.01 (72/145) (1.05 s)  ••••••••••—————————— 50%
+  Running "Increased education": 2006.01.01 (72/145) (1.03 s)  ••••••••••—————————— 50%
 
-  Running "Increased education": 2007.01.01 (84/145) (1.25 s)  •••••••••••————————— 59%
+  Running "Increased education": 2007.01.01 (84/145) (1.22 s)  •••••••••••————————— 59%
 
-  Running "Increased education": 2008.01.01 (96/145) (1.44 s)  •••••••••••••——————— 67%
+  Running "Increased education": 2008.01.01 (96/145) (1.41 s)  •••••••••••••——————— 67%
 
-  Running "Increased education": 2009.01.01 (108/145) (1.64 s)  •••••••••••••••————— 75%
+  Running "Increased education": 2009.01.01 (108/145) (1.60 s)  •••••••••••••••————— 75%
 
-  Running "Increased education": 2010.01.01 (120/145) (1.83 s)  ••••••••••••••••———— 83%
+  Running "Increased education": 2010.01.01 (120/145) (1.79 s)  ••••••••••••••••———— 83%
 
-  Running "Increased education": 2011.01.01 (132/145) (2.03 s)  ••••••••••••••••••—— 92%
+  Running "Increased education": 2011.01.01 (132/145) (1.98 s)  ••••••••••••••••••—— 92%
 
-  Running "Increased education": 2012.01.01 (144/145) (2.23 s)  •••••••••••••••••••• 100%
+  Running "Increased education": 2012.01.01 (144/145) (2.18 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 </div>
 <p>Plot the resulting education levels.</p>
-<div id="60f43bb5" class="cell" data-execution_count="8">
+<div id="0c56e091" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plt.plot(s0.results.timevec, s0.results.edu.mean_attainment, label<span class="op">=</span>s0.label)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.plot(s1.results.timevec, s1.results.edu.mean_attainment, label<span class="op">=</span>s1.label)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Average years of education among women'</span>)</span>
