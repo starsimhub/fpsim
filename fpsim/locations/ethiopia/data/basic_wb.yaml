@@ -1,0 +1,9 @@
+# Assign data points of interest in DHS dictionary for Ethiopia data.
+# All data 2019 unless otherwise indicated
+
+{
+'maternal_mortality_ratio': 401.0, # Per 100,000 live births, (2017) From World Bank https://data.worldbank.org/indicator/SH.STA.MMRT?locations=ET
+'infant_mortality_rate': 36.6, # Per 1,000 live births, From World Bank
+'crude_death_rate': 6.4, # Per 1,000 inhabitants, From World Bank
+'crude_birth_rate': 33.1, # Per 1,000 inhabitants, From World Bank
+}

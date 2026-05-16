@@ -1,0 +1,100 @@
+region,method,perc,freq
+addis_ababa,Condoms,0.8,0.008
+addis_ababa,Implants,6.7,0.067
+addis_ababa,Injectables,9.1,0.091
+addis_ababa,IUDs,2.5,0.025
+addis_ababa,Other modern,1.2,0.012
+addis_ababa,Other traditional,1.4,0.014
+addis_ababa,Pill,4.5,0.045
+addis_ababa,BTL,0,0
+addis_ababa,Withdrawal,0,0
+afar,Condoms,0.2,0.002
+afar,Implants,1.2,0.012
+afar,Injectables,6.7,0.067
+afar,IUDs,0.6,0.006
+afar,Other modern,0.5,0.005
+afar,Other traditional,0,0
+afar,Pill,1.9,0.019
+afar,BTL,0,0
+afar,Withdrawal,0,0
+amhara,Condoms,0,0
+amhara,Implants,7.5,0.075
+amhara,Injectables,24.7,0.247
+amhara,IUDs,0.9,0.009
+amhara,Other modern,0.2,0.002
+amhara,Other traditional,0,0
+amhara,Pill,1.1,0.011
+amhara,BTL,0.1,0.001
+amhara,Withdrawal,0,0
+benishangul_gumuz,Condoms,0,0
+benishangul_gumuz,Implants,11.1,0.111
+benishangul_gumuz,Injectables,12.1,0.121
+benishangul_gumuz,IUDs,1.5,0.015
+benishangul_gumuz,Other modern,0.6,0.006
+benishangul_gumuz,Other traditional,1.3,0.013
+benishangul_gumuz,Pill,0.7,0.007
+benishangul_gumuz,BTL,0,0
+benishangul_gumuz,Withdrawal,0.1,0.001
+dire_dawa,Condoms,0.6,0.006
+dire_dawa,Implants,7.2,0.072
+dire_dawa,Injectables,4.9,0.049
+dire_dawa,IUDs,0.5,0.005
+dire_dawa,Other modern,1.5,0.015
+dire_dawa,Other traditional,0.3,0.003
+dire_dawa,Pill,3.3,0.033
+dire_dawa,BTL,0.2,0.002
+dire_dawa,Withdrawal,0,0
+gambela,Condoms,0.1,0.001
+gambela,Implants,0.6,0.006
+gambela,Injectables,20.5,0.205
+gambela,IUDs,0.2,0.002
+gambela,Other modern,0,0
+gambela,Other traditional,0.4,0.004
+gambela,Pill,1.7,0.017
+gambela,BTL,0,0
+gambela,Withdrawal,0,0
+harari,Condoms,0.8,0.008
+harari,Implants,6.9,0.069
+harari,Injectables,6.3,0.063
+harari,IUDs,0.8,0.008
+harari,Other modern,2,0.02
+harari,Other traditional,1.3,0.013
+harari,Pill,2.4,0.024
+harari,BTL,0.1,0.001
+harari,Withdrawal,0,0
+oromia,Condoms,0,0
+oromia,Implants,5.2,0.052
+oromia,Injectables,18.3,0.183
+oromia,IUDs,1.1,0.011
+oromia,Other modern,0.9,0.009
+oromia,Other traditional,1,0.01
+oromia,Pill,1.4,0.014
+oromia,BTL,0.6,0.006
+oromia,Withdrawal,0.4,0.004
+snnpr,Condoms,0.1,0.001
+snnpr,Implants,5.4,0.054
+snnpr,Injectables,23.4,0.234
+snnpr,IUDs,1,0.01
+snnpr,Other modern,0.2,0.002
+snnpr,Other traditional,0.1,0.001
+snnpr,Pill,0.9,0.009
+snnpr,BTL,0.2,0.002
+snnpr,Withdrawal,0.2,0.002
+somali,Condoms,0,0
+somali,Implants,0.3,0.003
+somali,Injectables,1.3,0.013
+somali,IUDs,0,0
+somali,Other modern,0.5,0.005
+somali,Other traditional,0,0
+somali,Pill,0.7,0.007
+somali,BTL,0,0
+somali,Withdrawal,0,0
+tigray,Condoms,1.2,0.012
+tigray,Implants,10.3,0.103
+tigray,Injectables,11,0.11
+tigray,IUDs,0.7,0.007
+tigray,Other modern,0.4,0.004
+tigray,Other traditional,0.3,0.003
+tigray,Pill,2.6,0.026
+tigray,BTL,0,0
+tigray,Withdrawal,0.2,0.002

@@ -1,0 +1,23 @@
+﻿region,counseling,odds_ratio,ci_lower,ci_upper
+(Intercept),Home Visit,0.3242107,0.2620344,0.4011404
+addis_ababa,Home Visit,0.5890118,0.4527123,0.7663475
+afar,Home Visit,0.6254891,0.4542427,0.8612942
+amhara,Home Visit,1.1021678,0.8187663,1.4836636
+benishangul_gumuz,Home Visit,2.2689547,1.7083646,3.0134994
+dire_dawa,Home Visit,0.9151816,0.6863432,1.2203185
+gambela,Home Visit,0.5445181,0.381984,0.7762104
+harari,Home Visit,1.4518625,1.0655247,1.9782786
+snnpr,Home Visit,0.9184506,0.7076715,1.19201
+somali,Home Visit,0.39826,0.2737166,0.5794716
+tigray,Home Visit,1.9019704,1.4568299,2.4831253
+(Intercept),Health Facility Visit,0.5776954,0.4595869,0.7261563
+addis_ababa,Health Facility Visit,0.5436622,0.4003222,0.7383269
+afar,Health Facility Visit,0.3941829,0.2700067,0.5754677
+amhara,Health Facility Visit,0.8878718,0.6816073,1.156555
+benishangul_gumuz,Health Facility Visit,0.8376974,0.5929251,1.183517
+dire_dawa,Health Facility Visit,1.0560823,0.7652221,1.4574982
+gambela,Health Facility Visit,0.5296597,0.366004,0.7664929
+harari,Health Facility Visit,3.1452878,2.1695299,4.5598982
+snnpr,Health Facility Visit,1.1511583,0.8582575,1.5440184
+somali,Health Facility Visit,0.2161826,0.1147701,0.4072046
+tigray,Health Facility Visit,1.5678079,1.1805364,2.0821226

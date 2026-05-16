@@ -1,0 +1,9 @@
+# Assign data points of interest in DHS dictionary for Senegal data.  
+# All data 2018 unless otherwise indicated
+
+{
+  'maternal_mortality_ratio': 315.0,  # Per 100,000 live births, (2017) From World Bank https://data.worldbank.org/indicator/SH.STA.MMRT?locations=SN
+  'infant_mortality_rate': 33.6,  # Per 1,000 live births, From World Bank
+  'crude_death_rate': 5.7,  # Per 1,000 inhabitants, From World Bank
+  'crude_birth_rate': 34.5,  # Per 1,000 inhabitants, From World Bank
+}
