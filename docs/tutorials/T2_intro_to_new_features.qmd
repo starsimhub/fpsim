@@ -14,7 +14,7 @@ This is the default option for how contraceptive decisions are made in FPsim. Un
 
 The snippet below illustrates how to set up and run a simulation using the `StandardChoice` module.
 
-```{python3}
+```{python}
 # Import FPsim and define the baseline parameters
 import fpsim as fp
 location = 'kenya'
@@ -39,7 +39,7 @@ The `RandomChoice` module is included only for testing purposes. In this module,
 
 It is recommended that use of the `SimpleChoice` and `RandomChoice` modules is reserved for testing purposes, as the `StandardChoice` captures more of the factors relevant for contraceptive decision making. Nevertheless, the example below shows how to use the `SimpleChoice` module. This example can also be considered as a template for anyone wishing to define their own contraceptive choice module.
 
-```{python3}
+```{python}
 method_choice = fp.SimpleChoice(location=location)
 sim = fp.Sim(pars=pars, contraception_module=method_choice, analyzers=fp.lifeof_recorder())
 sim.run()

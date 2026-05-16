@@ -6,14 +6,14 @@ jupyter: python3
 
 At this point, you should now be able to run multiple simulations with distinct interventions, using default or custom parameters and plot the results. So far we've seen interventions that target a model parameter. Now we will see how we can we specify a function that tells FPsim who will receive the intervention. First, import the model and set your default settings.
 
-```{python3}
+```{python}
 import fpsim as fp      # Main FPsim module
 import sciris as sc     # For utilities
 import starsim as ss    # For running multiple sims in parallel
 import matplotlib.pyplot as plt  # For plotting
 ```
 
-```{python3}
+```{python}
 location = 'kenya'
 pars = dict(
     n_agents   = 1_000,
@@ -26,7 +26,7 @@ pars = dict(
 
 Now, we will modify a 'state' value of all eligible women. To see all the states you can select based on, run this code:
 
-```{python3}
+```{python}
 from fpsim.defaults import fpmod_states
 for i, state in enumerate(fpmod_states): print(f"{i}: {state.name}")
 ```
@@ -37,7 +37,7 @@ The `change_people_state` intervention can be used to change 'states' or attribu
 
 First, we will identify our eligible subpopulation for this intervention. In this case, we are selecting all women who have a goal to achieve at least one year of education.
 
-```{python3}
+```{python}
 def select_undereducated(sim):
     """ Select women who have a goal to achieve at least 1 year of education """
     is_eligible = ((sim.people.female) &
@@ -48,14 +48,14 @@ def select_undereducated(sim):
 
 Now, define a baseline simulation, s0, with no changes.
 
-```{python3}
+```{python}
 edu = fp.Education(location=location)
 s0 = fp.Sim(pars=pars, education_module=edu, label='Baseline')
 ```
 
 Next, we define our education change intervention. This intervention finds all of the eligible women (those with a goal of achieveing at least 1 year of education), and gives all of them 15 years of education, starting in the year 2010. We define a simulation, s1, with this educaiton intervention.
 
-```{python3}
+```{python}
 change_education = fp.change_people_state(
                         'edu.attainment',
                         eligibility=select_undereducated,
@@ -71,7 +71,7 @@ s1 = fp.Sim(pars=pars,
 
 Run a multile simulation run with msim to get the results of both of these simulations.
 
-```{python3}
+```{python}
 msim = ss.MultiSim(sims=[s0, s1])
 msim.run(parallel=False)
 s0, s1 = msim.sims
@@ -79,7 +79,7 @@ s0, s1 = msim.sims
 
 Plot the resulting education levels.
 
-```{python3}
+```{python}
 plt.plot(s0.results.timevec, s0.results.edu.mean_attainment, label=s0.label)
 plt.plot(s1.results.timevec, s1.results.edu.mean_attainment, label=s1.label)
 plt.ylabel('Average years of education among women')

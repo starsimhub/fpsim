@@ -14,9 +14,10 @@ echo "Removing build files..."
 rm -rvf .quarto
 rm -rvf api
 
-rm -rf _inv
-rm -rvf _site
-rm -rvf _freeze
+rm -rvf _inv/
+rm -rvf _site/
+rm -rvf _freeze/
+rm -rvf site_libs/
 rm -rvf .jupyter_cache/
 rm -rvf .virtual_documents/
 rm -rvf __pycache__/
