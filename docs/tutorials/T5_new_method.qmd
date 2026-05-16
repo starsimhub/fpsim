@@ -141,7 +141,7 @@ plt.show()
 First, make a copy of the default list of contraceptive methods:
 
 ```{python}
-import sciris as scmy_methods = fp.make_methods()
+my_methods = fp.make_methods()
 ```
 
 Define a new method with its attributes:1. A simple name (used inside the code)2. Efficacy (as a decimal)3. Whether it is a modern method4. Duration of use (in months or as a distribution)5. A label (used in plots)
@@ -165,7 +165,17 @@ method_choice = fp.RandomChoice(methods=my_methods)
 Now run simulations comparing baseline (without the new method) to a scenario with the new method:
 
 ```{python}
-pars = dict(    n_agents   = 10_000,    location   = 'senegal',    start      = 2000,     stop       = 2012,    exposure_factor = 1.0  # Overall scale factor on probability of becoming pregnant)s1 = fp.Sim(pars=pars, label='Baseline')s2 = fp.Sim(pars=pars, contraception_module=method_choice, label='New Method')simlist = sc.autolist([s1, s2])msim = ss.MultiSim(sims=simlist)msim.run(parallel=False)
+pars = dict(
+    n_agents   = 10_000,    
+    location   = 'senegal',    
+    start      = 2000,     
+    stop       = 2012,    
+    exposure_factor = 1.0  # Overall scale factor on probability of becoming pregnant
+)
+s1 = fp.Sim(pars=pars, label='Baseline')
+s2 = fp.Sim(pars=pars, contraception_module=method_choice, label='New Method')
+msim = ss.MultiSim(sims=[s1, s2])
+msim.run()
 ```
 
 Compare the contraceptive prevalence rate between the two scenarios:
