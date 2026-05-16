@@ -1,0 +1,114 @@
+---
+jupyter: python3
+---
+
+<div class="alert alert-info">
+    
+An interactive version of this notebook is available on [Google Colab](https://colab.research.google.com/github/fpsim/fpsim/blob/main/docs/tutorials/T3_intervention_methods.ipynb?install=fpsim) or [Binder](https://mybinder.org/v2/gh/fpsim/fpsim/HEAD?labpath=docs%2Ftutorials%2FT3_intervention_methods.ipynb).
+    
+</div>
+
+# Interventions 
+
+At this point, you should now be able to run a single sim, using default or custom parameters and plot the results. In this tutorial, you will learn how to use interventions.
+
+First, define the basic parmeters as you learned in the previous tutorial.
+
+```{python3}
+import fpsim as fp
+import sciris as sc
+import starsim as ss
+
+pars = dict(
+    n_agents   = 1_000,
+    location   = 'kenya',
+    start_year = 2000, 
+    end_year   = 2020,
+    exposure_factor = 1.0  # Overall scale factor on probability of becoming pregnant
+)
+method_choice = fp.RandomChoice()  
+```
+
+# Define multiple types of interventions
+
+It is typical to want to test many interventions and compared with a baseline simulation wihtout the intervention. FPsim has the MultiSim class which handles the running of multiple simulations, and provides mechanisms to plot the results together to facilitate comparison. We will use this class here. But first, let's define each of our individual simulations. To distiguish each simulation in the plots, we will pass one more argument to the sim: its 'label'. In this tutorial, we will define a baseline scenario and three different types of interventions, then run them all together
+
+### 1. A simulation without intervention (baseline)
+We define our baseline simulation as s1, without any interventions.
+
+```{python3}
+s1 = fp.Sim(pars=pars, contraception_module=method_choice, label="Baseline")
+```
+
+### 2. A simulation with an intervention that changes the EFFICACY of a method
+
+First, let's have a look at which contraceptive methods we have available.
+
+```{python3}
+Methods = fp.make_methods()
+for method in Methods.values(): print(f"{method.idx}: {method.label}")
+```
+
+Then, let's add an intervention that changes the efficacy of injectables, and create a new sim with that intervention, called s2.
+
+```{python3}
+change_efficacy_intervention = fp.update_methods(eff={"Injectables": 0.99}, year=2010)  # new efficacy starts in 2010
+
+s2 = fp.Sim(pars=pars, contraception_module=method_choice, 
+                 interventions=change_efficacy_intervention, 
+                 label="More effective Injectables")
+```
+
+### 3. A simulation with an intervention that changes the distribution of DURATIONS on the method
+
+Now, let's try changing a different aspect of the method: the distribution of time-on-method, which is how we specify the duration women use a method. Time-on-method is parameterized as a distribution, which can be either exponential, lognormal, loglogistic, gamma, or weibull. Which distribution is selected for each contraceptiove method, as well as the default parameters used to inform the distribution, is calucalted based on an analysis of DHS calendar data. This analysis is shown in `time_on_method.R` in the <i>locations/data_processing</i> folder. To impact the duration of use manually, you can set the relevant parameters manually: 
+
+```{python3}
+# The baseline duration for Injectables is a lognormal with parameter par1=2, and par2=3
+change_duration_intervention = fp.update_methods(dur_use={'Injectables': dict(dist='lognormal', par1=3, par2=0.2)}, year=2010) 
+
+# Define a simulaiton for this intervention called s3
+s3 = fp.Sim(pars=pars, contraception_module=method_choice, 
+                 interventions=change_duration_intervention, 
+                 label="Longer time on Injectables")
+```
+
+### 4. A simulation with an intervention that changes the METHOD MIX 
+Finally, let's add a scenrio that impacts the method mix, or the probability of selecting a specific method when a woman starts using one. Method mix is defined as a set of matrices, depending on the method she used previously, her postpartum status, and age. This intervention replaces all of those with a single matrix that you define. It is a set of numbers representing the percent of women that will choose (in this order):
+* Pill
+* IUD
+* Injectable
+* Condom
+* BTL
+* Withdrawal
+* Implant
+* Other traditional
+* Other modern
+
+You can specify the percent who chooses each of these methods, and the year to start using this percentage, as follows:
+
+```{python3}
+# The values in method_mix should add up to 1, but if they don't, the intervention update_methods() will autamotailly normalize them to add up to 1. 
+change_mix = fp.update_methods(method_mix=[0.25, 0.05, 0.05, 0.0, 0.05, 0.3, 0.1, 0.1, 0.0], year=2010.0)
+
+# Define a simulation for this intervention called s4
+s4 = fp.Sim(pars=pars, contraception_module=method_choice, 
+            interventions=change_mix, 
+            label='Different mix')
+```
+
+# Run multiple simulations
+To run all of these simulations together, create a list of all the simulations you want to include, the use msim to run a multisim analysis as follows:
+
+```{python3}
+simlist = sc.autolist([s1, s2, s3, s4])
+msim = ss.MultiSim(sims=simlist)
+msim.run(parallel=False)
+```
+
+Plot contraceptive use for all of the simulations you just ran. 
+
+```{python3}
+msim.plot(key='cpr');
+```
+

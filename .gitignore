@@ -124,6 +124,15 @@ docs/_build/
 docs/fpsim*
 docs/api/_autosummary/
 
+# Quarto documentation
+docs/_site/
+docs/_extensions/
+docs/_freeze/
+docs/_inv/
+docs/.quarto/
+docs/objects.json
+docs/api/*.qmd
+
 # PyBuilder
 target/
 
@@ -154,8 +163,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
 # Cache for doc build: copy of docs where notebooks are executed (repo notebooks never modified)
 .docs_build
 

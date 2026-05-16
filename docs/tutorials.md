@@ -1,4 +1,6 @@
-# Tutorials
+---
+title: "Tutorials"
+---
 
 These tutorials walk through how to use FPsim. To run locally, start a Jupyter environment in the `docs/tutorials` folder. You can use either `jupyter lab` or `jupyter notebook` to run these tutorials.
 
