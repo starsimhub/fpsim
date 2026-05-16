@@ -3,4 +3,4 @@
 set -euo pipefail # Fail fast if needed
 
 quarto render --cache-refresh
-quarto publish gh-pages --no-render --no-browser
+quarto publish gh-pages --no-render --no-browser --no-prompt

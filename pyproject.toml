@@ -52,16 +52,16 @@ dev = [
     "pytest-cov",
     "pytest-env", 
     "pytest-xdist",
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocstrings[python]",
-    "mkdocs-include-markdown-plugin",
-    "mkdocs-jupyter",
+    "jupyter",
+    "jupyter-cache",
+    "jupytext",
+    "quartodoc",
+    "sphobjinv",
 ]
 
 [project.urls]
 "Website" = "http://fpsim.org"
-"Source" = "https://github.com/fpsim/fpsim/"
+"Source" = "https://github.com/starsimhub/fpsim/"
 
 [tool.setuptools.packages.find]
 where = ["."]

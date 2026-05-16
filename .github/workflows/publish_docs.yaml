@@ -5,42 +5,39 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
 
 jobs:
   build:
+    name: Quarto
+    timeout-minutes: 30
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
-      - uses: actions/cache@v4
-        with:
-          key: mkdocs-material-${{ runner.os }}-${{ hashFiles('**/requirements.txt', '**/pyproject.toml', '**/mkdocs.yml') }}
-          path: ~/.cache/pip
+      - name: Install FPsim
+        run: pip install -e .[dev]
 
-      - run: pip install -r docs/requirements.txt
+      - name: Pre-build font cache
+        run: python -c "import fpsim"
 
-      - run: mkdocs build
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
+      - name: Install Quarto interlinks extension
+        working-directory: ./docs
+        run: quarto add machow/quartodoc --no-prompt
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    steps:
-      - uses: actions/deploy-pages@v4
+      - name: Custom Quarto publish
+        working-directory: ./docs
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          ./publish
