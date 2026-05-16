@@ -26,12 +26,6 @@ The basic design philosophy of FPsim is: **common modelling tasks should be simp
 
 This tutorial walks you through how to define parameters and run the simulation. The next tutorial will show you how to plot the results of a simulation.
 
-<div class="alert alert-info">
-    
-An interactive version of this notebook is available on [Google Colab](https://colab.research.google.com/github/fpsim/fpsim/blob/main/docs/tutorials/T1_intro.ipynb?install=fpsim) or [Binder](https://mybinder.org/v2/gh/fpsim/fpsim/HEAD?labpath=docs%2Ftutorials%2FT1_intro.ipynb).
-    
-</div>
-
 To create, run, and plot a sim with default options is just:
 
 ```{python3}

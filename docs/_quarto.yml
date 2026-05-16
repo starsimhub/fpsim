@@ -69,11 +69,11 @@ website:
           href: whats-new.md
         - section: "**Tutorials**"
           contents:
-            - tutorials/T1_intro.ipynb
-            - tutorials/T2_intro_to_new_features.ipynb
-            - tutorials/T3_interventions_methods.ipynb
-            - tutorials/T4_intervention_eligibility.ipynb
-            - tutorials/T5_new_method.ipynb
+            - tutorials/T1_intro.qmd
+            - tutorials/T2_intro_to_new_features.qmd
+            - tutorials/T3_interventions_methods.qmd
+            - tutorials/T4_intervention_eligibility.qmd
+            - tutorials/T5_new_method.qmd
         - href: conduct.md
           text: "**Code of conduct**"
         - href: contributing.md

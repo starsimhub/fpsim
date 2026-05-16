@@ -1,20 +1,20 @@
 #!/bin/bash
-# Execute all Jupyter notebooks in docs/tutorials
+# Render all Quarto tutorials in docs/tutorials
 
 set -e  # Exit on error
 
-NOTEBOOK_DIR="tutorials"
+TUTORIAL_DIR="tutorials"
 
-echo "Executing notebooks in $NOTEBOOK_DIR..."
+echo "Rendering tutorials in $TUTORIAL_DIR..."
 echo ""
 
-for notebook in "$NOTEBOOK_DIR"/*.ipynb; do
-    if [ -f "$notebook" ]; then
-        echo "Executing: $notebook"
-        jupyter execute "$notebook"
-        echo "✓ Completed: $notebook"
+for qmd in "$TUTORIAL_DIR"/*.qmd; do
+    if [ -f "$qmd" ]; then
+        echo "Rendering: $qmd"
+        quarto render "$qmd"
+        echo "✓ Completed: $qmd"
         echo ""
     fi
 done
 
-echo "All notebooks executed successfully!"
+echo "All tutorials rendered successfully!"

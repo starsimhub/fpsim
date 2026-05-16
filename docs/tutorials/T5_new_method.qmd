@@ -2,12 +2,6 @@
 jupyter: python3
 ---
 
-<div class="alert alert-info">
-
-An interactive version of this notebook is available on [Google Colab](https://colab.research.google.com/github/fpsim/fpsim/blob/main/docs/tutorials/T5_new_method.ipynb?install=fpsim) or [Binder](https://mybinder.org/v2/gh/fpsim/fpsim/HEAD?labpath=docs%2Ftutorials%2FT5_new_method.ipynb).
-
-</div>
-
 # Adding a new method
 
 This tutorial shows how to use the **`add_method`** intervention to introduce a new contraceptive method into an FPsim run at a specified year. You can use it in several ways:

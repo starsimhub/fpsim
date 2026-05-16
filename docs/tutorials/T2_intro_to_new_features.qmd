@@ -2,13 +2,7 @@
 jupyter: python3
 ---
 
-<div class="alert alert-info">
-    
-An interactive version of this notebook is available on [Google Colab](https://colab.research.google.com/github/fpsim/fpsim/blob/main/docs/tutorials/T2_intro_to_new_features.ipynb?install=fpsim) or [Binder](https://mybinder.org/v2/gh/fpsim/fpsim/HEAD?labpath=docs%2Ftutorials%2FT2_intro_to_new_features.ipynb).
-    
-</div>
-
-# Understanding contraceptive use 
+# Understanding contraceptive use
 
 There are many factors that influence women's decisions about contraceptive use. FPsim 2.0 brings enhancements that incorporate these factors. It also provides users with new flexibility for defining their own logic for how women make contraceptive decisions. We will illustrate some of this functionality in this tutorial.
 

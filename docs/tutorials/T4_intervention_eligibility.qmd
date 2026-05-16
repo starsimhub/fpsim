@@ -2,12 +2,6 @@
 jupyter: python3
 ---
 
-<div class="alert alert-info">
-    
-An interactive version of this notebook is available on [Google Colab](https://colab.research.google.com/github/fpsim/fpsim/blob/main/docs/tutorials/T4_intervention_eligibility.ipynb?install=fpsim) or [Binder](https://mybinder.org/v2/gh/fpsim/fpsim/HEAD?labpath=docs%2Ftutorials%2FT4_intervention_eligibility.ipynb).
-    
-</div>
-
 # Select a specific subpopulation for an intervention
 
 At this point, you should now be able to run multiple simulations with distinct interventions, using default or custom parameters and plot the results. So far we've seen interventions that target a model parameter. Now we will see how we can we specify a function that tells FPsim who will receive the intervention. First, import the model and set your default settings.
