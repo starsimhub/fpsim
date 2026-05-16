@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>whats-new – FPsim</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./tutorials/T1_intro.html" rel="next">
+<link href="./overview.html" rel="prev">
+<link href=".//assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-de84f8d6bb715db06a919283c2d1e787.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-9a023c9ade86a60361e96e3e3f11bc54.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-59543038ce2dbea0d2434f74fa4d1829.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-7ea877b0c499ea30230d408925a201b3.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./assets/starsim-logo.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./overview.html"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./whats-new.html"> 
+<span class="menu-text">What’s new</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./tutorials.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./conduct.html"> 
+<span class="menu-text">Code of conduct</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./contributing.html"> 
+<span class="menu-text">Contributing</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./api/index.html"> 
+<span class="menu-text">API reference</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools tools-wide">
+    <a href="https://github.com/fpsim/fpsim" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+    <a href="mailto:info@starsim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-envelope-at-fill"></i></a>
+    <a href="https://fpsim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-globe"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./whats-new.html"><strong>What’s new</strong></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Home</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Overview</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./whats-new.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><strong>What’s new</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>Tutorials</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Getting started - Requirements</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/T2_intro_to_new_features.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Understanding contraceptive use</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Interventions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Select a specific subpopulation for an intervention</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/T5_new_method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adding a new method</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conduct.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Code of conduct</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./contributing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Contributing</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>API reference</strong></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="3">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#whats-new" id="toc-whats-new" class="nav-link active" data-scroll-target="#whats-new">What’s new</a>
+  <ul>
+  <li><a href="#version-3.5.3-2026-03-18" id="toc-version-3.5.3-2026-03-18" class="nav-link" data-scroll-target="#version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</a></li>
+  <li><a href="#version-3.5.2-2026-03-04" id="toc-version-3.5.2-2026-03-04" class="nav-link" data-scroll-target="#version-3.5.2-2026-03-04">Version 3.5.2 (2026-03-04)</a></li>
+  <li><a href="#version-3.5.1-2026-02-17" id="toc-version-3.5.1-2026-02-17" class="nav-link" data-scroll-target="#version-3.5.1-2026-02-17">Version 3.5.1 (2026-02-17)</a></li>
+  <li><a href="#version-3.5.0-2026-02-10" id="toc-version-3.5.0-2026-02-10" class="nav-link" data-scroll-target="#version-3.5.0-2026-02-10">Version 3.5.0 (2026-02-10)</a></li>
+  <li><a href="#version-3.4.1-2025-09-22" id="toc-version-3.4.1-2025-09-22" class="nav-link" data-scroll-target="#version-3.4.1-2025-09-22">Version 3.4.1 (2025-09-22)</a></li>
+  <li><a href="#version-3.4.0-2025-09-11" id="toc-version-3.4.0-2025-09-11" class="nav-link" data-scroll-target="#version-3.4.0-2025-09-11">Version 3.4.0 (2025-09-11)</a></li>
+  <li><a href="#version-3.3.2-2025-09-05" id="toc-version-3.3.2-2025-09-05" class="nav-link" data-scroll-target="#version-3.3.2-2025-09-05">Version 3.3.2 (2025-09-05)</a></li>
+  <li><a href="#version-3.3.1-2025-08-28" id="toc-version-3.3.1-2025-08-28" class="nav-link" data-scroll-target="#version-3.3.1-2025-08-28">Version 3.3.1 (2025-08-28)</a></li>
+  <li><a href="#version-3.3.0-2025-08-27" id="toc-version-3.3.0-2025-08-27" class="nav-link" data-scroll-target="#version-3.3.0-2025-08-27">Version 3.3.0 (2025-08-27)</a></li>
+  <li><a href="#version-3.2.0-2025-08-15" id="toc-version-3.2.0-2025-08-15" class="nav-link" data-scroll-target="#version-3.2.0-2025-08-15">Version 3.2.0 (2025-08-15)</a></li>
+  <li><a href="#version-3.1.0-2025-07-31" id="toc-version-3.1.0-2025-07-31" class="nav-link" data-scroll-target="#version-3.1.0-2025-07-31">Version 3.1.0 (2025-07-31)</a></li>
+  <li><a href="#version-3.0.4-2025-07-30" id="toc-version-3.0.4-2025-07-30" class="nav-link" data-scroll-target="#version-3.0.4-2025-07-30">Version 3.0.4 (2025-07-30)</a></li>
+  <li><a href="#version-3.0.3-2025-07-09" id="toc-version-3.0.3-2025-07-09" class="nav-link" data-scroll-target="#version-3.0.3-2025-07-09">Version 3.0.3 (2025-07-09)</a></li>
+  <li><a href="#version-3.0.2-2025-07-02" id="toc-version-3.0.2-2025-07-02" class="nav-link" data-scroll-target="#version-3.0.2-2025-07-02">Version 3.0.2 (2025-07-02)</a></li>
+  <li><a href="#version-3.0.1-2025-07-01" id="toc-version-3.0.1-2025-07-01" class="nav-link" data-scroll-target="#version-3.0.1-2025-07-01">Version 3.0.1 (2025-07-01)</a></li>
+  <li><a href="#version-3.0.0-2025-06-26" id="toc-version-3.0.0-2025-06-26" class="nav-link" data-scroll-target="#version-3.0.0-2025-06-26">Version 3.0.0 (2025-06-26)</a>
+  <ul>
+  <li><a href="#overview-of-changes" id="toc-overview-of-changes" class="nav-link" data-scroll-target="#overview-of-changes">Overview of changes</a></li>
+  <li><a href="#detailed-changes" id="toc-detailed-changes" class="nav-link" data-scroll-target="#detailed-changes">Detailed changes</a></li>
+  </ul></li>
+  <li><a href="#version-2.0.2-2025-05-28" id="toc-version-2.0.2-2025-05-28" class="nav-link" data-scroll-target="#version-2.0.2-2025-05-28">Version 2.0.2 (2025-05-28)</a></li>
+  <li><a href="#version-2.0.1-2025-05-09" id="toc-version-2.0.1-2025-05-09" class="nav-link" data-scroll-target="#version-2.0.1-2025-05-09">Version 2.0.1 (2025-05-09)</a></li>
+  <li><a href="#version-2.0.0-2025-03-31" id="toc-version-2.0.0-2025-03-31" class="nav-link" data-scroll-target="#version-2.0.0-2025-03-31">Version 2.0.0 (2025-03-31)</a></li>
+  <li><a href="#version-1.0.4-2024-08-19" id="toc-version-1.0.4-2024-08-19" class="nav-link" data-scroll-target="#version-1.0.4-2024-08-19">Version 1.0.4 (2024-08-19)</a></li>
+  <li><a href="#version-1.0.3-2024-07-26" id="toc-version-1.0.3-2024-07-26" class="nav-link" data-scroll-target="#version-1.0.3-2024-07-26">Version 1.0.3 (2024-07-26)</a></li>
+  <li><a href="#version-1.0.2-2024-07-25" id="toc-version-1.0.2-2024-07-25" class="nav-link" data-scroll-target="#version-1.0.2-2024-07-25">Version 1.0.2 (2024-07-25)</a></li>
+  <li><a href="#version-1.0.1-2024-06-17" id="toc-version-1.0.1-2024-06-17" class="nav-link" data-scroll-target="#version-1.0.1-2024-06-17">Version 1.0.1 (2024-06-17)</a></li>
+  <li><a href="#version-1.0.0-2024-06-07" id="toc-version-1.0.0-2024-06-07" class="nav-link" data-scroll-target="#version-1.0.0-2024-06-07">Version 1.0.0 (2024-06-07)</a></li>
+  <li><a href="#version-0.28.3-2024-04-30" id="toc-version-0.28.3-2024-04-30" class="nav-link" data-scroll-target="#version-0.28.3-2024-04-30">Version 0.28.3 (2024-04-30)</a></li>
+  <li><a href="#version-0.28.2-2024-04-20" id="toc-version-0.28.2-2024-04-20" class="nav-link" data-scroll-target="#version-0.28.2-2024-04-20">Version 0.28.2 (2024-04-20)</a></li>
+  <li><a href="#version-0.28.1-2024-04-11" id="toc-version-0.28.1-2024-04-11" class="nav-link" data-scroll-target="#version-0.28.1-2024-04-11">Version 0.28.1 (2024-04-11)</a></li>
+  <li><a href="#version-0.27.0-2024-02-09" id="toc-version-0.27.0-2024-02-09" class="nav-link" data-scroll-target="#version-0.27.0-2024-02-09">Version 0.27.0 (2024-02-09)</a></li>
+  <li><a href="#version-0.26.8-2024-02-08" id="toc-version-0.26.8-2024-02-08" class="nav-link" data-scroll-target="#version-0.26.8-2024-02-08">Version 0.26.8 (2024-02-08)</a></li>
+  <li><a href="#version-0.26.7-2023-10-24" id="toc-version-0.26.7-2023-10-24" class="nav-link" data-scroll-target="#version-0.26.7-2023-10-24">Version 0.26.7 (2023-10-24)</a></li>
+  <li><a href="#version-0.26.6-2023-9-27" id="toc-version-0.26.6-2023-9-27" class="nav-link" data-scroll-target="#version-0.26.6-2023-9-27">Version 0.26.6 (2023-9-27)</a></li>
+  <li><a href="#version-0.26.5-2023-9-27" id="toc-version-0.26.5-2023-9-27" class="nav-link" data-scroll-target="#version-0.26.5-2023-9-27">Version 0.26.5 (2023-9-27)</a></li>
+  <li><a href="#version-0.26.4-2023-9-27" id="toc-version-0.26.4-2023-9-27" class="nav-link" data-scroll-target="#version-0.26.4-2023-9-27">Version 0.26.4 (2023-9-27)</a></li>
+  <li><a href="#version-0.26.3-2023-9-27" id="toc-version-0.26.3-2023-9-27" class="nav-link" data-scroll-target="#version-0.26.3-2023-9-27">Version 0.26.3 (2023-9-27)</a></li>
+  <li><a href="#version-0.26.2-2023-7-25" id="toc-version-0.26.2-2023-7-25" class="nav-link" data-scroll-target="#version-0.26.2-2023-7-25">Version 0.26.2 (2023-7-25)</a></li>
+  <li><a href="#version-0.26.1-2023-6-29" id="toc-version-0.26.1-2023-6-29" class="nav-link" data-scroll-target="#version-0.26.1-2023-6-29">Version 0.26.1 (2023-6-29)</a></li>
+  <li><a href="#version-0.26.0-2023-5-31" id="toc-version-0.26.0-2023-5-31" class="nav-link" data-scroll-target="#version-0.26.0-2023-5-31">Version 0.26.0 (2023-5-31)</a></li>
+  <li><a href="#version-0.25.0-2023-5-13" id="toc-version-0.25.0-2023-5-13" class="nav-link" data-scroll-target="#version-0.25.0-2023-5-13">Version 0.25.0 (2023-5-13)</a></li>
+  <li><a href="#version-0.24.1-2023-4-14" id="toc-version-0.24.1-2023-4-14" class="nav-link" data-scroll-target="#version-0.24.1-2023-4-14">Version 0.24.1 (2023-4-14)</a></li>
+  <li><a href="#version-0.24.0-2023-3-17" id="toc-version-0.24.0-2023-3-17" class="nav-link" data-scroll-target="#version-0.24.0-2023-3-17">Version 0.24.0 (2023-3-17)</a></li>
+  <li><a href="#version-0.23.2-2023-3-6" id="toc-version-0.23.2-2023-3-6" class="nav-link" data-scroll-target="#version-0.23.2-2023-3-6">Version 0.23.2 (2023-3-6)</a></li>
+  <li><a href="#version-0.23.1-2023-2-28" id="toc-version-0.23.1-2023-2-28" class="nav-link" data-scroll-target="#version-0.23.1-2023-2-28">Version 0.23.1 (2023-2-28)</a></li>
+  <li><a href="#version-0.23.0-2023-2-10" id="toc-version-0.23.0-2023-2-10" class="nav-link" data-scroll-target="#version-0.23.0-2023-2-10">Version 0.23.0 (2023-2-10)</a></li>
+  <li><a href="#version-0.22.1-2023-2-03" id="toc-version-0.22.1-2023-2-03" class="nav-link" data-scroll-target="#version-0.22.1-2023-2-03">Version 0.22.1 (2023-2-03)</a></li>
+  <li><a href="#version-0.22.0-2023-1-24" id="toc-version-0.22.0-2023-1-24" class="nav-link" data-scroll-target="#version-0.22.0-2023-1-24">Version 0.22.0 (2023-1-24)</a></li>
+  <li><a href="#version-0.21.2-2022-12-16" id="toc-version-0.21.2-2022-12-16" class="nav-link" data-scroll-target="#version-0.21.2-2022-12-16">Version 0.21.2 (2022-12-16)</a></li>
+  <li><a href="#version-0.21.1-2022-12-09" id="toc-version-0.21.1-2022-12-09" class="nav-link" data-scroll-target="#version-0.21.1-2022-12-09">Version 0.21.1 (2022-12-09)</a></li>
+  <li><a href="#version-0.21.0-2022-12-06" id="toc-version-0.21.0-2022-12-06" class="nav-link" data-scroll-target="#version-0.21.0-2022-12-06">Version 0.21.0 (2022-12-06)</a></li>
+  <li><a href="#version-0.20.0-2022-11-30" id="toc-version-0.20.0-2022-11-30" class="nav-link" data-scroll-target="#version-0.20.0-2022-11-30">Version 0.20.0 (2022-11-30)</a></li>
+  <li><a href="#version-0.19.2-2022-10-28" id="toc-version-0.19.2-2022-10-28" class="nav-link" data-scroll-target="#version-0.19.2-2022-10-28">Version 0.19.2 (2022-10-28)</a></li>
+  <li><a href="#version-0.19.1-2022-10-26" id="toc-version-0.19.1-2022-10-26" class="nav-link" data-scroll-target="#version-0.19.1-2022-10-26">Version 0.19.1 (2022-10-26)</a></li>
+  <li><a href="#version-0.19.0-2022-09-01" id="toc-version-0.19.0-2022-09-01" class="nav-link" data-scroll-target="#version-0.19.0-2022-09-01">Version 0.19.0 (2022-09-01)</a></li>
+  <li><a href="#version-0.18.2-2022-08-12" id="toc-version-0.18.2-2022-08-12" class="nav-link" data-scroll-target="#version-0.18.2-2022-08-12">Version 0.18.2 (2022-08-12)</a></li>
+  <li><a href="#version-0.18.1-2022-08-08" id="toc-version-0.18.1-2022-08-08" class="nav-link" data-scroll-target="#version-0.18.1-2022-08-08">Version 0.18.1 (2022-08-08)</a></li>
+  <li><a href="#version-0.18.0-2022-08-01" id="toc-version-0.18.0-2022-08-01" class="nav-link" data-scroll-target="#version-0.18.0-2022-08-01">Version 0.18.0 (2022-08-01)</a></li>
+  <li><a href="#version-0.17.5-2022-07-28" id="toc-version-0.17.5-2022-07-28" class="nav-link" data-scroll-target="#version-0.17.5-2022-07-28">Version 0.17.5 (2022-07-28)</a></li>
+  <li><a href="#version-0.17.4-2022-07-27" id="toc-version-0.17.4-2022-07-27" class="nav-link" data-scroll-target="#version-0.17.4-2022-07-27">Version 0.17.4 (2022-07-27)</a></li>
+  <li><a href="#version-0.17.3-2022-07-18" id="toc-version-0.17.3-2022-07-18" class="nav-link" data-scroll-target="#version-0.17.3-2022-07-18">Version 0.17.3 (2022-07-18)</a></li>
+  <li><a href="#version-0.17.2-2022-07-15" id="toc-version-0.17.2-2022-07-15" class="nav-link" data-scroll-target="#version-0.17.2-2022-07-15">Version 0.17.2 (2022-07-15)</a></li>
+  <li><a href="#version-0.17.1-2022-07-14" id="toc-version-0.17.1-2022-07-14" class="nav-link" data-scroll-target="#version-0.17.1-2022-07-14">Version 0.17.1 (2022-07-14)</a></li>
+  <li><a href="#version-0.17.0-2022-07-08" id="toc-version-0.17.0-2022-07-08" class="nav-link" data-scroll-target="#version-0.17.0-2022-07-08">Version 0.17.0 (2022-07-08)</a></li>
+  <li><a href="#version-0.16.2-2022-07-01" id="toc-version-0.16.2-2022-07-01" class="nav-link" data-scroll-target="#version-0.16.2-2022-07-01">Version 0.16.2 (2022-07-01)</a></li>
+  <li><a href="#version-0.16.1-2022-06-30" id="toc-version-0.16.1-2022-06-30" class="nav-link" data-scroll-target="#version-0.16.1-2022-06-30">Version 0.16.1 (2022-06-30)</a></li>
+  <li><a href="#version-0.16.0-2022-06-28" id="toc-version-0.16.0-2022-06-28" class="nav-link" data-scroll-target="#version-0.16.0-2022-06-28">Version 0.16.0 (2022-06-28)</a></li>
+  <li><a href="#version-0.15.0-2022-06-13" id="toc-version-0.15.0-2022-06-13" class="nav-link" data-scroll-target="#version-0.15.0-2022-06-13">Version 0.15.0 (2022-06-13)</a></li>
+  <li><a href="#version-0.14.2-2022-06-06" id="toc-version-0.14.2-2022-06-06" class="nav-link" data-scroll-target="#version-0.14.2-2022-06-06">Version 0.14.2 (2022-06-06)</a></li>
+  <li><a href="#version-0.14.2-2022-05-31" id="toc-version-0.14.2-2022-05-31" class="nav-link" data-scroll-target="#version-0.14.2-2022-05-31">Version 0.14.2 (2022-05-31)</a></li>
+  <li><a href="#version-0.14.1-2022-05-27" id="toc-version-0.14.1-2022-05-27" class="nav-link" data-scroll-target="#version-0.14.1-2022-05-27">Version 0.14.1 (2022-05-27)</a></li>
+  <li><a href="#version-0.14.0-2022-05-26" id="toc-version-0.14.0-2022-05-26" class="nav-link" data-scroll-target="#version-0.14.0-2022-05-26">Version 0.14.0 (2022-05-26)</a></li>
+  <li><a href="#version-0.13.2-2022-05-25" id="toc-version-0.13.2-2022-05-25" class="nav-link" data-scroll-target="#version-0.13.2-2022-05-25">Version 0.13.2 (2022-05-25)</a></li>
+  <li><a href="#version-0.13.1-2022-05-25" id="toc-version-0.13.1-2022-05-25" class="nav-link" data-scroll-target="#version-0.13.1-2022-05-25">Version 0.13.1 (2022-05-25)</a></li>
+  <li><a href="#version-0.13.0-2022-05-23" id="toc-version-0.13.0-2022-05-23" class="nav-link" data-scroll-target="#version-0.13.0-2022-05-23">Version 0.13.0 (2022-05-23)</a></li>
+  <li><a href="#version-0.12.0-2022-05-22" id="toc-version-0.12.0-2022-05-22" class="nav-link" data-scroll-target="#version-0.12.0-2022-05-22">Version 0.12.0 (2022-05-22)</a></li>
+  <li><a href="#version-0.11.5-2022-05-21" id="toc-version-0.11.5-2022-05-21" class="nav-link" data-scroll-target="#version-0.11.5-2022-05-21">Version 0.11.5 (2022-05-21)</a></li>
+  <li><a href="#version-0.11.4-2022-05-20" id="toc-version-0.11.4-2022-05-20" class="nav-link" data-scroll-target="#version-0.11.4-2022-05-20">Version 0.11.4 (2022-05-20)</a></li>
+  <li><a href="#version-0.11.3-2022-05-20" id="toc-version-0.11.3-2022-05-20" class="nav-link" data-scroll-target="#version-0.11.3-2022-05-20">Version 0.11.3 (2022-05-20)</a></li>
+  <li><a href="#version-0.11.2-2022-05-20" id="toc-version-0.11.2-2022-05-20" class="nav-link" data-scroll-target="#version-0.11.2-2022-05-20">Version 0.11.2 (2022-05-20)</a></li>
+  <li><a href="#version-0.11.1-2022-05-20" id="toc-version-0.11.1-2022-05-20" class="nav-link" data-scroll-target="#version-0.11.1-2022-05-20">Version 0.11.1 (2022-05-20)</a></li>
+  <li><a href="#version-0.11.0-2022-05-20" id="toc-version-0.11.0-2022-05-20" class="nav-link" data-scroll-target="#version-0.11.0-2022-05-20">Version 0.11.0 (2022-05-20)</a></li>
+  <li><a href="#version-0.10.7-2022-05-19" id="toc-version-0.10.7-2022-05-19" class="nav-link" data-scroll-target="#version-0.10.7-2022-05-19">Version 0.10.7 (2022-05-19)</a></li>
+  <li><a href="#version-0.10.6-2022-05-19" id="toc-version-0.10.6-2022-05-19" class="nav-link" data-scroll-target="#version-0.10.6-2022-05-19">Version 0.10.6 (2022-05-19)</a></li>
+  <li><a href="#version-0.10.5-2022-05-18" id="toc-version-0.10.5-2022-05-18" class="nav-link" data-scroll-target="#version-0.10.5-2022-05-18">Version 0.10.5 (2022-05-18)</a></li>
+  <li><a href="#version-0.10.4-2022-05-17" id="toc-version-0.10.4-2022-05-17" class="nav-link" data-scroll-target="#version-0.10.4-2022-05-17">Version 0.10.4 (2022-05-17)</a></li>
+  <li><a href="#version-0.10.3-2022-05-12" id="toc-version-0.10.3-2022-05-12" class="nav-link" data-scroll-target="#version-0.10.3-2022-05-12">Version 0.10.3 (2022-05-12)</a></li>
+  <li><a href="#version-0.10.2-2022-05-10" id="toc-version-0.10.2-2022-05-10" class="nav-link" data-scroll-target="#version-0.10.2-2022-05-10">Version 0.10.2 (2022-05-10)</a></li>
+  <li><a href="#version-0.10.1-2022-05-09" id="toc-version-0.10.1-2022-05-09" class="nav-link" data-scroll-target="#version-0.10.1-2022-05-09">Version 0.10.1 (2022-05-09)</a></li>
+  <li><a href="#version-0.10.0-2022-05-08" id="toc-version-0.10.0-2022-05-08" class="nav-link" data-scroll-target="#version-0.10.0-2022-05-08">Version 0.10.0 (2022-05-08)</a></li>
+  <li><a href="#version-0.9.0-2022-05-05" id="toc-version-0.9.0-2022-05-05" class="nav-link" data-scroll-target="#version-0.9.0-2022-05-05">Version 0.9.0 (2022-05-05)</a></li>
+  <li><a href="#version-0.8.0-2021-08-28" id="toc-version-0.8.0-2021-08-28" class="nav-link" data-scroll-target="#version-0.8.0-2021-08-28">Version 0.8.0 (2021-08-28)</a></li>
+  <li><a href="#version-0.7.3-2021-07-15" id="toc-version-0.7.3-2021-07-15" class="nav-link" data-scroll-target="#version-0.7.3-2021-07-15">Version 0.7.3 (2021-07-15)</a></li>
+  <li><a href="#version-0.7.2-2021-07-14" id="toc-version-0.7.2-2021-07-14" class="nav-link" data-scroll-target="#version-0.7.2-2021-07-14">Version 0.7.2 (2021-07-14)</a></li>
+  <li><a href="#version-0.7.1-2021-07-14" id="toc-version-0.7.1-2021-07-14" class="nav-link" data-scroll-target="#version-0.7.1-2021-07-14">Version 0.7.1 (2021-07-14)</a></li>
+  <li><a href="#version-0.7.0-2021-06-29" id="toc-version-0.7.0-2021-06-29" class="nav-link" data-scroll-target="#version-0.7.0-2021-06-29">Version 0.7.0 (2021-06-29)</a></li>
+  <li><a href="#version-0.6.5-2021-06-11" id="toc-version-0.6.5-2021-06-11" class="nav-link" data-scroll-target="#version-0.6.5-2021-06-11">Version 0.6.5 (2021-06-11)</a></li>
+  <li><a href="#version-0.6.4-2021-06-10" id="toc-version-0.6.4-2021-06-10" class="nav-link" data-scroll-target="#version-0.6.4-2021-06-10">Version 0.6.4 (2021-06-10)</a></li>
+  <li><a href="#version-0.6.3-2021-06-10" id="toc-version-0.6.3-2021-06-10" class="nav-link" data-scroll-target="#version-0.6.3-2021-06-10">Version 0.6.3 (2021-06-10)</a></li>
+  <li><a href="#version-0.6.2-2021-05-10" id="toc-version-0.6.2-2021-05-10" class="nav-link" data-scroll-target="#version-0.6.2-2021-05-10">Version 0.6.2 (2021-05-10)</a></li>
+  <li><a href="#version-0.6.1-2021-05-02" id="toc-version-0.6.1-2021-05-02" class="nav-link" data-scroll-target="#version-0.6.1-2021-05-02">Version 0.6.1 (2021-05-02)</a></li>
+  <li><a href="#version-0.6.0-2021-05-01" id="toc-version-0.6.0-2021-05-01" class="nav-link" data-scroll-target="#version-0.6.0-2021-05-01">Version 0.6.0 (2021-05-01)</a></li>
+  <li><a href="#version-0.5.2-2021-04-30" id="toc-version-0.5.2-2021-04-30" class="nav-link" data-scroll-target="#version-0.5.2-2021-04-30">Version 0.5.2 (2021-04-30)</a></li>
+  <li><a href="#version-0.5.1-2021-04-29" id="toc-version-0.5.1-2021-04-29" class="nav-link" data-scroll-target="#version-0.5.1-2021-04-29">Version 0.5.1 (2021-04-29)</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+<section id="whats-new" class="level1">
+<h1>What’s new</h1>
+<p>All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term “Regression information”.</p>
+<section id="version-3.5.3-2026-03-18" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</h2>
+<ul>
+<li><strong>Regression information</strong>
+<ul>
+<li>Extended <code>spacing_pref</code> to apply to all parous women, not just postpartum women. Previously, spacing preference weights at intervals beyond <code>dur_postpartum</code> (e.g., 24-48 months) had no effect because women had already exited the postpartum state. Now spacing preferences influence sexual activity for any woman with a prior live birth, using the appropriate base rate (postpartum or age-based). Also switched the time-since-birth calculation from <code>ti_delivery</code> to <code>ti_live_birth</code> to avoid NaN values caused by miscarriage. This will change birth spacing distributions in existing calibrations.</li>
+<li>Recalibrated all 9 non-Ethiopia region locations.</li>
+</ul></li>
+<li><strong>Calibration improvements</strong>
+<ul>
+<li><a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>Calibration</code></a> class: added <code>exposure_age</code> curve fitting with 13 knots and a smoothness penalty (<code>fit_exposure_age</code>, <code>smoothness_weight</code>, <code>exposure_age_bounds</code> parameters). Set <code>fit_exposure_age=False</code> to disable.</li>
+<li><a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>Calibration</code></a> class: location <code>make_calib_pars()</code> is now automatically neutralized during calibration so optimizer trial values take effect instead of being overridden.</li>
+</ul></li>
+<li><strong>Other changes</strong>
+<ul>
+<li><code>experiment.py</code>: <code>age_first_stats</code> metric now compares 5 percentiles (10th, 25th, 50th, 75th, 90th) instead of 3</li>
+<li><code>run_calibrated_location.py</code>: added <code>--seed</code> and <code>--results-dir</code> options for validation</li>
+<li><code>plotting.py</code>: added mean-normalized RMSE display to validation plots</li>
+</ul></li>
+</ul>
+</section>
+<section id="version-3.5.2-2026-03-04" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.2-2026-03-04">Version 3.5.2 (2026-03-04)</h2>
+<ul>
+<li>Fixed compatibility with Starsim 3.2.0: changed <a href="./api/fpmod.html#fpsim.fpmod.FPmod" title="0"><code>FPmod</code></a> to inherit from <a href="https://docs.starsim.org/api/connectors.html#starsim.connectors.Connector" title="0"><code>ss.Connector</code></a> instead of <a href="https://docs.starsim.org/api/modules.html#starsim.modules.Module" title="0"><code>ss.Module</code></a> so it is correctly stored in <code>sim.connectors</code>.</li>
+<li>Fixed MCPR year matching in <code>Experiment.get_mcpr()</code>: converted Timestamp index to integer years to match data format after Starsim 3.2.0’s <code>to_df()</code> change.</li>
+</ul>
+</section>
+<section id="version-3.5.1-2026-02-17" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.1-2026-02-17">Version 3.5.1 (2026-02-17)</h2>
+<ul>
+<li>Re-enables running a sim without a specified location for a quick FPsim demo.</li>
+<li>Switches documentation to <code>mkdocs</code> and switches build to <code>pyproject.toml</code>.</li>
+</ul>
+</section>
+<section id="version-3.5.0-2026-02-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.0-2026-02-10">Version 3.5.0 (2026-02-10)</h2>
+<p>Adds the <a href="./api/interventions.html#fpsim.interventions.add_method" title="0"><code>add_method</code></a> intervention to introduce new contraceptive methods mid-simulation, plus intent states, analyzer updates for Starsim v3, and several bug fixes.</p>
+<ul>
+<li><strong>New features</strong>
+<ul>
+<li><a href="./api/interventions.html#fpsim.interventions.add_method" title="0"><code>add_method</code></a> intervention: introduce a new contraceptive method at a specified year. Supports full Method objects, cloning from existing methods (<code>copy_from</code>), <code>method_pars</code> overrides, and <code>split_shares</code> for market splitting.</li>
+<li><a href="./api/interventions.html#fpsim.interventions.change_initiation" title="0"><code>change_initiation</code></a>: new parameters <code>age_range</code>, <code>perc_of_eligible</code>, <code>target_method</code>, <code>final_perc</code> for age-targeted and scale-up scenarios.</li>
+<li>Intent states (<code>intent_to_use</code>, <code>fertility_intent</code>) moved into FPsim from kenya_empowerment.</li>
+<li><a href="./api/analyzers.html#fpsim.analyzers.method_mix_over_time" title="0"><code>method_mix_over_time</code></a> analyzer: <code>plot()</code> now supports <code>share</code>, <a href="./api/methods.html#fpsim.methods" title="0"><code>methods</code></a>, <code>stacked</code>.</li>
+<li>New <code>Switching</code> class and <a href="./api/interventions.html#fpsim.interventions.method_switching" title="0"><code>method_switching</code></a> intervention for modifying switching matrices.</li>
+<li><a href="./api/analyzers.html#fpsim.analyzers.state_tracker" title="0"><code>state_tracker</code></a> analyzer: new <code>module_name</code> parameter for module-scoped states.</li>
+</ul></li>
+<li><strong>Minor changes</strong>
+<ul>
+<li>Partnership handling moved to People; <code>partnered</code> is now a computed property.</li>
+<li>Fixed <a href="./api/analyzers.html#fpsim.analyzers.education_recorder" title="0"><code>education_recorder</code></a> pregnant key access; added tests.</li>
+<li>Fixed <a href="./api/analyzers.html#fpsim.analyzers.method_mix_over_time" title="0"><code>method_mix_over_time</code></a> histogram binning for method indices.</li>
+<li>Fixed <a href="./api/interventions.html#fpsim.interventions.change_initiation" title="0"><code>change_initiation</code></a> and <a href="./api/analyzers.html#fpsim.analyzers.track_as" title="0"><code>track_as</code></a> for Starsim v3.</li>
+<li>Pandas v3.0.0 compatibility.</li>
+<li>Scenario class simplified; probability/matrix options removed.</li>
+<li>Removed <code>n_urban</code> from sim results.</li>
+</ul></li>
+<li><strong>Regression information</strong>
+<ul>
+<li><a href="./api/scenarios.html#fpsim.scenarios.Scenario" title="0"><code>Scenario</code></a> class simplified: removed <code>method_mix</code>, <code>matrix</code>, <code>ages</code>, <code>init_factor</code>, <code>discont_factor</code>, <code>init_value</code>, <code>discont_value</code>, and <code>copy_from</code>. Use <a href="./api/interventions.html#fpsim.interventions.update_methods" title="0"><code>update_methods</code></a> or custom interventions instead; see examples folder and <code>test_interventions</code>.</li>
+<li><code>n_urban</code> removed from sim results.</li>
+</ul></li>
+</ul>
+</section>
+<section id="version-3.4.1-2025-09-22" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.4.1-2025-09-22">Version 3.4.1 (2025-09-22)</h2>
+<p>This release adds several priority regions with preliminary calibrations to FPsim Version 3.3.0. These countries/regions are: Cote d’Ivore, Niger, Pakistan Sindh region, Nigeria with regions Kano, Kaduna, and Lagos.</p>
+<ul>
+<li><strong>DHS data processing scripts</strong>
+<ul>
+<li>Changed DHS and PMA data processing R scripts to filter to region level is specified in config.R file inputs region_variable (either “v024” or for Nigeria specifically, “sstate”), region name (e.g.&nbsp;“kaduna”), region_code (integer, e.g.&nbsp;110 for Nigeria Kaduna), and country_region folder name (e.g.&nbsp;nigeria_kaduna). Script path: <code>fpsim/fpsim/data_processing/DHS_PMA_scripts/*.R</code>.</li>
+<li>Created DHS/PMA config_files sub folder within fpsim/data_processing/DHS_PMA_scripts/ to store previously run config files for future reference. Config files by country/region and saved as config_{country_region}.R</li>
+<li>Updated fpsim/fpsim/data_processing/DHS_PMA_scripts/breastfeeding_stats.R script to accept the “still breastfeeding” status as either the value code (95) or the string (“still breastfeeding”)</li>
+</ul></li>
+<li><strong>New locations</strong>
+<ul>
+<li>Added additional locations (countries or subregions) to fpsim/fpsim/locations/{country_region} folders to store DHS, PMA, UN, and World Bank data.</li>
+<li>Created location specific fpsim/fpsim/locations/{country_region}/run_{country}.py files to store parameters of calibrated models (calibrated to FPsim v3.3.0), run and save the calibrated model, and generate and save figures of the calibration (fpsim/plotting.py script, plot_calib function) in a “calib_results” directory. Also generated a README.md file for each country{_region} describing any manual edits to data files after generation by the DHS_PMA_scripts.</li>
+<li>Added the following countries and country/regions to defaults.py valid_country_locs = [‘senegal’, ‘kenya’, ‘ethiopia’, ‘cotedivoire’, ‘niger’, ‘nigeria_kano’, ‘nigeria_kaduna’, ‘nigeria_lagos’, ‘pakistan_sindh’]</li>
+<li>Added country/region imports to the fpsim/locations/<strong>init</strong>.py</li>
+</ul></li>
+</ul>
+</section>
+<section id="version-3.4.0-2025-09-11" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.4.0-2025-09-11">Version 3.4.0 (2025-09-11)</h2>
+<p>Refactors data storage within FPsim, so that new locations can reside in external directories. The existing syntax <code>sim = fp.Sim(location='kenya')</code> still works, but now it is additionally possible to add a new setting from any folder via:</p>
+<pre><code>import fpsim as fp
+my_data = fp.DataLoader(data_path='path-to-my-data')
+sim = fp.Sim(dataloader=my_data)</code></pre>
+<p>In addition to allowing extra flexibility for users creating new locations, this change also supported the ongoing modularization of FPsim into distinct modules. The <code>DataLoader</code> class processes all data in the folder provided and sorts it into the module that requires it: death rates for the <a href="./api/demographics.html#fpsim.demographics.Deaths" title="0"><code>Deaths</code></a> module, contraceptive choice parameters for the <code>Contraception</code> module, etc.</p>
+</section>
+<section id="version-3.3.2-2025-09-05" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.3.2-2025-09-05">Version 3.3.2 (2025-09-05)</h2>
+<p>Minor bugfix in plotting.plot_calib(). Fixes x axis units for MCPR plot and reenables ASFR plot.</p>
+</section>
+<section id="version-3.3.1-2025-08-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.3.1-2025-08-28">Version 3.3.1 (2025-08-28)</h2>
+<p>Minor release to add missing changelog.</p>
+</section>
+<section id="version-3.3.0-2025-08-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.3.0-2025-08-27">Version 3.3.0 (2025-08-27)</h2>
+<p>Updates the FPsim code to be compatible with the most recent version of Starsim (v3.0.2). The most recent Starsim release included many improvements to the logic of time, probability, and rates. FPsim now benefits from these improvements; in particular: - fp.defaults.mpy has been removed - All of the logic of FPsim is now agnostic to the timestep. This means that everything will still work if you want to use a timestep of 3 months instead of 1, for instance. - There were previously many places in the code where random draws occured. These have all been replaced with Starsim distributions, so it is now possible to take advantage of Starsim’s common random number generation. - The <code>archive</code> folder has been removed.</p>
+</section>
+<section id="version-3.2.0-2025-08-15" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.2.0-2025-08-15">Version 3.2.0 (2025-08-15)</h2>
+<ul>
+<li><strong>FPmod Class</strong> This release moves the majority of FP logic from the <a href="./api/people.html#fpsim.people.People" title="0"><code>People</code></a> class to a new <a href="./api/fpmod.html#fpsim.fpmod.FPmod" title="0"><code>FPmod</code></a> class. This is intended to make it more straightforward in the future to combine FP analyses with other analyses. This has several downstream implications for how to use the model and access results:
+<ul>
+<li>Most FP results are now stored in <code>sim.results.fp</code>, e.g.&nbsp;<code>sim.results.fp.pregnancies</code>. This will lead to eventual consistency with combined Starsim models, e.g.&nbsp;<code>sim.results.hiv.infections</code>.</li>
+<li>Similarly, results related to contraception are stored in <code>sim.results.contraception</code>, e.g.&nbsp;<code>sim.result.contraception.mcpr</code>.</li>
+<li>Introduces specific distributions for each random event; these distributions are CRN-safe and will eventually move FPsim to a CRN-safe model.</li>
+<li><code>sim.fp_pars</code> is now <code>sim.pars.fp</code>, which will make it consistent with other parameters like <code>sim.pars.hiv</code>.</li>
+<li>Moves the <code>location</code> parameter from the <code>FPPars</code> class to the <a href="./api/parameters.html#fpsim.parameters.SimPars" title="0"><code>SimPars</code></a> class.</li>
+</ul></li>
+<li><strong>Result tidying</strong>
+<ul>
+<li>All the <code>tfr_{by_age}</code> results have been moved to an age-specific result structure. This means, for instance, that you would access the fertility rate for 20-24yos via <code>sim.connectors.fp.asfr[4, :]</code> instead of <code>sim.results.tfr_20-24</code>.</li>
+<li>All the <code>{result}_over_year</code> results have been removed. Annualized results can be easily calculated after a sim has been run, using <code>sim.results.to_df(resample='year')</code>.</li>
+</ul></li>
+<li><strong>Misc changes</strong>
+<ul>
+<li><code>longitudinal_history</code> analyzer moved from the fpsim repo to the kenya_empowerment repo</li>
+<li>Added attributes to people for storing the timesteps at which significant events occur, e.g.&nbsp;<code>ti_live_birth</code>, to make it easier to create analyzers related to these events</li>
+<li>Removes <code>total_births_{by_age}</code> and <code>total_women_{by_age}</code> - these were previously needed to calculate the total fertility rate, but this is no longer needed, and the addition of these results increases the size of the results object considerably. If these results are needed, they can be computed with an analyzer or people snapshot.</li>
+<li>Renames <code>urban_women</code> to <code>n_urban</code> for consistency with other results, e.g.&nbsp;<code>n_wq1</code>, <code>n_fecund</code>.</li>
+<li>Removes the <code>extract_employment</code> method from the <a href="./api/experiment.html#fpsim.experiment.Experiment" title="0"><code>Experiment</code></a> class, as this is no longer functional.</li>
+<li>Removes the <code>MultiSim</code> class.</li>
+<li>Numerous bugfixes; see PR for details.</li>
+</ul></li>
+</ul>
+</section>
+<section id="version-3.1.0-2025-07-31" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.1.0-2025-07-31">Version 3.1.0 (2025-07-31)</h2>
+<ul>
+<li>Refactors Contraception and Education to Starsim modules (connectors)</li>
+<li>Exposes all parameters for different modules in the <code>pars</code> dictionary passed to the Sim. This means that creating a sim is far more flexible, e.g.&nbsp;all of these will work:</li>
+</ul>
+<pre><code>import fpsim as fp
+sim1 = fp.Sim(prob_use_trend_par=0.3, start=2000)
+sim2 = fp.Sim(pars = dict(prob_use_trend_par=0.3, start=2000))
+sim3 = fp.Sim(contra_pars = dict(prob_use_trend_par=0.3), sim_pars=dict(start=2000))
+sim4 = fp.Sim(start=2000, contraception_module = fp.SimpleChoice(prob_use_trend_par=0.3))</code></pre>
+<ul>
+<li>Refactors parameters.py, so that all FP parameters inherit from Starsim parameter classes. We now have a <a href="./api/parameters.html#fpsim.parameters.SimPars" title="0"><code>SimPars</code></a> class, as well as <code>FPPars</code>, <code>ContraPars</code>, and <a href="./api/education.html#fpsim.education.EduPars" title="0"><code>EduPars</code></a>. When a Sim is created, any parameters passed in by the user will automatically get assigned to the right modules. This also allowed for a notable simplifaction in the parameter validation logic, since Starsim handles that automatically.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/575">575</a></li>
+</ul>
+</section>
+<section id="version-3.0.4-2025-07-30" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.0.4-2025-07-30">Version 3.0.4 (2025-07-30)</h2>
+<ul>
+<li>Updates ethiopia/regions model files according to latest template used in country files</li>
+<li>Updates data_utils.py and plotting.py to be usable with both country and region model locations</li>
+<li>In conjunction with two changes above, modifies ethiopia region data filenames to be consistent with country data filenames</li>
+<li>Shifts valid_country_locs and valid_region_locs to top of defaults.py for easier modification</li>
+<li>Updates locations/README to document the steps to add region model(s) according to changes and expected format above</li>
+<li>Slight change to filenames() function format in template and model files to more robustly capture filepaths with correct base_dir</li>
+<li>Removes deprecated region logic in experiment.py and sim.py</li>
+<li>Tiny updates to sim and multisim examples</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/592">581</a></li>
+</ul>
+</section>
+<section id="version-3.0.3-2025-07-09" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.0.3-2025-07-09">Version 3.0.3 (2025-07-09)</h2>
+<p>Resolves issues: #580 - removes requirement headers for Tutorials 2-5 (redundant because in header of Tutorial 1) #578 - modifies sigmoid function in methods.py to use scipy’s expit function to avoid runtime warnings (due to overflow with very large/small rhs values) - <em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/581">581</a></p>
+</section>
+<section id="version-3.0.2-2025-07-02" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.0.2-2025-07-02">Version 3.0.2 (2025-07-02)</h2>
+<ul>
+<li>Fixes issue 567 (bug in method_mix_by_age_analyzer)</li>
+<li>Fixes issue 568 (reduces default verbosity of Sim)</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/574">574</a></li>
+</ul>
+</section>
+<section id="version-3.0.1-2025-07-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.0.1-2025-07-01">Version 3.0.1 (2025-07-01)</h2>
+<p>Adds a plotting class that can be used to create plots typically used for calibration and analyses. Both manual and automatic calibration example scripts were cleaned and consolidated. Tutorial explaining overall calibration process created.</p>
+<p><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/547">https://github.com/fpsim/fpsim/pull/547</a></p>
+</section>
+<section id="version-3.0.0-2025-06-26" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.0.0-2025-06-26">Version 3.0.0 (2025-06-26)</h2>
+<p>This version of FPsim is now built on <a href="https://starsim.org">Starsim</a>. Several major changes were introduced as a result.</p>
+<section id="overview-of-changes" class="level3">
+<h3 class="anchored" data-anchor-id="overview-of-changes">Overview of changes</h3>
+<ul>
+<li><p><strong>Analyzer Refactor</strong></p>
+<ul>
+<li><p>Replaced <code>fpsim.analyzers.Analyzer</code> with <a href="https://docs.starsim.org/api/analyzers.html#starsim.analyzers.Analyzer" title="0"><code>starsim.Analyzer</code></a> as the base class.</p></li>
+<li><p>Updated all analyzer classes in <code>fpsim/analyzers.py</code> to inherit from <a href="https://docs.starsim.org/api/analyzers.html#starsim.analyzers.Analyzer" title="0"><code>starsim.Analyzer</code></a>.</p></li>
+<li><p>Renamed and refactored key analyzer methods:</p>
+<ul>
+<li>Replaced <code>apply</code> with <code>step</code>.</li>
+<li>Refactored initialization/finalization methods to align with StarSim conventions (<code>init_results</code>, <code>init_pre</code>, <code>init_post</code>, etc.).</li>
+<li>Updated logic to use <code>.female</code> instead of <code>.is_female</code> and <code>.uids</code> for indexing.</li>
+</ul></li>
+<li><p>Replaced direct boolean/array filtering with StarSim’s approach using <code>.uids</code> and attribute access.</p></li>
+</ul></li>
+<li><p><strong>Array Handling</strong></p>
+<ul>
+<li>Introduced new module: <code>fpsim/arrays.py</code> with a <a href="./api/arrays.html#fpsim.arrays.TwoDimensionalArr" title="0"><code>TwoDimensionalArr</code></a> array class for handling multi-valued attributes (e.g., birth ages).</li>
+<li>Replaced previous handling of multi-valued person states (like <code>birth_ages</code>, <code>stillborn_ages</code>, etc.) with <a href="./api/arrays.html#fpsim.arrays.TwoDimensionalArr" title="0"><code>TwoDimensionalArr</code></a> arrays in <code>fpsim/defaults.py</code>.</li>
+</ul></li>
+<li><p><strong>Parameter System Overhaul</strong></p>
+<ul>
+<li><p>Simplified and separated FPsim-specific and simulation-level parameters in <code>fpsim/parameters.py</code>.</p>
+<ul>
+<li>Added <code>default_sim_pars</code> for high-level simulation settings.</li>
+<li>Refactored <code>pars()</code> function to create parameter sets and validate keys.</li>
+<li>Removed old <code>Pars</code> class.</li>
+<li>Updated parameter validation logic.</li>
+</ul></li>
+<li><p>Adjusted parameter passing and initialization throughout the codebase for compatibility (notably in <code>fpsim/experiment.py</code>, <code>fpsim/scenarios.py</code>, etc.).</p></li>
+</ul></li>
+<li><p><strong>Method &amp; Module API Changes</strong></p>
+<ul>
+<li>All module methods that handle people (contraception, education, etc.) now require explicit <code>uids</code> for subsetting and updating.</li>
+<li>Updated contraception and education modules to take and use <code>uids</code> for all relevant operations.</li>
+<li>Refactored method selection, probability assignment, and duration logic in <code>fpsim/methods.py</code> for array compatibility and efficiency.</li>
+</ul></li>
+</ul>
+</section>
+<section id="detailed-changes" class="level3">
+<h3 class="anchored" data-anchor-id="detailed-changes">Detailed changes</h3>
+<ul>
+<li><p><strong>fpsim/analyzers.py</strong></p>
+<ul>
+<li>Refactored all analyzers for new array and indexing conventions.</li>
+<li>Updated key logic for CPR, method mix, education, age pyramids, and tracking analyzers.</li>
+</ul></li>
+<li><p><strong>fpsim/defaults.py</strong></p>
+<ul>
+<li>Changed all person state definitions to use StarSim array classes.</li>
+<li>Removed direct use of numpy arrays, replaced with typed StarSim arrays and new <a href="./api/arrays.html#fpsim.arrays.TwoDimensionalArr" title="0"><code>TwoDimensionalArr</code></a>.</li>
+<li>Updated results arrays and lists for new structure.</li>
+</ul></li>
+<li><p><strong>fpsim/education.py</strong></p>
+<ul>
+<li>Refactored all methods to use explicit <code>uids</code> for subsetting.</li>
+<li>Improved efficiency and clarity of education progression, interruption, resumption, and graduation logic.</li>
+</ul></li>
+<li><p><strong>fpsim/experiment.py</strong></p>
+<ul>
+<li>Updated experiment parameter passing to use new <code>pars</code> structure.</li>
+<li>Adjusted data extraction and model comparison routines for compatibility.</li>
+</ul></li>
+<li><p><strong>fpsim/methods.py</strong></p>
+<ul>
+<li>Refactored all module methods to use <code>uids</code> for indexing and updating.</li>
+<li>Improved probabilistic selection, method choice, and duration assignment logic.</li>
+</ul></li>
+<li><p><strong>fpsim/parameters.py</strong></p>
+<ul>
+<li>Removed class-based parameter system; now uses plain dictionaries and utility functions.</li>
+<li>Introduced validation and JSON (de)serialization helpers.</li>
+</ul></li>
+<li><p><strong>fpsim/scenarios.py</strong></p>
+<ul>
+<li>Refactored scenario parameter handling and simulation creation for new parameter API.</li>
+</ul></li>
+<li><p><strong>fpsim/utils.py</strong></p>
+<ul>
+<li>Updated Numba-accelerated utility functions to use <code>float32</code> for compatibility.</li>
+</ul></li>
+<li><p><strong>Other changes</strong></p>
+<ul>
+<li>Removed obsolete <code>fpsim/base.py</code>.</li>
+<li>Various bug fixes and code style improvements for array handling, type consistency, and API clarity.</li>
+</ul></li>
+</ul>
+<hr>
+<p><strong>Note:</strong> This PR introduces several breaking changes to the FPsim API, notably in how arrays and parameters are handled, and how modules interact with people objects. Downstream code and scripts will likely require updates to align with the new conventions.</p>
+<p><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/490">490</a></p>
+</section>
+</section>
+<section id="version-2.0.2-2025-05-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-2.0.2-2025-05-28">Version 2.0.2 (2025-05-28)</h2>
+<ul>
+<li>Introduces a flexible location_registry system to support custom location modules defined outside the core fpsim package.</li>
+<li>External users can now create an analysis repo and register their own locations in their respective repo via fpsim.defaults.register_location(), eliminating the need for a user to modify the core code in order to test creating their own model in location other than Ethiopia, Senegal, or Kenya.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/547">547</a></li>
+</ul>
+</section>
+<section id="version-2.0.1-2025-05-09" class="level2">
+<h2 class="anchored" data-anchor-id="version-2.0.1-2025-05-09">Version 2.0.1 (2025-05-09)</h2>
+<ul>
+<li>Cleanup of data processing scripts in the data_processing directory</li>
+<li>Creation of shared_data dir for data shared across model locations and corresponding data_utils cleanup</li>
+<li>Addition of <location>.py template for new users</location></li>
+<li>Documentation overhaul in locations/README, data_processing/README, and data processing scripts</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/531">531</a></li>
+</ul>
+</section>
+<section id="version-2.0.0-2025-03-31" class="level2">
+<h2 class="anchored" data-anchor-id="version-2.0.0-2025-03-31">Version 2.0.0 (2025-03-31)</h2>
+<p>FPsim 2.0 represents a major overhaul of how the model represents contraceptive choices. Previously, women updated their contraceptive choices each year in their birth month. This version introduces a new method for setting contraceptive choices, whereby women choose a method of contraception, and are then assigned a duration of use (<code>dur_use</code>). They update their contraceptive choice at the end of this duration, or after certain other events (e.g.&nbsp;postpartum, or after a change in one of their empowerment metrics).</p>
+<p>To support this new feature, this PR also introduces several new items: - <code>ContraceptiveChoice</code> modules can be defined (eg, <a href="./api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a>) and flexibly added to sims depending on how one wishes to model the mechanism for choosing contraception</p>
+<p>There are also several other minor changes: - <code>sim.i</code> has been renamed <code>sim.ti</code> for consistency across starsim modules and for clarity that it refers to an integer representation of time (time step) - <code>track_switching</code> has been moved to an analyzer - the fpsim <code>ndict</code> class has been removed and replaced with the starsim <code>ndict</code> class - the lists of lists in the results object have been replaced with arrays - <code>Education</code> modules have been added - new parameters and people’s attributes have been added: <code>fertility_intent</code>, <code>intent_to_use</code> and <code>wealth_quintile</code> - new analyzer “Life of” has been added to visualise the events during the lifecourse of a woman - new intervention that allows for changes in the probability of initiation (of contraceptive use) in contraception modules that use a logistic regression module. - Fixes a bug that prevented simulations from running if pars[‘timestep’] !=1 - Adds a circular buffer to track the last 12 months of data, and enable model updates that depend on the previous state</p>
+<p><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/411">411</a></p>
+</section>
+<section id="version-1.0.4-2024-08-19" class="level2">
+<h2 class="anchored" data-anchor-id="version-1.0.4-2024-08-19">Version 1.0.4 (2024-08-19)</h2>
+<ul>
+<li>Fixes issue 310 (Removes legacy use_subnational logic)</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/392">392</a></li>
+</ul>
+</section>
+<section id="version-1.0.3-2024-07-26" class="level2">
+<h2 class="anchored" data-anchor-id="version-1.0.3-2024-07-26">Version 1.0.3 (2024-07-26)</h2>
+<ul>
+<li>Adds .devcontainer configuration for a Codespaces dev container</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/369">369</a></li>
+</ul>
+</section>
+<section id="version-1.0.2-2024-07-25" class="level2">
+<h2 class="anchored" data-anchor-id="version-1.0.2-2024-07-25">Version 1.0.2 (2024-07-25)</h2>
+<ul>
+<li>Fixes issue 347, correcting variable in defaults storing age-specific results</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/388">388</a></li>
+</ul>
+</section>
+<section id="version-1.0.1-2024-06-17" class="level2">
+<h2 class="anchored" data-anchor-id="version-1.0.1-2024-06-17">Version 1.0.1 (2024-06-17)</h2>
+<ul>
+<li>Adds empowerment metrics (paid work and education attainment) to calibration targets</li>
+<li>Creates script for empowerment calibration</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/240">240</a></li>
+</ul>
+</section>
+<section id="version-1.0.0-2024-06-07" class="level2">
+<h2 class="anchored" data-anchor-id="version-1.0.0-2024-06-07">Version 1.0.0 (2024-06-07)</h2>
+<ul>
+<li>Releases FPsim1.0 to pypi</li>
+<li>Adds FPsim New User Instructions to tutorials</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/349">349</a></li>
+</ul>
+</section>
+<section id="version-0.28.3-2024-04-30" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.28.3-2024-04-30">Version 0.28.3 (2024-04-30)</h2>
+<ul>
+<li>Creates subnational tutorial for Ethiopia</li>
+<li>Updates regional scripts to improve subnationals calibrations for Ethiopia</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/334">334</a></li>
+</ul>
+</section>
+<section id="version-0.28.2-2024-04-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.28.2-2024-04-20">Version 0.28.2 (2024-04-20)</h2>
+<ul>
+<li>Refactoring of location directory, such that there is a country folder under locations/ dir containing the data, model script(s), and figs pertaining to that location only</li>
+<li>Modifies these new paths accordingly in all relevant files</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/316">316</a></li>
+</ul>
+</section>
+<section id="version-0.28.1-2024-04-11" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.28.1-2024-04-11">Version 0.28.1 (2024-04-11)</h2>
+<ul>
+<li>Updates regional parameters to calibrate subnationally in Ethiopia</li>
+<li>Revises subnational calibration script to run for all regions and includes a new multisim script for subnational comparisons</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/319">319</a></li>
+</ul>
+</section>
+<section id="version-0.27.0-2024-02-09" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.27.0-2024-02-09">Version 0.27.0 (2024-02-09)</h2>
+<ul>
+<li>Builds out new regional attribute and parameters for subnational dynamics in Ethiopia</li>
+<li>Creates new subnational calibration script and subfolder for regional datasets and figures</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/241">241</a></li>
+</ul>
+</section>
+<section id="version-0.26.8-2024-02-08" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.8-2024-02-08">Version 0.26.8 (2024-02-08)</h2>
+<ul>
+<li>Removed unused <code>timeseries_recorder</code> and <code>verbose_sim</code> analyzers.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/257">257</a></li>
+</ul>
+</section>
+<section id="version-0.26.7-2023-10-24" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.7-2023-10-24">Version 0.26.7 (2023-10-24)</h2>
+<ul>
+<li>Created two scripts in data_processing dir to scrape UN and World Bank country calibration data</li>
+<li>Updated location_template.txt with logic to pull this scraped data for future contexts</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/213">213</a></li>
+</ul>
+</section>
+<section id="version-0.26.6-2023-9-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.6-2023-9-27">Version 0.26.6 (2023-9-27)</h2>
+<ul>
+<li>Renamed the country data filenames to be standardized across contexts</li>
+<li>Updated references to these updated country data files</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/196">196</a></li>
+</ul>
+</section>
+<section id="version-0.26.5-2023-9-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.5-2023-9-27">Version 0.26.5 (2023-9-27)</h2>
+<ul>
+<li>Adds Tutorial for manual calibration to docs/tutorials/ directory</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/166">166</a></li>
+</ul>
+</section>
+<section id="version-0.26.4-2023-9-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.4-2023-9-27">Version 0.26.4 (2023-9-27)</h2>
+<ul>
+<li>Refactoring of Experiment class to run with the latest country data formats</li>
+<li>Country files have updated references to these updated country data files</li>
+<li>Senegal country data files updated to latest standard format (based on Kenya)</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/193">193</a></li>
+</ul>
+</section>
+<section id="version-0.26.3-2023-9-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.3-2023-9-27">Version 0.26.3 (2023-9-27)</h2>
+<ul>
+<li>Updates Senegal files in locations/senegal to be in the same format as Kenya for standardization purposes</li>
+<li>Minor updates to calibrate_manual.py to be able to run with Senegal data (in addition to Kenya and other contexts)</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/165">165</a></li>
+</ul>
+</section>
+<section id="version-0.26.2-2023-7-25" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.2-2023-7-25">Version 0.26.2 (2023-7-25)</h2>
+<ul>
+<li>Updates code for manual calibration</li>
+<li>Adds folder to create figures for manual calibration runs</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/164">164</a></li>
+</ul>
+</section>
+<section id="version-0.26.1-2023-6-29" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.1-2023-6-29">Version 0.26.1 (2023-6-29)</h2>
+<ul>
+<li>Updates code for contraceptive matrices</li>
+<li>Adds contraceptive matrices for Ethiopia to run manual calibration</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/161">161</a></li>
+</ul>
+</section>
+<section id="version-0.26.0-2023-5-31" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.26.0-2023-5-31">Version 0.26.0 (2023-5-31)</h2>
+<ul>
+<li>Builds out new parameters file for Ethiopia</li>
+<li>Adds camparison data for Ethiopia calibration</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/156">156</a></li>
+</ul>
+</section>
+<section id="version-0.25.0-2023-5-13" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.25.0-2023-5-13">Version 0.25.0 (2023-5-13)</h2>
+<ul>
+<li>Adds to sim.py to track sexual inactivity in agents</li>
+<li>Restricts method use to only those women sexually active over the last 12 months and debuted</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/157">157</a></li>
+</ul>
+</section>
+<section id="version-0.24.1-2023-4-14" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.24.1-2023-4-14">Version 0.24.1 (2023-4-14)</h2>
+<ul>
+<li>Fixes example_calib.py and example_exp.py to run with fpsim library</li>
+<li>Updates manual_calibration.py to be flexible to take any location with identically structured data as Kenya</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/133">133</a></li>
+</ul>
+</section>
+<section id="version-0.24.0-2023-3-17" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.24.0-2023-3-17">Version 0.24.0 (2023-3-17)</h2>
+<ul>
+<li>Finish a manual calibration script for plotting model outcomes vs data for Kenya</li>
+<li>Goal is to make this script more flexible for other locations, still needs some tweaks for data import</li>
+<li>Compares ASFR, TFR, age/parity mix, contraceptive use and mix, CPR, pop growth rate, age at first birth, and birth spacing bins</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/133">133</a></li>
+</ul>
+</section>
+<section id="version-0.23.2-2023-3-6" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.23.2-2023-3-6">Version 0.23.2 (2023-3-6)</h2>
+<ul>
+<li>Add duration of a short birth interval between live births (short_int) to senegal.py</li>
+<li>Track number of short interval births an agent has had over their life and number are happening at each time step in sim.py</li>
+<li>Add age limit parameters (age_low, age_high) to senegal.py to track age-specific short interval births.</li>
+<li>Create a time series plot of all short births interval during a sim as well as the age-specific time series.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/107">107</a></li>
+</ul>
+</section>
+<section id="version-0.23.1-2023-2-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.23.1-2023-2-28">Version 0.23.1 (2023-2-28)</h2>
+<ul>
+<li>Add location folder for Ethiopia calibration</li>
+<li>Add comparison data to Ethiopia folder</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/118">118</a></li>
+</ul>
+</section>
+<section id="version-0.23.0-2023-2-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.23.0-2023-2-10">Version 0.23.0 (2023-2-10)</h2>
+<ul>
+<li>Add optimize-space-prefs.py using Calibration class to algorithmically find best birth space params</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/119">119</a></li>
+</ul>
+</section>
+<section id="version-0.22.1-2023-2-03" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.22.1-2023-2-03">Version 0.22.1 (2023-2-03)</h2>
+<ul>
+<li>Update contraceptive matrices to be weighted</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/113">113</a></li>
+</ul>
+</section>
+<section id="version-0.22.0-2023-1-24" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.22.0-2023-1-24">Version 0.22.0 (2023-1-24)</h2>
+<ul>
+<li>Add calibrate_manual.py to compare sim runs to data with new data structures</li>
+<li>Add plot_birth_spacing.py under senegal location to fine tune this calibration</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/109">109</a></li>
+</ul>
+</section>
+<section id="version-0.21.2-2022-12-16" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.21.2-2022-12-16">Version 0.21.2 (2022-12-16)</h2>
+<ul>
+<li>Updates Kenya, 2nd pass, completed 1st draft</li>
+<li>Starts calibrate_manual.py for Kenya with ASFR plot</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/76">76</a></li>
+</ul>
+</section>
+<section id="version-0.21.1-2022-12-09" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.21.1-2022-12-09">Version 0.21.1 (2022-12-09)</h2>
+<ul>
+<li>Updates calibrated data to compare for Kenya, 1st pass</li>
+<li>Adds raw data to kenya folder</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/70">70</a></li>
+</ul>
+</section>
+<section id="version-0.21.0-2022-12-06" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.21.0-2022-12-06">Version 0.21.0 (2022-12-06)</h2>
+<ul>
+<li>Updates contraceptive matrices in kenya.py to be from Kenya PMA 2019-2020</li>
+<li>Adds raw data to kenya folder and processing code to data_processing folder</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/51">51</a></li>
+</ul>
+</section>
+<section id="version-0.20.0-2022-11-30" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.20.0-2022-11-30">Version 0.20.0 (2022-11-30)</h2>
+<ul>
+<li>Builds out new parameters file for Kenya</li>
+<li>Adds and reorganizes directories for external data files and data processing scripts</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/37">37</a></li>
+</ul>
+</section>
+<section id="version-0.19.2-2022-10-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.19.2-2022-10-28">Version 0.19.2 (2022-10-28)</h2>
+<ul>
+<li>Added user guide</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/4">4</a></li>
+</ul>
+</section>
+<section id="version-0.19.1-2022-10-26" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.19.1-2022-10-26">Version 0.19.1 (2022-10-26)</h2>
+<ul>
+<li>Moved to new repository location (http://github.com/fpsim/fpsim)</li>
+<li>Updated documentation in README</li>
+<li>Created new tutorials in tutorials folder</li>
+<li>Ordered tutorials by complexity through T1, T2, T3… Tn numbering system</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/fpsim/fpsim/pull/1">1</a></li>
+</ul>
+</section>
+<section id="version-0.19.0-2022-09-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.19.0-2022-09-01">Version 0.19.0 (2022-09-01)</h2>
+<ul>
+<li>Added age-specific plotting for tfr, pregnancies, imr, mmr, stillbirths, and births to Sim, MultiSim, and Scenarios</li>
+<li>Added ability to plot channels by age over the course of an interval of time (one year, for example)</li>
+<li>Added yearly age-specific plotting for pregnancies, imr and mmr</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/590">590</a></li>
+</ul>
+</section>
+<section id="version-0.18.2-2022-08-12" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.18.2-2022-08-12">Version 0.18.2 (2022-08-12)</h2>
+<ul>
+<li>Added age specific plotting for cpr, mcpr, and acpr to Sim, MultiSim, and Scenarios</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/584">584</a></li>
+</ul>
+</section>
+<section id="version-0.18.1-2022-08-08" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.18.1-2022-08-08">Version 0.18.1 (2022-08-08)</h2>
+<ul>
+<li>Added y-axis scaling to Sim.plot and MultiSim.plot()</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/583">583</a></li>
+</ul>
+</section>
+<section id="version-0.18.0-2022-08-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.18.0-2022-08-01">Version 0.18.0 (2022-08-01)</h2>
+<ul>
+<li>Adjusted stillbirth rates from Nori et al., which was conducted June 2022</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/560">560</a></li>
+</ul>
+</section>
+<section id="version-0.17.5-2022-07-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.5-2022-07-28">Version 0.17.5 (2022-07-28)</h2>
+<ul>
+<li>Refactored ExperimentVerbose and verbose_sim and related parts of test suite</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/471">471</a></li>
+</ul>
+</section>
+<section id="version-0.17.4-2022-07-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.4-2022-07-27">Version 0.17.4 (2022-07-27)</h2>
+<ul>
+<li>Added new test suite for the Scenarios API</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/527">527</a></li>
+</ul>
+</section>
+<section id="version-0.17.3-2022-07-18" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.3-2022-07-18">Version 0.17.3 (2022-07-18)</h2>
+<ul>
+<li>Added tutorial jupyter notebook to showcase Scenarios features</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/484">484</a></li>
+</ul>
+</section>
+<section id="version-0.17.2-2022-07-15" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.2-2022-07-15">Version 0.17.2 (2022-07-15)</h2>
+<ul>
+<li>Switched method mix plotting from line chart to stacked area chart for all classes</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/568">568</a></li>
+</ul>
+</section>
+<section id="version-0.17.1-2022-07-14" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.1-2022-07-14">Version 0.17.1 (2022-07-14)</h2>
+<ul>
+<li>Added example_scens.py for a quick debug of adding a novel method when developing new features</li>
+<li>Updated README with new debugging guidance</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/570">570</a></li>
+</ul>
+</section>
+<section id="version-0.17.0-2022-07-08" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.17.0-2022-07-08">Version 0.17.0 (2022-07-08)</h2>
+<ul>
+<li>Added method mix timeseries plotting to Sim, MultiSim, and Scenarios through plot(to_plot=‘method’)</li>
+<li>Added some test coverage for method mix plotting</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/554">554</a></li>
+</ul>
+</section>
+<section id="version-0.16.2-2022-07-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.16.2-2022-07-01">Version 0.16.2 (2022-07-01)</h2>
+<ul>
+<li>Refactors channel aggregation in Scenarios.analyze_sims()</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/561">561</a></li>
+</ul>
+</section>
+<section id="version-0.16.1-2022-06-30" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.16.1-2022-06-30">Version 0.16.1 (2022-06-30)</h2>
+<ul>
+<li>Add tracking of pregnancies</li>
+<li>Add cumulative sum of pregnancies to plotting functionality (see plot(‘apo’))</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/555">555</a></li>
+</ul>
+</section>
+<section id="version-0.16.0-2022-06-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.16.0-2022-06-28">Version 0.16.0 (2022-06-28)</h2>
+<ul>
+<li>Split matrix age category &gt;25 into 26-35 and &gt;35</li>
+<li>Baseline contraceptive behavior remains the same, but interventions can differentiate now</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/551">551</a></li>
+</ul>
+</section>
+<section id="version-0.15.0-2022-06-13" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.15.0-2022-06-13">Version 0.15.0 (2022-06-13)</h2>
+<ul>
+<li>Added new plotting functionality <code>Scenarios.plot('mortality')</code></li>
+<li>Added new plotting functionality <code>Scenarios.plot('apo')</code> for adverse pregnancy outcomes</li>
+<li>Added <code>stillbirths_over_year</code> to keys, tracking, and plotting</li>
+<li>Added tracking of miscarriage, abortion, corresponding keys and plotting</li>
+<li>Temporarily commented out plot_interventions in <code>sim.py</code> to fix x-axis and vline issues in plotting</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fpsim/pull/549">549</a></li>
+</ul>
+</section>
+<section id="version-0.14.2-2022-06-06" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.14.2-2022-06-06">Version 0.14.2 (2022-06-06)</h2>
+<ul>
+<li>Adding 3 new columns to the results dataframe in Scenarios</li>
+</ul>
+</section>
+<section id="version-0.14.2-2022-05-31" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.14.2-2022-05-31">Version 0.14.2 (2022-05-31)</h2>
+<ul>
+<li>Fixed bug in <a href="./api/analyzers.html#fpsim.analyzers.snapshot" title="0"><code>fp.snapshot()</code></a> missing non-exact timesteps.</li>
+<li>Fixed bug with <code>fp.timeseries_recorder()</code> not being capable of being added as a kwarg.</li>
+<li>Tidied output of <code>SimVerbose.story()</code>.</li>
+<li>Added <code>sim.get_analyzer()</code> and <code>sim.get_intervention()</code> methods (along with the plural versions).</li>
+<li>Renamed <code>Experiment.dhs_data</code> to <code>Experiment.data</code>; likewise for <code>model_to_calib</code> -&gt; <code>model</code>.</li>
+<li>Fixed bug with MCPR year plotting in <a href="./api/experiment.html#fpsim.experiment.Experiment" title="0"><code>Experiment</code></a>.</li>
+<li>Fixed bug with analyzers being applied only at the end of the sim instead of at every timestep.</li>
+<li>Fixed bug with interventions not plotting with simulations.</li>
+<li>Fixed bug with <code>finalize()</code> not being called for interventions.</li>
+<li>Increased code coverage of tests from 67% to 80%.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/533">533</a></li>
+</ul>
+</section>
+<section id="version-0.14.1-2022-05-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.14.1-2022-05-27">Version 0.14.1 (2022-05-27)</h2>
+<ul>
+<li>Fixed bugs in how <code>copy_from</code> is implemented in scenarios.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/526">526</a></li>
+</ul>
+</section>
+<section id="version-0.14.0-2022-05-26" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.14.0-2022-05-26">Version 0.14.0 (2022-05-26)</h2>
+<ul>
+<li>Adds an options module, allowing things like DPI to be set via <code>fp.options(dpi=150)</code>.</li>
+<li>Updates plotting options and allows more control over style.</li>
+<li>Adds more control to plots, including <code>start_year</code> and <code>end_year</code>.</li>
+<li>Adds a <code>copy_from</code> keyword to method probability update scenarios.</li>
+<li>Renames <code>years</code> to <code>par_years</code> in scenarios.</li>
+<li>Changes the logic of the <a href="./api/people.html#fpsim.people.People" title="0"><code>People</code></a> update step so that lactational amenorrhea is calculated after breastfeeding is updated.</li>
+<li>Changes the <a href="./api/sim.html#fpsim.sim.Sim" title="0"><code>Sim</code></a> representation to e.g.&nbsp;<code>Sim("My sim"; n=10,000; 1960-2020; results: b=69,541 ☠=11,920 pop=62,630)</code></li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/522">522</a></li>
+</ul>
+</section>
+<section id="version-0.13.2-2022-05-25" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.13.2-2022-05-25">Version 0.13.2 (2022-05-25)</h2>
+<ul>
+<li>Added ASFR as an output of Experiments.</li>
+<li><code>MultiSim.run()</code> now automatically labels un-labeled sims; this fixes bugs in MultiSim plotting functions.</li>
+<li>MultiSims also have additional error checking (e.g., they cannot be rerun).</li>
+<li>Refactored data files to be in “tall” instead of “wide” format.</li>
+<li>Removed years and age bins from summary statistics.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/517">517</a></li>
+</ul>
+</section>
+<section id="version-0.13.1-2022-05-25" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.13.1-2022-05-25">Version 0.13.1 (2022-05-25)</h2>
+<ul>
+<li>Changed <code>MultiSim.plot_method_mix()</code> to be able to work with <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>Scenarios</code></a></li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/513">513</a></li>
+</ul>
+</section>
+<section id="version-0.13.0-2022-05-23" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.13.0-2022-05-23">Version 0.13.0 (2022-05-23)</h2>
+<ul>
+<li>Changed parameters from a dictionary to a class and added <code>parameters.py</code>. This class has additional validation, the ability to import from/export to JSON, etc.</li>
+<li>Restructured methods, including renaming <code>pars['method_efficacy']</code> to <code>pars['methods']['eff']</code>, plus a new entry, <code>pars['methods']['modern']</code>, to specify which are modern methods used for calculating MCPR.</li>
+<li>Methods have been reordered, grouping traditional and modern methods and sorting modern methods by longevity (e.g.&nbsp;condoms -&gt; pill -&gt; implants -&gt; IUDs).</li>
+<li>Added ability to add/remove contraceptive methods via <code>pars.add_method()</code> and <code>pars.rm_method()</code>.</li>
+<li>Added a method to run a single scenario.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/503">503</a></li>
+</ul>
+</section>
+<section id="version-0.12.0-2022-05-22" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.12.0-2022-05-22">Version 0.12.0 (2022-05-22)</h2>
+<ul>
+<li>Split FPsim repository from analyses scripts.</li>
+<li>Refactors <code>experiment.py</code> to load files for a specific location rather than being hard-coded.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/504">504</a></li>
+</ul>
+</section>
+<section id="version-0.11.5-2022-05-21" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.5-2022-05-21">Version 0.11.5 (2022-05-21)</h2>
+<ul>
+<li>Improvements to the scenarios, including more helpful docstrings and error messages.</li>
+<li>Improved error checking of sims.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/502">502</a></li>
+</ul>
+</section>
+<section id="version-0.11.4-2022-05-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.4-2022-05-20">Version 0.11.4 (2022-05-20)</h2>
+<ul>
+<li>Renamed parameter <code>n</code> to <code>n_agents</code>, and adds parameter <code>scaled_pop</code>.</li>
+<li>Tracking of switch events is disabled by default; set <code>pars['track_switching'] = True</code> to re-enable.</li>
+<li>Update default end year from 2019 to 2020.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/496">496</a></li>
+</ul>
+</section>
+<section id="version-0.11.3-2022-05-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.3-2022-05-20">Version 0.11.3 (2022-05-20)</h2>
+<ul>
+<li>Tidied <code>tests</code> folder.</li>
+<li>Removed the calibration database by default (to keep, use <code>fp.Calibration(keep_db=True)</code>).</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/495">495</a></li>
+</ul>
+</section>
+<section id="version-0.11.2-2022-05-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.2-2022-05-20">Version 0.11.2 (2022-05-20)</h2>
+<ul>
+<li>Added a <code>people.make_pregnant()</code> method.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/494">494</a></li>
+</ul>
+</section>
+<section id="version-0.11.1-2022-05-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.1-2022-05-20">Version 0.11.1 (2022-05-20)</h2>
+<ul>
+<li>Replaced <code>high</code> and <code>low</code> breastfeeding duration parameters with Gumbel distribution parameters <code>mu</code> and <code>beta</code>.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/493">493</a></li>
+</ul>
+</section>
+<section id="version-0.11.0-2022-05-20" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.11.0-2022-05-20">Version 0.11.0 (2022-05-20)</h2>
+<ul>
+<li>Major refactor of <code>senegal.py</code>, organizing parameters into groups and renaming.</li>
+<li>Parameter names made more consistent, e.g.&nbsp;<code>exposure_correction</code> -&gt; <code>exposure_factor</code>, <code>maternal_mortality_multiplier</code> -&gt; <code>maternal_mortality_factor</code>.</li>
+<li>Added comprehensive parameter checking.</li>
+<li>Updates to the default representation: <code>print(sim)</code> is now a very brief representation; use <code>sim.disp()</code> to get the old behavior.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/492">492</a></li>
+</ul>
+</section>
+<section id="version-0.10.7-2022-05-19" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.7-2022-05-19">Version 0.10.7 (2022-05-19)</h2>
+<ul>
+<li>Updated <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>fp.Scenarios()</code></a> API.</li>
+<li>Added a new <a href="./api/scenarios.html#fpsim.scenarios.Scenario" title="0"><code>fp.Scenario()</code></a> class, with a convenience function <a href="./api/scenarios.html#fpsim.scenarios.make_scen" title="0"><code>fp.make_scen()</code></a> for creating new scenarios, for later use with <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>fp.Scenarios()</code></a>.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/488">488</a></li>
+</ul>
+</section>
+<section id="version-0.10.6-2022-05-19" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.6-2022-05-19">Version 0.10.6 (2022-05-19)</h2>
+<ul>
+<li>Adds <code>fp.parallel()</code> to quickly run multiple sims in parallel and return a <code>MultiSim</code> object.</li>
+<li>Adds an <a href="./api/interventions.html#fpsim.interventions.change_par" title="0"><code>fp.change_par()</code></a> intervention.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/487">487</a></li>
+</ul>
+</section>
+<section id="version-0.10.5-2022-05-18" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.5-2022-05-18">Version 0.10.5 (2022-05-18)</h2>
+<ul>
+<li>Changes how the matrices are implemented. For example, <code>sim['methods']['probs']['18-25']</code> has been renamed <code>sim['methods']['raw']['annual']['18-25']</code>; <code>sim['methods']['probs']['18-25']</code> has been renamed <code>sim['methods']['adjusted']['annual']['18-25']</code>; <code>sim['methods_postpartum']['probs1to6']['18-25']</code> has been renamed <code>sim['methods']['adjusted']['pp1to6']['18-25']</code>; etc.</li>
+<li>Various other parameters were renamed for consistency (e.g.&nbsp;<code>years</code> -&gt; <code>year</code>).</li>
+<li>Various other methods were renamed for clarity (e.g.&nbsp;<code>maternal_mortality()</code> -&gt; <code>check_maternal_mortality()</code>; <code>check_mcpr()</code> -&gt; <code>track_mcpr()</code>).</li>
+<li>Input validation has been added to the <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>Scenarios</code></a> class.</li>
+<li>Fixed <a href="./api/interventions.html#fpsim.interventions.update_methods" title="0"><code>fp.update_methods()</code></a> so it can no longer produce probabilities &gt;1.</li>
+<li>Removed a circular import in <code>scenarios.py</code>.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/482">482</a></li>
+</ul>
+</section>
+<section id="version-0.10.4-2022-05-17" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.4-2022-05-17">Version 0.10.4 (2022-05-17)</h2>
+<ul>
+<li>Fixes bugs with the MCPR growth implementation, as well as the wrong matrix being used.</li>
+<li>Added three new parameters: <code>mcpr_growth_rate</code>, <code>mcpr_max</code>, and <code>mcpr_norm_year</code>, to control how MCPR growth is projected into the future.</li>
+<li>Updated <code>sim.run()</code> to return <code>self</code> rather than <code>self.results</code>.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/480">480</a></li>
+</ul>
+</section>
+<section id="version-0.10.3-2022-05-12" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.3-2022-05-12">Version 0.10.3 (2022-05-12)</h2>
+<ul>
+<li>Move country-specific parameters from <code>fpsim.data</code> to <code>fpsim.locations</code>.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/464">464</a></li>
+</ul>
+</section>
+<section id="version-0.10.2-2022-05-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.2-2022-05-10">Version 0.10.2 (2022-05-10)</h2>
+<ul>
+<li>Refactored <code>People.get_method()</code> to use more efficient looping.</li>
+<li>Numbafied <code>n_multinomial()</code> to get a ~20% speed increase.</li>
+<li>Added a <code>method_timestep</code> parameter to allow skipping contraceptive matrix updates (saves significant time for small sims).</li>
+<li>Added <code>fp.pars(location='test')</code> to use defaults for testing (e.g.&nbsp;small population size).</li>
+<li>Fixed divide-by-zero bug for small population sizes in total fertility rate.</li>
+<li>Refactored tests; they should now run locally in ~15 s.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/448">448</a></li>
+</ul>
+</section>
+<section id="version-0.10.1-2022-05-09" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.1-2022-05-09">Version 0.10.1 (2022-05-09)</h2>
+<ul>
+<li>Fix <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>Scenarios</code></a> class.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/433">433</a></li>
+</ul>
+</section>
+<section id="version-0.10.0-2022-05-08" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.10.0-2022-05-08">Version 0.10.0 (2022-05-08)</h2>
+<ul>
+<li>Moved Senegal parameters into FPsim.</li>
+<li>Added age of sexual debut.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/427">427</a></li>
+</ul>
+</section>
+<section id="version-0.9.0-2022-05-05" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.9.0-2022-05-05">Version 0.9.0 (2022-05-05)</h2>
+<ul>
+<li>Added a new <a href="./api/scenarios.html#fpsim.scenarios.Scenarios" title="0"><code>Scenarios</code></a> class.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/416">416</a></li>
+</ul>
+</section>
+<section id="version-0.8.0-2021-08-28" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.8.0-2021-08-28">Version 0.8.0 (2021-08-28)</h2>
+<ul>
+<li>Refactored the <a href="./api/people.html#fpsim.people.People" title="0"><code>People</code></a> object to use a new filtering-based approach.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/219">219</a></li>
+</ul>
+</section>
+<section id="version-0.7.3-2021-07-15" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.7.3-2021-07-15">Version 0.7.3 (2021-07-15)</h2>
+<ul>
+<li>Fix bug to ensure that at least one process runs on each worker.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/163">163</a></li>
+</ul>
+</section>
+<section id="version-0.7.2-2021-07-14" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.7.2-2021-07-14">Version 0.7.2 (2021-07-14)</h2>
+<ul>
+<li>Allow <code>total_trials</code> to be passed to an <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>fp.Calibration</code></a> object.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/162">162</a></li>
+</ul>
+</section>
+<section id="version-0.7.1-2021-07-14" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.7.1-2021-07-14">Version 0.7.1 (2021-07-14)</h2>
+<ul>
+<li>Allow <code>weights</code> to be passed to an <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>fp.Calibration</code></a> object.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/161">161</a></li>
+</ul>
+</section>
+<section id="version-0.7.0-2021-06-29" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.7.0-2021-06-29">Version 0.7.0 (2021-06-29)</h2>
+<ul>
+<li>Added new calibration plotting methods.</li>
+<li>Separated Experiment and Calibration into separate files, and renamed <code>model.py</code> to <code>sim.py</code>.</li>
+<li>Fixed a bug where the age pyramid was being unintentionally modified in-place.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/144">144</a></li>
+</ul>
+</section>
+<section id="version-0.6.5-2021-06-11" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.5-2021-06-11">Version 0.6.5 (2021-06-11)</h2>
+<ul>
+<li>Added R support; see <code>examples/example_sim.R</code>.</li>
+<li>Fixed a bug where the age pyramid was being unintentionally modified in-place.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/128">128</a></li>
+</ul>
+</section>
+<section id="version-0.6.4-2021-06-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.4-2021-06-10">Version 0.6.4 (2021-06-10)</h2>
+<ul>
+<li>Added a <code>MultiSim</code> class, which can handle parallel runs and uncertainty bounds.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/124">124</a></li>
+</ul>
+</section>
+<section id="version-0.6.3-2021-06-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.3-2021-06-10">Version 0.6.3 (2021-06-10)</h2>
+<ul>
+<li>Fixed a bug where exposure correction by age was accidentally being clipped to the range [0,1], restoring behavior of the array-based model to match the object-based model (notwithstanding stochastic effects and other bugfixes).</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/119">119</a></li>
+</ul>
+</section>
+<section id="version-0.6.2-2021-05-10" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.2-2021-05-10">Version 0.6.2 (2021-05-10)</h2>
+<ul>
+<li>Added <code>fp.Intervention</code> and <code>fp.Analyzer</code> classes, which are much more flexible ways to modify and record the state of the simulation, respectively.</li>
+<li>Fixed a bug with only females being born.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/100">100</a></li>
+</ul>
+</section>
+<section id="version-0.6.1-2021-05-02" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.1-2021-05-02">Version 0.6.1 (2021-05-02)</h2>
+<ul>
+<li>Renamed <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>fp.Calibration</code></a> to <a href="./api/experiment.html#fpsim.experiment.Experiment" title="0"><code>fp.Experiment</code></a>, and added a new <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>fp.Calibration</code></a> class, using Optuna.</li>
+<li>This allows the user to do e.g.&nbsp;<code>calib = fp.Calibration(pars); calib.calibrate(calib_pars)</code></li>
+<li>Calibrating a single parameter takes about 20 seconds for a single parameter and a small population size (500 people). Realistic calibrations should take roughly 10 - 60 minutes.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/93">93</a></li>
+</ul>
+</section>
+<section id="version-0.6.0-2021-05-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.6.0-2021-05-01">Version 0.6.0 (2021-05-01)</h2>
+<ul>
+<li>Refactored the model to use an array-based implementation, instead of a loop over individual people.</li>
+<li>This results in a performance increase of roughly 20-100x, depending on the size of the simulation. In practice, this means that 50,000 people can be run in roughly the same amount of time as 500 could be previously.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/92">92</a></li>
+</ul>
+</section>
+<section id="version-0.5.2-2021-04-30" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.5.2-2021-04-30">Version 0.5.2 (2021-04-30)</h2>
+<ul>
+<li>Added a new script, <code>preprocess_data.py</code>, that takes large raw data files and preprocesses them down to only the essentials used in the model.</li>
+<li>This increases the performance of <code>calib.run()</code> (<strong>not</strong> counting model runtime) by a factor of 1000.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/91">91</a></li>
+</ul>
+</section>
+<section id="version-0.5.1-2021-04-29" class="level2">
+<h2 class="anchored" data-anchor-id="version-0.5.1-2021-04-29">Version 0.5.1 (2021-04-29)</h2>
+<ul>
+<li>Added <code>summarize()</code> and <code>to_json()</code> methods to <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>Calibration</code></a>. Also added an <a href="./api/experiment.html#fpsim.experiment.diff_summaries" title="0"><code>fp.diff_summaries()</code></a> method for comparing them.</li>
+<li>Added regression and benchmarking tests (current total time: 24 s).</li>
+<li>Added a code coverage script (current code coverage: 59%).</li>
+<li>Added default flags for which quantities to compute.</li>
+<li>Split the logic of <a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>Calibration</code></a> out into more detail: e.g., initialization, running, and post-processing.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/fp_analyses/pull/90">90</a></li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./overview.html" class="pagination-link" aria-label="**Overview**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><strong>Overview</strong></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./tutorials/T1_intro.html" class="pagination-link" aria-label="Getting started - Requirements">
+        <span class="nav-page-text">Getting started - Requirements</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Docs built for FPsim v3.5.3 (2026-03-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/fpsim/fpsim">
+      <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:info@starsim.org">
+      <i class="bi bi-envelope-at-fill" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://fpsim.org/">
+      <i class="bi bi-globe" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
