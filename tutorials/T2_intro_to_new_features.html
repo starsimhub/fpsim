@@ -82,9 +82,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d583026f9b0ef0925622aad6f62ce451.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-89e3c27e96d96616de92a086d0ca516a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-d583026f9b0ef0925622aad6f62ce451.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-0978a1599afb96a8f79af3325b3d0cbc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -476,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="standard-contraceptive-choice">Standard contraceptive choice</h2>
 <p>This is the default option for how contraceptive decisions are made in FPsim. Under this option, a woman’s decision about whether to use contraception depends on her age, whether or not she has ever used contraception before, her level of education, her wealth quintile, her parity, and her geographical setting (urban/rural). Data on these variables is available from the Demographic and Health Survey (DHS).</p>
 <p>The snippet below illustrates how to set up and run a simulation using the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> module.</p>
-<div id="779997c2" class="cell" data-execution_count="1">
+<div id="f8238a1f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import FPsim and define the baseline parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> <span class="st">'kenya'</span></span>
@@ -502,79 +502,79 @@ Initializing sim with 500 agents
 
   Running 1983 (36/481) (0.46 s)  •——————————————————— 8%
 
-  Running 1984 (48/481) (0.62 s)  ••—————————————————— 10%
+  Running 1984 (48/481) (0.63 s)  ••—————————————————— 10%
 
   Running 1985 (60/481) (0.80 s)  ••—————————————————— 13%
 
-  Running 1986 (72/481) (0.97 s)  •••————————————————— 15%
+  Running 1986 (72/481) (0.98 s)  •••————————————————— 15%
 
-  Running 1987 (84/481) (1.14 s)  •••————————————————— 18%
+  Running 1987 (84/481) (1.15 s)  •••————————————————— 18%
 
-  Running 1988 (96/481) (1.31 s)  ••••———————————————— 20%
+  Running 1988 (96/481) (1.33 s)  ••••———————————————— 20%
 
-  Running 1989 (108/481) (1.47 s)  ••••———————————————— 23%
+  Running 1989 (108/481) (1.50 s)  ••••———————————————— 23%
 
-  Running 1990 (120/481) (1.65 s)  •••••——————————————— 25%
+  Running 1990 (120/481) (1.68 s)  •••••——————————————— 25%
 
-  Running 1991 (132/481) (1.82 s)  •••••——————————————— 28%
+  Running 1991 (132/481) (1.85 s)  •••••——————————————— 28%
 
-  Running 1992 (144/481) (1.98 s)  ••••••—————————————— 30%
+  Running 1992 (144/481) (2.01 s)  ••••••—————————————— 30%
 
-  Running 1993 (156/481) (2.13 s)  ••••••—————————————— 33%
+  Running 1993 (156/481) (2.18 s)  ••••••—————————————— 33%
 
-  Running 1994 (168/481) (2.29 s)  •••••••————————————— 35%
+  Running 1994 (168/481) (2.34 s)  •••••••————————————— 35%
 
-  Running 1995 (180/481) (2.45 s)  •••••••————————————— 38%
+  Running 1995 (180/481) (2.50 s)  •••••••————————————— 38%
 
-  Running 1996 (192/481) (2.61 s)  ••••••••———————————— 40%
+  Running 1996 (192/481) (2.67 s)  ••••••••———————————— 40%
 
-  Running 1997 (204/481) (2.77 s)  ••••••••———————————— 43%
+  Running 1997 (204/481) (2.84 s)  ••••••••———————————— 43%
 
-  Running 1998 (216/481) (2.94 s)  •••••••••——————————— 45%
+  Running 1998 (216/481) (3.01 s)  •••••••••——————————— 45%
 
-  Running 1999 (228/481) (3.10 s)  •••••••••——————————— 48%
+  Running 1999 (228/481) (3.18 s)  •••••••••——————————— 48%
 
-  Running 2000 (240/481) (3.28 s)  ••••••••••—————————— 50%
+  Running 2000 (240/481) (3.36 s)  ••••••••••—————————— 50%
 
-  Running 2001 (252/481) (3.46 s)  ••••••••••—————————— 53%
+  Running 2001 (252/481) (3.55 s)  ••••••••••—————————— 53%
 
-  Running 2002 (264/481) (3.64 s)  •••••••••••————————— 55%
+  Running 2002 (264/481) (3.74 s)  •••••••••••————————— 55%
 
-  Running 2003 (276/481) (3.83 s)  •••••••••••————————— 58%
+  Running 2003 (276/481) (3.94 s)  •••••••••••————————— 58%
 
-  Running 2004 (288/481) (4.02 s)  ••••••••••••———————— 60%
+  Running 2004 (288/481) (4.12 s)  ••••••••••••———————— 60%
 
-  Running 2005 (300/481) (4.19 s)  ••••••••••••———————— 63%
+  Running 2005 (300/481) (4.31 s)  ••••••••••••———————— 63%
 
-  Running 2006 (312/481) (4.38 s)  •••••••••••••——————— 65%
+  Running 2006 (312/481) (4.48 s)  •••••••••••••——————— 65%
 
-  Running 2007 (324/481) (4.56 s)  •••••••••••••——————— 68%
+  Running 2007 (324/481) (4.66 s)  •••••••••••••——————— 68%
 
-  Running 2008 (336/481) (4.74 s)  ••••••••••••••—————— 70%
+  Running 2008 (336/481) (4.86 s)  ••••••••••••••—————— 70%
 
-  Running 2009 (348/481) (4.92 s)  ••••••••••••••—————— 73%
+  Running 2009 (348/481) (5.04 s)  ••••••••••••••—————— 73%
 
-  Running 2010 (360/481) (5.10 s)  •••••••••••••••————— 75%
+  Running 2010 (360/481) (5.22 s)  •••••••••••••••————— 75%
 
-  Running 2011 (372/481) (5.28 s)  •••••••••••••••————— 78%
+  Running 2011 (372/481) (5.41 s)  •••••••••••••••————— 78%
 
-  Running 2012 (384/481) (5.48 s)  ••••••••••••••••———— 80%
+  Running 2012 (384/481) (5.61 s)  ••••••••••••••••———— 80%
 
-  Running 2013 (396/481) (5.66 s)  ••••••••••••••••———— 83%
+  Running 2013 (396/481) (5.80 s)  ••••••••••••••••———— 83%
 
-  Running 2014 (408/481) (5.83 s)  •••••••••••••••••——— 85%
+  Running 2014 (408/481) (5.98 s)  •••••••••••••••••——— 85%
 
-  Running 2015 (420/481) (6.02 s)  •••••••••••••••••——— 88%
+  Running 2015 (420/481) (6.17 s)  •••••••••••••••••——— 88%
 
-  Running 2016 (432/481) (6.19 s)  ••••••••••••••••••—— 90%
+  Running 2016 (432/481) (6.35 s)  ••••••••••••••••••—— 90%
 
-  Running 2017 (444/481) (6.39 s)  ••••••••••••••••••—— 93%
+  Running 2017 (444/481) (6.56 s)  ••••••••••••••••••—— 93%
 
-  Running 2018 (456/481) (6.57 s)  •••••••••••••••••••— 95%
+  Running 2018 (456/481) (6.74 s)  •••••••••••••••••••— 95%
 
-  Running 2019 (468/481) (6.75 s)  •••••••••••••••••••— 98%
+  Running 2019 (468/481) (6.93 s)  •••••••••••••••••••— 98%
 
-  Running 2020 (480/481) (6.95 s)  •••••••••••••••••••• 100%
+  Running 2020 (480/481) (7.13 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -585,7 +585,7 @@ Initializing sim with 500 agents
 <p>In the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module, a woman’s decision about whether to use contraception only depends on her age and whether or not she has ever used contraception before. Compared to the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> module, the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module disregards the influence of women’s education, wealth, parity, and urban/rural status on her contraceptive decisions.</p>
 <p>The <a href="../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> module is included only for testing purposes. In this module, women choose contraception at random. This module can be useful for sanity checking that the more realistic modules behave as expected.</p>
 <p>It is recommended that use of the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> and <a href="../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> modules is reserved for testing purposes, as the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> captures more of the factors relevant for contraceptive decision making. Nevertheless, the example below shows how to use the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module. This example can also be considered as a template for anyone wishing to define their own contraceptive choice module.</p>
-<div id="20eacd18" class="cell" data-execution_count="2">
+<div id="d85527df" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>method_choice <span class="op">=</span> fp.SimpleChoice(location<span class="op">=</span>location)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, analyzers<span class="op">=</span>fp.lifeof_recorder())</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
@@ -599,85 +599,85 @@ Initializing sim with 500 agents
 
   Running 1980 ( 0/481) (0.00 s)  ———————————————————— 0%
 
-  Running 1981 (12/481) (0.14 s)  ———————————————————— 3%
+  Running 1981 (12/481) (0.13 s)  ———————————————————— 3%
 
-  Running 1982 (24/481) (0.28 s)  •——————————————————— 5%
+  Running 1982 (24/481) (0.29 s)  •——————————————————— 5%
 
   Running 1983 (36/481) (0.43 s)  •——————————————————— 8%
 
-  Running 1984 (48/481) (0.57 s)  ••—————————————————— 10%
+  Running 1984 (48/481) (0.58 s)  ••—————————————————— 10%
 
-  Running 1985 (60/481) (0.71 s)  ••—————————————————— 13%
+  Running 1985 (60/481) (0.72 s)  ••—————————————————— 13%
 
-  Running 1986 (72/481) (0.87 s)  •••————————————————— 15%
+  Running 1986 (72/481) (0.88 s)  •••————————————————— 15%
 
-  Running 1987 (84/481) (1.01 s)  •••————————————————— 18%
+  Running 1987 (84/481) (1.03 s)  •••————————————————— 18%
 
-  Running 1988 (96/481) (1.16 s)  ••••———————————————— 20%
+  Running 1988 (96/481) (1.19 s)  ••••———————————————— 20%
 
-  Running 1989 (108/481) (1.32 s)  ••••———————————————— 23%
+  Running 1989 (108/481) (1.34 s)  ••••———————————————— 23%
 
-  Running 1990 (120/481) (1.46 s)  •••••——————————————— 25%
+  Running 1990 (120/481) (1.49 s)  •••••——————————————— 25%
 
-  Running 1991 (132/481) (1.61 s)  •••••——————————————— 28%
+  Running 1991 (132/481) (1.65 s)  •••••——————————————— 28%
 
-  Running 1992 (144/481) (1.75 s)  ••••••—————————————— 30%
+  Running 1992 (144/481) (1.79 s)  ••••••—————————————— 30%
 
-  Running 1993 (156/481) (1.90 s)  ••••••—————————————— 33%
+  Running 1993 (156/481) (1.94 s)  ••••••—————————————— 33%
 
-  Running 1994 (168/481) (2.05 s)  •••••••————————————— 35%
+  Running 1994 (168/481) (2.10 s)  •••••••————————————— 35%
 
-  Running 1995 (180/481) (2.21 s)  •••••••————————————— 38%
+  Running 1995 (180/481) (2.26 s)  •••••••————————————— 38%
 
-  Running 1996 (192/481) (2.36 s)  ••••••••———————————— 40%
+  Running 1996 (192/481) (2.42 s)  ••••••••———————————— 40%
 
-  Running 1997 (204/481) (2.53 s)  ••••••••———————————— 43%
+  Running 1997 (204/481) (2.59 s)  ••••••••———————————— 43%
 
-  Running 1998 (216/481) (2.69 s)  •••••••••——————————— 45%
+  Running 1998 (216/481) (2.75 s)  •••••••••——————————— 45%
 
-  Running 1999 (228/481) (2.85 s)  •••••••••——————————— 48%
+  Running 1999 (228/481) (2.92 s)  •••••••••——————————— 48%
 
-  Running 2000 (240/481) (3.02 s)  ••••••••••—————————— 50%
+  Running 2000 (240/481) (3.10 s)  ••••••••••—————————— 50%
 
-  Running 2001 (252/481) (3.20 s)  ••••••••••—————————— 53%
+  Running 2001 (252/481) (3.28 s)  ••••••••••—————————— 53%
 
-  Running 2002 (264/481) (3.37 s)  •••••••••••————————— 55%
+  Running 2002 (264/481) (3.45 s)  •••••••••••————————— 55%
 
-  Running 2003 (276/481) (3.51 s)  •••••••••••————————— 58%
+  Running 2003 (276/481) (3.60 s)  •••••••••••————————— 58%
 
-  Running 2004 (288/481) (3.70 s)  ••••••••••••———————— 60%
+  Running 2004 (288/481) (3.79 s)  ••••••••••••———————— 60%
 
-  Running 2005 (300/481) (3.87 s)  ••••••••••••———————— 63%
+  Running 2005 (300/481) (3.97 s)  ••••••••••••———————— 63%
 
-  Running 2006 (312/481) (4.04 s)  •••••••••••••——————— 65%
+  Running 2006 (312/481) (4.14 s)  •••••••••••••——————— 65%
 
-  Running 2007 (324/481) (4.22 s)  •••••••••••••——————— 68%
+  Running 2007 (324/481) (4.32 s)  •••••••••••••——————— 68%
 
-  Running 2008 (336/481) (4.40 s)  ••••••••••••••—————— 70%
+  Running 2008 (336/481) (4.52 s)  ••••••••••••••—————— 70%
 
-  Running 2009 (348/481) (4.56 s)  ••••••••••••••—————— 73%
+  Running 2009 (348/481) (4.68 s)  ••••••••••••••—————— 73%
 
-  Running 2010 (360/481) (4.73 s)  •••••••••••••••————— 75%
+  Running 2010 (360/481) (4.84 s)  •••••••••••••••————— 75%
 
-  Running 2011 (372/481) (4.89 s)  •••••••••••••••————— 78%
+  Running 2011 (372/481) (5.01 s)  •••••••••••••••————— 78%
 
-  Running 2012 (384/481) (5.06 s)  ••••••••••••••••———— 80%
+  Running 2012 (384/481) (5.19 s)  ••••••••••••••••———— 80%
 
-  Running 2013 (396/481) (5.23 s)  ••••••••••••••••———— 83%
+  Running 2013 (396/481) (5.35 s)  ••••••••••••••••———— 83%
 
-  Running 2014 (408/481) (5.40 s)  •••••••••••••••••——— 85%
+  Running 2014 (408/481) (5.52 s)  •••••••••••••••••——— 85%
 
-  Running 2015 (420/481) (5.57 s)  •••••••••••••••••——— 88%
+  Running 2015 (420/481) (5.70 s)  •••••••••••••••••——— 88%
 
-  Running 2016 (432/481) (5.74 s)  ••••••••••••••••••—— 90%
+  Running 2016 (432/481) (5.87 s)  ••••••••••••••••••—— 90%
 
-  Running 2017 (444/481) (5.92 s)  ••••••••••••••••••—— 93%
+  Running 2017 (444/481) (6.04 s)  ••••••••••••••••••—— 93%
 
-  Running 2018 (456/481) (6.10 s)  •••••••••••••••••••— 95%
+  Running 2018 (456/481) (6.23 s)  •••••••••••••••••••— 95%
 
-  Running 2019 (468/481) (6.26 s)  •••••••••••••••••••— 98%
+  Running 2019 (468/481) (6.39 s)  •••••••••••••••••••— 98%
 
-  Running 2020 (480/481) (6.42 s)  •••••••••••••••••••• 100%
+  Running 2020 (480/481) (6.55 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display">

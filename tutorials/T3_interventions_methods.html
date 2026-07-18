@@ -82,9 +82,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d583026f9b0ef0925622aad6f62ce451.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-89e3c27e96d96616de92a086d0ca516a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-d583026f9b0ef0925622aad6f62ce451.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-0978a1599afb96a8f79af3325b3d0cbc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -476,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Interventions</h1>
 <p>At this point, you should now be able to run a single sim, using default or custom parameters and plot the results. In this tutorial, you will learn how to use interventions.</p>
 <p>First, define the basic parmeters as you learned in the previous tutorial.</p>
-<div id="f7678b6e" class="cell" data-execution_count="1">
+<div id="57460aa4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss</span>
@@ -494,7 +494,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-simulation-without-intervention-baseline" class="level3">
 <h3 class="anchored" data-anchor-id="a-simulation-without-intervention-baseline">1. A simulation without intervention (baseline)</h3>
 <p>We define our baseline simulation as s1, without any interventions.</p>
-<div id="ab69f98a" class="cell" data-execution_count="2">
+<div id="118c2937" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, label<span class="op">=</span><span class="st">"Baseline"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
@@ -505,7 +505,7 @@ Applying calibration parameters for kenya...</code></pre>
 <section id="a-simulation-with-an-intervention-that-changes-the-efficacy-of-a-method" class="level3">
 <h3 class="anchored" data-anchor-id="a-simulation-with-an-intervention-that-changes-the-efficacy-of-a-method">2. A simulation with an intervention that changes the EFFICACY of a method</h3>
 <p>First, let’s have a look at which contraceptive methods we have available.</p>
-<div id="4ab04a9d" class="cell" data-execution_count="3">
+<div id="de3dc5a2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Methods <span class="op">=</span> fp.make_methods()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> method <span class="kw">in</span> Methods.values(): <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>method<span class="sc">.</span>idx<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>method<span class="sc">.</span>label<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -522,7 +522,7 @@ Applying calibration parameters for kenya...</code></pre>
 </div>
 </div>
 <p>Then, let’s add an intervention that changes the efficacy of injectables, and create a new sim with that intervention, called s2.</p>
-<div id="b32c1169" class="cell" data-execution_count="4">
+<div id="ba371242" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>change_efficacy_intervention <span class="op">=</span> fp.update_methods(eff<span class="op">=</span>{<span class="st">"Injectables"</span>: <span class="fl">0.99</span>}, year<span class="op">=</span><span class="dv">2010</span>)  <span class="co"># new efficacy starts in 2010</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, </span>
@@ -537,7 +537,7 @@ Applying calibration parameters for kenya...</code></pre>
 <section id="a-simulation-with-an-intervention-that-changes-the-distribution-of-durations-on-the-method" class="level3">
 <h3 class="anchored" data-anchor-id="a-simulation-with-an-intervention-that-changes-the-distribution-of-durations-on-the-method">3. A simulation with an intervention that changes the distribution of DURATIONS on the method</h3>
 <p>Now, let’s try changing a different aspect of the method: the distribution of time-on-method, which is how we specify the duration women use a method. Time-on-method is parameterized as a distribution, which can be either exponential, lognormal, loglogistic, gamma, or weibull. Which distribution is selected for each contraceptiove method, as well as the default parameters used to inform the distribution, is calucalted based on an analysis of DHS calendar data. This analysis is shown in <code>time_on_method.R</code> in the <i>locations/data_processing</i> folder. To impact the duration of use manually, you can set the relevant parameters manually:</p>
-<div id="1a89605c" class="cell" data-execution_count="5">
+<div id="8a5d06b5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The baseline duration for Injectables is a lognormal with parameter par1=2, and par2=3</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>change_duration_intervention <span class="op">=</span> fp.update_methods(dur_use<span class="op">=</span>{<span class="st">'Injectables'</span>: <span class="bu">dict</span>(dist<span class="op">=</span><span class="st">'lognormal'</span>, par1<span class="op">=</span><span class="dv">3</span>, par2<span class="op">=</span><span class="fl">0.2</span>)}, year<span class="op">=</span><span class="dv">2010</span>) </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -555,7 +555,7 @@ Applying calibration parameters for kenya...</code></pre>
 <h3 class="anchored" data-anchor-id="a-simulation-with-an-intervention-that-changes-the-method-mix">4. A simulation with an intervention that changes the METHOD MIX</h3>
 <p>Finally, let’s add a scenrio that impacts the method mix, or the probability of selecting a specific method when a woman starts using one. Method mix is defined as a set of matrices, depending on the method she used previously, her postpartum status, and age. This intervention replaces all of those with a single matrix that you define. It is a set of numbers representing the percent of women that will choose (in this order): * Pill * IUD * Injectable * Condom * BTL * Withdrawal * Implant * Other traditional * Other modern</p>
 <p>You can specify the percent who chooses each of these methods, and the year to start using this percentage, as follows:</p>
-<div id="09cb3a2d" class="cell" data-execution_count="6">
+<div id="0e8099d7" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The values in method_mix should add up to 1, but if they don't, the intervention update_methods() will autamotailly normalize them to add up to 1. </span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>change_mix <span class="op">=</span> fp.update_methods(method_mix<span class="op">=</span>[<span class="fl">0.25</span>, <span class="fl">0.05</span>, <span class="fl">0.05</span>, <span class="fl">0.0</span>, <span class="fl">0.05</span>, <span class="fl">0.3</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.0</span>], year<span class="op">=</span><span class="fl">2010.0</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -573,7 +573,7 @@ Applying calibration parameters for kenya...</code></pre>
 <section id="run-multiple-simulations" class="level1">
 <h1>Run multiple simulations</h1>
 <p>To run all of these simulations together, create a list of all the simulations you want to include, the use msim to run a multisim analysis as follows:</p>
-<div id="2f96a561" class="cell" data-execution_count="7">
+<div id="6e7095f6" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>simlist <span class="op">=</span> sc.autolist([s1, s2, s3, s4])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> ss.MultiSim(sims<span class="op">=</span>simlist)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>msim.run(parallel<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -586,41 +586,41 @@ Applying calibration parameters for kenya...</code></pre>
 
   Running "Baseline": 2002 (24/241) (0.21 s)  ••—————————————————— 10%
 
-  Running "Baseline": 2003 (36/241) (0.33 s)  •••————————————————— 15%
+  Running "Baseline": 2003 (36/241) (0.34 s)  •••————————————————— 15%
 
-  Running "Baseline": 2004 (48/241) (0.46 s)  ••••———————————————— 20%
+  Running "Baseline": 2004 (48/241) (0.47 s)  ••••———————————————— 20%
 
-  Running "Baseline": 2005 (60/241) (0.58 s)  •••••——————————————— 25%
+  Running "Baseline": 2005 (60/241) (0.59 s)  •••••——————————————— 25%
 
-  Running "Baseline": 2006 (72/241) (0.71 s)  ••••••—————————————— 30%
+  Running "Baseline": 2006 (72/241) (0.72 s)  ••••••—————————————— 30%
 
-  Running "Baseline": 2007 (84/241) (0.84 s)  •••••••————————————— 35%
+  Running "Baseline": 2007 (84/241) (0.85 s)  •••••••————————————— 35%
 
-  Running "Baseline": 2008 (96/241) (0.96 s)  ••••••••———————————— 40%
+  Running "Baseline": 2008 (96/241) (0.98 s)  ••••••••———————————— 40%
 
-  Running "Baseline": 2009 (108/241) (1.09 s)  •••••••••——————————— 45%
+  Running "Baseline": 2009 (108/241) (1.11 s)  •••••••••——————————— 45%
 
-  Running "Baseline": 2010 (120/241) (1.22 s)  ••••••••••—————————— 50%
+  Running "Baseline": 2010 (120/241) (1.25 s)  ••••••••••—————————— 50%
 
-  Running "Baseline": 2011 (132/241) (1.35 s)  •••••••••••————————— 55%
+  Running "Baseline": 2011 (132/241) (1.38 s)  •••••••••••————————— 55%
 
-  Running "Baseline": 2012 (144/241) (1.48 s)  ••••••••••••———————— 60%
+  Running "Baseline": 2012 (144/241) (1.51 s)  ••••••••••••———————— 60%
 
-  Running "Baseline": 2013 (156/241) (1.61 s)  •••••••••••••——————— 65%
+  Running "Baseline": 2013 (156/241) (1.64 s)  •••••••••••••——————— 65%
 
-  Running "Baseline": 2014 (168/241) (1.74 s)  ••••••••••••••—————— 70%
+  Running "Baseline": 2014 (168/241) (1.78 s)  ••••••••••••••—————— 70%
 
-  Running "Baseline": 2015 (180/241) (1.87 s)  •••••••••••••••————— 75%
+  Running "Baseline": 2015 (180/241) (1.91 s)  •••••••••••••••————— 75%
 
-  Running "Baseline": 2016 (192/241) (2.00 s)  ••••••••••••••••———— 80%
+  Running "Baseline": 2016 (192/241) (2.04 s)  ••••••••••••••••———— 80%
 
-  Running "Baseline": 2017 (204/241) (2.13 s)  •••••••••••••••••——— 85%
+  Running "Baseline": 2017 (204/241) (2.17 s)  •••••••••••••••••——— 85%
 
-  Running "Baseline": 2018 (216/241) (2.26 s)  ••••••••••••••••••—— 90%
+  Running "Baseline": 2018 (216/241) (2.31 s)  ••••••••••••••••••—— 90%
 
-  Running "Baseline": 2019 (228/241) (3.34 s)  •••••••••••••••••••— 95%
+  Running "Baseline": 2019 (228/241) (2.46 s)  •••••••••••••••••••— 95%
 
-  Running "Baseline": 2020 (240/241) (3.49 s)  •••••••••••••••••••• 100%
+  Running "Baseline": 2020 (240/241) (2.61 s)  •••••••••••••••••••• 100%
 
 Initializing sim "More effective Injectables" with 1000 agents
 
@@ -632,39 +632,39 @@ Initializing sim "More effective Injectables" with 1000 agents
 
   Running "More effective Injectables": 2003 (36/241) (0.34 s)  •••————————————————— 15%
 
-  Running "More effective Injectables": 2004 (48/241) (0.46 s)  ••••———————————————— 20%
+  Running "More effective Injectables": 2004 (48/241) (0.47 s)  ••••———————————————— 20%
 
-  Running "More effective Injectables": 2005 (60/241) (0.59 s)  •••••——————————————— 25%
+  Running "More effective Injectables": 2005 (60/241) (0.60 s)  •••••——————————————— 25%
 
-  Running "More effective Injectables": 2006 (72/241) (0.72 s)  ••••••—————————————— 30%
+  Running "More effective Injectables": 2006 (72/241) (0.73 s)  ••••••—————————————— 30%
 
-  Running "More effective Injectables": 2007 (84/241) (0.84 s)  •••••••————————————— 35%
+  Running "More effective Injectables": 2007 (84/241) (0.86 s)  •••••••————————————— 35%
 
-  Running "More effective Injectables": 2008 (96/241) (0.97 s)  ••••••••———————————— 40%
+  Running "More effective Injectables": 2008 (96/241) (0.99 s)  ••••••••———————————— 40%
 
-  Running "More effective Injectables": 2009 (108/241) (1.10 s)  •••••••••——————————— 45%
+  Running "More effective Injectables": 2009 (108/241) (1.12 s)  •••••••••——————————— 45%
 
-  Running "More effective Injectables": 2010 (120/241) (1.23 s)  ••••••••••—————————— 50%
+  Running "More effective Injectables": 2010 (120/241) (1.25 s)  ••••••••••—————————— 50%
 
-  Running "More effective Injectables": 2011 (132/241) (1.36 s)  •••••••••••————————— 55%
+  Running "More effective Injectables": 2011 (132/241) (1.39 s)  •••••••••••————————— 55%
 
-  Running "More effective Injectables": 2012 (144/241) (1.49 s)  ••••••••••••———————— 60%
+  Running "More effective Injectables": 2012 (144/241) (1.52 s)  ••••••••••••———————— 60%
 
-  Running "More effective Injectables": 2013 (156/241) (1.62 s)  •••••••••••••——————— 65%
+  Running "More effective Injectables": 2013 (156/241) (1.65 s)  •••••••••••••——————— 65%
 
-  Running "More effective Injectables": 2014 (168/241) (1.75 s)  ••••••••••••••—————— 70%
+  Running "More effective Injectables": 2014 (168/241) (1.78 s)  ••••••••••••••—————— 70%
 
-  Running "More effective Injectables": 2015 (180/241) (1.87 s)  •••••••••••••••————— 75%
+  Running "More effective Injectables": 2015 (180/241) (1.92 s)  •••••••••••••••————— 75%
 
-  Running "More effective Injectables": 2016 (192/241) (2.00 s)  ••••••••••••••••———— 80%
+  Running "More effective Injectables": 2016 (192/241) (2.05 s)  ••••••••••••••••———— 80%
 
-  Running "More effective Injectables": 2017 (204/241) (2.14 s)  •••••••••••••••••——— 85%
+  Running "More effective Injectables": 2017 (204/241) (2.19 s)  •••••••••••••••••——— 85%
 
-  Running "More effective Injectables": 2018 (216/241) (2.27 s)  ••••••••••••••••••—— 90%
+  Running "More effective Injectables": 2018 (216/241) (2.33 s)  ••••••••••••••••••—— 90%
 
-  Running "More effective Injectables": 2019 (228/241) (2.40 s)  •••••••••••••••••••— 95%
+  Running "More effective Injectables": 2019 (228/241) (2.47 s)  •••••••••••••••••••— 95%
 
-  Running "More effective Injectables": 2020 (240/241) (2.55 s)  •••••••••••••••••••• 100%
+  Running "More effective Injectables": 2020 (240/241) (2.61 s)  •••••••••••••••••••• 100%
 
 Initializing sim "Longer time on Injectables" with 1000 agents
 
@@ -674,41 +674,41 @@ Initializing sim "Longer time on Injectables" with 1000 agents
 
   Running "Longer time on Injectables": 2002 (24/241) (0.21 s)  ••—————————————————— 10%
 
-  Running "Longer time on Injectables": 2003 (36/241) (0.33 s)  •••————————————————— 15%
+  Running "Longer time on Injectables": 2003 (36/241) (0.34 s)  •••————————————————— 15%
 
-  Running "Longer time on Injectables": 2004 (48/241) (0.46 s)  ••••———————————————— 20%
+  Running "Longer time on Injectables": 2004 (48/241) (0.47 s)  ••••———————————————— 20%
 
-  Running "Longer time on Injectables": 2005 (60/241) (0.58 s)  •••••——————————————— 25%
+  Running "Longer time on Injectables": 2005 (60/241) (0.60 s)  •••••——————————————— 25%
 
-  Running "Longer time on Injectables": 2006 (72/241) (0.71 s)  ••••••—————————————— 30%
+  Running "Longer time on Injectables": 2006 (72/241) (0.73 s)  ••••••—————————————— 30%
 
-  Running "Longer time on Injectables": 2007 (84/241) (0.84 s)  •••••••————————————— 35%
+  Running "Longer time on Injectables": 2007 (84/241) (0.86 s)  •••••••————————————— 35%
 
-  Running "Longer time on Injectables": 2008 (96/241) (0.96 s)  ••••••••———————————— 40%
+  Running "Longer time on Injectables": 2008 (96/241) (0.99 s)  ••••••••———————————— 40%
 
-  Running "Longer time on Injectables": 2009 (108/241) (1.09 s)  •••••••••——————————— 45%
+  Running "Longer time on Injectables": 2009 (108/241) (1.12 s)  •••••••••——————————— 45%
 
-  Running "Longer time on Injectables": 2010 (120/241) (1.22 s)  ••••••••••—————————— 50%
+  Running "Longer time on Injectables": 2010 (120/241) (1.26 s)  ••••••••••—————————— 50%
 
-  Running "Longer time on Injectables": 2011 (132/241) (1.35 s)  •••••••••••————————— 55%
+  Running "Longer time on Injectables": 2011 (132/241) (1.39 s)  •••••••••••————————— 55%
 
-  Running "Longer time on Injectables": 2012 (144/241) (1.47 s)  ••••••••••••———————— 60%
+  Running "Longer time on Injectables": 2012 (144/241) (1.52 s)  ••••••••••••———————— 60%
 
-  Running "Longer time on Injectables": 2013 (156/241) (1.60 s)  •••••••••••••——————— 65%
+  Running "Longer time on Injectables": 2013 (156/241) (1.65 s)  •••••••••••••——————— 65%
 
-  Running "Longer time on Injectables": 2014 (168/241) (1.73 s)  ••••••••••••••—————— 70%
+  Running "Longer time on Injectables": 2014 (168/241) (1.78 s)  ••••••••••••••—————— 70%
 
-  Running "Longer time on Injectables": 2015 (180/241) (1.86 s)  •••••••••••••••————— 75%
+  Running "Longer time on Injectables": 2015 (180/241) (1.91 s)  •••••••••••••••————— 75%
 
-  Running "Longer time on Injectables": 2016 (192/241) (1.99 s)  ••••••••••••••••———— 80%
+  Running "Longer time on Injectables": 2016 (192/241) (2.05 s)  ••••••••••••••••———— 80%
 
-  Running "Longer time on Injectables": 2017 (204/241) (2.12 s)  •••••••••••••••••——— 85%
+  Running "Longer time on Injectables": 2017 (204/241) (2.18 s)  •••••••••••••••••——— 85%
 
-  Running "Longer time on Injectables": 2018 (216/241) (2.25 s)  ••••••••••••••••••—— 90%
+  Running "Longer time on Injectables": 2018 (216/241) (2.32 s)  ••••••••••••••••••—— 90%
 
-  Running "Longer time on Injectables": 2019 (228/241) (2.38 s)  •••••••••••••••••••— 95%
+  Running "Longer time on Injectables": 2019 (228/241) (2.46 s)  •••••••••••••••••••— 95%
 
-  Running "Longer time on Injectables": 2020 (240/241) (2.53 s)  •••••••••••••••••••• 100%
+  Running "Longer time on Injectables": 2020 (240/241) (2.62 s)  •••••••••••••••••••• 100%
 
 Initializing sim "Different mix" with 1000 agents
 
@@ -716,43 +716,43 @@ Initializing sim "Different mix" with 1000 agents
 
   Running "Different mix": 2001 (12/241) (0.09 s)  •——————————————————— 5%
 
-  Running "Different mix": 2002 (24/241) (0.21 s)  ••—————————————————— 10%
+  Running "Different mix": 2002 (24/241) (0.22 s)  ••—————————————————— 10%
 
-  Running "Different mix": 2003 (36/241) (0.34 s)  •••————————————————— 15%
+  Running "Different mix": 2003 (36/241) (0.35 s)  •••————————————————— 15%
 
-  Running "Different mix": 2004 (48/241) (0.46 s)  ••••———————————————— 20%
+  Running "Different mix": 2004 (48/241) (0.48 s)  ••••———————————————— 20%
 
-  Running "Different mix": 2005 (60/241) (0.59 s)  •••••——————————————— 25%
+  Running "Different mix": 2005 (60/241) (0.61 s)  •••••——————————————— 25%
 
-  Running "Different mix": 2006 (72/241) (0.72 s)  ••••••—————————————— 30%
+  Running "Different mix": 2006 (72/241) (0.74 s)  ••••••—————————————— 30%
 
-  Running "Different mix": 2007 (84/241) (0.85 s)  •••••••————————————— 35%
+  Running "Different mix": 2007 (84/241) (0.87 s)  •••••••————————————— 35%
 
-  Running "Different mix": 2008 (96/241) (0.98 s)  ••••••••———————————— 40%
+  Running "Different mix": 2008 (96/241) (1.00 s)  ••••••••———————————— 40%
 
-  Running "Different mix": 2009 (108/241) (1.11 s)  •••••••••——————————— 45%
+  Running "Different mix": 2009 (108/241) (1.13 s)  •••••••••——————————— 45%
 
-  Running "Different mix": 2010 (120/241) (1.24 s)  ••••••••••—————————— 50%
+  Running "Different mix": 2010 (120/241) (1.27 s)  ••••••••••—————————— 50%
 
-  Running "Different mix": 2011 (132/241) (1.37 s)  •••••••••••————————— 55%
+  Running "Different mix": 2011 (132/241) (1.40 s)  •••••••••••————————— 55%
 
-  Running "Different mix": 2012 (144/241) (1.50 s)  ••••••••••••———————— 60%
+  Running "Different mix": 2012 (144/241) (1.53 s)  ••••••••••••———————— 60%
 
-  Running "Different mix": 2013 (156/241) (1.63 s)  •••••••••••••——————— 65%
+  Running "Different mix": 2013 (156/241) (1.67 s)  •••••••••••••——————— 65%
 
-  Running "Different mix": 2014 (168/241) (1.76 s)  ••••••••••••••—————— 70%
+  Running "Different mix": 2014 (168/241) (1.80 s)  ••••••••••••••—————— 70%
 
-  Running "Different mix": 2015 (180/241) (1.89 s)  •••••••••••••••————— 75%
+  Running "Different mix": 2015 (180/241) (1.93 s)  •••••••••••••••————— 75%
 
-  Running "Different mix": 2016 (192/241) (2.02 s)  ••••••••••••••••———— 80%
+  Running "Different mix": 2016 (192/241) (2.07 s)  ••••••••••••••••———— 80%
 
-  Running "Different mix": 2017 (204/241) (2.16 s)  •••••••••••••••••——— 85%
+  Running "Different mix": 2017 (204/241) (2.21 s)  •••••••••••••••••——— 85%
 
-  Running "Different mix": 2018 (216/241) (2.29 s)  ••••••••••••••••••—— 90%
+  Running "Different mix": 2018 (216/241) (2.34 s)  ••••••••••••••••••—— 90%
 
-  Running "Different mix": 2019 (228/241) (2.44 s)  •••••••••••••••••••— 95%
+  Running "Different mix": 2019 (228/241) (2.48 s)  •••••••••••••••••••— 95%
 
-  Running "Different mix": 2020 (240/241) (2.58 s)  •••••••••••••••••••• 100%
+  Running "Different mix": 2020 (240/241) (2.64 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -760,7 +760,7 @@ Initializing sim "Different mix" with 1000 agents
 </div>
 </div>
 <p>Plot contraceptive use for all of the simulations you just ran.</p>
-<div id="730803c3" class="cell" data-execution_count="8">
+<div id="5e288d3d" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>msim.plot(key<span class="op">=</span><span class="st">'cpr'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Figure(1536x960)</code></pre>
