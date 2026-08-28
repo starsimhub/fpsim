@@ -339,7 +339,7 @@ class change_people_state(ss.Intervention):
         if self.pars.annual:
             # per timestep/monthly growth rate or perc of eligible women who will be made to choose contraception
             self.annual_perc = self.pars.prop
-            self.pars.prop = ((1 + self.annual_perc) ** sim.dt)-1
+            self.pars.prop = ((1 + self.annual_perc) ** sim.dt.years)-1
         # Validate years and values
         if self.pars.years is None:
             # f'Intervention start and end years not provided. Will use sim start an end years'
@@ -665,13 +665,13 @@ class change_initiation(ss.Intervention):
 
         # Convert final_perc if needed
         if self.final_perc is not None and self.annual:
-            self.final_perc = ((1 + self.final_perc) ** float(sim.dt)) - 1
+            self.final_perc = ((1 + self.final_perc) ** sim.dt.years) - 1
 
         # Adjust the probability by the sim's timestep, if it's an annual probability
         if self.annual:
             # per timestep/monthly growth rate or perc of eligible women who will be made to choose contraception
             self.annual_perc = self.perc
-            self.perc = ((1 + self.annual_perc) ** float(sim.dt))-1
+            self.perc = ((1 + self.annual_perc) ** sim.dt.years)-1
 
         return
 
@@ -924,7 +924,7 @@ class method_switching(ss.Intervention):
         if self.annual:
             for key in self.switch_prob_dict:
                 annual_prob = self.switch_prob_dict[key]
-                self.switch_prob_dict[key] = ((1 + annual_prob) ** float(sim.dt)) - 1
+                self.switch_prob_dict[key] = ((1 + annual_prob) ** sim.dt.years) - 1
 
         # Determine age groups to modify
         if self.age_groups is None:
