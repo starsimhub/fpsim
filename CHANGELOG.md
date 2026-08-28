@@ -3,6 +3,11 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.5.4 (2026-08-27)
+- Fixed compatibility with Starsim 3.6.0: `change_initiation` and `change_switching` converted annual probabilities to per-timestep values via `float(sim.dt)`, which now raises a `TypeError` since `TimePar.__float__()` is disallowed; these now use `sim.dt.years`.
+- Bumped the minimum Starsim version to 3.6.0.
+
+
 ## Version 3.5.3 (2026-03-18)
 
 * **Regression information**
