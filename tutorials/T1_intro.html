@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -77,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-3121752182e3410fc65440cde8a237d8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-3fc6716df1091e711d23e37ca1fd8fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7717a4d0f6adcf5190f30b5c191ddeff.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-3fc6716df1091e711d23e37ca1fd8fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -486,43 +489,43 @@ pip install -e .</code></pre>
 </ul>
 <p>This tutorial walks you through how to define parameters and run the simulation. The next tutorial will show you how to plot the results of a simulation.</p>
 <p>To create, run, and plot a sim with default options is just:</p>
-<div id="f3574d04" class="cell" data-execution_count="1">
+<div id="907bb1b0" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(location<span class="op">=</span><span class="st">'kenya'</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 1000 agents
-  Running 2000.01.01 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001.01.01 (12/241) (0.06 s)  •——————————————————— 5%
-  Running 2002.01.01 (24/241) (0.13 s)  ••—————————————————— 10%
-  Running 2003.01.01 (36/241) (0.21 s)  •••————————————————— 15%
-  Running 2004.01.01 (48/241) (0.28 s)  ••••———————————————— 20%
-  Running 2005.01.01 (60/241) (0.36 s)  •••••——————————————— 25%
-  Running 2006.01.01 (72/241) (0.44 s)  ••••••—————————————— 30%
-  Running 2007.01.01 (84/241) (0.52 s)  •••••••————————————— 35%
-  Running 2008.01.01 (96/241) (0.60 s)  ••••••••———————————— 40%
-  Running 2009.01.01 (108/241) (0.68 s)  •••••••••——————————— 45%
-  Running 2010.01.01 (120/241) (0.77 s)  ••••••••••—————————— 50%
-  Running 2011.01.01 (132/241) (0.85 s)  •••••••••••————————— 55%
-  Running 2012.01.01 (144/241) (0.94 s)  ••••••••••••———————— 60%
-  Running 2013.01.01 (156/241) (1.02 s)  •••••••••••••——————— 65%
-  Running 2014.01.01 (168/241) (1.11 s)  ••••••••••••••—————— 70%
-  Running 2015.01.01 (180/241) (1.20 s)  •••••••••••••••————— 75%
-  Running 2016.01.01 (192/241) (1.29 s)  ••••••••••••••••———— 80%
-  Running 2017.01.01 (204/241) (1.38 s)  •••••••••••••••••——— 85%
-  Running 2018.01.01 (216/241) (1.47 s)  ••••••••••••••••••—— 90%
-  Running 2019.01.01 (228/241) (1.56 s)  •••••••••••••••••••— 95%
-  Running 2020.01.01 (240/241) (1.65 s)  •••••••••••••••••••• 100%
+  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
+  Running 2001 (12/241) (0.14 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.34 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (0.55 s)  •••————————————————— 15%
+  Running 2004 (48/241) (0.76 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (0.97 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (1.18 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (1.38 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (1.60 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (1.82 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (2.04 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (2.26 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (2.47 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (2.68 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (2.90 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (3.11 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (3.33 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (3.54 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (3.76 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (3.99 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (4.23 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="T1_intro_files/figure-html/cell-2-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="T1_intro_files/figure-html/cell-2-output-2.png" width="1298" height="983" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -542,7 +545,7 @@ Initializing sim with 1000 agents
 <li>Education <br></li>
 </ul>
 <p>The most common category of parameters to change in FPsim is the basic category, which includes the geographic location (i.e.&nbsp;Kenya, Senegal, northern India), the starting population, the starting year, and the initial number of agents. We can define these as:</p>
-<div id="93bfdba1" class="cell" data-execution_count="2">
+<div id="3fddc3a7" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">10_000</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    location   <span class="op">=</span> <span class="st">'kenya'</span>,</span>
@@ -554,34 +557,34 @@ Initializing sim with 1000 agents
 <section id="running-simulations" class="level1">
 <h1>Running simulations</h1>
 <p>Running a simulation is pretty easy. In fact, running a sim with the parameters we defined above is just:</p>
-<div id="37bc3c37" class="cell" data-execution_count="3">
+<div id="9ce72753" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 10000 agents
-  Running 2000.01.01 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001.01.01 (12/241) (0.13 s)  •——————————————————— 5%
-  Running 2002.01.01 (24/241) (0.31 s)  ••—————————————————— 10%
-  Running 2003.01.01 (36/241) (0.49 s)  •••————————————————— 15%
-  Running 2004.01.01 (48/241) (0.67 s)  ••••———————————————— 20%
-  Running 2005.01.01 (60/241) (0.87 s)  •••••——————————————— 25%
-  Running 2006.01.01 (72/241) (1.06 s)  ••••••—————————————— 30%
-  Running 2007.01.01 (84/241) (1.26 s)  •••••••————————————— 35%
-  Running 2008.01.01 (96/241) (1.46 s)  ••••••••———————————— 40%
-  Running 2009.01.01 (108/241) (1.66 s)  •••••••••——————————— 45%
-  Running 2010.01.01 (120/241) (1.87 s)  ••••••••••—————————— 50%
-  Running 2011.01.01 (132/241) (2.08 s)  •••••••••••————————— 55%
-  Running 2012.01.01 (144/241) (2.28 s)  ••••••••••••———————— 60%
-  Running 2013.01.01 (156/241) (2.49 s)  •••••••••••••——————— 65%
-  Running 2014.01.01 (168/241) (2.71 s)  ••••••••••••••—————— 70%
-  Running 2015.01.01 (180/241) (2.94 s)  •••••••••••••••————— 75%
-  Running 2016.01.01 (192/241) (3.16 s)  ••••••••••••••••———— 80%
-  Running 2017.01.01 (204/241) (3.38 s)  •••••••••••••••••——— 85%
-  Running 2018.01.01 (216/241) (3.61 s)  ••••••••••••••••••—— 90%
-  Running 2019.01.01 (228/241) (3.84 s)  •••••••••••••••••••— 95%
-  Running 2020.01.01 (240/241) (4.07 s)  •••••••••••••••••••• 100%
+  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
+  Running 2001 (12/241) (0.29 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.67 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (1.07 s)  •••————————————————— 15%
+  Running 2004 (48/241) (1.47 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (1.89 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (2.33 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (2.76 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (3.20 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (3.66 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (4.10 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (4.56 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (5.02 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (5.48 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (5.96 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (6.46 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (6.93 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (7.42 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (7.90 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (8.39 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (8.89 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -592,142 +595,218 @@ Initializing sim with 10000 agents
 <section id="inspecting-results" class="level1">
 <h1>Inspecting results</h1>
 <p>Running the simulation will generate a results [dictionary] <code>sim.results</code>. A dictionary is simply collection of items, and you can access the values of results using different ‘key’ words. Almost all of the results relevant for FPsim are stored under the key ‘fp’; for example, the number of pregnancies over time can be found using <code>sim.results.fp['pregnancies']</code>. Execute the code below:</p>
-<div id="6d53d83d" class="cell" data-execution_count="4">
+<div id="9c400fd7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim.results.fp[<span class="st">'pregnancies'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Result(pregnancies):
-array([185. 134. 134.  91.  74.  69.  63.  76.  55.  50.  59.  54.  81.  61.
-  63.  72.  67.  62.  56.  60.  57.  59.  47.  58.  46.  41.  36.  45.
-  49.  32.  58.  45.  37.  47.  61.  60.  60.  53.  49.  59.  48.  62.
-  30.  57.  57.  45.  56.  60.  61.  55.  61.  43.  59.  61.  49.  58.
-  45.  41.  62.  49.  58.  52.  56.  45.  60.  44.  39.  52.  47.  44.
-  56.  50.  47.  40.  42.  58.  47.  43.  41.  35.  48.  41.  48.  50.
-  55.  49.  41.  44.  34.  38.  35.  39.  39.  40.  32.  56.  47.  29.
-  51.  50.  42.  51.  49.  40.  46.  48.  46.  41.  41.  50.  48.  54.
-  42.  48.  44.  51.  38.  52.  53.  35.  39.  40.  29.  31.  34.  36.
-  50.  40.  38.  36.  34.  38.  38.  45.  41.  48.  52.  46.  58.  45.
-  49.  50.  38.  47.  42.  55.  36.  38.  47.  43.  45.  54.  30.  49.
-  40.  48.  32.  52.  51.  45.  42.  51.  34.  54.  43.  36.  55.  55.
-  52.  43.  46.  39.  48.  49.  55.  40.  52.  45.  49.  52.  35.  56.
-  49.  41.  34.  40.  41.  43.  43.  49.  32.  42.  39.  46.  41.  42.
-  42.  52.  39.  47.  36.  47.  58.  42.  46.  49.  43.  47.  52.  44.
-  46.  57.  50.  45.  49.  54.  49.  41.  43.  44.  43.  52.  50.  57.
-  64.  50.  47.  53.  37.  58.  59.  68.  52.  62.  65.  46.  51.  53.
-  63.  62.  57.])</code></pre>
+array([218. 157. 105.  98.  79.  83.  77.  78.  56.  66.  61.  48.  57.  62.
+  60.  67.  66.  59.  52.  57.  60.  38.  49.  41.  47.  47.  38.  37.
+  47.  39.  28.  37.  54.  70.  54.  53.  56.  60.  47.  58.  56.  52.
+  38.  54.  54.  41.  47.  64.  67.  53.  58.  41.  58.  48.  53.  52.
+  55.  38.  43.  42.  47.  52.  52.  56.  47.  40.  38.  33.  51.  46.
+  40.  47.  37.  33.  51.  48.  48.  46.  50.  41.  42.  56.  43.  51.
+  42.  62.  34.  41.  43.  36.  46.  55.  49.  40.  43.  38.  45.  41.
+  39.  42.  33.  37.  40.  49.  34.  32.  49.  49.  51.  26.  45.  42.
+  28.  42.  38.  37.  34.  36.  38.  41.  42.  47.  45.  43.  48.  51.
+  40.  38.  37.  39.  29.  42.  43.  42.  39.  43.  40.  52.  47.  39.
+  38.  34.  52.  31.  36.  38.  41.  31.  32.  47.  39.  39.  35.  31.
+  36.  44.  41.  47.  42.  44.  40.  39.  37.  45.  30.  45.  51.  35.
+  49.  50.  40.  38.  42.  36.  52.  43.  34.  45.  44.  42.  45.  50.
+  44.  54.  47.  52.  37.  49.  50.  41.  42.  35.  53.  36.  38.  56.
+  49.  39.  51.  45.  54.  46.  54.  35.  62.  49.  44.  60.  53.  45.
+  51.  41.  48.  46.  46.  51.  52.  49.  51.  50.  58.  59.  47.  59.
+  52.  48.  54.  56.  41.  44.  49.  39.  49.  45.  52.  53.  44.  47.
+  64.  55.  46.])</code></pre>
 </div>
 </div>
 <p>If you want to see all the ‘keys’ that are available in the results dictionary you can use</p>
-<div id="9a44b59d" class="cell" data-execution_count="5">
+<div id="d1bf8677" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sim.list_available_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Result keys:
-  contraception.acpr                  
-  contraception.cpr                   
-  contraception.mcpr                  
-  contraception.n_at_risk_non_users   
-  contraception.n_at_risk_users       
-  contraception.n_mod_users           
-  contraception.n_non_users           
-  contraception.n_users               
-  cum_deaths                          
-  deaths.cmr                          
-  deaths.cumulative                   
-  deaths.new                          
-  edu.mean_attainment                 
-  edu.mean_objective                  
-  edu.n_completed                     
-  edu.n_dropped                       
-  edu.n_in_school                     
-  edu.n_interrupted                   
-  edu.n_started                       
-  edu.prop_completed                  
-  edu.prop_dropped                    
-  edu.prop_in_school                  
-  fp.abortions                        
-  fp.births                           
-  fp.contra_access                    
-  fp.ever_used_contra                 
-  fp.imr                              
-  fp.infant_deaths                    
-  fp.maternal_deaths                  
-  fp.method_failures                  
-  fp.miscarriages                     
-  fp.mmr                              
-  fp.n_ever_used_contra               
-  fp.n_fecund                         
-  fp.n_fertile                        
-  fp.n_fertility_intent               
-  fp.n_intent_to_use                  
-  fp.n_lactating                      
-  fp.n_lam                            
-  fp.n_on_contra                      
-  fp.n_partnered                      
-  fp.n_postpartum                     
-  fp.n_pregnant                       
-  fp.n_sexual_debut                   
-  fp.n_sexually_active                
-  fp.new_users                        
-  fp.nonpostpartum                    
-  fp.p_short_interval                 
-  fp.parity0to1                       
-  fp.parity2to3                       
-  fp.parity4to5                       
-  fp.parity6plus                      
-  fp.pp0to5                           
-  fp.pp12to23                         
-  fp.pp6to11                          
-  fp.pregnancies                      
-  fp.secondary_births                 
-  fp.short_intervals                  
-  fp.stillbirths                      
-  fp.switchers                        
-  fp.tfr                              
-  fp.total_births                     
-  n_alive                             
-  n_female                            
-  n_urban                             
-  n_wq1                               
-  n_wq2                               
-  n_wq3                               
-  n_wq4                               
-  n_wq5                               
-  new_deaths                          
-  new_emigrants                       
-</code></pre>
+<div class="ansi-escaped-output">
+<pre>Result keys:
+
+<span class="ansi-blue-fg">  contraception.acpr                  </span>
+
+<span class="ansi-blue-fg">  contraception.cpr                   </span>
+
+<span class="ansi-blue-fg">  contraception.mcpr                  </span>
+
+<span class="ansi-blue-fg">  contraception.n_at_risk_non_users   </span>
+
+<span class="ansi-blue-fg">  contraception.n_at_risk_users       </span>
+
+<span class="ansi-blue-fg">  contraception.n_mod_users           </span>
+
+<span class="ansi-blue-fg">  contraception.n_non_users           </span>
+
+<span class="ansi-blue-fg">  contraception.n_users               </span>
+
+<span class="ansi-blue-fg">  cum_deaths                          </span>
+
+<span class="ansi-blue-fg">  deaths.cmr                          </span>
+
+<span class="ansi-blue-fg">  deaths.cumulative                   </span>
+
+<span class="ansi-blue-fg">  deaths.new                          </span>
+
+<span class="ansi-blue-fg">  edu.mean_attainment                 </span>
+
+<span class="ansi-blue-fg">  edu.mean_objective                  </span>
+
+<span class="ansi-blue-fg">  edu.n_completed                     </span>
+
+<span class="ansi-blue-fg">  edu.n_dropped                       </span>
+
+<span class="ansi-blue-fg">  edu.n_in_school                     </span>
+
+<span class="ansi-blue-fg">  edu.n_interrupted                   </span>
+
+<span class="ansi-blue-fg">  edu.n_started                       </span>
+
+<span class="ansi-blue-fg">  edu.prop_completed                  </span>
+
+<span class="ansi-blue-fg">  edu.prop_dropped                    </span>
+
+<span class="ansi-blue-fg">  edu.prop_in_school                  </span>
+
+<span class="ansi-blue-fg">  fp.abortions                        </span>
+
+<span class="ansi-blue-fg">  fp.births                           </span>
+
+<span class="ansi-blue-fg">  fp.contra_access                    </span>
+
+<span class="ansi-blue-fg">  fp.ever_used_contra                 </span>
+
+<span class="ansi-blue-fg">  fp.imr                              </span>
+
+<span class="ansi-blue-fg">  fp.infant_deaths                    </span>
+
+<span class="ansi-blue-fg">  fp.maternal_deaths                  </span>
+
+<span class="ansi-blue-fg">  fp.method_failures                  </span>
+
+<span class="ansi-blue-fg">  fp.miscarriages                     </span>
+
+<span class="ansi-blue-fg">  fp.mmr                              </span>
+
+<span class="ansi-blue-fg">  fp.n_ever_used_contra               </span>
+
+<span class="ansi-blue-fg">  fp.n_fecund                         </span>
+
+<span class="ansi-blue-fg">  fp.n_fertile                        </span>
+
+<span class="ansi-blue-fg">  fp.n_fertility_intent               </span>
+
+<span class="ansi-blue-fg">  fp.n_intent_to_use                  </span>
+
+<span class="ansi-blue-fg">  fp.n_lactating                      </span>
+
+<span class="ansi-blue-fg">  fp.n_lam                            </span>
+
+<span class="ansi-blue-fg">  fp.n_on_contra                      </span>
+
+<span class="ansi-blue-fg">  fp.n_partnered                      </span>
+
+<span class="ansi-blue-fg">  fp.n_postpartum                     </span>
+
+<span class="ansi-blue-fg">  fp.n_pregnant                       </span>
+
+<span class="ansi-blue-fg">  fp.n_sexual_debut                   </span>
+
+<span class="ansi-blue-fg">  fp.n_sexually_active                </span>
+
+<span class="ansi-blue-fg">  fp.new_users                        </span>
+
+<span class="ansi-blue-fg">  fp.nonpostpartum                    </span>
+
+<span class="ansi-blue-fg">  fp.p_short_interval                 </span>
+
+<span class="ansi-blue-fg">  fp.parity0to1                       </span>
+
+<span class="ansi-blue-fg">  fp.parity2to3                       </span>
+
+<span class="ansi-blue-fg">  fp.parity4to5                       </span>
+
+<span class="ansi-blue-fg">  fp.parity6plus                      </span>
+
+<span class="ansi-blue-fg">  fp.pp0to5                           </span>
+
+<span class="ansi-blue-fg">  fp.pp12to23                         </span>
+
+<span class="ansi-blue-fg">  fp.pp6to11                          </span>
+
+<span class="ansi-blue-fg">  fp.pregnancies                      </span>
+
+<span class="ansi-blue-fg">  fp.secondary_births                 </span>
+
+<span class="ansi-blue-fg">  fp.short_intervals                  </span>
+
+<span class="ansi-blue-fg">  fp.stillbirths                      </span>
+
+<span class="ansi-blue-fg">  fp.switchers                        </span>
+
+<span class="ansi-blue-fg">  fp.tfr                              </span>
+
+<span class="ansi-blue-fg">  fp.total_births                     </span>
+
+<span class="ansi-blue-fg">  n_alive                             </span>
+
+<span class="ansi-blue-fg">  n_female                            </span>
+
+<span class="ansi-blue-fg">  n_urban                             </span>
+
+<span class="ansi-blue-fg">  n_wq1                               </span>
+
+<span class="ansi-blue-fg">  n_wq2                               </span>
+
+<span class="ansi-blue-fg">  n_wq3                               </span>
+
+<span class="ansi-blue-fg">  n_wq4                               </span>
+
+<span class="ansi-blue-fg">  n_wq5                               </span>
+
+<span class="ansi-blue-fg">  new_deaths                          </span>
+
+<span class="ansi-blue-fg">  new_emigrants                       </span>
+
+
+</pre>
+</div>
 </div>
 </div>
 </section>
 <section id="slightly-different-way-of-defining-parameters" class="level1">
 <h1>Slightly different way of defining parameters</h1>
 <p>You can also specify different parameters by specifyuing them directly as arguments in the simulation object:</p>
-<div id="4f812a5b" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(n_agents<span class="op">=</span><span class="fl">10e3</span>, location<span class="op">=</span><span class="st">'kenya'</span>, start_year<span class="op">=</span><span class="dv">2000</span>, end_year<span class="op">=</span><span class="dv">2020</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="bcd0b408" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(n_agents<span class="op">=</span><span class="fl">10e3</span>, location<span class="op">=</span><span class="st">'kenya'</span>, start_year<span class="op">=</span><span class="dv">2000</span>, end_year<span class="op">=</span><span class="dv">2020</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 10000 agents
-  Running 2000.01.01 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001.01.01 (12/241) (0.13 s)  •——————————————————— 5%
-  Running 2002.01.01 (24/241) (0.31 s)  ••—————————————————— 10%
-  Running 2003.01.01 (36/241) (0.50 s)  •••————————————————— 15%
-  Running 2004.01.01 (48/241) (0.71 s)  ••••———————————————— 20%
-  Running 2005.01.01 (60/241) (0.90 s)  •••••——————————————— 25%
-  Running 2006.01.01 (72/241) (1.10 s)  ••••••—————————————— 30%
-  Running 2007.01.01 (84/241) (1.30 s)  •••••••————————————— 35%
-  Running 2008.01.01 (96/241) (1.50 s)  ••••••••———————————— 40%
-  Running 2009.01.01 (108/241) (1.71 s)  •••••••••——————————— 45%
-  Running 2010.01.01 (120/241) (1.92 s)  ••••••••••—————————— 50%
-  Running 2011.01.01 (132/241) (2.17 s)  •••••••••••————————— 55%
-  Running 2012.01.01 (144/241) (2.39 s)  ••••••••••••———————— 60%
-  Running 2013.01.01 (156/241) (2.60 s)  •••••••••••••——————— 65%
-  Running 2014.01.01 (168/241) (2.81 s)  ••••••••••••••—————— 70%
-  Running 2015.01.01 (180/241) (3.05 s)  •••••••••••••••————— 75%
-  Running 2016.01.01 (192/241) (3.28 s)  ••••••••••••••••———— 80%
-  Running 2017.01.01 (204/241) (3.51 s)  •••••••••••••••••——— 85%
-  Running 2018.01.01 (216/241) (3.74 s)  ••••••••••••••••••—— 90%
-  Running 2019.01.01 (228/241) (3.97 s)  •••••••••••••••••••— 95%
-  Running 2020.01.01 (240/241) (4.20 s)  •••••••••••••••••••• 100%
+  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
+  Running 2001 (12/241) (0.29 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.67 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (1.06 s)  •••————————————————— 15%
+  Running 2004 (48/241) (1.46 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (1.89 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (2.32 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (2.75 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (3.19 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (3.65 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (4.08 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (4.54 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (4.98 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (5.45 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (5.92 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (6.40 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (6.87 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (7.35 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (7.82 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (8.31 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (8.80 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -735,34 +814,34 @@ Initializing sim with 10000 agents
 </div>
 </div>
 <p>You can mix and match too – pass in the parameter dictionary (<code>pars</code> defined above) with some default options, and then include other parameters as arguments to the sim. Doing this overrides the equally named parameters in <code>pars</code> because (keyword) arguments take precedence). For example:</p>
-<div id="358fbf5f" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars, n_agents<span class="op">=</span><span class="dv">100</span>) <span class="co"># Use parameters defined above, but overrides the value `n_agents` in pars, and uses instead 100 agents, not 10,000</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="50939ac1" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars, n_agents<span class="op">=</span><span class="dv">100</span>) <span class="co"># Use parameters defined above, but overrides the value `n_agents` in pars, and uses instead 100 agents, not 10,000</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 100 agents
-  Running 2000.01.01 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001.01.01 (12/241) (0.03 s)  •——————————————————— 5%
-  Running 2002.01.01 (24/241) (0.07 s)  ••—————————————————— 10%
-  Running 2003.01.01 (36/241) (0.11 s)  •••————————————————— 15%
-  Running 2004.01.01 (48/241) (0.14 s)  ••••———————————————— 20%
-  Running 2005.01.01 (60/241) (0.18 s)  •••••——————————————— 25%
-  Running 2006.01.01 (72/241) (0.23 s)  ••••••—————————————— 30%
-  Running 2007.01.01 (84/241) (0.27 s)  •••••••————————————— 35%
-  Running 2008.01.01 (96/241) (0.31 s)  ••••••••———————————— 40%
-  Running 2009.01.01 (108/241) (0.35 s)  •••••••••——————————— 45%
-  Running 2010.01.01 (120/241) (0.39 s)  ••••••••••—————————— 50%
-  Running 2011.01.01 (132/241) (0.43 s)  •••••••••••————————— 55%
-  Running 2012.01.01 (144/241) (0.60 s)  ••••••••••••———————— 60%
-  Running 2013.01.01 (156/241) (0.64 s)  •••••••••••••——————— 65%
-  Running 2014.01.01 (168/241) (0.68 s)  ••••••••••••••—————— 70%
-  Running 2015.01.01 (180/241) (0.72 s)  •••••••••••••••————— 75%
-  Running 2016.01.01 (192/241) (0.76 s)  ••••••••••••••••———— 80%
-  Running 2017.01.01 (204/241) (0.81 s)  •••••••••••••••••——— 85%
-  Running 2018.01.01 (216/241) (0.85 s)  ••••••••••••••••••—— 90%
-  Running 2019.01.01 (228/241) (0.90 s)  •••••••••••••••••••— 95%
-  Running 2020.01.01 (240/241) (0.95 s)  •••••••••••••••••••• 100%
+  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
+  Running 2001 (12/241) (0.10 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.26 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (0.40 s)  •••————————————————— 15%
+  Running 2004 (48/241) (0.52 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (0.65 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (0.79 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (0.91 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (1.03 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (1.15 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (1.26 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (1.38 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (1.47 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (1.61 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (1.74 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (1.86 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (1.98 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (2.10 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (2.23 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (2.35 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (2.48 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -783,27 +862,27 @@ Initializing sim with 100 agents
 <li><i>‘mortality’</i> will plot mortality-related outcomes <br></li>
 <li><i>‘method’</i> plots the method mix over time <br></li>
 </ul>
-<div id="0513e023" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sim.plot() <span class="co"># the default</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sim.plot(<span class="st">'cpr'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="d925ef87" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sim.plot() <span class="co"># the default</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>sim.plot(<span class="st">'cpr'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="T1_intro_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="T1_intro_files/figure-html/cell-9-output-1.png" width="1298" height="983" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="T1_intro_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="T1_intro_files/figure-html/cell-9-output-2.png" width="1298" height="983" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div>
 <figure class="figure">
-<p><img src="T1_intro_files/figure-html/cell-9-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="T1_intro_files/figure-html/cell-9-output-3.png" width="1298" height="983" class="figure-img"></p>
 </figure>
 </div>
 </div>
