@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -42,14 +42,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-0978a1599afb96a8f79af3325b3d0cbc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-3121752182e3410fc65440cde8a237d8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -405,6 +405,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#whats-new" id="toc-whats-new" class="nav-link active" data-scroll-target="#whats-new">What’s new</a>
   <ul>
+  <li><a href="#version-3.5.4-2026-08-27" id="toc-version-3.5.4-2026-08-27" class="nav-link" data-scroll-target="#version-3.5.4-2026-08-27">Version 3.5.4 (2026-08-27)</a></li>
   <li><a href="#version-3.5.3-2026-03-18" id="toc-version-3.5.3-2026-03-18" class="nav-link" data-scroll-target="#version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</a></li>
   <li><a href="#version-3.5.2-2026-03-04" id="toc-version-3.5.2-2026-03-04" class="nav-link" data-scroll-target="#version-3.5.2-2026-03-04">Version 3.5.2 (2026-03-04)</a></li>
   <li><a href="#version-3.5.1-2026-02-17" id="toc-version-3.5.1-2026-02-17" class="nav-link" data-scroll-target="#version-3.5.1-2026-02-17">Version 3.5.1 (2026-02-17)</a></li>
@@ -524,6 +525,13 @@ ul.task-list li input[type="checkbox"] {
 <section id="whats-new" class="level1">
 <h1>What’s new</h1>
 <p>All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term “Regression information”.</p>
+<section id="version-3.5.4-2026-08-27" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.4-2026-08-27">Version 3.5.4 (2026-08-27)</h2>
+<ul>
+<li>Fixed compatibility with Starsim 3.6.0: <a href="./api/interventions.html#fpsim.interventions.change_initiation" title="0"><code>change_initiation</code></a> and <code>change_switching</code> converted annual probabilities to per-timestep values via <code>float(sim.dt)</code>, which now raises a <a href="https://docs.python.org/3/library/exceptions.html#TypeError" title="1"><code>TypeError</code></a> since <code>TimePar.__float__()</code> is disallowed; these now use <code>sim.dt.years</code>.</li>
+<li>Bumped the minimum Starsim version to 3.6.0.</li>
+</ul>
+</section>
 <section id="version-3.5.3-2026-03-18" class="level2">
 <h2 class="anchored" data-anchor-id="version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</h2>
 <ul>
@@ -1931,7 +1939,7 @@ sim4 = fp.Sim(start=2000, contraception_module = fp.SimpleChoice(prob_use_trend_
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.3 (2026-03-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.5.4 (2026-08-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

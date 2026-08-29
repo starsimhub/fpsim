@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -77,14 +77,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-0978a1599afb96a8f79af3325b3d0cbc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-35ceff1c48eef27914f7d6d0547a22f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-3121752182e3410fc65440cde8a237d8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-8d921db33d2064563717a47d034d5a5a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -476,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="standard-contraceptive-choice">Standard contraceptive choice</h2>
 <p>This is the default option for how contraceptive decisions are made in FPsim. Under this option, a woman’s decision about whether to use contraception depends on her age, whether or not she has ever used contraception before, her level of education, her wealth quintile, her parity, and her geographical setting (urban/rural). Data on these variables is available from the Demographic and Health Survey (DHS).</p>
 <p>The snippet below illustrates how to set up and run a simulation using the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> module.</p>
-<div id="f8238a1f" class="cell" data-execution_count="1">
+<div id="dca72174" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import FPsim and define the baseline parameters</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> <span class="st">'kenya'</span></span>
@@ -490,91 +490,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> fp.Sim(pars, contraception_module<span class="op">=</span>choice, education_module<span class="op">=</span>edu)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>s.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 500 agents
-
-  Running 1980 ( 0/481) (0.00 s)  ———————————————————— 0%
-
-  Running 1981 (12/481) (0.12 s)  ———————————————————— 3%
-
-  Running 1982 (24/481) (0.29 s)  •——————————————————— 5%
-
-  Running 1983 (36/481) (0.46 s)  •——————————————————— 8%
-
-  Running 1984 (48/481) (0.63 s)  ••—————————————————— 10%
-
-  Running 1985 (60/481) (0.80 s)  ••—————————————————— 13%
-
-  Running 1986 (72/481) (0.98 s)  •••————————————————— 15%
-
-  Running 1987 (84/481) (1.15 s)  •••————————————————— 18%
-
-  Running 1988 (96/481) (1.33 s)  ••••———————————————— 20%
-
-  Running 1989 (108/481) (1.50 s)  ••••———————————————— 23%
-
-  Running 1990 (120/481) (1.68 s)  •••••——————————————— 25%
-
-  Running 1991 (132/481) (1.85 s)  •••••——————————————— 28%
-
-  Running 1992 (144/481) (2.01 s)  ••••••—————————————— 30%
-
-  Running 1993 (156/481) (2.18 s)  ••••••—————————————— 33%
-
-  Running 1994 (168/481) (2.34 s)  •••••••————————————— 35%
-
-  Running 1995 (180/481) (2.50 s)  •••••••————————————— 38%
-
-  Running 1996 (192/481) (2.67 s)  ••••••••———————————— 40%
-
-  Running 1997 (204/481) (2.84 s)  ••••••••———————————— 43%
-
-  Running 1998 (216/481) (3.01 s)  •••••••••——————————— 45%
-
-  Running 1999 (228/481) (3.18 s)  •••••••••——————————— 48%
-
-  Running 2000 (240/481) (3.36 s)  ••••••••••—————————— 50%
-
-  Running 2001 (252/481) (3.55 s)  ••••••••••—————————— 53%
-
-  Running 2002 (264/481) (3.74 s)  •••••••••••————————— 55%
-
-  Running 2003 (276/481) (3.94 s)  •••••••••••————————— 58%
-
-  Running 2004 (288/481) (4.12 s)  ••••••••••••———————— 60%
-
-  Running 2005 (300/481) (4.31 s)  ••••••••••••———————— 63%
-
-  Running 2006 (312/481) (4.48 s)  •••••••••••••——————— 65%
-
-  Running 2007 (324/481) (4.66 s)  •••••••••••••——————— 68%
-
-  Running 2008 (336/481) (4.86 s)  ••••••••••••••—————— 70%
-
-  Running 2009 (348/481) (5.04 s)  ••••••••••••••—————— 73%
-
-  Running 2010 (360/481) (5.22 s)  •••••••••••••••————— 75%
-
-  Running 2011 (372/481) (5.41 s)  •••••••••••••••————— 78%
-
-  Running 2012 (384/481) (5.61 s)  ••••••••••••••••———— 80%
-
-  Running 2013 (396/481) (5.80 s)  ••••••••••••••••———— 83%
-
-  Running 2014 (408/481) (5.98 s)  •••••••••••••••••——— 85%
-
-  Running 2015 (420/481) (6.17 s)  •••••••••••••••••——— 88%
-
-  Running 2016 (432/481) (6.35 s)  ••••••••••••••••••—— 90%
-
-  Running 2017 (444/481) (6.56 s)  ••••••••••••••••••—— 93%
-
-  Running 2018 (456/481) (6.74 s)  •••••••••••••••••••— 95%
-
-  Running 2019 (468/481) (6.93 s)  •••••••••••••••••••— 98%
-
-  Running 2020 (480/481) (7.13 s)  •••••••••••••••••••• 100%
+  Running 1980.01.01 ( 0/481) (0.00 s)  ———————————————————— 0%
+  Running 1981.01.01 (12/481) (0.05 s)  ———————————————————— 3%
+  Running 1982.01.01 (24/481) (0.12 s)  •——————————————————— 5%
+  Running 1983.01.01 (36/481) (0.20 s)  •——————————————————— 8%
+  Running 1984.01.01 (48/481) (0.27 s)  ••—————————————————— 10%
+  Running 1985.01.01 (60/481) (0.34 s)  ••—————————————————— 13%
+  Running 1986.01.01 (72/481) (0.41 s)  •••————————————————— 15%
+  Running 1987.01.01 (84/481) (0.48 s)  •••————————————————— 18%
+  Running 1988.01.01 (96/481) (0.54 s)  ••••———————————————— 20%
+  Running 1989.01.01 (108/481) (0.61 s)  ••••———————————————— 23%
+  Running 1990.01.01 (120/481) (0.68 s)  •••••——————————————— 25%
+  Running 1991.01.01 (132/481) (0.75 s)  •••••——————————————— 28%
+  Running 1992.01.01 (144/481) (0.82 s)  ••••••—————————————— 30%
+  Running 1993.01.01 (156/481) (0.89 s)  ••••••—————————————— 33%
+  Running 1994.01.01 (168/481) (0.96 s)  •••••••————————————— 35%
+  Running 1995.01.01 (180/481) (1.02 s)  •••••••————————————— 38%
+  Running 1996.01.01 (192/481) (1.10 s)  ••••••••———————————— 40%
+  Running 1997.01.01 (204/481) (1.17 s)  ••••••••———————————— 43%
+  Running 1998.01.01 (216/481) (1.24 s)  •••••••••——————————— 45%
+  Running 1999.01.01 (228/481) (1.32 s)  •••••••••——————————— 48%
+  Running 2000.01.01 (240/481) (1.39 s)  ••••••••••—————————— 50%
+  Running 2001.01.01 (252/481) (1.48 s)  ••••••••••—————————— 53%
+  Running 2002.01.01 (264/481) (1.56 s)  •••••••••••————————— 55%
+  Running 2003.01.01 (276/481) (1.64 s)  •••••••••••————————— 58%
+  Running 2004.01.01 (288/481) (1.72 s)  ••••••••••••———————— 60%
+  Running 2005.01.01 (300/481) (1.80 s)  ••••••••••••———————— 63%
+  Running 2006.01.01 (312/481) (1.87 s)  •••••••••••••——————— 65%
+  Running 2007.01.01 (324/481) (1.95 s)  •••••••••••••——————— 68%
+  Running 2008.01.01 (336/481) (2.03 s)  ••••••••••••••—————— 70%
+  Running 2009.01.01 (348/481) (2.10 s)  ••••••••••••••—————— 73%
+  Running 2010.01.01 (360/481) (2.17 s)  •••••••••••••••————— 75%
+  Running 2011.01.01 (372/481) (2.25 s)  •••••••••••••••————— 78%
+  Running 2012.01.01 (384/481) (2.32 s)  ••••••••••••••••———— 80%
+  Running 2013.01.01 (396/481) (2.40 s)  ••••••••••••••••———— 83%
+  Running 2014.01.01 (408/481) (2.48 s)  •••••••••••••••••——— 85%
+  Running 2015.01.01 (420/481) (2.55 s)  •••••••••••••••••——— 88%
+  Running 2016.01.01 (432/481) (2.63 s)  ••••••••••••••••••—— 90%
+  Running 2017.01.01 (444/481) (2.71 s)  ••••••••••••••••••—— 93%
+  Running 2018.01.01 (456/481) (2.79 s)  •••••••••••••••••••— 95%
+  Running 2019.01.01 (468/481) (2.87 s)  •••••••••••••••••••— 98%
+  Running 2020.01.01 (480/481) (2.94 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -585,7 +544,7 @@ Initializing sim with 500 agents
 <p>In the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module, a woman’s decision about whether to use contraception only depends on her age and whether or not she has ever used contraception before. Compared to the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> module, the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module disregards the influence of women’s education, wealth, parity, and urban/rural status on her contraceptive decisions.</p>
 <p>The <a href="../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> module is included only for testing purposes. In this module, women choose contraception at random. This module can be useful for sanity checking that the more realistic modules behave as expected.</p>
 <p>It is recommended that use of the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> and <a href="../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> modules is reserved for testing purposes, as the <a href="../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> captures more of the factors relevant for contraceptive decision making. Nevertheless, the example below shows how to use the <a href="../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> module. This example can also be considered as a template for anyone wishing to define their own contraceptive choice module.</p>
-<div id="d85527df" class="cell" data-execution_count="2">
+<div id="295a5c88" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>method_choice <span class="op">=</span> fp.SimpleChoice(location<span class="op">=</span>location)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, analyzers<span class="op">=</span>fp.lifeof_recorder())</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
@@ -593,104 +552,63 @@ Initializing sim with 500 agents
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> sim.plot(to_plot<span class="op">=</span><span class="st">'cpr'</span>)<span class="op">;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> sim.analyzers[<span class="dv">0</span>].plot(index<span class="op">=</span><span class="dv">1</span>)<span class="op">;</span> <span class="co"># plot the life events of one woman</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
+<pre><code>Loading data from files in /home/cliffk/idm/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
 Initializing sim with 500 agents
-
-  Running 1980 ( 0/481) (0.00 s)  ———————————————————— 0%
-
-  Running 1981 (12/481) (0.13 s)  ———————————————————— 3%
-
-  Running 1982 (24/481) (0.29 s)  •——————————————————— 5%
-
-  Running 1983 (36/481) (0.43 s)  •——————————————————— 8%
-
-  Running 1984 (48/481) (0.58 s)  ••—————————————————— 10%
-
-  Running 1985 (60/481) (0.72 s)  ••—————————————————— 13%
-
-  Running 1986 (72/481) (0.88 s)  •••————————————————— 15%
-
-  Running 1987 (84/481) (1.03 s)  •••————————————————— 18%
-
-  Running 1988 (96/481) (1.19 s)  ••••———————————————— 20%
-
-  Running 1989 (108/481) (1.34 s)  ••••———————————————— 23%
-
-  Running 1990 (120/481) (1.49 s)  •••••——————————————— 25%
-
-  Running 1991 (132/481) (1.65 s)  •••••——————————————— 28%
-
-  Running 1992 (144/481) (1.79 s)  ••••••—————————————— 30%
-
-  Running 1993 (156/481) (1.94 s)  ••••••—————————————— 33%
-
-  Running 1994 (168/481) (2.10 s)  •••••••————————————— 35%
-
-  Running 1995 (180/481) (2.26 s)  •••••••————————————— 38%
-
-  Running 1996 (192/481) (2.42 s)  ••••••••———————————— 40%
-
-  Running 1997 (204/481) (2.59 s)  ••••••••———————————— 43%
-
-  Running 1998 (216/481) (2.75 s)  •••••••••——————————— 45%
-
-  Running 1999 (228/481) (2.92 s)  •••••••••——————————— 48%
-
-  Running 2000 (240/481) (3.10 s)  ••••••••••—————————— 50%
-
-  Running 2001 (252/481) (3.28 s)  ••••••••••—————————— 53%
-
-  Running 2002 (264/481) (3.45 s)  •••••••••••————————— 55%
-
-  Running 2003 (276/481) (3.60 s)  •••••••••••————————— 58%
-
-  Running 2004 (288/481) (3.79 s)  ••••••••••••———————— 60%
-
-  Running 2005 (300/481) (3.97 s)  ••••••••••••———————— 63%
-
-  Running 2006 (312/481) (4.14 s)  •••••••••••••——————— 65%
-
-  Running 2007 (324/481) (4.32 s)  •••••••••••••——————— 68%
-
-  Running 2008 (336/481) (4.52 s)  ••••••••••••••—————— 70%
-
-  Running 2009 (348/481) (4.68 s)  ••••••••••••••—————— 73%
-
-  Running 2010 (360/481) (4.84 s)  •••••••••••••••————— 75%
-
-  Running 2011 (372/481) (5.01 s)  •••••••••••••••————— 78%
-
-  Running 2012 (384/481) (5.19 s)  ••••••••••••••••———— 80%
-
-  Running 2013 (396/481) (5.35 s)  ••••••••••••••••———— 83%
-
-  Running 2014 (408/481) (5.52 s)  •••••••••••••••••——— 85%
-
-  Running 2015 (420/481) (5.70 s)  •••••••••••••••••——— 88%
-
-  Running 2016 (432/481) (5.87 s)  ••••••••••••••••••—— 90%
-
-  Running 2017 (444/481) (6.04 s)  ••••••••••••••••••—— 93%
-
-  Running 2018 (456/481) (6.23 s)  •••••••••••••••••••— 95%
-
-  Running 2019 (468/481) (6.39 s)  •••••••••••••••••••— 98%
-
-  Running 2020 (480/481) (6.55 s)  •••••••••••••••••••• 100%
+  Running 1980.01.01 ( 0/481) (0.00 s)  ———————————————————— 0%
+  Running 1981.01.01 (12/481) (0.05 s)  ———————————————————— 3%
+  Running 1982.01.01 (24/481) (0.11 s)  •——————————————————— 5%
+  Running 1983.01.01 (36/481) (0.17 s)  •——————————————————— 8%
+  Running 1984.01.01 (48/481) (0.23 s)  ••—————————————————— 10%
+  Running 1985.01.01 (60/481) (0.29 s)  ••—————————————————— 13%
+  Running 1986.01.01 (72/481) (0.36 s)  •••————————————————— 15%
+  Running 1987.01.01 (84/481) (0.42 s)  •••————————————————— 18%
+  Running 1988.01.01 (96/481) (0.49 s)  ••••———————————————— 20%
+  Running 1989.01.01 (108/481) (0.55 s)  ••••———————————————— 23%
+  Running 1990.01.01 (120/481) (0.61 s)  •••••——————————————— 25%
+  Running 1991.01.01 (132/481) (0.67 s)  •••••——————————————— 28%
+  Running 1992.01.01 (144/481) (0.73 s)  ••••••—————————————— 30%
+  Running 1993.01.01 (156/481) (0.80 s)  ••••••—————————————— 33%
+  Running 1994.01.01 (168/481) (0.86 s)  •••••••————————————— 35%
+  Running 1995.01.01 (180/481) (0.91 s)  •••••••————————————— 38%
+  Running 1996.01.01 (192/481) (0.98 s)  ••••••••———————————— 40%
+  Running 1997.01.01 (204/481) (1.06 s)  ••••••••———————————— 43%
+  Running 1998.01.01 (216/481) (1.13 s)  •••••••••——————————— 45%
+  Running 1999.01.01 (228/481) (1.20 s)  •••••••••——————————— 48%
+  Running 2000.01.01 (240/481) (1.28 s)  ••••••••••—————————— 50%
+  Running 2001.01.01 (252/481) (1.35 s)  ••••••••••—————————— 53%
+  Running 2002.01.01 (264/481) (1.43 s)  •••••••••••————————— 55%
+  Running 2003.01.01 (276/481) (1.50 s)  •••••••••••————————— 58%
+  Running 2004.01.01 (288/481) (1.58 s)  ••••••••••••———————— 60%
+  Running 2005.01.01 (300/481) (1.65 s)  ••••••••••••———————— 63%
+  Running 2006.01.01 (312/481) (1.72 s)  •••••••••••••——————— 65%
+  Running 2007.01.01 (324/481) (1.79 s)  •••••••••••••——————— 68%
+  Running 2008.01.01 (336/481) (1.86 s)  ••••••••••••••—————— 70%
+  Running 2009.01.01 (348/481) (1.93 s)  ••••••••••••••—————— 73%
+  Running 2010.01.01 (360/481) (1.99 s)  •••••••••••••••————— 75%
+  Running 2011.01.01 (372/481) (2.06 s)  •••••••••••••••————— 78%
+  Running 2012.01.01 (384/481) (2.13 s)  ••••••••••••••••———— 80%
+  Running 2013.01.01 (396/481) (2.19 s)  ••••••••••••••••———— 83%
+  Running 2014.01.01 (408/481) (2.26 s)  •••••••••••••••••——— 85%
+  Running 2015.01.01 (420/481) (2.32 s)  •••••••••••••••••——— 88%
+  Running 2016.01.01 (432/481) (2.39 s)  ••••••••••••••••••—— 90%
+  Running 2017.01.01 (444/481) (2.45 s)  ••••••••••••••••••—— 93%
+  Running 2018.01.01 (456/481) (2.53 s)  •••••••••••••••••••— 95%
+  Running 2019.01.01 (468/481) (2.60 s)  •••••••••••••••••••— 98%
+  Running 2020.01.01 (480/481) (2.68 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="T2_intro_to_new_features_files/figure-html/cell-3-output-2.png" width="1298" height="964" class="figure-img"></p>
+<p><img src="T2_intro_to_new_features_files/figure-html/cell-3-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="T2_intro_to_new_features_files/figure-html/cell-3-output-3.png" width="1166" height="525" class="figure-img"></p>
+<p><img src="T2_intro_to_new_features_files/figure-html/cell-3-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1135,7 +1053,7 @@ Initializing sim with 500 agents
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.3 (2026-03-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.5.4 (2026-08-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
