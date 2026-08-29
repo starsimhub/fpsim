@@ -87,8 +87,8 @@ class cpr_by_age(ss.Analyzer):
 
         # Define results for each age group based on the method_age_map
         for k in fpd.method_age_map.keys():
-            self.define_results(ss.Result(name=k,dtype=float, scale=False))
-        self.define_results(ss.Result(name='total',dtype=float, scale=False))
+            self.define_results(ss.Result(name=k, dtype=float, scale=False))
+        self.define_results(ss.Result(name='total', dtype=float, scale=False))
         return
 
     def step(self):
@@ -705,7 +705,7 @@ class method_mix_over_time(ss.Analyzer):
             fig, ax = plt.subplots(figsize=(10, 5))
 
             # Convert tvec to numeric array for plotting
-            tvec = np.array(self.t.tvec, dtype=float)
+            tvec = self.t.yearvec
 
             # Determine which methods to plot
             methods_to_plot = methods if methods is not None else self.methods
