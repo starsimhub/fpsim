@@ -17,8 +17,11 @@ import numpy as np
 import traceback
 import sciris as sc
 import fpsim as fp
+from optuna.storages import JournalStorage
+from optuna.storages.journal import JournalFileBackend
 
 results_dir = os.path.join(os.path.dirname(__file__), 'calib_results')
+journal_dir = os.path.join(os.path.dirname(__file__), 'calib_journals')
 
 
 def calibrate(locations=None, total_trials=200, n_agents=5000, n_workers=None):
@@ -54,6 +57,7 @@ def calibrate(locations=None, total_trials=200, n_agents=5000, n_workers=None):
     )
 
     os.makedirs(results_dir, exist_ok=True)
+    os.makedirs(journal_dir, exist_ok=True)
     results = {}
     failed = []
 
@@ -65,7 +69,13 @@ def calibrate(locations=None, total_trials=200, n_agents=5000, n_workers=None):
         print(f'  CALIBRATING: {loc}')
         print(f'{"="*60}\n')
         try:
-            db_name = f'fpsim_calib_{loc}.db'
+            # JournalStorage over SQLite: SQLite's global write lock produces a
+            # storm of StorageInternalErrors past ~32 concurrent workers, and
+            # even a small percentage of failed commits corrupts the study state
+            # enough that best_pars can no longer be retrieved. Journal storage
+            # (file-append log) is what hpvsim/stisim moved to for the same reason.
+            journal_path = os.path.join(journal_dir, f'fpsim_calib_{loc}.log')
+            sc.rmpath(journal_path, die=False)  # start fresh; fp.Calibration.make_study doesn't load_if_exists
             calib = fp.Calibration(
                 pars=dict(location=loc, n_agents=n_agents, start=1960, verbose=0),
                 calib_pars=calib_pars,
@@ -75,8 +85,7 @@ def calibrate(locations=None, total_trials=200, n_agents=5000, n_workers=None):
                 total_trials=total_trials,
                 n_workers=n_workers,
                 name=f'calib_{loc}',
-                db_name=db_name,
-                storage=f'sqlite:///{db_name}',
+                storage=JournalStorage(JournalFileBackend(journal_path)),
                 keep_db=True,  # Retain the Optuna study so an interrupted location can resume
                 verbose=True,
             )
