@@ -7,6 +7,7 @@ Usage:
     python calibrate_all.py                  # Run all locations
     python calibrate_all.py --location kenya # Run one location
     python calibrate_all.py --update         # Update location .py files from saved results
+    python calibrate_all.py --workers 10     # Cap parallel workers (default: all cores)
 """
 
 import os
@@ -19,8 +20,15 @@ import fpsim as fp
 results_dir = os.path.join(os.path.dirname(__file__), 'calib_results')
 
 
-def calibrate(locations=None, total_trials=200, n_agents=5000):
-    """Run calibration for specified locations"""
+def calibrate(locations=None, total_trials=200, n_agents=5000, n_workers=None):
+    """
+    Run calibration for specified locations.
+
+    n_workers defaults to every available core, which is what you want on a dedicated
+    machine; pass a smaller number when sharing a machine or calibrating on a laptop.
+    """
+    if n_workers is None:
+        n_workers = os.cpu_count()
 
     if locations is None:
         locations = [
@@ -64,10 +72,11 @@ def calibrate(locations=None, total_trials=200, n_agents=5000):
                 fit_exposure_age=True,
                 smoothness_weight=0.1,
                 total_trials=total_trials,
-                n_workers=10,
+                n_workers=n_workers,
                 name=f'calib_{loc}',
                 db_name=db_name,
                 storage=f'sqlite:///{db_name}',
+                keep_db=True,  # Retain the Optuna study so an interrupted location can resume
                 verbose=True,
             )
             calib.calibrate()
@@ -209,6 +218,7 @@ if __name__ == '__main__':
     parser.add_argument('--update', action='store_true', help='Update location .py files from saved results')
     parser.add_argument('--trials', type=int, default=200, help='Number of Optuna trials (default: 200)')
     parser.add_argument('--agents', type=int, default=5000, help='Number of agents (default: 5000)')
+    parser.add_argument('--workers', type=int, default=None, help='Parallel workers (default: all cores)')
     parser.add_argument('--force', action='store_true', help='With --update, overwrite location files even if parameters would be dropped')
     args = parser.parse_args()
 
@@ -217,4 +227,4 @@ if __name__ == '__main__':
         update_location_files(locs, force=args.force)
     else:
         locs = [args.location] if args.location else None
-        calibrate(locs, total_trials=args.trials, n_agents=args.agents)
+        calibrate(locs, total_trials=args.trials, n_agents=args.agents, n_workers=args.workers)
