@@ -3,6 +3,25 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
+## Version 3.6.0 (2026-09-03)
+
+* **Regression information**
+  * `FPmod` now inherits from `ss.Pregnancy` instead of `ss.Connector`. Pregnancy progression, gestation and delivery are handled by Starsim's `Pregnancy` module rather than by FPsim. The module is now reached at `sim.people.fp`, not `sim.connectors.fp`; update any code or analyzers that referenced the old path.
+  * Gestation length is now drawn from Starsim's 32-42 week distribution (mean 40.1 weeks) instead of a fixed 9 months. With monthly timesteps this shifts most deliveries one timestep later relative to conception, and spreads a conception cohort's births over several timesteps. Any analysis assuming a fixed 9-month conception-to-birth offset needs revisiting.
+  * All 9 locations recalibrated against the refactored model. `tests/baseline.json` and `tests/benchmark.json` regenerated to match.
+
+* **Calibration**
+  * `calibrate_all.py`: `n_workers` now defaults to every available core instead of a hardcoded 10, with `--workers` to cap it on shared machines. Added `--trials`, `--agents` and `--force`.
+  * `calibrate_all.py`: switched from SQLite to Optuna `JournalStorage`. SQLite's global write lock produced `StorageInternalError` storms past ~32 concurrent workers, corrupting study state badly enough that `best_pars` could not be retrieved; a 160-worker run lost all 9 locations this way despite each study completing hundreds of trials.
+  * `calibrate_all.py --update`: location files are regenerated from calibration results, but parameters the generator cannot emit (`method_weights`, `dur_postpartum`) are now carried over verbatim. Each rewritten file is reloaded and compared against what it defined before; if anything is missing the original is restored and the location skipped. Previously these hand-tuned parameters were silently dropped.
+  * `Calibration`: the number of `spacing_pref` bins is read from the location data rather than assumed. 7 of 9 locations use 19 bins, not the default 17, so calibration previously built preference arrays of the wrong length for most locations.
+
+* **Fixes**
+  * `method_switching`: the `annual` argument was accepted but ignored, so `annual=True` silently had no effect. Annual probabilities are converted to per-timestep values again.
+
+* **Tests**
+  * `test_pregnant_women` now follows the cohort that conceives in the first three months through to each pregnancy's outcome, instead of comparing fixed result windows. The old form assumed a fixed 9-month gestation and mis-attributed roughly 17% of the cohort once gestation became a distribution.
+
 ## Version 3.5.4 (2026-08-27)
 - Fixed compatibility with Starsim 3.6.0: `change_initiation` and `change_switching` converted annual probabilities to per-timestep values via `float(sim.dt)`, which now raises a `TypeError` since `TimePar.__float__()` is disallowed; these now use `sim.dt.years`.
 - Bumped the minimum Starsim version to 3.6.0.

@@ -121,7 +121,7 @@ sim_split = fp.Sim(pars=pars, interventions=[intv_split], label='With DMPA-SC').
 
 # Method-specific usage at end
 cm = sim_split.connectors.contraception
-fp_mod = sim_split.connectors.fp
+fp_mod = sim_split.people.fp
 inj_usage = fp_mod.method_mix[cm.methods['inj'].idx, -1] * 100
 dmpasc_usage = fp_mod.method_mix[cm.methods['dmpasc'].idx, -1] * 100
 print(f"Injectable: {inj_usage:.1f}%  |  DMPA-SC: {dmpasc_usage:.1f}%")
