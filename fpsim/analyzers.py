@@ -107,9 +107,26 @@ class cpr_by_age(ss.Analyzer):
 
 
 class method_mix_by_age(ss.Analyzer):
-    '''
-    Analyzer that records the method mix by age at the end of the simulation.
-    '''
+    """
+    Record the method mix by age at the end of the simulation.
+
+    Produces a single end-of-run snapshot, so use it to compare method mix across age
+    groups against survey data. For a time series instead, use
+    [method_mix_over_time](`fpsim.analyzers.method_mix_over_time`).
+
+    Args:
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        sim = fp.Sim(location='kenya', analyzers=fp.method_mix_by_age())
+        sim.run()
+        mix = sim.analyzers[0]
+        ```
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)   # Initialize the Analyzer object
         self.age_bins = [v[1] for v in fpd.method_age_map.values()]
@@ -666,8 +683,24 @@ class age_pyramids(ss.Analyzer):
 
 class method_mix_over_time(ss.Analyzer):
     """
-    Tracks the number of women on each method available
-    for each time step
+    Track the number of women on each method at every timestep.
+
+    Use this to see how method mix evolves, for example after introducing a new method with
+    [add_method](`fpsim.interventions.add_method`). For an end-of-run snapshot by age
+    instead, use [method_mix_by_age](`fpsim.analyzers.method_mix_by_age`).
+
+    Args:
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        sim = fp.Sim(location='kenya', analyzers=fp.method_mix_over_time())
+        sim.run()
+        sim.analyzers[0].plot()
+        ```
     """
 
     def __init__(self, **kwargs):
@@ -748,10 +781,29 @@ class method_mix_over_time(ss.Analyzer):
 
 
 class state_tracker(ss.Analyzer):
-    '''
-    Records the number of living women on a specific boolean state (eg, numbe of
-    living women who live in rural settings)
-    '''
+    """
+    Record the number of living women in a given boolean state each timestep.
+
+    Use this to track any boolean state without writing a custom analyzer, for example how
+    many women live in urban settings or are currently postpartum.
+
+    Args:
+        state_name (str): name of the boolean state to track, e.g. ``'urban'``
+        module_name (str): module the state belongs to, e.g. ``'fp'``; omit for states on People
+        min_age (float): youngest age to include
+        max_age (float): oldest age to include
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        tracker = fp.state_tracker(state_name='urban')  # urban is a People state
+        sim = fp.Sim(location='kenya', analyzers=tracker)
+        sim.run()
+        ```
+    """
 
     def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
         """
@@ -845,7 +897,14 @@ class state_tracker(ss.Analyzer):
 
 class track_parity(ss.Analyzer):
     """
-    Analyzer for binning parity
+    Record the distribution of parity (number of live births per woman).
+
+    Use this to compare the simulated parity distribution against survey data, which is one
+    of the standard calibration targets.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
     """
     def __init__(self):
         super().__init__()
@@ -869,7 +928,14 @@ class track_parity(ss.Analyzer):
 
 class track_postpartum(ss.Analyzer):
     """
-    Analyzer for tracking postpartum status, binned by months
+    Record postpartum status, binned by months since delivery.
+
+    Useful when checking postpartum contraceptive uptake or the duration of postpartum
+    infecundability, both of which shape birth spacing.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
     """
     def __init__(self):
         super().__init__()
@@ -894,10 +960,18 @@ class track_postpartum(ss.Analyzer):
 
 class track_as(ss.Analyzer):
     """
-    Analyzer for tracking age-specific results
+    Record age-specific versions of the standard results.
+
+    Adds age stratification to results that are otherwise reported for the whole
+    population, such as fertility and contraceptive use.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
     """
 
     def __init__(self):
+        super().__init__()
         # Check versioning
         if sc.compareversions(fp, '<3.0'):
             errormsg = (f'Your current version of FPsim is {fp.__version__}, but this analyzer is slated for release'

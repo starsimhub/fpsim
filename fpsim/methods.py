@@ -22,6 +22,42 @@ __all__ = ['Method', 'make_method_list', 'ContraPars', 'make_contra_pars', 'make
 
 # %% Base definition of contraceptive methods -- can be overwritten by locations
 class Method:
+    """
+    A contraceptive method.
+
+    Methods are held by a contraceptive choice module, which decides who uses which one.
+    A woman re-chooses when her current method's ``dur_use`` elapses, so ``dur_use``
+    shapes the long-run method mix as much as ``efficacy`` does.
+
+    Note that ``name`` and ``label`` are not interchangeable: code indexes the method
+    dictionary by ``name`` (``cm.methods['inj']``), while interventions that take method
+    identifiers look them up by ``label`` (``'Injectables'``).
+
+    Args:
+        name (str): short identifier used in code, e.g. ``'inj'``
+        label (str): display name used in plots and interventions, e.g. ``'Injectables'``
+        idx (int): position in the method list; set automatically when added to a module
+        efficacy (float): proportional reduction in conception probability while using
+        modern (bool): whether this counts towards modern contraceptive prevalence (mCPR)
+        dur_use (Dist): distribution of duration of use before re-choosing
+        rel_dur_use (float): multiplier on ``dur_use``, for scaling a copied method
+        csv_name (str): name used for this method in the input data files
+
+    **Example**:
+
+        ```python
+        import starsim as ss
+        import fpsim.methods as fpm
+
+        dmpasc = fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
+                            dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+        ```
+
+    Note:
+        To introduce a method partway through a simulation, use the
+        [add_method](`fpsim.interventions.add_method`) intervention rather than building
+        the method list by hand.
+    """
     def __init__(self, name=None, label=None, idx=None, efficacy=None, modern=None, dur_use=None, rel_dur_use=1, csv_name=None, _source_dur=None):
         self.name = name
         self.label = label or name
@@ -203,7 +239,28 @@ def make_contra_pars():
 
 
 def make_methods(method_list=None, method_df=None):
-    """ Shortcut for making methods"""
+    """
+    Build the default method list as an ndict keyed by method name.
+
+    Call this when you want to start from the standard ten methods and add your own, rather
+    than constructing the full list by hand.
+
+    Args:
+        method_list (list): explicit list of [Method](`fpsim.methods.Method`) objects
+        method_df (DataFrame): method definitions to build from, instead of the defaults
+
+    Returns:
+        ndict: methods keyed by name
+
+    **Example**:
+
+        ```python
+        import fpsim.methods as fpm
+
+        methods = fpm.make_methods()
+        print(list(methods.keys()))  # ['none', 'pill', 'iud', 'inj', ...]
+        ```
+    """
     if method_list is None:
         if method_df is None:
             cpars = make_contra_pars()
@@ -215,6 +272,22 @@ def make_methods(method_list=None, method_df=None):
 # %% Define classes to contain information about the way women choose contraception
 
 class ContraceptiveChoice(ss.Connector):
+    """
+    Base class for contraceptive choice modules.
+
+    A choice module owns the list of available methods and decides, for each woman at each
+    decision point, whether she uses contraception and which method. Subclasses differ only
+    in how that probability is computed; see [RandomChoice](`fpsim.methods.RandomChoice`),
+    [SimpleChoice](`fpsim.methods.SimpleChoice`) and
+    [StandardChoice](`fpsim.methods.StandardChoice`).
+
+    The module is reached at ``sim.connectors.contraception`` during and after a run. Note
+    this is distinct from the FP module itself, which lives at ``sim.people.fp``.
+
+    Args:
+        pars (dict): parameters for the choice module
+        kwargs (dict): passed to ``ss.Connector``
+    """
     def __init__(self, pars=None, **kwargs):
         """
         Base contraceptive choice module
@@ -1062,7 +1135,30 @@ class ContraceptiveChoice(ss.Connector):
 
 
 class RandomChoice(ContraceptiveChoice):
-    """ Randomly choose a method of contraception """
+    """
+    Choose a method uniformly at random.
+
+    Intended for testing model mechanics, not for producing realistic method mix. Because
+    it needs no fitted data, it is the only choice module that accepts a method list
+    containing methods with no per-method data -- useful when checking that a new method
+    behaves sensibly before wiring up its uptake.
+
+    Args:
+        pars (dict): parameters for the choice module
+        kwargs (dict): passed to [ContraceptiveChoice](`fpsim.methods.ContraceptiveChoice`)
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+        import fpsim.methods as fpm
+
+        methods = fpm.make_methods()
+        methods += fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
+                              dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+        sim = fp.Sim(location='kenya', contraception_module=fpm.RandomChoice(methods=methods))
+        ```
+    """
     def __init__(self, pars=None, **kwargs):
         super().__init__(pars=pars, **kwargs)
         self._method_choice_dist = ss.choice(a=np.arange(1, self.n_methods+1))
@@ -1082,9 +1178,29 @@ class RandomChoice(ContraceptiveChoice):
 
 class SimpleChoice(RandomChoice):
     """
-    Simple choice model where method choice depends on age and previous method.
-    Uses location-specific data to set parameters, and needs to be initialized with
-    either a location string or a data dictionary.
+    Choose a method based on age and previous method.
+
+    Uses location-specific fitted data, so it must be initialized with either a location
+    string or a data dictionary. Because the fit is per method, passing a method list that
+    contains a method with no fitted duration data raises an ``IndexError``; to introduce a
+    new method use the [add_method](`fpsim.interventions.add_method`) intervention with
+    ``copy_from``, which inherits an existing method's behaviour.
+
+    Args:
+        pars (dict): parameters for the choice module
+        location (str): location whose fitted coefficients to load, e.g. ``'kenya'``
+        data (dict): pre-loaded data, used instead of loading from ``location``
+        contra_mod (str): which fitted coefficient set to use
+        kwargs (dict): passed to [RandomChoice](`fpsim.methods.RandomChoice`)
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+        import fpsim.methods as fpm
+
+        sim = fp.Sim(location='kenya', contraception_module=fpm.SimpleChoice(location='kenya'))
+        ```
     """
     def __init__(self, pars=None, location=None, data=None, contra_mod='simple', **kwargs):
         """
@@ -1345,8 +1461,29 @@ class SimpleChoice(RandomChoice):
 
 class StandardChoice(SimpleChoice):
     """
-    Default contraceptive choice module.
-    Contraceptive choice is based on age, education, wealth, parity, and prior use.
+    Choose a method based on age, education, wealth, parity and prior use.
+
+    This is the default choice module, used when no ``contraception_module`` is passed to
+    [Sim](`fpsim.sim.Sim`). It extends [SimpleChoice](`fpsim.methods.SimpleChoice`) with
+    education and wealth, and carries the same requirement for per-method fitted data.
+
+    Args:
+        pars (dict): parameters for the choice module
+        location (str): location whose fitted coefficients to load, e.g. ``'kenya'``
+        data (dict): pre-loaded data, used instead of loading from ``location``
+        contra_mod (str): which fitted coefficient set to use
+        kwargs (dict): passed to [SimpleChoice](`fpsim.methods.SimpleChoice`)
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        # Used automatically, so these are equivalent
+        sim = fp.Sim(location='kenya')
+        sim = fp.Sim(location='kenya',
+                     contraception_module=fp.StandardChoice(location='kenya'))
+        ```
     """
     def __init__(self, pars=None, location=None, data=None, contra_mod='mid', **kwargs):
         super().__init__(pars=pars, location=location, data=data, contra_mod=contra_mod, **kwargs)
