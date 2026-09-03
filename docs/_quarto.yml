@@ -52,6 +52,8 @@ website:
         href: installation.qmd
       - text: Tutorials
         href: tutorials/index.qmd
+      - text: User guide
+        href: user-guide/index.qmd
       - text: Code of conduct
         href: conduct.md
       - text: Contributing
@@ -79,6 +81,17 @@ website:
             - tutorials/T3_interventions_methods.qmd
             - tutorials/T4_intervention_eligibility.qmd
             - tutorials/T5_new_method.qmd
+        - section: "**User guide**"
+          contents:
+            - user-guide/index.qmd
+            - section: "Calibration"
+              contents:
+                - user-guide/calibration/index.qmd
+                - user-guide/calibration/recalibrate.qmd
+            - section: "Contraception"
+              contents:
+                - user-guide/contraception/index.qmd
+                - user-guide/contraception/add-method.qmd
         - href: conduct.md
           text: "**Code of conduct**"
         - href: contributing.md

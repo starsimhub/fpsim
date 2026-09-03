@@ -1,0 +1,15 @@
+---
+title: User guide
+---
+
+The [tutorials](../tutorials/index.qmd) show how to run FPsim. This user guide covers the
+two areas where users most often need to go further: fitting the model to a setting, and
+changing what contraceptive methods exist and who uses them.
+
+- **[Calibration](calibration/index.qmd)** -- what FPsim fits, how mismatch is computed,
+  and how to recalibrate a location.
+- **[Contraception](contraception/index.qmd)** -- how methods are defined, how choice is
+  modelled, and how to introduce a new method.
+
+Each section starts with an explanation of how the mechanism works, followed by how-to
+topics for specific tasks.

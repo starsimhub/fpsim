@@ -2,6 +2,9 @@
 
 This document describes the process for recalibrating FPsim when model logic changes.
 
+> This content is also published, and kept current, in the user guide:
+> [Recalibrate a location](https://docs.fpsim.org/user-guide/calibration/recalibrate.html).
+
 ## When to recalibrate
 
 Recalibration is needed when:

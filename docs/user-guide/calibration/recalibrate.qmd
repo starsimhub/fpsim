@@ -1,0 +1,126 @@
+---
+title: Recalibrate a location
+---
+
+Recalibration is needed when model logic changes in a way that shifts fertility or
+contraceptive dynamics: the conception pipeline, sexual activity or contraception update
+logic, new data sources, or a new location. It is *not* needed for bug fixes that restore
+intended behaviour, new result tracking that does not affect dynamics, or documentation
+and test changes.
+
+All commands below are run from the repository root.
+
+## 1. Save current baselines
+
+Before changing anything, snapshot the existing parameters so you can compare afterwards:
+
+```bash
+python fpsim/locations/compare_calib_pars.py --save
+```
+
+This writes a JSON snapshot per location to `fpsim/locations/calib_baselines/`.
+
+## 2. Run the calibration
+
+For all nine locations:
+
+```bash
+SCIRIS_BACKEND=agg python fpsim/locations/calibrate_all.py
+```
+
+For a single location:
+
+```bash
+SCIRIS_BACKEND=agg python fpsim/locations/calibrate_all.py --location kenya
+```
+
+Useful options:
+
+| Option | Effect |
+|---|---|
+| `--trials` | Optuna trials per location (default 200) |
+| `--workers` | Parallel workers (defaults to every core) |
+| `--agents` | Agents per simulation (default 5000) |
+
+The default of 200 trials is low for a 26-dimensional search. If you have the compute,
+use considerably more; on a 120-core machine, 2000 trials across all nine locations takes
+roughly half an hour.
+
+Each location's result is written to `fpsim/locations/calib_results/<location>.obj` as
+soon as it finishes, so a run that is interrupted does not lose completed locations. Each
+location also keeps its Optuna study, so an interrupted location resumes rather than
+restarting.
+
+## 3. Compare parameters
+
+```bash
+python fpsim/locations/compare_calib_pars.py --verbose
+```
+
+This flags parameters that moved more than 30% (`--tolerance` to change).
+
+Expect `exposure_age` and `exposure_parity` knots to move substantially while the curve
+shape stays similar -- judge them by shape. The scalars (`exposure_factor`,
+`fecundity_low`/`fecundity_high`) are the ones to scrutinise.
+
+Treat these as red flags:
+
+- A scalar parameter changing by more than 2x
+- `exposure_factor` or fecundity landing on a bound
+- Best mismatch clearly worse than the previous calibration
+
+## 4. Inspect the fit visually
+
+```bash
+python fpsim/locations/run_calibrated_location.py kenya
+```
+
+This plots model output against data for mCPR, ASFR, total fertility rate, birth spacing,
+age at first birth, and method mix. Do this before accepting a calibration; mismatch alone
+will not tell you that a curve is the wrong shape.
+
+## 5. Update the location files
+
+```bash
+python fpsim/locations/calibrate_all.py --update
+```
+
+This rewrites each location's `make_calib_pars()` from the saved results. Parameters the
+generator cannot produce -- `method_weights` and `dur_postpartum` -- are carried over from
+the existing file, and each rewritten file is reloaded and checked against what it defined
+before. If anything would be lost, the original is restored and the location is skipped
+with a message naming the missing parameters.
+
+If a location is skipped, read the reason rather than reaching for `--force`. Forcing the
+overwrite drops the hand-tuned parameters, which has previously caused large and confusing
+differences in results.
+
+## 6. Save new baselines
+
+```bash
+python fpsim/locations/compare_calib_pars.py --save
+```
+
+## 7. Regenerate test baselines
+
+Recalibration changes simulation output, so the test baselines need regenerating:
+
+```bash
+cd tests && python update_baseline
+```
+
+## Key files
+
+| File | Purpose |
+|---|---|
+| `fpsim/locations/calibrate_all.py` | Run calibration and update location files |
+| `fpsim/locations/compare_calib_pars.py` | Compare parameters between versions |
+| `fpsim/locations/run_calibrated_location.py` | Run and plot a calibrated model |
+| `fpsim/locations/calib_results/*.obj` | Saved results (best parameters and mismatch) |
+| `fpsim/locations/calib_baselines/*.json` | Parameter baselines for regression checking |
+| `fpsim/locations/<location>/<location>.py` | Location-specific calibrated parameters |
+| `tests/test_parameters.py` | Parameter coverage and regression tests |
+
+## See also
+
+- [Calibration](index.qmd) for what is being fitted and why

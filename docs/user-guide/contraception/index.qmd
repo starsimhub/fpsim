@@ -1,0 +1,59 @@
+---
+title: Contraception
+---
+
+Contraception in FPsim has two parts: the **methods** that exist, and the **choice module**
+that decides who uses which one. They are separate, so you can change the method list
+without touching choice behaviour, or swap the choice model while keeping the same methods.
+
+## Methods
+
+A method is an `fp.Method` with these fields:
+
+| Field | Meaning |
+|---|---|
+| `name` | Short identifier used in code, e.g. `inj` |
+| `label` | Display name used in plots and interventions, e.g. `Injectables` |
+| `efficacy` | Proportional reduction in conception probability while using |
+| `modern` | Whether it counts towards modern contraceptive prevalence (mCPR) |
+| `dur_use` | Distribution of how long a user continues before switching or stopping |
+
+Note that `name` and `label` are not interchangeable. Code that indexes the method
+dictionary uses `name` (`cm.methods['inj']`), while interventions that take method
+identifiers, such as efficacy scenarios, look methods up by `label` (`'Injectables'`).
+
+The default method set has ten entries, including `none`, which represents non-use and
+makes the method mix sum to one.
+
+## Choice modules
+
+The choice module decides, for each woman at each decision point, whether she uses a method
+and which one. FPsim provides three:
+
+| Module | Behaviour |
+|---|---|
+| `RandomChoice` | Uniform random choice among methods; mainly for testing |
+| `SimpleChoice` | Choice depends on age and parity, fitted per location |
+| `StandardChoice` | The default; adds education and wealth to the above |
+
+A woman's decision points are governed by `dur_use`: when her current method's duration
+elapses, she chooses again. This is why `dur_use` matters as much as `efficacy` for
+long-run method mix.
+
+## Results
+
+Method usage is reported as `method_mix`, an array of shape (number of methods, number of
+timesteps), giving the share of contraceptive users on each method over time. Overall
+prevalence is reported separately as `mcpr` on the contraception module.
+
+Because `method_mix` is indexed by method position, adding a method mid-simulation changes
+the array's shape. Index into it via the method's `idx` rather than a hardcoded position.
+
+## How-to topics
+
+- [Add a new method](add-method.qmd)
+
+## See also
+
+- [Interventions and methods](../../tutorials/T3_interventions_methods.qmd) tutorial
+- [Methods API](../../api/methods.qmd)
