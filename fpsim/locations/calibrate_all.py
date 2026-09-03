@@ -1,31 +1,33 @@
 """
 Run calibration for all FPsim locations sequentially using fp.Calibration.
 Uses multiprocessing for parallel Optuna workers within each location.
-Results are printed as code snippets to paste into each location's .py file.
+Results are saved to calib_results/ and can be used to update location files.
+
+Usage:
+    python calibrate_all.py                  # Run all locations
+    python calibrate_all.py --location kenya # Run one location
+    python calibrate_all.py --update         # Update location .py files from saved results
 """
 
+import os
+import re
 import numpy as np
 import traceback
+import sciris as sc
 import fpsim as fp
 
+results_dir = os.path.join(os.path.dirname(__file__), 'calib_results')
 
-def main():
-    locations = [
-        'senegal',
-        'kenya',
-        'cotedivoire',
-        'ethiopia',
-        'niger',
-        'nigeria_kaduna',
-        'nigeria_kano',
-        'nigeria_lagos',
-        'pakistan_sindh',
-    ]
 
-    total_trials = 200
-    n_agents = 5000
+def calibrate(locations=None, total_trials=200, n_agents=5000):
+    """Run calibration for specified locations"""
 
-    # Calibration parameter ranges [best, low, high]
+    if locations is None:
+        locations = [
+            'senegal', 'kenya', 'cotedivoire', 'ethiopia', 'niger',
+            'nigeria_kaduna', 'nigeria_kano', 'nigeria_lagos', 'pakistan_sindh',
+        ]
+
     calib_pars = dict(
         exposure_factor    = [1.0, 0.5, 3.0],
         prob_use_intercept = [-1.0, -3.0, 0.0],
@@ -42,6 +44,7 @@ def main():
         infant_mortality_rate=0.5, method_counts=0,
     )
 
+    os.makedirs(results_dir, exist_ok=True)
     results = {}
     failed = []
 
@@ -69,17 +72,24 @@ def main():
             )
             calib.calibrate()
 
-            results[loc] = dict(
+            result = dict(
                 best_pars=calib.best_pars,
                 mismatch=calib.study.best_value,
             )
+            results[loc] = result
+
+            # Save per-location result immediately
+            outfile = os.path.join(results_dir, f'{loc}.obj')
+            sc.saveobj(outfile, result)
+
             print(f'\nOK {loc} complete (mismatch: {calib.study.best_value:.2f})')
-            print(f'Best pars: {calib.best_pars}')
+            print(f'Saved to {outfile}')
         except Exception as e:
             print(f'\nFAIL {loc} FAILED: {e}')
             traceback.print_exc()
             failed.append(loc)
 
+    # Summary
     print(f'\n\n{"="*60}')
     print(f'  SUMMARY')
     print(f'{"="*60}')
@@ -87,9 +97,124 @@ def main():
     if failed:
         print(f'Failed: {failed}')
     for loc, res in results.items():
-        print(f'\n{loc}: mismatch={res["mismatch"]:.2f}')
-        print(f'  pars: {res["best_pars"]}')
+        print(f'  {loc}: mismatch={res["mismatch"]:.2f}')
+
+    return results
+
+
+scalar_keys = ['exposure_factor', 'prob_use_intercept', 'prob_use_trend_par',
+               'fecundity_low', 'fecundity_high']
+
+# Parameters this generator knows how to write out; anything else present in an existing
+# location file would be silently lost by the rewrite, so we refuse rather than drop it
+emitted_keys = set(scalar_keys) | {'exposure_age', 'exposure_parity', 'spacing_pref'}
+
+
+def update_location_files(locations=None, force=False):
+    """
+    Update each location's .py file with calibrated parameters from saved results.
+
+    The location file is regenerated from scratch, so any hand-tuned parameter that this
+    generator cannot emit (e.g. method_weights, dur_postpartum) would be destroyed. Such
+    locations are skipped unless force=True.
+    """
+
+    if locations is None:
+        locations = [
+            'senegal', 'kenya', 'cotedivoire', 'ethiopia', 'niger',
+            'nigeria_kaduna', 'nigeria_kano', 'nigeria_lagos', 'pakistan_sindh',
+        ]
+
+    for loc in locations:
+        result_file = os.path.join(results_dir, f'{loc}.obj')
+        if not os.path.exists(result_file):
+            print(f'{loc}: no saved results found at {result_file}')
+            continue
+
+        result = sc.loadobj(result_file)
+        pars = result['best_pars']
+        mismatch = result['mismatch']
+
+        # Refuse to clobber parameters we cannot regenerate
+        loc_file = os.path.join(os.path.dirname(__file__), loc, f'{loc}.py')
+        if os.path.exists(loc_file):
+            existing = set(re.findall(r"pars\['(\w+)'\]", open(loc_file).read()))
+            dropped = existing - emitted_keys
+            if dropped and not force:
+                print(f'{loc}: SKIPPED, rewriting would drop {sorted(dropped)} from {loc_file}. '
+                      f'Port these by hand or re-run with --force to overwrite anyway.')
+                continue
+
+        # Build the make_calib_pars function body
+        lines = []
+        lines.append(f'"""\nSet the parameters for a location-specific FPsim model.\n"""')
+        lines.append('import numpy as np')
+        lines.append('import fpsim.locations.data_utils as fpld')
+        lines.append('')
+        lines.append('')
+        lines.append('def make_calib_pars():')
+        lines.append(f'    """ Make a dictionary of location-specific parameters (mismatch: {mismatch:.2f}) """')
+        lines.append('    pars = {}')
+
+        # Scalar parameters
+        for key in scalar_keys:
+            if key in pars:
+                lines.append(f'    pars[\'{key}\'] = {pars[key]:.4f}')
+
+        # Exposure age
+        if 'exposure_age' in pars:
+            ea = pars['exposure_age']
+            ages_str = ', '.join(f'{a:g}' for a in ea[0])
+            vals_str = ', '.join(f'{v:.4f}' for v in ea[1])
+            lines.append(f'    pars[\'exposure_age\'] = np.array([[{ages_str}],')
+            lines.append(f'                                      [{vals_str}]])')
+
+        # Exposure parity
+        if 'exposure_parity' in pars:
+            ep = pars['exposure_parity']
+            par_str = ', '.join(f'{int(a)}' for a in ep[0])
+            val_str = ', '.join(f'{v:.4f}' for v in ep[1])
+            lines.append(f'    pars[\'exposure_parity\'] = np.array([[{par_str}],')
+            lines.append(f'                                         [{val_str}]])')
+
+        # Spacing preference
+        if 'spacing_pref' in pars:
+            pref = pars['spacing_pref'].get('preference', None)
+            if pref is None:
+                print(f'{loc}: warning, spacing_pref has no preference array, omitting')
+            else:
+                pref_str = ', '.join(f'{v:.4f}' for v in pref)
+                lines.append(f'    pars[\'spacing_pref\'] = {{')
+                lines.append(f'        \'preference\': np.array([{pref_str}])')
+                lines.append(f'    }}')
+
+        lines.append('    return pars')
+        lines.append('')
+        lines.append('')
+        lines.append(f'def dataloader(location=\'{loc}\'):')
+        lines.append(f'    return fpld.DataLoader(location=location)')
+        lines.append('')
+
+        # Write the file
+        with open(loc_file, 'w') as f:
+            f.write('\n'.join(lines))
+
+        print(f'{loc}: updated {loc_file} (mismatch: {mismatch:.2f})')
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--location', type=str, default=None, help='Calibrate a single location')
+    parser.add_argument('--update', action='store_true', help='Update location .py files from saved results')
+    parser.add_argument('--trials', type=int, default=200, help='Number of Optuna trials (default: 200)')
+    parser.add_argument('--agents', type=int, default=5000, help='Number of agents (default: 5000)')
+    parser.add_argument('--force', action='store_true', help='With --update, overwrite location files even if parameters would be dropped')
+    args = parser.parse_args()
+
+    if args.update:
+        locs = [args.location] if args.location else None
+        update_location_files(locs, force=args.force)
+    else:
+        locs = [args.location] if args.location else None
+        calibrate(locs, total_trials=args.trials, n_agents=args.agents)

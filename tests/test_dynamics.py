@@ -175,10 +175,30 @@ def test_durations(location='senegal'):
     return [sim_base, sim_short]
 
 
+def test_fertility_rates():
+    sc.heading('Testing that fertility rates are non-zero...')
+
+    sim = fp.Sim(n_agents=1000, location='senegal', start=2000, stop=2005, seed=1, verbose=-1)
+    sim.run()
+
+    # Check that ASFR is non-zero
+    asfr = sim.people.fp.asfr
+    assert asfr.sum() > 0, 'ASFR should be non-zero after running a sim'
+    print(f'✓ (ASFR sum = {asfr.sum():.2f})')
+
+    # Check that TFR is non-zero
+    tfr = sim.results.fp.tfr
+    assert tfr.sum() > 0, 'TFR should be non-zero after running a sim'
+    print(f'✓ (TFR sum = {tfr.sum():.2f})')
+
+    return sim
+
+
 if __name__ == '__main__':
 
     sims1 = test_mcpr()
     sims2 = test_durations()
+    sim3 = test_fertility_rates()
 
     print('Done.')
 

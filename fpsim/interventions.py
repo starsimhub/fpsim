@@ -230,7 +230,7 @@ class add_method(ss.Intervention):
         # Cache the method index for later use (e.g., reporting and activation).
         self._method_idx = cm.methods[self.method.name].idx
 
-        fp_mod = sim.connectors.fp
+        fp_mod = sim.people.fp
         old_mix = fp_mod.method_mix
         # The FP module tracks method mix as an array of shape (n_methods, n_timepoints).
         # Adding a method increases the number of options, so we need to resize this array
@@ -282,7 +282,7 @@ class add_method(ss.Intervention):
 
         if self.verbose:
             sim = self.sim
-            fp_mod = sim.connectors.fp
+            fp_mod = sim.people.fp
 
             # Get final method usage for the new method
             final_usage = fp_mod.method_mix[self._method_idx, -1] if self._method_idx < fp_mod.method_mix.shape[0] else 0
@@ -831,7 +831,6 @@ class method_switching(ss.Intervention):
             from_methods='inj',
             to_method='dmpasc',
             switch_prob=0.10,
-            annual=False
         )
 
         # Different rates for different methods
@@ -840,7 +839,6 @@ class method_switching(ss.Intervention):
             from_methods=['dmpasc3', 'withdrawal', 'other_trad'],
             to_method='dmpasc6',
             switch_prob={'dmpasc3': 0.26, 'withdrawal': 0.20, 'other_trad': 0.20},
-            annual=False
         )
     """
 

@@ -864,17 +864,16 @@ class ContraceptiveChoice(ss.Connector):
     def init_post(self):
         """
          Decide who will start using contraception, when, which contraception method and the
-         duration on that method. This method is called by the simulation to initialise the
+         duration on that method. This method is called by the simulation to initialize the
          people object at the beginning of the simulation and new people born during the simulation.
          """
         super().init_post()
-        ppl = self.sim.people
-        fecund = ppl.female & (ppl.age < self.sim.pars.fp['age_limit_fecundity'])
-        fecund_uids = fecund.uids
+        fpppl = self.sim.people.fp
+        
+        # Get people who might use contraception
+        eligible_contra = fpppl.fecund & ~fpppl.pregnant & (fpppl.ti_contra == self.ti)
+        self.init_contraception(eligible_contra.uids)
 
-        # Look for women who have reached the time to choose
-        time_to_set_contra_uids = fecund_uids[(ppl.fp.ti_contra[fecund_uids] == 0)]
-        self.init_contraception(time_to_set_contra_uids)
         return
 
     def init_contraception(self, uids):
@@ -1274,9 +1273,9 @@ class SimpleChoice(RandomChoice):
                 dur_method[user_idxs] *= method.rel_dur_use  # Scale if needed
 
         dt = self.t.dt.months
-        timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].years)  # Include a maximum. Durs seem way too high
+        timesteps_til_update = np.clip(np.round(dur_method/dt), 1, self.pars['max_dur'].months)  # Include a maximum. Durs seem way too high
 
-        return timesteps_til_update
+        return timesteps_til_update.astype(int)
 
     def choose_method(self, uids, event=None, jitter=1e-4):
         ppl = self.sim.people
@@ -1359,6 +1358,7 @@ class StandardChoice(SimpleChoice):
         """
         ppl = self.sim.people
         year = self.t.year
+        fppars = self.sim.pars.fp
 
         # Figure out which coefficients to use
         if event is None : p = self.pars.contra_use_pars[0]
@@ -1374,8 +1374,8 @@ class StandardChoice(SimpleChoice):
 
         # Add age
         int_age = ppl.int_age(uids)
-        int_age[int_age < fpd.min_age] = fpd.min_age
-        int_age[int_age >= fpd.max_age_preg] = fpd.max_age_preg-1
+        int_age[int_age < fppars.method_age] = fppars.method_age
+        int_age[int_age >= fppars.max_age] = fppars.max_age-1
         dfa = self.pars.age_spline.loc[int_age]
         rhs += p.age_factors[0] * dfa['knot_1'].values + p.age_factors[1] * dfa['knot_2'].values + p.age_factors[2] * dfa['knot_3'].values
         rhs += (p.age_ever_user_factors[0] * dfa['knot_1'].values * ppl.ever_used_contra[uids]
@@ -1406,7 +1406,6 @@ class StandardChoice(SimpleChoice):
             return  # Skip if no coefficients available
         
         ppl = self.sim.people
-        fp_connector = self.sim.connectors.fp
 
         pp1 = self.ti - ppl.fp.ti_delivery <= 1
         nonpp1 = ~pp1  # Delivered last timestep
@@ -1419,7 +1418,7 @@ class StandardChoice(SimpleChoice):
                         ppl.alive &
                         nonpp1 &
                         bday &
-                        ~fp_connector.on_contra)  # Only update for women not currently on contraception
+                        ~ppl.fp.on_contra)  # Only update for women not currently on contraception
         eligible_uids = uids[eligible_mask[uids]] if len(uids) > 0 else eligible_mask.uids
         
         if len(eligible_uids) == 0:
@@ -1449,7 +1448,7 @@ class StandardChoice(SimpleChoice):
         # Reference category is "cannot-get-pregnant" (coefficient = 0)
         # fertility_intent_cat: 0=cannot-get-pregnant, 1=no, 2=yes
         if "fertility_intentno" in p and "fertility_intentyes" in p:
-            cat_intent = fp_connector.fertility_intent_cat[eligible_uids]
+            cat_intent = ppl.fp.fertility_intent_cat[eligible_uids]
             fi_contrib = np.zeros(len(eligible_uids))
             fi_contrib[cat_intent == 1] = p["fertility_intentno"]
             fi_contrib[cat_intent == 2] = p["fertility_intentyes"]
@@ -1463,13 +1462,13 @@ class StandardChoice(SimpleChoice):
         new_vals = self.pars.p_intent.rvs(eligible_uids)
         
         # Update the intent_to_use state
-        old_vals = fp_connector.intent_to_use[eligible_uids]
+        old_vals = ppl.fp.intent_to_use[eligible_uids]
         changers = eligible_uids[new_vals != old_vals]  # People whose intent changes
-        
+
         if len(changers) > 0:
             # Trigger update to contraceptive choices if intent changes
-            fp_connector.ti_contra[changers] = self.t.ti
-        
+            ppl.fp.ti_contra[changers] = self.t.ti
+
         # Update the state
-        fp_connector.intent_to_use[eligible_uids] = new_vals
+        ppl.fp.intent_to_use[eligible_uids] = new_vals
         return

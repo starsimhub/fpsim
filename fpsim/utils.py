@@ -23,7 +23,7 @@ def digitize_ages_1yr(ages):
     The bin index is used as an integer representation of the agent's age.
     """
     # Create age bins because ppl.age is a continous variable
-    age_cutoffs = np.arange(0, fpd.max_age + 1)
+    age_cutoffs = np.arange(0, fpd.spline_max_age + 1)
     return np.digitize(ages, age_cutoffs) - 1
 
 

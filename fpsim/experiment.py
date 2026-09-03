@@ -224,7 +224,7 @@ class Experiment(sc.prettyobj):
         # Model extraction
         age_bins = list(fpd.age_bin_map.keys())
         self.model['asfr_bins'] = age_bins
-        self.model['asfr'] = self.sim.connectors.fp.asfr[2:-1, -1]  # TODO fix
+        self.model['asfr'] = self.sim.people.fp.asfr[2:-1, -1]  # TODO fix
 
         # Check
         assert self.data['asfr_bins'] == self.model['asfr_bins'], f'ASFR data age bins do not match sim: {sc.strjoin(age_bins)}'
@@ -293,7 +293,11 @@ class Experiment(sc.prettyobj):
 
         # Extract age at first birth from model
         any_births_uids = ppl.alive.uids[ppl.female & (ppl.fp.parity>0)]
-        model_age_first = np.stack(ppl.fp.birth_ages[any_births_uids])[:,0]
+        if len(any_births_uids) > 0:
+            model_age_first = np.stack(ppl.fp.birth_ages[any_births_uids])[:,0]
+            model_age_first = model_age_first[~np.isnan(model_age_first)]  # Exclude women with only stillbirths
+        else:
+            model_age_first = np.array([])
 
         # Extract birth spaces and age at first birth from data
         for i, j in data_spaces.iterrows():
