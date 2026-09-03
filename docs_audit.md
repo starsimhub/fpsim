@@ -3,6 +3,9 @@
 FPsim, branch `rc3.6-port`, audited 2026-09-03 against IDM documentation standards
 (completeness, Diátaxis topic types, persona targeting, Python docstrings).
 
+**Status: most recommendations have since been actioned** -- see "Actions taken" at the
+end for what changed and what is still outstanding.
+
 ## 1. Summary
 
 FPsim's documentation is structurally sound and better than average for a research
@@ -134,3 +137,43 @@ Ranked by impact, then effort.
 | Persona targeting | Partial | Model-user well served; extender/builder underserved |
 | Docstring quality | Partial | 78% coverage, 19% `Args:`, 7% `Example:` |
 | Style linting (Vale) | **Missing** | No `vale.ini` or `.github/styles` |
+
+
+## 6. Actions taken (2026-09-03)
+
+Done:
+
+1. **Stale API fixed** -- T5 and four example files moved off `sim.connectors.fp`; the docs
+   site now renders clean end to end, which it did not before.
+2. **README** -- added the missing quick-start, led with what FPsim does rather than "this
+   repository contains", renamed the mislabeled "User guide" section.
+3. **Installation** -- split out of T1 into its own how-to.
+4. **Tutorials** -- `tutorials/index.qmd` is now the section landing page; T2-T5 have
+   explicit titles.
+5. **User guide** -- added Calibration and Contraception guides, each an explanation parent
+   with how-tos beneath, closing the Diátaxis gap. The recalibration how-to is promoted
+   from `fpsim/locations/CALIBRATION.md`, which users could not see.
+6. **Docstrings** -- Args and runnable Examples added to the user-facing classes in
+   `methods.py`, `analyzers.py` and `interventions.py`. Example coverage on those modules
+   went from 8 to 20 objects. Package-wide: coverage 79%, Args 22%, Example 10%.
+7. **Examples** -- all eight scripts fixed and now covered by `tests/test_examples.py`.
+
+Deliberately not done:
+
+- **Vale** -- `idm_standards` ships no `vale.ini` or style bundle, so this cannot be
+  satisfied by copying a template. Choosing a voice bundle (Microsoft, Google, custom) is a
+  team decision, and dropping one in would flag existing prose wholesale. Needs a decision
+  before it can be configured.
+
+Still outstanding:
+
+- **Docstring depth** -- Args and Example coverage remain low package-wide (22% and 10%).
+  The three user-facing modules are done; `plotting.py` (22 docstrings, 1 Args) and
+  `experiment.py` are the next most valuable.
+- **Broken analyzers** -- `track_as` (public), `track_parity` and `track_postpartum` assign
+  a plain dict to `self.results`, which Starsim 3.6.0 locks, so they raise on init. They
+  need porting to `ss.Results`.
+- **Docs build needs network** -- `quartodoc interlinks` fetches `objects.inv` from
+  scipy/numpy at build time and fails hard if unreachable; one render here failed on a
+  connection timeout and only succeeded on retry. Worth caching the inventories, given how
+  much the persona guidance emphasises low-connectivity users.
