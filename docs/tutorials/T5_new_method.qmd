@@ -1,8 +1,8 @@
 ---
+title: Adding a new method
 jupyter: python3
 ---
 
-# Adding a new method
 
 This tutorial shows how to use the **`add_method`** intervention to introduce a new contraceptive method into an FPsim run at a specified year. You can use it in several ways:
 

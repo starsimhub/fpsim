@@ -1,0 +1,41 @@
+---
+title: Installation
+---
+
+FPsim requires a working Python environment (Python 3.10 or later).
+
+## Install from PyPI
+
+For most users, install the latest release with:
+
+```
+pip install fpsim
+```
+
+You should then be able to import FPsim:
+
+```
+python -c "import fpsim as fp; print(fp.__version__)"
+```
+
+## Install from source
+
+To modify FPsim, or to work from the development version, clone the repository and
+install it in editable mode:
+
+```
+git clone https://github.com/fpsim/fpsim.git
+cd fpsim
+pip install -e .
+```
+
+To run the tests and build the documentation as well, install the development extras:
+
+```
+pip install -e .[dev]
+```
+
+## See also
+
+- [Tutorials](tutorials/index.qmd) to get started with your first simulation
+- [Contributing](contributing.md) if you plan to make changes to FPsim

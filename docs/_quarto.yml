@@ -48,8 +48,10 @@ website:
         href: overview.md
       - text: What's new
         href: whats-new.md
+      - text: Installation
+        href: installation.qmd
       - text: Tutorials
-        href: tutorials.md
+        href: tutorials/index.qmd
       - text: Code of conduct
         href: conduct.md
       - text: Contributing
@@ -67,8 +69,11 @@ website:
           href: overview.md
         - text: "**What's new**"
           href: whats-new.md
+        - text: "**Installation**"
+          href: installation.qmd
         - section: "**Tutorials**"
           contents:
+            - tutorials/index.qmd
             - tutorials/T1_intro.qmd
             - tutorials/T2_intro_to_new_features.qmd
             - tutorials/T3_interventions_methods.qmd

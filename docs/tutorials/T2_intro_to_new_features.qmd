@@ -1,8 +1,8 @@
 ---
+title: Understanding contraceptive use
 jupyter: python3
 ---
 
-# Understanding contraceptive use
 
 There are many factors that influence women's decisions about contraceptive use. FPsim 2.0 brings enhancements that incorporate these factors. It also provides users with new flexibility for defining their own logic for how women make contraceptive decisions. We will illustrate some of this functionality in this tutorial.
 

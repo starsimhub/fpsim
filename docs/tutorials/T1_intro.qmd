@@ -1,22 +1,10 @@
 ---
-title: Getting started - Requirements
+title: Getting started
 jupyter: python3
 ---
 
-Python (🐍):  This assumes that you have a python environment installed.
-
-To install FPsim, you first need to clone or download a copy of the source code from https://github.com/fpsim/fpsim
- 
-```
-git clone -b <branch> --single-branch https://github.com/fpsim/fpsim.git
-cd fpsim
-pip install -e .
-```
-
-If it worked, you should be able to import fpsim with `import fpsim as fp`.
-
-
-# Getting started with FPsim
+This tutorial covers defining parameters, running a simulation, and plotting the results.
+It assumes FPsim is already installed; if not, see [Installation](../installation.qmd).
 
 The basic design philosophy of FPsim is: **common modelling tasks should be simple**. For example:
 

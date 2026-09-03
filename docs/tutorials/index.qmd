@@ -1,0 +1,23 @@
+---
+title: Tutorials
+---
+
+These tutorials build up from a first simulation to customising FPsim with your own
+contraceptive methods. Work through them in order; each assumes the previous ones.
+
+If you have not installed FPsim yet, start with [Installation](../installation.qmd).
+
+| Tutorial | What it covers |
+|---|---|
+| [Getting started](T1_intro.qmd) | Defining parameters, running a simulation, plotting results |
+| [Understanding contraceptive use](T2_intro_to_new_features.qmd) | Contraceptive choice, method mix, and how use evolves |
+| [Interventions and methods](T3_interventions_methods.qmd) | Changing method efficacy and uptake with interventions |
+| [Intervention eligibility](T4_intervention_eligibility.qmd) | Targeting an intervention at a specific subpopulation |
+| [Adding a new method](T5_new_method.qmd) | Introducing a new contraceptive method mid-simulation |
+
+To run these locally rather than reading them, start a Jupyter environment in the
+`docs/tutorials` folder with either `jupyter lab` or `jupyter notebook`.
+
+## See also
+
+- [API reference](../api/index.qmd) for full details on the classes used here
