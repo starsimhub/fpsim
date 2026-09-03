@@ -202,16 +202,16 @@ class education_recorder(ss.Analyzer):
             rows, cols = sc.get_rows_cols(2)
 
             fig = pl.figure(**fig_args)
-            keys2 = ['edu_completed', 'edu_interrupted', 'edu_dropout']
+            keys2 = ['completed', 'interrupted', 'dropped']
             keys3 = ['pregnant', 'alive']
 
             k = 0
             pl.subplot(rows, cols, k + 1)
             age_data = self.trajectories["age"]
-            state = "edu_attainment"
+            state = "attainment"
             data = self.trajectories[state]
             pl.step(self.time, data[:, index], color="black", label=f"{state}", where='mid', **pl_args)
-            state = "edu_objective"
+            state = "objective"
             data = self.trajectories[state]
             pl.step(self.time, data[:, index], color="red", ls="--", label=f"{state}", where='mid', **pl_args)
             pl.ylim([0, 24])
@@ -225,9 +225,9 @@ class education_recorder(ss.Analyzer):
                 pl.subplot(rows, cols, k + 1)
                 data = self.trajectories[state]
                 if state in keys2:
-                    if state  == 'edu_interrupted':
+                    if state == 'interrupted':
                         pl.step(self.time, 3*data[:, index], color=[0.7, 0.7, 0.7], label=f"{state}", ls=":", where='mid', **pl_args)
-                    elif state == "edu_dropout":
+                    elif state == "dropped":
                         pl.step(self.time, 3*data[:, index], color="black", label=f"{state}", ls=":", where='mid', **pl_args)
                     else:
                         pl.step(self.time, 3*data[:, index], color="#2ca25f", label=f"{state}", where='mid', **pl_args)
@@ -262,8 +262,8 @@ class education_recorder(ss.Analyzer):
 
             from scipy.stats import gaussian_kde
 
-            data_att = self.trajectories["edu_attainment"]
-            data_obj = self.trajectories["edu_objective"]
+            data_att = self.trajectories["attainment"]
+            data_obj = self.trajectories["objective"]
             data_age = self.trajectories["age"]
 
             mask = (data_age < min_age) | (data_age > max_age) | np.isnan(data_age)
