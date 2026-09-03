@@ -1043,11 +1043,13 @@ class FPmod(ss.Pregnancy):
         Per-step result recording.
 
         Extends the parent to add:
+        - Total births (live births plus stillbirths)
         - Infant mortality rate (IMR) = infant_deaths / births * 1000
         - Method mix via compute_method_usage
         """
         super().update_results()
         ti = self.ti
+        self.results['total_births'][ti] = self.results['births'][ti] + self.results['stillbirths'][ti]
         self.results['imr'][ti] = sc.safedivide(self.results['infant_deaths'][ti], self.results['births'][ti]) * 1e3
         self.compute_method_usage()
         return
@@ -1075,10 +1077,12 @@ class FPmod(ss.Pregnancy):
         """
         Compute cumulative event counts after the simulation completes.
 
-        Adds cum_{key} results for each event type defined in fpd.event_counts
-        (e.g. cum_pregnancies, cum_births, cum_stillbirths, etc.).
+        Adds cum_{key} results for each event type in fpd.event_counts, and for the
+        parent Pregnancy results in fpd.inherited_counts (cum_births, cum_stillbirths,
+        cum_miscarriages, cum_pregnancies, cum_maternal_deaths), which the parent
+        does not accumulate itself.
         """
         super().finalize_results()
-        for res in fpd.event_counts:
+        for res in fpd.event_counts + fpd.inherited_counts:
             self.results[f'cum_{res}'] = np.cumsum(self.results[res])
         return

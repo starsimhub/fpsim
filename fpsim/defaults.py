@@ -212,10 +212,19 @@ event_counts = sc.autolist(
     # NB: stillbirths and miscarriages are defined by the parent Pregnancy class in starsim
     'abortions',
     'short_intervals',
-    'secondary_births',
     'total_births',
     'infant_deaths',
     'method_failures',
+)
+
+# Results owned by the parent Pregnancy class. We don't define these, but we do want
+# cumulative versions of them, which the parent does not provide.
+inherited_counts = sc.autolist(
+    'births',
+    'stillbirths',
+    'miscarriages',
+    'pregnancies',
+    'maternal_deaths',
 )
 
 people_counts = sc.autolist(
