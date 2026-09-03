@@ -12,6 +12,7 @@ Usage:
 
 import os
 import re
+import importlib.util
 import numpy as np
 import traceback
 import sciris as sc
@@ -119,6 +120,33 @@ scalar_keys = ['exposure_factor', 'prob_use_intercept', 'prob_use_trend_par',
 emitted_keys = set(scalar_keys) | {'exposure_age', 'exposure_parity', 'spacing_pref'}
 
 
+def _load_calib_pars(loc_file, tag):
+    """ Load make_calib_pars() from a location file without disturbing sys.modules """
+    spec = importlib.util.spec_from_file_location(f'_fpsim_loccheck_{tag}', loc_file)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.make_calib_pars()
+
+
+def _preserved_lines(loc_file):
+    """
+    Source lines for any make_calib_pars assignment this generator cannot emit
+    (e.g. method_weights, dur_postpartum), so hand-tuned values survive the rewrite.
+    Tracks bracket depth so multi-line assignments are carried over whole.
+    """
+    kept, keeping, depth = [], False, 0
+    for line in open(loc_file).read().splitlines():
+        match = re.match(r"\s*pars\['(\w+)'\]", line)
+        if match and not keeping:
+            keeping = match.group(1) not in emitted_keys
+        if keeping:
+            kept.append(line)
+            depth += sum(line.count(c) for c in '([{') - sum(line.count(c) for c in ')]}')
+            if depth <= 0:
+                keeping, depth = False, 0
+    return kept
+
+
 def update_location_files(locations=None, force=False):
     """
     Update each location's .py file with calibrated parameters from saved results.
@@ -144,15 +172,12 @@ def update_location_files(locations=None, force=False):
         pars = result['best_pars']
         mismatch = result['mismatch']
 
-        # Refuse to clobber parameters we cannot regenerate
+        # Capture what the file already defines, so nothing is silently lost
         loc_file = os.path.join(os.path.dirname(__file__), loc, f'{loc}.py')
-        if os.path.exists(loc_file):
-            existing = set(re.findall(r"pars\['(\w+)'\]", open(loc_file).read()))
-            dropped = existing - emitted_keys
-            if dropped and not force:
-                print(f'{loc}: SKIPPED, rewriting would drop {sorted(dropped)} from {loc_file}. '
-                      f'Port these by hand or re-run with --force to overwrite anyway.')
-                continue
+        existed = os.path.exists(loc_file)
+        original = open(loc_file).read() if existed else None
+        before = _load_calib_pars(loc_file, loc) if existed else {}
+        preserved = _preserved_lines(loc_file) if existed else []
 
         # Build the make_calib_pars function body
         lines = []
@@ -197,6 +222,8 @@ def update_location_files(locations=None, force=False):
                 lines.append(f'        \'preference\': np.array([{pref_str}])')
                 lines.append(f'    }}')
 
+        if preserved:  # Hand-tuned parameters the calibration does not fit
+            lines.extend(preserved)
         lines.append('    return pars')
         lines.append('')
         lines.append('')
@@ -208,7 +235,21 @@ def update_location_files(locations=None, force=False):
         with open(loc_file, 'w') as f:
             f.write('\n'.join(lines))
 
-        print(f'{loc}: updated {loc_file} (mismatch: {mismatch:.2f})')
+        # Verify the rewrite kept every parameter, and restore the original if not
+        try:
+            after = _load_calib_pars(loc_file, f'{loc}_new')
+            missing = sorted(set(before) - set(after))
+        except Exception as e:
+            after, missing = None, [f'<file failed to load: {e}>']
+        if missing and not force:
+            if original is not None:
+                with open(loc_file, 'w') as f:
+                    f.write(original)
+            print(f'{loc}: SKIPPED, rewrite would drop {missing}; original restored')
+            continue
+
+        kept = f', preserved {sorted(set(before) - set(emitted_keys))}' if preserved else ''
+        print(f'{loc}: updated {loc_file} (mismatch: {mismatch:.2f}){kept}')
 
 
 if __name__ == '__main__':
