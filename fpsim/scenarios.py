@@ -316,7 +316,8 @@ class Scenarios(sc.prettyobj):
 
         # Create msim
         if self.repeats == 1:
-            self.msim = ss.MultiSim(*[s for s in self.simslist])
+            # simslist holds one list of sims per scenario, so flatten before passing on
+            self.msim = ss.MultiSim(sims=[sim for sims in self.simslist for sim in sims])
         else:
             errormsg = 'Scenarios with repeats > 1 are not supported.'
             raise ValueError(errormsg)
@@ -337,19 +338,17 @@ class Scenarios(sc.prettyobj):
         return
 
 
-    def plot(self, to_plot=None, plot_sims=True, **kwargs):
-        ''' Plot the scenarios with bands -- see ``sim.plot()`` for args '''
+    def plot(self, key=None, **kwargs):
+        ''' Plot the scenarios -- see ``ss.MultiSim.plot()`` for args '''
         self.check_run()
-        if to_plot == 'method':
-            return self.msim.plot(to_plot=to_plot, plot_sims=plot_sims, **kwargs)
-        else:
-            return self.msim_merged.plot(to_plot=to_plot, plot_sims=plot_sims, **kwargs)
+        # There is only one multisim, since repeats > 1 is not supported
+        return self.msim.plot(key=key, **kwargs)
 
 
-    def plot_sims(self, to_plot=None, plot_sims=True, **kwargs):
-        ''' Plot each sim as a separate line across all senarios -- see ``sim.plot()`` for args '''
+    def plot_sims(self, key=None, **kwargs):
+        ''' Plot each sim as a separate line across all scenarios '''
         self.check_run()
-        return self.msim.plot(to_plot=to_plot, plot_sims=plot_sims, **kwargs)
+        return self.msim.plot(key=key, **kwargs)
 
     def analyze_sims(self, start=None, end=None):
         ''' Take a list of sims that have different labels and extrapolate statistics from each '''

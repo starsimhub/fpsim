@@ -23,7 +23,7 @@ def digitize_ages_1yr(ages):
     The bin index is used as an integer representation of the agent's age.
     """
     # Create age bins because ppl.age is a continous variable
-    age_cutoffs = np.arange(0, fpd.max_age + 1)
+    age_cutoffs = np.arange(0, fpd.spline_max_age + 1)
     return np.digitize(ages, age_cutoffs) - 1
 
 
@@ -145,7 +145,7 @@ def sigmoid_product(x, a1, b1, a2, b2):
 def gompertz(x, a, b, c):
     '''
     Compute the Gompertz function for a given set of parameters.
-    This function is used for describing mortality and ageing-like processes.
+    This function is used for describing mortality and aging-like processes.
 
     See:
     https://en.wikipedia.org/wiki/Gompertz_function

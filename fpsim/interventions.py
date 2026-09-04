@@ -230,7 +230,7 @@ class add_method(ss.Intervention):
         # Cache the method index for later use (e.g., reporting and activation).
         self._method_idx = cm.methods[self.method.name].idx
 
-        fp_mod = sim.connectors.fp
+        fp_mod = sim.people.fp
         old_mix = fp_mod.method_mix
         # The FP module tracks method mix as an array of shape (n_methods, n_timepoints).
         # Adding a method increases the number of options, so we need to resize this array
@@ -282,7 +282,7 @@ class add_method(ss.Intervention):
 
         if self.verbose:
             sim = self.sim
-            fp_mod = sim.connectors.fp
+            fp_mod = sim.people.fp
 
             # Get final method usage for the new method
             final_usage = fp_mod.method_mix[self._method_idx, -1] if self._method_idx < fp_mod.method_mix.shape[0] else 0
@@ -313,6 +313,13 @@ class change_people_state(ss.Intervention):
                      who will have the new state value
         annual      (bool): whether the increase, prop, represents a "per year" increase, or per time step
 
+    **Example**::
+
+        # Move 10% of eligible women to urban in 2010
+        def eligible(sim): return sim.people.female & (sim.people.age > 18)
+        intv = fp.change_people_state('urban', new_val=True, years=2010,
+                                      eligibility=eligible, prop=0.1)
+        sim = fp.Sim(location='kenya', interventions=intv).run()
     """
 
     def __init__(self, state_name, new_val, years=None, eligibility=None, prop=1.0, annual=False, **kwargs):
@@ -422,6 +429,11 @@ class update_methods(ss.Intervention):
         p_use (float): probability of using any form of contraception
         method_mix (list/arr): probabilities of selecting each form of contraception
 
+    **Example**::
+
+        # Raise injectable efficacy from 2010; methods are named by label here
+        intv = fp.update_methods(year=2010, eff={'Injectables': 0.99})
+        sim = fp.Sim(location='kenya', interventions=intv).run()
     """
 
     def __init__(self, year, eff=None, dur_use=None, p_use=None, method_mix=None,
@@ -501,7 +513,7 @@ class update_methods(ss.Intervention):
 
             # Change in method mix
             if self.pars.method_mix is not None:
-                this_mix = self.pars.method_mix / np.sum(self.pars.method_mix) # Renormalise in case they are not adding up to 1
+                this_mix = self.pars.method_mix / np.sum(self.pars.method_mix) # Renormalize in case they are not adding up to 1
                 cm.pars['method_mix'] = this_mix
             
             # Change in switching matrix
@@ -521,6 +533,12 @@ class change_initiation_prob(ss.Intervention):
         year (float): The year in which this intervention will be applied
         prob_use_intercept (float): A number that changes the intercept in the logistic regression model
         p_use = 1 / (1 + np.exp(-rhs + p_use_time_trend + p_use_intercept))
+
+    **Example**::
+
+        # Raise the contraceptive uptake intercept from 2010
+        intv = fp.change_initiation_prob(year=2010, prob_use_intercept=0.5)
+        sim = fp.Sim(location='kenya', interventions=intv).run()
     """
 
     def __init__(self, year=None, prob_use_intercept=0.0, verbose=False, **kwargs):
@@ -535,12 +553,12 @@ class change_initiation_prob(ss.Intervention):
     def init_pre(self, sim=None):
         super().init_pre(sim)
         # self._validate()
-        if isinstance(sim.people.contraception_module, (fpm.SimpleChoice)):
+        if isinstance(sim.connectors.contraception, (fpm.SimpleChoice)):
             self.par_name = 'prob_use_intercept'
 
         if self.par_name is None:
             errormsg = (
-                f"Contraceptive module  {type(sim.people.contraception_module)} does not have `{self.par_name}` parameter.")
+                f"Contraceptive module {type(sim.connectors.contraception)} does not have `{self.par_name}` parameter.")
             raise ValueError(errormsg)
 
         return
@@ -554,7 +572,7 @@ class change_initiation_prob(ss.Intervention):
         sim = self.sim
         if not self.applied and sim.t.year >= self.year:
             self.applied = True # Ensure we don't apply this more than once
-            sim.people.contraception_module.pars[self.par_name] = self.prob_use_intercept
+            sim.connectors.contraception.pars[self.par_name] = self.prob_use_intercept
 
         return
 
@@ -588,6 +606,12 @@ class change_initiation(ss.Intervention):
             natural method distribution.
         final_perc (float, optional): If provided, perc will scale linearly from initial perc to
             final_perc over the intervention period. Enables scale-up scenarios.
+
+    **Example**::
+
+        # Increase initiation by 5% per year from 2010
+        intv = fp.change_initiation(years=2010, perc=0.05)
+        sim = fp.Sim(location='kenya', interventions=intv).run()
     """
 
     def __init__(self, years=None, eligibility=None, perc=0.0, annual=True, force_theoretical=False,
@@ -831,7 +855,6 @@ class method_switching(ss.Intervention):
             from_methods='inj',
             to_method='dmpasc',
             switch_prob=0.10,
-            annual=False
         )
 
         # Different rates for different methods
@@ -840,7 +863,6 @@ class method_switching(ss.Intervention):
             from_methods=['dmpasc3', 'withdrawal', 'other_trad'],
             to_method='dmpasc6',
             switch_prob={'dmpasc3': 0.26, 'withdrawal': 0.20, 'other_trad': 0.20},
-            annual=False
         )
     """
 

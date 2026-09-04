@@ -1,8 +1,8 @@
 ---
+title: Interventions and methods
 jupyter: python3
 ---
 
-# Interventions
 
 At this point, you should now be able to run a single sim, using default or custom parameters and plot the results. In this tutorial, you will learn how to use interventions.
 

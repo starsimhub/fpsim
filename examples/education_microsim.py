@@ -8,15 +8,14 @@ import matplotlib.pyplot as plt
 
 # Set options
 do_plot = True
-pars = fp.pars(location='kenya')
-pars['n_agents'] = 50  # Small population size
+pars = dict(location='kenya', n_agents=50)  # Small population size
 
 sc.tic()
-sim = fp.Sim(pars=pars, analyzers=[fp.education_recorder()], education_module=fp.Education())
+sim = fp.Sim(pars=pars, analyzers=[fp.education_recorder()], education_module=fp.Education(location='kenya'))
 sim.run()
 
 if do_plot:
-    edu_analyzer= sim.get_analyzers()[0]
+    edu_analyzer = sim.analyzers[0]
     # Plot a subset of the available trajectories for female individuals
     for idx in range(max(2, edu_analyzer.max_agents//8)):
         edu_analyzer.plot(index=idx)

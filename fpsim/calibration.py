@@ -246,7 +246,27 @@ class Calibration(sc.prettyobj):
                 loc_module.make_calib_pars = self._original_calib
             self._original_calib = None
 
+    def _get_n_spacing_bins(self):
+        """
+        Get the number of spacing_pref bins for the current location.
 
+        Locations differ (most have 19 bins, senegal and ethiopia have 17), so this
+        must be read from the location data rather than assumed; fpd.default_n_spacing_bins
+        is only used when the location has no spacing_pref data.
+        """
+        if not hasattr(self, '_n_spacing_bins'):
+            location = self.pars.get('location')
+            if location is None:  # No location means default parameters, which use the default bins
+                self._n_spacing_bins = fpd.default_n_spacing_bins
+            else:
+                data = fplocs.data_utils.DataLoader(location=location).load()
+                pref = data.get('fp', {}).get('spacing_pref', {}).get('preference', None)
+                if pref is None:
+                    print(f'Warning: no spacing_pref data for {location}, using {fpd.default_n_spacing_bins} bins')
+                    self._n_spacing_bins = fpd.default_n_spacing_bins
+                else:
+                    self._n_spacing_bins = len(pref)
+        return self._n_spacing_bins
 
     def run_exp(self, calib_pars, return_exp=False, **kwargs):
         """ Create and run an experiment """
@@ -333,7 +353,7 @@ class Calibration(sc.prettyobj):
             strength = trial.suggest_float('spacing_suppress_strength', defs['strength'][1], defs['strength'][2])
 
             # Build spacing_pref array: 1.0 before start_bin, linear ramp down after
-            n_bins = fpd.default_n_spacing_bins
+            n_bins = self._get_n_spacing_bins()
             pref = np.ones(n_bins)
             if start_bin < n_bins:
                 n_suppress = n_bins - start_bin
@@ -435,7 +455,7 @@ class Calibration(sc.prettyobj):
         if self.fit_spacing_pref:
             start_bin = int(round(self.best_pars.pop('spacing_suppress_start')))
             strength = self.best_pars.pop('spacing_suppress_strength')
-            n_bins = fpd.default_n_spacing_bins
+            n_bins = self._get_n_spacing_bins()
             pref = np.ones(n_bins)
             if start_bin < n_bins:
                 n_suppress = n_bins - start_bin

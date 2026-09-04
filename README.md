@@ -1,10 +1,28 @@
 # FPsim: Family Planning Simulator
 
-This repository contains the code for the Institute for Disease Modeling's family planning simulator, FPsim.
+FPsim is the Institute for Disease Modeling's agent-based model of family planning. It
+simulates women's contraceptive and reproductive histories over the life course, so that
+program and policy questions -- what happens if a new method is introduced, or if access
+changes for younger women -- can be explored before committing resources. It is calibrated
+to nine settings across sub-Saharan Africa and South Asia.
 
 **FPsim is currently under development**.
 
-## User guide
+## Quick start
+
+Install with `pip install fpsim`, then:
+
+```python
+import fpsim as fp
+
+sim = fp.Sim(location='kenya', n_agents=1000, start_year=2000, end_year=2020)
+sim.run()
+sim.plot()
+```
+
+See the [tutorials](https://docs.fpsim.org/tutorials.html) to go further.
+
+## When to use FPsim
 
 FPsim is designed as an open-source tool for family planning research.
 However, it is not a silver bullet tool. It is designed to answer

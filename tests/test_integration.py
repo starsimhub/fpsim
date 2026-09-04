@@ -30,6 +30,43 @@ f_age_pyramid[0,:] = [0, 100, 100]
 f_age_pyramid[0,:] = [75, 100, 100]
 
 
+class BirthOutcomes(ss.Analyzer):
+    """
+    Follow the women who conceive in the first few timesteps through to the outcome of
+    that specific pregnancy.
+
+    Gestation is drawn from starsim's 32-42 week distribution, so a conception cohort's
+    deliveries are spread over several timesteps and any fixed birth window also catches
+    later conceptions. Recording each outcome as it happens avoids both problems, and is
+    immune to ti_pregnant being overwritten by a subsequent pregnancy.
+    """
+    def __init__(self, max_ti=2):
+        super().__init__()
+        self.max_ti = max_ti  # Last timestep on which conceptions join the cohort
+        self.cohort = set()
+        self.resolved = set()
+        self.counts = dict(live_birth=0, stillbirth=0, miscarriage=0, abortion=0)
+        return
+
+    def step(self):
+        mod = self.sim.people.fp
+        ti = self.sim.ti
+        if ti <= self.max_ti:
+            # Abortions clear ti_pregnant in the same step they conceive, so count them separately
+            self.cohort.update((mod.ti_pregnant == ti).uids.tolist() + (mod.ti_abortion == ti).uids.tolist())
+
+        pending = self.cohort - self.resolved
+        if pending:
+            uids = ss.uids(sorted(pending))
+            outcomes = [('live_birth', mod.ti_live_birth), ('stillbirth', mod.ti_stillbirth),
+                        ('miscarriage', mod.ti_miscarriage), ('abortion', mod.ti_abortion)]
+            for key, state in outcomes:
+                hit = uids[state[uids] == ti]
+                self.counts[key] += len(hit)
+                self.resolved.update(np.asarray(hit).tolist())  # Only count each woman's first outcome
+        return
+
+
 def test_pregnant_women():
     sc.heading('Test pregnancy and birth outcomes... ')
 
@@ -54,19 +91,20 @@ def test_pregnant_women():
 
     custom_pars = {
         'start_year': 2000,
-        'end_year': 2001,
+        'end_year': 2002,  # Long enough for the months 0-2 conception cohort to fully resolve
         'n_agents': 1000,
         'test': True,
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
-        'primary_infertility': 0,
+        'p_infertile': 0,
+        'burnin': False,
         'sexual_activity': sexual_activity,
         'exposure_factor': 1,
         'exposure_age': dict(age=[0, 50], rel_exp=[1, 1]),
         'exposure_parity': dict(parity=[0, 20], rel_exp=[1, 1]),
     }
 
-    sim = fp.Sim(pars=custom_pars, contraception_module=contra_mod)
+    sim = fp.Sim(pars=custom_pars, contraception_module=contra_mod, analyzers=BirthOutcomes())
     sim.init()
 
     # Override fecundity to maximize pregnancies and minimize variation during test
@@ -84,30 +122,30 @@ def test_pregnant_women():
     assert (fecundity24*1.1) * n_agents > sim.results.fp.pregnancies[0:12].sum() > (fecundity24*0.9) * n_agents, "Expected number of pregnancies not met"
     print(f'✓ ({sim.results.fp.pregnancies[0:12].sum()} pregnancies, as expected)')
 
-    # stillbirth rate: 2.5% of all pregnancies, but only count completed pregnancies
-    assert 0.06 * sim.results.fp.pregnancies[0:3].sum() > sim.results.fp.stillbirths[9:12].sum() > 0.01 * sim.results.fp.pregnancies[0:3].sum() , "Expected number of stillbirths not met"
-    print(f'✓ ({sim.results.fp.stillbirths[9:12].sum()} stillbirths, as expected)')
+    # Outcomes are checked against the cohort who conceived in months 0-2, followed to the
+    # resolution of that pregnancy, rather than against fixed result windows
+    outcomes = sim.analyzers[0]
+    cohort = len(outcomes.cohort)
+    counts = outcomes.counts
+    unresolved = cohort - sum(counts.values())
+    assert unresolved == 0, f"{unresolved} of {cohort} cohort pregnancies never resolved"
+    print(f'✓ (all {cohort} cohort pregnancies resolved)')
 
-    # miscarriage rate: 10% of all pregnancies. Miscarriages are calculated at end of 1st trimester, so pregnancies from months 0-9
-    # have miscarriages from months 3-12.
-    pregnancies = sim.results.fp.pregnancies[0:9].sum()
-    miscarriages = sim.results.fp.miscarriages[3:12].sum()
-    assert 0.15 * pregnancies > miscarriages > 0.05 * pregnancies, "Expected number of miscarriages not met"
-    print(f'✓ ({miscarriages} miscarriages, as expected)')
+    # stillbirth rate: 2.5% of all pregnancies
+    assert 0.06 * cohort > counts['stillbirth'] > 0.01 * cohort, "Expected number of stillbirths not met"
+    print(f'✓ ({counts["stillbirth"]} stillbirths, as expected)')
+
+    # miscarriage rate: 10% of all pregnancies
+    assert 0.15 * cohort > counts['miscarriage'] > 0.05 * cohort, "Expected number of miscarriages not met"
+    print(f'✓ ({counts["miscarriage"]} miscarriages, as expected)')
 
     # abortion rate: 8% of all pregnancies
-    # abortions occur at same timestep as conception, so all pregnancies were checked for abortions
-    pregnancies = sim.results.fp.pregnancies.sum()
-    abortions = sim.results.fp.abortions.sum()
-    assert 0.13 * pregnancies > abortions > 0.03 * pregnancies, "Expected number of abortions not met"
-    print(f'✓ ({abortions} abortions, as expected)')
+    assert 0.13 * cohort > counts['abortion'] > 0.03 * cohort, "Expected number of abortions not met"
+    print(f'✓ ({counts["abortion"]} abortions, as expected)')
 
     # live birth rate: 79.5% of all pregnancies
-    # no premature births so all births are full term
-    pregnancies = sim.results.fp.pregnancies[0:3].sum()
-    live_births = sim.results.fp.births[9:12].sum()
-    assert 0.85 * pregnancies > live_births > 0.75 * pregnancies, "Expected number of live births not met"
-    print(f'✓ ({live_births} live births from {pregnancies} pregnancies, as expected)')
+    assert 0.85 * cohort > counts['live_birth'] > 0.75 * cohort, "Expected number of live births not met"
+    print(f'✓ ({counts["live_birth"]} live births from {cohort} pregnancies, as expected)')
 
     return sim
 
@@ -147,7 +185,7 @@ def test_contraception():
         'location': 'senegal',
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
-        'primary_infertility': 0,
+        'p_infertile': 0,
         'sexual_activity': sexual_activity,
     }
 
@@ -182,7 +220,7 @@ def test_method_selection_dependencies():
         'start_year': 2000,
         'end_year': 2001,
         'n_agents': 1000,
-        'primary_infertility': 1,  # make sure no pregnancies!
+        'p_infertile': 1,  # make sure no pregnancies!
     }
 
     cm_pars = dict(
@@ -231,21 +269,16 @@ def test_education_preg():
     sc.heading('Testing that lower fertility rate leads to more education...')
 
     def make_sim(pregnant=False):
-        pars = dict(start=2000, stop=2010, n_agents=1000, test=True)
+        pars = dict(start=2000, stop=2001, n_agents=1000, test=True, burnin=False)
         sim = fp.Sim(pars=pars)
         sim.init()
         sim.people.age[:] = 15
         sim.people.female[:] = True
-        fpppl = sim.people.fp
+        uids = sim.people.female.uids
         if pregnant:
-            fpppl.gestation[:] = 1  # Start the counter at 1
-            fpppl.dur_pregnancy[:] = 9  # Set pregnancy duration
-            fpppl.ti_delivery[:] = 9  # Set time of delivery
-            fpppl.ti_pregnant[:] = 0
-            fpppl.pregnant[:] = True
-            fpppl.method[:] = 0
-            fpppl.on_contra[:] = False
-            fpppl.ti_contra[:] = 12
+            embryo_counts = np.ones(len(uids))
+            sim.demographics.fp.make_pregnancies(uids)
+            sim.demographics.fp.make_embryos(uids, embryo_counts)
         return sim
 
     sim_base = make_sim()

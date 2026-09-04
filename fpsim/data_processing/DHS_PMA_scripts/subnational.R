@@ -6,7 +6,9 @@
 ################################################################
 
 
-rm(list=ls())
+# Clear environment (preserve run control variables)
+run_vars <- ls(pattern = "^run_")
+rm(list = setdiff(ls(), run_vars))
 
 
 # -- Libraries -- #

@@ -180,3 +180,7 @@ campaign.json
 .DS_Store
 dropbox/.DS_Store
 .DS_Store
+
+# Optuna calibration databases
+fpsim_calib_*.db
+fpsim_calibration.db

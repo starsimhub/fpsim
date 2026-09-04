@@ -90,7 +90,7 @@ def test_method_usage(sim=None):
     """ Test that method usage proportions add to 1 and correspond to population """
     if sim is None:
         sim = fp.Sim(test=True).run()
-    proportions = sim.connectors.fp.method_mix.sum(axis=0)
+    proportions = sim.demographics.fp.method_mix.sum(axis=0)
     assert np.isclose(proportions, 1, atol=0.0001).all()
     return
 

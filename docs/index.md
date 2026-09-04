@@ -7,7 +7,8 @@ FPsim is the Institute for Disease Modeling's family planning simulator, an agen
 ## Full contents
 
 - [Overview](overview.md)
-- [Tutorials](tutorials.md)
+- [Installation](installation.qmd)
+- [Tutorials](tutorials/index.qmd)
 - [What's new](whats-new.md)
 - [Code of conduct](conduct.md)
 - [Contributing](contributing.md)

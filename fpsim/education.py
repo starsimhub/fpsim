@@ -94,25 +94,35 @@ class Education(ss.Connector):
 
     def set_objective_dists(self, objective_data):
         """
-        Return an educational objective distribution based on provided data.
-        The data should be provided in the form of a pandas DataFrame with
-         "edu" and "percent" as columns.
-        Returns:
-            An ``ss.Dist`` instance that returns an educational objective for newly created agents
+        Set the educational objective distributions from provided data.
+
+        Data should be a pandas DataFrame with "edu" and "percent" columns, and
+        optionally "urban". Always sets ``_objective_dists`` to a two-element list
+        indexed by urban status (0 = rural, 1 = urban), since that is how
+        [`init_objectives`](`fpsim.education.Education.init_objectives`) draws from it.
+        Without urban-stratified data both entries are the same distribution.
+
+        Args:
+            objective_data (DataFrame): educational objective data, or None to use an
+                uninformative uniform distribution over 0-24 years
         """
-        if objective_data is None:
-            self._objective_dists = ss.uniform(low=0, high=24, name='Educational objective distribution')
-        else:
-            # Process
-            if isinstance(objective_data, pd.DataFrame):
-                # Check whether urban is a column
+        def uninformative(is_urb):
+            return ss.uniform(low=0, high=24, name=f'Edu obj, urban: {is_urb}')
+
+        if objective_data is None:  # No data, so rural and urban share an uninformative distribution
+            self._objective_dists = [uninformative(is_urb) for is_urb in [0, 1]]
+        elif isinstance(objective_data, pd.DataFrame):
+            self._objective_dists = sc.autolist()
+            for is_urb in [0, 1]:
                 if 'urban' in objective_data.columns:
-                    self._objective_dists = sc.autolist()
-                    for is_urb in [0, 1]:
-                        df = objective_data.loc[objective_data.urban == is_urb]
-                        bins = df['edu'].values
-                        props = df['percent'].values
-                        self._objective_dists += ss.histogram(values=props, bins=bins, name=f'Edu obj, urban: {is_urb}')
+                    df = objective_data.loc[objective_data.urban == is_urb]
+                else:  # Not stratified by urban, so use the same data for both
+                    df = objective_data
+                self._objective_dists += ss.histogram(values=df['percent'].values, bins=df['edu'].values,
+                                                      name=f'Edu obj, urban: {is_urb}')
+        else:
+            errormsg = f'Educational objective data must be a DataFrame or None, not {type(objective_data)}'
+            raise TypeError(errormsg)
         return
 
     def init_post(self):
@@ -127,7 +137,7 @@ class Education(ss.Connector):
             return
         else:
             ppl = self.sim.people
-            f_uids = self.sim.people.female.uids
+            f_uids = (self.sim.people.female & (self.sim.people.age > 0)).uids
             if isinstance(self.attainment_data, pd.DataFrame):
                 edu = self.attainment_data['edu']
                 f_ages = np.floor(ppl.age[f_uids]).astype(int)
@@ -207,9 +217,9 @@ class Education(ss.Connector):
         Interrupt education due to pregnancy. This method hinders education progression if a
         woman is pregnant and towards the end of the first trimester
         """
-        ppl = self.sim.people
+        fp = self.sim.demographics.fp
         # Hinder education progression if a woman is pregnant and towards the end of the first trimester
-        pregnant_students = self.in_school & ppl.fp.pregnant & (ppl.fp.gestation == self.sim.pars.fp['end_first_tri'])
+        pregnant_students = fp.end_tri1_uids[self.in_school[fp.end_tri1_uids]]
         self.interrupted[pregnant_students] = True
         return
 
@@ -255,14 +265,14 @@ class Education(ss.Connector):
         # If education was interrupted due to pregnancy, resume after 9 months pospartum ()
         # TODO: check if there's any evidence supporting this assumption
         """
-        ppl = self.sim.people
+        fp = self.sim.demographics.fp
         # Basic mechanism to resume education post-pregnancy:
         # If education was interrupted due to pregnancy, resume after 9 months pospartum
-        postpartum_students = (ppl.fp.postpartum &
+        postpartum_students = (fp.postpartum &
                                 self.interrupted &
                                 ~self.completed &
                                 ~self.dropped &
-                                ((self.ti - ppl.fp.ti_delivery) > 9)  # 9 months postpartum
+                                ((self.ti - fp.ti_delivery) > 9)  # 9 months postpartum
                                 )
         self.interrupted[postpartum_students] = False
         return
