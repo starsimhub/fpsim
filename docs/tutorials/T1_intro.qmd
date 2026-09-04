@@ -6,7 +6,7 @@ jupyter: python3
 This tutorial covers defining parameters, running a simulation, and plotting the results.
 It assumes FPsim is already installed; if not, see [Installation](../installation.qmd).
 
-The basic design philosophy of FPsim is: **common modelling tasks should be simple**. For example:
+The basic design philosophy of FPsim is: **common modeling tasks should be simple**. For example:
 
 - Defining parameters
 - Running a simulation

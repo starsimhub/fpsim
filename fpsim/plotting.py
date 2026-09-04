@@ -569,7 +569,7 @@ def plot_afb(sim, ax=None, legend_kwargs={}):
     # Plot
     sns.histplot(model_afb, stat='proportion', kde=True, binwidth=1, color='cornflowerblue', label='FPsim', ax=ax)
     sns.histplot(x=data_afb_vals, stat='proportion', kde=True, weights=data_afb_weights,
-                 binwidth=1, color='dimgrey', label='DHS data', ax=ax)
+                 binwidth=1, color='dimgray', label='DHS data', ax=ax)
     ax.set_xlabel('Age at first birth')
     if Config.show_rmse:
         ax.set_title(f"Age at First Birth\n(RMSE: {rmse_scores['afb']:.2f})")

@@ -31,7 +31,7 @@ s.run()
 
 ## The SimpleChoice and RandomChoice modules
 
-Whilst the `StandardChoice` module will be appropriate for most analyses, we have also included two simpler versions, `SimpleChoice` and `RandomChoice`. 
+While the `StandardChoice` module will be appropriate for most analyses, we have also included two simpler versions, `SimpleChoice` and `RandomChoice`. 
 
 In the `SimpleChoice` module, a woman's decision about whether to use contraception only depends on her age and whether or not she has ever used contraception before. Compared to the `StandardChoice` module, the `SimpleChoice` module disregards the influence of women's education, wealth, parity, and urban/rural status on her contraceptive decisions.
 

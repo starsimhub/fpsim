@@ -4,7 +4,7 @@ title: Contraception
 
 Contraception in FPsim has two parts: the **methods** that exist, and the **choice module**
 that decides who uses which one. They are separate, so you can change the method list
-without touching choice behaviour, or swap the choice model while keeping the same methods.
+without touching choice behavior, or swap the choice model while keeping the same methods.
 
 ## Methods
 
@@ -30,7 +30,7 @@ makes the method mix sum to one.
 The choice module decides, for each woman at each decision point, whether she uses a method
 and which one. FPsim provides three:
 
-| Module | Behaviour |
+| Module | Behavior |
 |---|---|
 | `RandomChoice` | Uniform random choice among methods; mainly for testing |
 | `SimpleChoice` | Choice depends on age and parity, fitted per location |

@@ -2,7 +2,7 @@
 title: Tutorials
 ---
 
-These tutorials build up from a first simulation to customising FPsim with your own
+These tutorials build up from a first simulation to customizing FPsim with your own
 contraceptive methods. Work through them in order; each assumes the previous ones.
 
 If you have not installed FPsim yet, start with [Installation](../installation.qmd).

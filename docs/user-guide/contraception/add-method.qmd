@@ -14,7 +14,7 @@ which a brand-new method does not have -- passing them an unknown method raises 
 
 So there are two workable routes:
 
-- **`fp.add_method` with `copy_from`**, which inherits an existing method's behaviour. This
+- **`fp.add_method` with `copy_from`**, which inherits an existing method's behavior. This
   is the right choice for essentially all real analyses.
 - **Building the method list directly**, which only works with `RandomChoice` unless you
   also supply the fitted data. `RandomChoice` allocates methods uniformly at random, so it
@@ -43,8 +43,8 @@ sim.run()
 ## Introduce a method partway through (recommended)
 
 The `fp.add_method` intervention adds a method at a given year, copying the uptake
-behaviour of an existing method. Pass the new method's attributes in `method_pars` and name
-the method to copy switching behaviour from in `copy_from`:
+behavior of an existing method. Pass the new method's attributes in `method_pars` and name
+the method to copy switching behavior from in `copy_from`:
 
 ```python
 import starsim as ss
@@ -52,7 +52,7 @@ import fpsim as fp
 
 intv = fp.add_method(
     year        = 2010,
-    copy_from   = 'inj',  # Inherit switching behaviour from injectables
+    copy_from   = 'inj',  # Inherit switching behavior from injectables
     method_pars = dict(
         name     = 'dmpasc',
         label    = 'DMPA-SC',

@@ -145,7 +145,7 @@ def sigmoid_product(x, a1, b1, a2, b2):
 def gompertz(x, a, b, c):
     '''
     Compute the Gompertz function for a given set of parameters.
-    This function is used for describing mortality and ageing-like processes.
+    This function is used for describing mortality and aging-like processes.
 
     See:
     https://en.wikipedia.org/wiki/Gompertz_function

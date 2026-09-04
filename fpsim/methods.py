@@ -1184,7 +1184,7 @@ class SimpleChoice(RandomChoice):
     string or a data dictionary. Because the fit is per method, passing a method list that
     contains a method with no fitted duration data raises an ``IndexError``; to introduce a
     new method use the [add_method](`fpsim.interventions.add_method`) intervention with
-    ``copy_from``, which inherits an existing method's behaviour.
+    ``copy_from``, which inherits an existing method's behavior.
 
     Args:
         pars (dict): parameters for the choice module

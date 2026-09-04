@@ -9,7 +9,7 @@ changing what contraceptive methods exist and who uses them.
 - **[Calibration](calibration/index.qmd)** -- what FPsim fits, how mismatch is computed,
   and how to recalibrate a location.
 - **[Contraception](contraception/index.qmd)** -- how methods are defined, how choice is
-  modelled, and how to introduce a new method.
+  modeled, and how to introduce a new method.
 
 Each section starts with an explanation of how the mechanism works, followed by how-to
 topics for specific tasks.

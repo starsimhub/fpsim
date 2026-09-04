@@ -11,7 +11,7 @@ contraceptive-use patterns for a setting.
 FPsim distinguishes two kinds of parameters. **Model parameters** describe mechanisms
 believed to be common across settings -- gestation length, method efficacy, the shape of
 the postpartum infecundability curve. These are fixed from the literature and are not
-calibrated. **Calibration parameters** absorb setting-specific behaviour that cannot be
+calibrated. **Calibration parameters** absorb setting-specific behavior that cannot be
 observed directly, and live in each location's `make_calib_pars()` function.
 
 The calibrated parameters are:
@@ -26,14 +26,14 @@ The calibrated parameters are:
 | `spacing_pref` | Preference for spacing births at given intervals |
 
 Together these are a 26-dimensional search space, which is why calibration uses an
-optimiser rather than hand-tuning.
+optimizer rather than hand-tuning.
 
 Two parameters that appear in location files, `method_weights` and `dur_postpartum`, are
 *not* calibrated -- they are set by hand and preserved across recalibration.
 
 ## How mismatch is computed
 
-Calibration minimises a weighted sum of mismatches between model output and data.
+Calibration minimizes a weighted sum of mismatches between model output and data.
 Components are weighted by how much they matter for the model's intended use, so the
 fertility and contraceptive-use targets dominate:
 
@@ -46,7 +46,7 @@ A lower mismatch is better, but the absolute number is only meaningful relative 
 runs of the same configuration. Comparing mismatch across locations is not meaningful,
 since each has different data available.
 
-## Why the optimiser is not the whole story
+## Why the optimizer is not the whole story
 
 The `exposure_age` and `exposure_parity` curves have many free knots that trade off
 against each other, so two calibrations with near-identical mismatch can have visibly

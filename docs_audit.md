@@ -22,7 +22,7 @@ nowhere to go.
 - **The README's caveats section is genuinely excellent.** "FPsim is not a replacement
   for good data", "cannot predict exogenous events", and the prompt to check whether
   descriptive statistics would answer the question are exactly the guidance the
-  model-user persona needs, and most modelling repos omit it entirely.
+  model-user persona needs, and most modeling repos omit it entirely.
 - **API reference coverage is essentially complete.** Every module except `version` is
   listed in the `quartodoc` config, with `parser: google` and `render_interlinks: true`
   correctly set.
@@ -176,4 +176,4 @@ Still outstanding:
 - **Docs build needs network** -- `quartodoc interlinks` fetches `objects.inv` from
   scipy/numpy at build time and fails hard if unreachable; one render here failed on a
   connection timeout and only succeeded on retry. Worth caching the inventories, given how
-  much the persona guidance emphasises low-connectivity users.
+  much the persona guidance emphasizes low-connectivity users.

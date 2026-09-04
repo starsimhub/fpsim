@@ -2,7 +2,7 @@
 
 FPsim is the Institute for Disease Modeling's agent-based model of family planning. It
 simulates women's contraceptive and reproductive histories over the life course, so that
-programme and policy questions -- what happens if a new method is introduced, or if access
+program and policy questions -- what happens if a new method is introduced, or if access
 changes for younger women -- can be explored before committing resources. It is calibrated
 to nine settings across sub-Saharan Africa and South Asia.
 

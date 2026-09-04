@@ -5,7 +5,7 @@ title: Recalibrate a location
 Recalibration is needed when model logic changes in a way that shifts fertility or
 contraceptive dynamics: the conception pipeline, sexual activity or contraception update
 logic, new data sources, or a new location. It is *not* needed for bug fixes that restore
-intended behaviour, new result tracking that does not affect dynamics, or documentation
+intended behavior, new result tracking that does not affect dynamics, or documentation
 and test changes.
 
 All commands below are run from the repository root.
@@ -61,7 +61,7 @@ This flags parameters that moved more than 30% (`--tolerance` to change).
 
 Expect `exposure_age` and `exposure_parity` knots to move substantially while the curve
 shape stays similar -- judge them by shape. The scalars (`exposure_factor`,
-`fecundity_low`/`fecundity_high`) are the ones to scrutinise.
+`fecundity_low`/`fecundity_high`) are the ones to scrutinize.
 
 Treat these as red flags:
 

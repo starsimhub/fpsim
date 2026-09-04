@@ -332,7 +332,7 @@ To support this new feature, this PR also introduces several new items:
  - the lists of lists in the results object have been replaced with arrays
  - `Education` modules have been added
  - new parameters and people's attributes have been added: `fertility_intent`, `intent_to_use` and `wealth_quintile`
- - new analyzer "Life of" has been added to visualise the events during the lifecourse of a woman
+ - new analyzer "Life of" has been added to visualize the events during the lifecourse of a woman
  - new intervention that allows for changes in the probability of initiation (of contraceptive use) in contraception modules that use a logistic regression module.
  - Fixes a bug that prevented simulations from running if pars['timestep'] !=1
  - Adds a circular buffer to track the last 12 months of data, and enable model updates that depend on the previous state
