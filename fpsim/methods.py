@@ -914,8 +914,12 @@ class ContraceptiveChoice(ss.Connector):
         ppl = sim.people
         fpppl = ppl.fp  # Shorter name for people.fp
 
-        # If people are 1 or 6m postpartum, we use different parameters for updating their contraceptive decisions
-        is_pp1 = (self.ti - fpppl.ti_delivery[uids]) == 1  # Delivered last timestep
+        # If people are 1 or 6m postpartum, we use different parameters for updating their contraceptive decisions.
+        # In both windows, exclude women who are already on contraception -- e.g. because an external
+        # intervention started them during the postpartum window, or because a prior contra choice's
+        # ti_contra happens to land inside pp1/pp6 -- and let those women flow into the pp0 (non-postpartum)
+        # path, which handles on_contra state correctly. Symmetric filtering between pp1 and pp6.
+        is_pp1 = ((self.ti - fpppl.ti_delivery[uids]) == 1) & ~fpppl.on_contra[uids]  # Delivered last timestep
         is_pp6 = ((self.ti - fpppl.ti_delivery[uids]) == 6) & ~fpppl.on_contra[uids]  # They may have decided to use contraception after 1m
         pp0 = uids[~(is_pp1 | is_pp6)]
         pp1 = uids[is_pp1]
@@ -963,6 +967,8 @@ class ContraceptiveChoice(ss.Connector):
         ppdict = {'pp1': pp1, 'pp6': pp6}
         for event, pp in ppdict.items():
             if len(pp):
+                # is_pp1 and is_pp6 filter out on_contra women, so this branch should
+                # only ever see off-contra women. Assertion retained as a defensive check.
                 if fpppl.on_contra[pp].any():
                     errormsg = 'Postpartum women should not currently be using contraception.'
                     raise ValueError(errormsg)
