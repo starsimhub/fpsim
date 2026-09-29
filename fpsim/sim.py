@@ -256,6 +256,12 @@ class Sim(ss.Sim):
 
         return self
 
+    def init_module_attrs(self, force=False):
+        super().init_module_attrs(force=force)
+        fp_mod = self.demographics.get('fp')
+        if fp_mod is not None and not hasattr(self.demographics, 'pregnancy'):
+            self.demographics.setattribute('pregnancy', fp_mod)
+
     def init_results(self):
         """
         Initialize the results dictionary. This is called at the start of the simulation.

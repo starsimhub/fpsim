@@ -84,6 +84,12 @@ class FPmod(ss.Pregnancy):
 
         return
 
+    def init_pre(self, sim):
+        super().init_pre(sim)
+        if not hasattr(sim.people, 'pregnancy'):
+            sim.people.pregnancy = self
+        return
+
     def init_post(self):
         """ Initialize population states, then set fertility/contraception intent for all fecund women """
         super().init_post()
