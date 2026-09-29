@@ -1,0 +1,116 @@
+---
+title: Model birth spacing and fetal health
+---
+
+Short interpregnancy intervals are associated with elevated risk of low birth weight
+and preterm birth (Conde-Agudelo *et al.* 2006, *JAMA*; WHO recommends &ge;24 mo
+between pregnancies). FPsim tracks interpregnancy interval; Starsim's `FetalHealth`
+module tracks fetal growth and delivery timing per pregnancy. Wired together, they
+answer the question: how many low-birth-weight and preterm babies would a postpartum
+contraception intervention avert?
+
+You will need FPsim and Starsim installed (`FetalHealth` lives in
+`starsim.library.mnch`).
+
+## Sim skeleton
+
+`FetalHealth` goes into the sim's `custom` slot; the interval-to-fetal-damage link goes
+into `connectors`; the postpartum intervention is the same one as in
+[Integrated postpartum care](postpartum_hiv_fp.qmd), with `offer_prep=False`:
+
+```python
+import starsim as ss
+import starsim.library as ssl
+import fpsim as fp
+
+def make_sim(scenario, seed):
+    intvs = []
+    if scenario == 'pp_fp':
+        intvs.append(PostnatalPackage(offer_fp=True, offer_prep=False))
+    return fp.Sim(
+        location='kenya', n_agents=20_000, start_year=2000, end_year=2035, rand_seed=seed,
+        custom=ssl.mnch.FetalHealth(),
+        connectors=[SpacingFetalPenalty()],
+        interventions=intvs,
+    )
+```
+
+## The spacing connector
+
+`FetalHealth` exposes two levers on any pregnancy: `apply_growth_restriction` (reduces
+birth weight) and `apply_timing_shift` (brings delivery forward, raising preterm risk).
+The spacing connector reads months since the mother's most recent live birth at
+conception and applies a penalty when the interval is short:
+
+```python
+import starsim as ss
+
+class SpacingFetalPenalty(ss.Connector):
+    def __init__(self, pars=None, name='spacing_fetal', **kwargs):
+        super().__init__(name=name)
+        self.define_pars(
+            short_cutoff_mo=18.0,
+            medium_cutoff_mo=24.0,
+            growth_penalty_short=0.10,
+            growth_penalty_medium=0.05,
+            timing_shift_short=ss.lognorm_ex(mean=ss.weeks(2.0), std=ss.weeks(0.5)),
+            timing_shift_medium=ss.lognorm_ex(mean=ss.weeks(1.0), std=ss.weeks(0.5)),
+        )
+        self.update_pars(pars, **kwargs)
+
+    def init_pre(self, sim):
+        super().init_pre(sim)
+        self.fp = sim.get_module(ss.Pregnancy)
+        self.fh = sim.custom['fetal_health']
+        self.fh.add_conception_callback(self._on_conception)
+
+    def _on_conception(self, uids):
+        parous = uids[self.fp.ti_live_birth.notnan[uids]]
+        if not len(parous):
+            return
+        months = self.sim.ti - self.fp.ti_live_birth[parous]
+        short = parous[months < self.pars.short_cutoff_mo]
+        medium = parous[(months >= self.pars.short_cutoff_mo) & (months < self.pars.medium_cutoff_mo)]
+
+        if len(short):
+            self.fh.apply_growth_restriction(short, self.pars.growth_penalty_short)
+            self.fh.apply_timing_shift(short, self.pars.timing_shift_short.rvs(short))
+        if len(medium):
+            self.fh.apply_growth_restriction(medium, self.pars.growth_penalty_medium)
+            self.fh.apply_timing_shift(medium, self.pars.timing_shift_medium.rvs(medium))
+
+    def step(self):
+        pass
+```
+
+The three-bin penalty structure (short / medium / long) is a stylised version of the
+spacing-outcomes literature. Effect sizes are chosen so short-interval pregnancies carry
+roughly the Conde-Agudelo 2006 odds ratios for LBW and preterm; they are illustrative,
+not tuned to any specific setting.
+
+## What to look at
+
+- `sim.results.fp.short_intervals` -- births at &lt;24 mo interval.
+- `sim.results.fp.n_preterm` -- preterm births (from the base `ss.Pregnancy`).
+- `sim.results.fetal_health.n_lbw` -- low birth weight births.
+- `sim.results.fetal_health.n_svn` -- small vulnerable newborns
+  (`preterm | lbw | sga`).
+
+Compare the intervention arm against baseline scenario by scenario, seed by seed.
+
+## Interpreting the numbers
+
+The LBW and preterm counts produced by this composition are the *spacing-attributable*
+subset -- other drivers (maternal nutrition, infection, adolescent pregnancy) are not
+modelled here. A real total burden requires either additional connectors for those
+drivers or a calibration of the `FetalHealth` baselines against setting-specific data.
+Averted counts also include two effects: fewer conceptions overall, and better outcomes
+among the pregnancies that still occur. A rate-based decomposition (LBW-per-birth by
+arm) will separate them.
+
+## Full reference project
+
+A Kenya version of this analysis lives at
+[`hiv_fp_kenya`](https://github.com/starsimhub/hiv_fp_kenya) as `demo_spacing.py` (sim
+and grid) and `spacing_fetal.py` (connector). The full run, two-panel figure, and
+narrative writeup are in that repo.

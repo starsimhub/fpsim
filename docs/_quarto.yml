@@ -92,6 +92,11 @@ website:
               contents:
                 - user-guide/contraception/index.qmd
                 - user-guide/contraception/add-method.qmd
+            - section: "Integrated modeling"
+              contents:
+                - user-guide/integrated-modeling/index.qmd
+                - user-guide/integrated-modeling/postpartum_hiv_fp.qmd
+                - user-guide/integrated-modeling/postpartum_spacing_fetal.qmd
         - href: conduct.md
           text: "**Code of conduct**"
         - href: contributing.md

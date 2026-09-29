@@ -1,0 +1,128 @@
+---
+title: Model integrated postpartum care
+---
+
+Postpartum women in many settings face two concurrent needs: contraception to space or
+limit births, and HIV prevention during a period of elevated exposure. A single
+postnatal visit can offer both. This how-to shows how to model a co-delivery
+intervention -- long-acting injectable contraception plus long-acting PrEP -- at the
+same 2-month postpartum contact, using FPsim for the family planning side and STIsim's
+HIV module for the PrEP side.
+
+You will need FPsim and [STIsim](https://github.com/starsimhub/stisim) installed.
+
+## Sim skeleton
+
+FPmod exposes `ti_live_birth` on every woman, which is the timestep of her most recent
+live birth. That is the natural hook for a postpartum intervention: on any given
+timestep, the eligible cohort is the women whose `ti_live_birth` was exactly
+`visit_month` timesteps ago and who are not currently pregnant.
+
+Wire FPsim, STIsim HIV, a structured sexual network, and a maternal network into one
+sim, then hand the postpartum cohort to a small custom intervention:
+
+```python
+import starsim as ss
+import stisim as sti
+import fpsim as fp
+
+def make_sim(seed):
+    hiv = sti.HIV(init_prev=0.05, beta_m2f=0.012)
+    intvs = [sti.HIVTest(test_prob_data=0.9), sti.ART(coverage=0.9),
+             PostnatalPackage(offer_fp=True, offer_prep=True)]
+    return fp.Sim(
+        location='kenya', n_agents=20_000, start_year=2000, end_year=2035, rand_seed=seed,
+        diseases=hiv,
+        networks=[sti.StructuredSexual(), ss.MaternalNet()],
+        interventions=intvs,
+    )
+```
+
+## The intervention
+
+`PostnatalPackage` is a small custom `ss.Intervention` that identifies women at
+`visit_month` timesteps postpartum, draws attendance, and offers the two services to the
+same attendees:
+
+```python
+class PostnatalPackage(ss.Intervention):
+    """Offer long-acting injectable contraception and/or long-acting PrEP at a postnatal visit."""
+
+    def __init__(self, pars=None, name='pp_shop', offer_fp=True, offer_prep=True, **kwargs):
+        super().__init__(name=name)
+        self.offer_fp = offer_fp
+        self.offer_prep = offer_prep
+        self.define_pars(
+            visit_month=2,
+            start_year=2027,
+            p_attend=ss.bernoulli(p=0.5),
+            p_fp_uptake=ss.bernoulli(p=0.3),
+            p_prep_uptake=ss.bernoulli(p=0.3),
+            prep_eff=0.95,
+            dur_prep=ss.normal(ss.months(6), ss.months(1)),
+        )
+        self.update_pars(pars, **kwargs)
+
+    def init_pre(self, sim):
+        super().init_pre(sim)
+        self.fp_mod = sim.demographics.fp
+        self.cm = sim.connectors.contraception
+        self.inj_idx = self.cm.methods['inj'].idx
+        self.hiv = sim.diseases.get('hiv') if self.offer_prep else None
+
+    def step(self):
+        if self.sim.t.now('year') < self.pars.start_year:
+            return
+        fp_mod = self.fp_mod
+        target_ti = self.sim.ti - self.pars.visit_month
+        eligible = ((fp_mod.ti_live_birth == target_ti) & ~fp_mod.pregnant).uids
+        attendees = self.pars.p_attend.filter(eligible)
+        if not len(attendees):
+            return
+
+        if self.offer_fp:
+            not_on_method = attendees[~fp_mod.on_contra[attendees]]
+            starters = self.pars.p_fp_uptake.filter(not_on_method)
+            fp_mod.on_contra[starters] = True
+            fp_mod.method[starters] = self.inj_idx
+            fp_mod.ti_contra[starters] = self.sim.ti + self.cm.set_dur_method(starters)
+
+        if self.offer_prep:
+            hiv_neg = attendees[~self.hiv.infected[attendees] & ~self.hiv.on_prep[attendees]]
+            starters = self.pars.p_prep_uptake.filter(hiv_neg)
+            dur = ss.years(self.pars.dur_prep.rvs(starters))
+            self.hiv.start_prep(starters, eff=self.pars.prep_eff, dur=dur, adh=1.0)
+```
+
+Use `ss.bernoulli` and `ss.normal` for the draws (not `numpy.random`) so common-random-
+number pairing across scenarios stays intact.
+
+## What to look at
+
+Run the sim once for each scenario you want to compare (typical grid: baseline, FP-only,
+PrEP-only, both) with several stochastic seeds, then extract:
+
+- `sim.results.fp.short_intervals` -- births at &lt;24 mo interpregnancy interval.
+- `sim.results.hiv.new_infections_f` -- new HIV infections among women.
+
+Both are annualized in the standard way (`.annualize()`) before you take differences
+against baseline.
+
+## Gotchas
+
+- **Visit at month 2, not month 1.** FPmod sets `ti_contra = ti + 1` at delivery, so the
+  contraception connector re-chooses a method at month 1. If the intervention fires at
+  month 1 the choice is overwritten immediately. Month 2 is safe.
+- **FPsim sexual activity and the STIsim sexual network are independent.** A woman can
+  conceive without a current partner in `StructuredSexual`, and vice versa. Acceptable
+  for an illustrative composition; call it out if you use the pattern for anything
+  quantitative.
+- **HIV calibration matters.** `sti.HIV` needs realistic `init_prev` and `beta_m2f` for
+  the setting, or the PrEP arm's effect will be measured against an implausible baseline.
+
+## Full reference project
+
+A calibrated Kenya version of this analysis lives at
+[`hiv_fp_kenya`](https://github.com/starsimhub/hiv_fp_kenya) -- the intervention above
+is `demo.py:PostnatalPackage`, and the full 4-scenario grid, calibrated HIV parameters,
+Kenya scale factor, and two-panel figure are all in the repo.
