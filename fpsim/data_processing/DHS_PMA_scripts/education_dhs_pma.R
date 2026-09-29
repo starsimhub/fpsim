@@ -22,8 +22,9 @@
 # 1. Setup
 # -------------------------------
 
-# Clear environment
-rm(list = ls())
+# Clear environment (preserve run control variables)
+run_vars <- ls(pattern = "^run_")
+rm(list = setdiff(ls(), run_vars))
 
 # Load user configuration
 source("./config.R")
@@ -141,7 +142,7 @@ table.edu.inital <-
   )) %>%
   bind_rows(table.edu.mean)
 
-# For initialising education objective, we look at the distribution of
+# For initializing education objective, we look at the distribution of
 # years of education for all women over age 20 and living in urban settings
 # (assumed that they have finished edu)
 min_age <- 20

@@ -292,7 +292,7 @@ def scenario_market_splitting():
     
     # Check method-specific usage
     cm = sim_with_dmpasc.connectors.contraception
-    fp_mod = sim_with_dmpasc.connectors.fp
+    fp_mod = sim_with_dmpasc.people.fp
     
     inj_idx = cm.methods['inj'].idx
     dmpasc_idx = cm.methods['dmpasc'].idx
@@ -425,7 +425,7 @@ def plot_scenario_comparison(sim_baseline, sim_with_method, new_method_name, sce
     # Plot 2: New method usage
     ax = axes[1]
     cm = sim_with_method.connectors.contraception
-    fp_mod = sim_with_method.connectors.fp
+    fp_mod = sim_with_method.people.fp
     
     if new_method_name in cm.methods:
         method_idx = cm.methods[new_method_name].idx
@@ -440,8 +440,9 @@ def plot_scenario_comparison(sim_baseline, sim_with_method, new_method_name, sce
     
     # Plot 3: Cumulative births
     ax = axes[2]
-    births_baseline = sim_baseline.results.fp.cum_births
-    births_new = sim_with_method.results.fp.cum_births
+    # cum_births was removed in v3.6.0; accumulate the per-timestep births result
+    births_baseline = np.cumsum(sim_baseline.results.fp.births)
+    births_new = np.cumsum(sim_with_method.results.fp.births)
     ax.plot(years, births_baseline, 'b-', linewidth=2, label='Baseline', alpha=0.8)
     ax.plot(years, births_new, 'r-', linewidth=2, label='With New Method', alpha=0.8)
     ax.axvline(x=INTRODUCTION_YEAR, color='green', linestyle='--', alpha=0.7)

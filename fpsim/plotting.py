@@ -160,7 +160,7 @@ def plot_asfr(sim, ax=None):
 
     # Extract ASFR from simulation results
     x_labels = [int(i.split('-')[0]) for i in data_agerange_cols]
-    asfr_model = sim.connectors.fp.asfr[2:-1, -1]
+    asfr_model = sim.people.fp.asfr[2:-1, -1]
 
     # Compute mean-normalized RMSE
     rmse_scores['asfr'] = compute_rmse(asfr_model, asfr_data)
@@ -569,7 +569,7 @@ def plot_afb(sim, ax=None, legend_kwargs={}):
     # Plot
     sns.histplot(model_afb, stat='proportion', kde=True, binwidth=1, color='cornflowerblue', label='FPsim', ax=ax)
     sns.histplot(x=data_afb_vals, stat='proportion', kde=True, weights=data_afb_weights,
-                 binwidth=1, color='dimgrey', label='DHS data', ax=ax)
+                 binwidth=1, color='dimgray', label='DHS data', ax=ax)
     ax.set_xlabel('Age at first birth')
     if Config.show_rmse:
         ax.set_title(f"Age at First Birth\n(RMSE: {rmse_scores['afb']:.2f})")

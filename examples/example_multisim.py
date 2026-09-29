@@ -3,28 +3,30 @@ Simple example usage for FPsim multisim
 '''
 
 import sciris as sc
+import starsim as ss
 import fpsim as fp
 
 # Set options
 do_plot = True
-pars1 = fp.pars(location='amhara')
-pars1['n_agents'] = 500 # Small population size
-pars1['end_year'] = 2020 # 1961 - 2020 is the normal date range
-pars1['exposure_factor'] = 1.0 # Overall scale factor on probability of becoming pregnant
+def make_pars(location):
+    return dict(
+        location = location,
+        n_agents = 500,         # Small population size
+        end_year = 2020,        # 1961 - 2020 is the normal date range
+        exposure_factor = 1.0,  # Overall scale factor on probability of becoming pregnant
+    )
 
-pars2 = fp.pars(location='somali')
-pars2['n_agents'] = 500 # Small population size
-pars2['end_year'] = 2020 # 1961 - 2020 is the normal date range
-pars2['exposure_factor'] = 1.0 # Overall scale factor on probability of becoming pregnant
+pars1 = make_pars('kenya')
+pars2 = make_pars('senegal')
 
 
 if __name__ == '__main__':
     sc.tic()
 
-    sim1 = fp.Sim(pars=pars1, label='Amhara')
-    sim2 = fp.Sim(pars=pars2, label='Somali')
+    sim1 = fp.Sim(pars=pars1, label='Kenya')
+    sim2 = fp.Sim(pars=pars2, label='Senegal')
 
-    msim = fp.MultiSim(sims=[sim1, sim2])
+    msim = ss.MultiSim(sims=[sim1, sim2])
 
     msim.run()
 

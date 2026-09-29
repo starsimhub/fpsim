@@ -1,0 +1,63 @@
+---
+title: Calibration
+---
+
+FPsim ships calibrated parameters for nine locations. Calibration is the process of
+choosing those parameters so the simulated population reproduces observed fertility and
+contraceptive-use patterns for a setting.
+
+## What gets calibrated
+
+FPsim distinguishes two kinds of parameters. **Model parameters** describe mechanisms
+believed to be common across settings -- gestation length, method efficacy, the shape of
+the postpartum infecundability curve. These are fixed from the literature and are not
+calibrated. **Calibration parameters** absorb setting-specific behavior that cannot be
+observed directly, and live in each location's `make_calib_pars()` function.
+
+The calibrated parameters are:
+
+| Parameter | Controls |
+|---|---|
+| `exposure_factor` | Overall scale on the probability of conceiving |
+| `fecundity_low`, `fecundity_high` | Bounds of the personal fecundity distribution |
+| `exposure_age` | Relative exposure by age, as a 13-knot curve |
+| `exposure_parity` | Relative exposure by number of prior births |
+| `prob_use_intercept`, `prob_use_trend_par` | Level and trend in contraceptive uptake |
+| `spacing_pref` | Preference for spacing births at given intervals |
+
+Together these are a 26-dimensional search space, which is why calibration uses an
+optimizer rather than hand-tuning.
+
+Two parameters that appear in location files, `method_weights` and `dur_postpartum`, are
+*not* calibrated -- they are set by hand and preserved across recalibration.
+
+## How mismatch is computed
+
+Calibration minimizes a weighted sum of mismatches between model output and data.
+Components are weighted by how much they matter for the model's intended use, so the
+fertility and contraceptive-use targets dominate:
+
+- Weight 3-4: mCPR, ASFR, total fertility rate, age at first birth
+- Weight 1: age-parity distribution, birth spacing
+- Weight 0.5: population size and growth, crude birth and death rates, maternal and
+  infant mortality
+
+A lower mismatch is better, but the absolute number is only meaningful relative to other
+runs of the same configuration. Comparing mismatch across locations is not meaningful,
+since each has different data available.
+
+## Why the optimizer is not the whole story
+
+The `exposure_age` and `exposure_parity` curves have many free knots that trade off
+against each other, so two calibrations with near-identical mismatch can have visibly
+different individual knot values while producing the same overall curve shape. Judge these
+by shape, not by individual numbers, and always inspect the validation plots rather than
+relying on mismatch alone.
+
+## How-to topics
+
+- [Recalibrate a location](recalibrate.qmd)
+
+## See also
+
+- [Calibration API](../../api/calibration.qmd)

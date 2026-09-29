@@ -107,9 +107,26 @@ class cpr_by_age(ss.Analyzer):
 
 
 class method_mix_by_age(ss.Analyzer):
-    '''
-    Analyzer that records the method mix by age at the end of the simulation.
-    '''
+    """
+    Record the method mix by age at the end of the simulation.
+
+    Produces a single end-of-run snapshot, so use it to compare method mix across age
+    groups against survey data. For a time series instead, use
+    [method_mix_over_time](`fpsim.analyzers.method_mix_over_time`).
+
+    Args:
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        sim = fp.Sim(location='kenya', analyzers=fp.method_mix_by_age())
+        sim.run()
+        mix = sim.analyzers[0]
+        ```
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)   # Initialize the Analyzer object
         self.age_bins = [v[1] for v in fpd.method_age_map.values()]
@@ -162,7 +179,7 @@ class education_recorder(ss.Analyzer):
             save result at snapshot[str(timestep)]
             """
             sim = self.sim
-            females = sim.people.female.uids
+            females = (sim.people.female & (sim.people.age>0)).uids
             self.snapshots[str(sim.ti)] = {}
             for key in self.edu_keys:
                 self.snapshots[str(sim.ti)][key] = sc.dcp(sim.people.edu[key][females])  # Take snapshot!
@@ -202,16 +219,16 @@ class education_recorder(ss.Analyzer):
             rows, cols = sc.get_rows_cols(2)
 
             fig = pl.figure(**fig_args)
-            keys2 = ['edu_completed', 'edu_interrupted', 'edu_dropout']
+            keys2 = ['completed', 'interrupted', 'dropped']
             keys3 = ['pregnant', 'alive']
 
             k = 0
             pl.subplot(rows, cols, k + 1)
             age_data = self.trajectories["age"]
-            state = "edu_attainment"
+            state = "attainment"
             data = self.trajectories[state]
             pl.step(self.time, data[:, index], color="black", label=f"{state}", where='mid', **pl_args)
-            state = "edu_objective"
+            state = "objective"
             data = self.trajectories[state]
             pl.step(self.time, data[:, index], color="red", ls="--", label=f"{state}", where='mid', **pl_args)
             pl.ylim([0, 24])
@@ -225,9 +242,9 @@ class education_recorder(ss.Analyzer):
                 pl.subplot(rows, cols, k + 1)
                 data = self.trajectories[state]
                 if state in keys2:
-                    if state  == 'edu_interrupted':
+                    if state == 'interrupted':
                         pl.step(self.time, 3*data[:, index], color=[0.7, 0.7, 0.7], label=f"{state}", ls=":", where='mid', **pl_args)
-                    elif state == "edu_dropout":
+                    elif state == "dropped":
                         pl.step(self.time, 3*data[:, index], color="black", label=f"{state}", ls=":", where='mid', **pl_args)
                     else:
                         pl.step(self.time, 3*data[:, index], color="#2ca25f", label=f"{state}", where='mid', **pl_args)
@@ -262,8 +279,8 @@ class education_recorder(ss.Analyzer):
 
             from scipy.stats import gaussian_kde
 
-            data_att = self.trajectories["edu_attainment"]
-            data_obj = self.trajectories["edu_objective"]
+            data_att = self.trajectories["attainment"]
+            data_obj = self.trajectories["objective"]
             data_age = self.trajectories["age"]
 
             mask = (data_age < min_age) | (data_age > max_age) | np.isnan(data_age)
@@ -666,8 +683,24 @@ class age_pyramids(ss.Analyzer):
 
 class method_mix_over_time(ss.Analyzer):
     """
-    Tracks the number of women on each method available
-    for each time step
+    Track the number of women on each method at every timestep.
+
+    Use this to see how method mix evolves, for example after introducing a new method with
+    [add_method](`fpsim.interventions.add_method`). For an end-of-run snapshot by age
+    instead, use [method_mix_by_age](`fpsim.analyzers.method_mix_by_age`).
+
+    Args:
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        sim = fp.Sim(location='kenya', analyzers=fp.method_mix_over_time())
+        sim.run()
+        sim.analyzers[0].plot()
+        ```
     """
 
     def __init__(self, **kwargs):
@@ -748,10 +781,29 @@ class method_mix_over_time(ss.Analyzer):
 
 
 class state_tracker(ss.Analyzer):
-    '''
-    Records the number of living women on a specific boolean state (eg, numbe of
-    living women who live in rural settings)
-    '''
+    """
+    Record the number of living women in a given boolean state each timestep.
+
+    Use this to track any boolean state without writing a custom analyzer, for example how
+    many women live in urban settings or are currently postpartum.
+
+    Args:
+        state_name (str): name of the boolean state to track, e.g. ``'urban'``
+        module_name (str): module the state belongs to, e.g. ``'fp'``; omit for states on People
+        min_age (float): youngest age to include
+        max_age (float): oldest age to include
+        kwargs (dict): passed to ``ss.Analyzer``
+
+    **Example**:
+
+        ```python
+        import fpsim as fp
+
+        tracker = fp.state_tracker(state_name='urban')  # urban is a People state
+        sim = fp.Sim(location='kenya', analyzers=tracker)
+        sim.run()
+        ```
+    """
 
     def __init__(self, state_name=None, module_name=None, min_age=fpd.min_age, max_age=fpd.max_age, **kwargs):
         """
@@ -780,6 +832,10 @@ class state_tracker(ss.Analyzer):
         """
         sim = self.sim
         super().init_post()
+        if self.min_age is None:
+            self.min_age = self.sim.pars.fp.min_age
+        if self.max_age is None:
+            self.max_age = self.sim.pars.fp.max_age
         self.data_num = np.full((sim.t.npts,), np.nan)
         self.data_perc = np.full((sim.t.npts,), np.nan)
         self.data_n_female = np.full((sim.t.npts,), np.nan)
@@ -839,12 +895,83 @@ class state_tracker(ss.Analyzer):
         return fig
 
 
+class track_parity(ss.Analyzer):
+    """
+    Record the distribution of parity (number of live births per woman).
+
+    Use this to compare the simulated parity distribution against survey data, which is one
+    of the standard calibration targets.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.parity_bins = np.array([1, 3, 5, 100])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.parity_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of parity """
+        fpmod = self.sim.demographics.fp
+        self.results[self.ti, :], _ = np.histogram(fpmod.parity, bins=self.parity_bins)
+        return
+
+
+class track_postpartum(ss.Analyzer):
+    """
+    Record postpartum status, binned by months since delivery.
+
+    Useful when checking postpartum contraceptive uptake or the duration of postpartum
+    infecundability, both of which shape birth spacing.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
+    """
+    def __init__(self):
+        super().__init__()
+        self.results = dict()
+        self.pp_bins = np.array([0, 6, 12, 24, 1000])
+        self.results = None
+        return
+
+    def init_pre(self, sim, force=False):
+        super().init_pre(sim, force)
+        n_bins = len(self.pp_bins)
+        self.results = np.zeros((sim.t.npts, n_bins))
+        return
+
+    def step(self):
+        """ Histogram of postpartum status """
+        fpmod = self.sim.demographics.fp
+        timesteps_since_birth = fpmod.ti - fpmod.ti_delivery
+        self.results[self.ti, :], _ = np.histogram(timesteps_since_birth[fpmod.postpartum], bins=self.pp_bins)
+        return
+
+
 class track_as(ss.Analyzer):
     """
-    Analyzer for tracking age-specific results
+    Record age-specific versions of the standard results.
+
+    Adds age stratification to results that are otherwise reported for the whole
+    population, such as fertility and contraceptive use.
+
+    Note:
+        This analyzer assigns a plain dict to ``self.results``, which Starsim 3.6.0 locks,
+        so it currently raises ``AttributeError`` on init. It needs porting to ``ss.Results``.
     """
 
     def __init__(self):
+        super().__init__()
         # Check versioning
         if sc.compareversions(fp, '<3.0'):
             errormsg = (f'Your current version of FPsim is {fp.__version__}, but this analyzer is slated for release'
