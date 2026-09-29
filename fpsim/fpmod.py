@@ -644,6 +644,9 @@ class FPmod(ss.Pregnancy):
         mothers_of_live = mother_uids - mothers_of_nnds
         self._set_contra_timing(mothers_of_live)
 
+        for cb in self._delivery_callbacks:
+            cb(mother_uids, newborn_uids)
+
         return
 
     def record_ages(self, stillborn, single, twin):
