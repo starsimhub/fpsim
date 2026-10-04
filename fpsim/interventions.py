@@ -502,7 +502,7 @@ class update_methods(ss.Intervention):
             # Change in method mix
             if self.pars.method_mix is not None:
                 this_mix = self.pars.method_mix / np.sum(self.pars.method_mix) # Renormalise in case they are not adding up to 1
-                cm.pars['method_mix'] = this_mix
+                cm._method_choice_dist.set(p=this_mix)
             
             # Change in switching matrix
             if self.pars.method_choice_pars is not None:
