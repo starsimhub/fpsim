@@ -50,9 +50,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3fc6716df1091e711d23e37ca1fd8fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-7717a4d0f6adcf5190f30b5c191ddeff.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-3fc6716df1091e711d23e37ca1fd8fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -408,6 +408,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#whats-new" id="toc-whats-new" class="nav-link active" data-scroll-target="#whats-new">What’s new</a>
   <ul>
+  <li><a href="#version-3.5.5-2026-10-03" id="toc-version-3.5.5-2026-10-03" class="nav-link" data-scroll-target="#version-3.5.5-2026-10-03">Version 3.5.5 (2026-10-03)</a></li>
   <li><a href="#version-3.5.4-2026-08-27" id="toc-version-3.5.4-2026-08-27" class="nav-link" data-scroll-target="#version-3.5.4-2026-08-27">Version 3.5.4 (2026-08-27)</a></li>
   <li><a href="#version-3.5.3-2026-03-18" id="toc-version-3.5.3-2026-03-18" class="nav-link" data-scroll-target="#version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</a></li>
   <li><a href="#version-3.5.2-2026-03-04" id="toc-version-3.5.2-2026-03-04" class="nav-link" data-scroll-target="#version-3.5.2-2026-03-04">Version 3.5.2 (2026-03-04)</a></li>
@@ -528,10 +529,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="whats-new" class="level1">
 <h1>What’s new</h1>
 <p>All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term “Regression information”.</p>
+<section id="version-3.5.5-2026-10-03" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.5.5-2026-10-03">Version 3.5.5 (2026-10-03)</h2>
+<ul>
+<li>Fixed <code>update_methods(method_mix=...)</code>, which set a parameter that was no longer used, so the method mix was not changed; it now updates the method choice probabilities (for <a href="./api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a>).</li>
+</ul>
+</section>
 <section id="version-3.5.4-2026-08-27" class="level2">
 <h2 class="anchored" data-anchor-id="version-3.5.4-2026-08-27">Version 3.5.4 (2026-08-27)</h2>
 <ul>
-<li>Fixed compatibility with Starsim 3.6.0: <a href="./api/interventions.html#fpsim.interventions.change_initiation" title="0"><code>change_initiation</code></a> and <code>change_switching</code> converted annual probabilities to per-timestep values via <code>float(sim.dt)</code>, which now raises a <a href="https://docs.python.org/3/library/exceptions.html#TypeError" title="1"><code>TypeError</code></a> since <code>TimePar.__float__()</code> is disallowed; these now use <code>sim.dt.years</code>.</li>
+<li>Fixed compatibility with Starsim 3.6.0: <a href="./api/interventions.html#fpsim.interventions.change_initiation" title="0"><code>change_initiation</code></a> and <code>change_switching</code> converted annual probabilities to per-timestep values via <code>float(sim.dt)</code>, which now raises a <a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" title="1"><code>TypeError</code></a> since <code>TimePar.__float__()</code> is disallowed; these now use <code>sim.dt.years</code>.</li>
 <li>Bumped the minimum Starsim version to 3.6.0.</li>
 </ul>
 </section>
@@ -1942,7 +1949,7 @@ sim4 = fp.Sim(start=2000, contraception_module = fp.SimpleChoice(prob_use_trend_
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.4 (2026-08-27).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.5.5 (2026-10-03).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
