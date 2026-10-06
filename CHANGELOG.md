@@ -3,7 +3,7 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.6.0 (2026-09-03)
+## Version 3.6.0 (2026-10-06)
 
 * **Regression information**
   * `FPmod` now inherits from `ss.Pregnancy` instead of `ss.Connector`. Pregnancy progression, gestation and delivery are handled by Starsim's `Pregnancy` module rather than by FPsim. The module is now reached at `sim.people.fp`, not `sim.connectors.fp`; update any code or analyzers that referenced the old path.
@@ -21,6 +21,11 @@ All notable changes to the codebase are documented in this file. Changes that ma
 
 * **Tests**
   * `test_pregnant_women` now follows the cohort that conceives in the first three months through to each pregnancy's outcome, instead of comparing fixed result windows. The old form assumed a fixed 9-month gestation and mis-attributed roughly 17% of the cohort once gestation became a distribution.
+
+
+## Version 3.5.5 (2026-10-03)
+- Fixed `update_methods(method_mix=...)`, which set a parameter that was no longer used, so the method mix was not changed; it now updates the method choice probabilities (for `RandomChoice`).
+
 
 ## Version 3.5.4 (2026-08-27)
 - Fixed compatibility with Starsim 3.6.0: `change_initiation` and `change_switching` converted annual probabilities to per-timestep values via `float(sim.dt)`, which now raises a `TypeError` since `TimePar.__float__()` is disallowed; these now use `sim.dt.years`.

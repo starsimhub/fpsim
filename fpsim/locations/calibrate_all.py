@@ -190,13 +190,13 @@ def update_location_files(locations=None, force=False):
 
         # Build the make_calib_pars function body
         lines = []
-        lines.append(f'"""\nSet the parameters for a location-specific FPsim model.\n"""')
+        lines.append(f'"""\nSet the parameters for {loc.replace("_", " ").title()}.\n"""')
         lines.append('import numpy as np')
         lines.append('import fpsim.locations.data_utils as fpld')
         lines.append('')
         lines.append('')
         lines.append('def make_calib_pars():')
-        lines.append(f'    """ Make a dictionary of location-specific parameters (mismatch: {mismatch:.2f}) """')
+        lines.append(f'    """ Make a dictionary of location-specific parameters (calibration objective: {mismatch:.2f}) """')
         lines.append('    pars = {}')
 
         # Scalar parameters

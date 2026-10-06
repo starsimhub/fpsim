@@ -1,12 +1,12 @@
 """
-Set the parameters for a location-specific FPsim model.
+Set the parameters for Niger.
 """
 import numpy as np
 import fpsim.locations.data_utils as fpld
 
 
 def make_calib_pars():
-    """ Make a dictionary of location-specific parameters (mismatch: 3.88) """
+    """ Make a dictionary of location-specific parameters (calibration objective: 3.88) """
     pars = {}
     pars['exposure_factor'] = 0.8999
     pars['prob_use_intercept'] = -1.9358
