@@ -171,7 +171,7 @@ def main(do_save=True, do_show=True, parallel=True):
             continue
         years = _get_years(sim)
         cm = sim.connectors.contraception
-        fp_conn = sim.connectors.fp
+        fp_conn = sim.people.fp
 
         total = np.zeros_like(years, dtype=float)
         for name, method in cm.methods.items():
@@ -362,14 +362,14 @@ def print_summary_statistics(scenarios):
     
     baseline = scenarios['Baseline']
     baseline_mcpr = baseline.results.contraception.mcpr[-1] * 100
-    baseline_births = baseline.results.fp.cum_births[-1]
+    baseline_births = baseline.results.fp.births.sum()  # cum_births was removed in v3.6.0
     
     print(f"\n{'Scenario':<40} {'mCPR (%)':<12} {'Δ mCPR':<12} {'Births Averted':<15}")
     print("-" * 80)
     
     for label, sim in scenarios.items():
         mcpr = sim.results.contraception.mcpr[-1] * 100
-        births_averted = baseline_births - sim.results.fp.cum_births[-1]
+        births_averted = baseline_births - sim.results.fp.births.sum()
         print(f"{label:<40} {mcpr:>10.2f}  {mcpr - baseline_mcpr:>10.2f}  {births_averted:>13.0f}")
     
     print("-" * 80)
@@ -383,7 +383,7 @@ def print_summary_statistics(scenarios):
             continue
         print(f"\n{label}:")
         cm = sim.connectors.contraception
-        fp_conn = sim.connectors.fp
+        fp_conn = sim.people.fp
         for name, method in cm.methods.items():
             if 'dmpasc' in name.lower() and name != 'none':
                 usage_pct = fp_conn.method_mix[method.idx, -1] * 100

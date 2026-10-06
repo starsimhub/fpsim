@@ -1,0 +1,58 @@
+---
+title: Integrated modeling
+---
+
+FPsim is designed to run in the same simulation as other Starsim modules. Because FPmod
+is a Pregnancy module, any Starsim module that reads or writes pregnancy state -- the
+postpartum window, delivery timing, `ti_live_birth`, `pregnant`, `ti_pregnant` -- can
+share a sim with FPsim and see all the same women, at the same timesteps, with the same
+histories.
+
+This opens up analyses that neither module could do alone: family planning and HIV in
+the same postpartum contact, birth spacing and its consequences for fetal outcomes,
+contraception and maternal infection, and so on.
+
+## The integration surface
+
+You compose FPsim with other modules by passing them to the sim's standard slots. No
+change to FPsim itself is required.
+
+| Slot | What goes in | Typical use |
+|---|---|---|
+| `diseases=` | STIsim or Starsim disease modules | HIV, syphilis, or any `ss.Disease` |
+| `custom=` | State-tracking modules that aren't diseases | Starsim's `ssl.mnch.FetalHealth` |
+| `connectors=` | Modules that link two other modules per timestep | A birth-spacing-to-fetal-outcome penalty |
+| `interventions=` | Program interventions that read and write across modules | A postpartum contact that offers both contraception and PrEP |
+| `networks=` | Contact structures | STIsim's `StructuredSexual`, Starsim's `MaternalNet`, `PrenatalNet` |
+
+## Common integration patterns
+
+**Postpartum interventions.** FPmod exposes `ti_live_birth` on every woman, which makes
+it straightforward to write an intervention that targets women a fixed number of
+timesteps after delivery. The intervention can then act on any other module: start a
+contraceptive method, offer a PrEP course, screen for an infection.
+
+**Fetal-outcome connectors.** Starsim's `FetalHealth` module tracks per-pregnancy fetal
+growth and delivery timing. A small connector can penalise those states based on any
+signal FPmod exposes at conception -- interpregnancy interval, parity, age -- or based
+on infection status from a disease module.
+
+**Disease-in-pregnancy connectors.** Disease modules that need to know whether an agent
+is pregnant, or when she is due, can read from `sim.get_module(ss.Pregnancy)` (which
+finds FPmod). This is the basis for MTCT, congenital infection, and pregnancy-aware
+care-seeking.
+
+## How-to topics
+
+- [Model integrated postpartum care](postpartum_hiv_fp.qmd) -- deliver long-acting
+  contraception and long-acting PrEP at the same 2-month postnatal visit, using FPsim
+  for the contraception side and STIsim's HIV module for the PrEP side.
+- [Model birth spacing and fetal health](postpartum_spacing_fetal.qmd) -- link
+  interpregnancy interval to low birth weight and preterm birth using Starsim's
+  `FetalHealth` module, and see how a postpartum contraception intervention averts
+  them.
+
+## See also
+
+- [Interventions and methods](../../tutorials/T3_interventions_methods.qmd) tutorial
+- [Intervention eligibility](../../tutorials/T4_intervention_eligibility.qmd) tutorial

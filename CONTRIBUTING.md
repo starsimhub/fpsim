@@ -17,7 +17,7 @@ If you have any other questions, please reach out to us: info@starsim.org. Thank
 
 * Everything you're working on must be linked to an issue. If you notice that something needs to be done (even small things or things nearly finished) and there isn't an issue for it, create an issue. This helps track who is doing what and why.
 * Label issues you are currently working on with `in progress` for tracking purposes - and to avoid accidental replication of work.
-* High priority issues are organized from top (most urgent) to bottom (least urgent) and can be labelled with `urgent` or `blocking` as appropriate. If you are working on something that is urgent or blocks other development, please set a reasonable deadline for review (can be updated, of course).
+* High priority issues are organized from top (most urgent) to bottom (least urgent) and can be labeled with `urgent` or `blocking` as appropriate. If you are working on something that is urgent or blocks other development, please set a reasonable deadline for review (can be updated, of course).
 * The Hydra Head Effect: Often when you solve one issue, two more pop up in its place. When this happens, close the original issue and start new issues (linked) to be triaged.
 * If your issue has more than two distinct tasks associated with it, please include a check list in the text, so that we can track which components of the issue have been resolved and which need to be supported.
 * If your issue is a bug that was not caught by test, and includes a specific expected value that can be hard-checked, please either include or request a test patch so that a test fails due to the bug
@@ -25,7 +25,7 @@ If you have any other questions, please reach out to us: info@starsim.org. Thank
 ### Pull requests
 
 * ALL PRs should be linked to at least one issue. As above, if you're working on a PR and there's no issue associated with it, you can create an issue. However, before doing so, ask yourself if the changes in the PR really need to be done.
-* All PRs should have another person assigned for review. If assigned to more than one person, use the comment section to assign an issue owner/main reviewer. Use your best judgement here, as roles shift, but in general:
+* All PRs should have another person assigned for review. If assigned to more than one person, use the comment section to assign an issue owner/main reviewer. Use your best judgment here, as roles shift, but in general:
 
    - @MOBrien-IDM as FPsim lead (approval required to merge)
    - Anyone you've worked with on this issue 1:1

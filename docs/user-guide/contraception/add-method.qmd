@@ -1,0 +1,104 @@
+---
+title: Add a new method
+---
+
+There are two situations: adding a method that exists from the start of the simulation, and
+introducing one partway through, for example to represent a product launch.
+
+## Which approach to use
+
+The choice module has to know how likely women are to pick the new method, and how long
+they stay on it. `SimpleChoice` and `StandardChoice` read that from per-method fitted data,
+which a brand-new method does not have -- passing them an unknown method raises an
+`IndexError` while processing durations.
+
+So there are two workable routes:
+
+- **`fp.add_method` with `copy_from`**, which inherits an existing method's behavior. This
+  is the right choice for essentially all real analyses.
+- **Building the method list directly**, which only works with `RandomChoice` unless you
+  also supply the fitted data. `RandomChoice` allocates methods uniformly at random, so it
+  is for testing mechanics, not for producing realistic method mix.
+
+## Add a method from the start (testing only)
+
+```python
+import starsim as ss
+import fpsim as fp
+import fpsim.methods as fpm
+
+methods = fpm.make_methods()  # Start from the default set
+methods += fpm.Method(
+    name     = 'dmpasc',
+    label    = 'DMPA-SC',
+    efficacy = 0.983,
+    modern   = True,
+    dur_use  = ss.lognorm_ex(ss.years(2), ss.years(1)),
+)
+
+sim = fp.Sim(location='kenya', contraception_module=fpm.RandomChoice(methods=methods))
+sim.run()
+```
+
+## Introduce a method partway through (recommended)
+
+The `fp.add_method` intervention adds a method at a given year, copying the uptake
+behavior of an existing method. Pass the new method's attributes in `method_pars` and name
+the method to copy switching behavior from in `copy_from`:
+
+```python
+import starsim as ss
+import fpsim as fp
+
+intv = fp.add_method(
+    year        = 2010,
+    copy_from   = 'inj',  # Inherit switching behavior from injectables
+    method_pars = dict(
+        name     = 'dmpasc',
+        label    = 'DMPA-SC',
+        efficacy = 0.983,
+        dur_use  = ss.lognorm_ex(ss.years(2), ss.years(1)),
+    ),
+)
+
+sim = fp.Sim(location='kenya', interventions=intv)
+sim.run()
+```
+
+`copy_from` takes the method's `name`, not its label. You can also pass a fully-specified
+`fp.Method` object as `method=` instead of using `method_pars`.
+
+By default the new method adds to total use. To have it instead take share from the method
+it was copied from, use `split_shares`, which is the fraction of would-be `copy_from` users
+who choose the new method:
+
+```python
+intv = fp.add_method(
+    year         = 2010,
+    copy_from    = 'inj',
+    method_pars  = dict(name='dmpasc', label='DMPA-SC', efficacy=0.983),
+    split_shares = 0.40,  # 40% of would-be injectable users switch
+)
+```
+
+## Check what happened
+
+Method usage is in `method_mix`, indexed by each method's `idx`:
+
+```python
+cm = sim.connectors.contraception
+fp_mod = sim.people.fp
+share = fp_mod.method_mix[cm.methods['dmpasc'].idx, -1] * 100
+print(f'DMPA-SC share at end: {share:.1f}%')
+```
+
+Note `sim.people.fp` for the FP module and `sim.connectors.contraception` for the choice
+module -- these live in different places.
+
+For complete worked examples, see `examples/example_add_method.py` and
+`examples/example_dmpasc.py` in the repository.
+
+## See also
+
+- [Contraception](index.qmd) for how methods and choice modules fit together
+- [Adding a new method](../../tutorials/T5_new_method.qmd) tutorial
