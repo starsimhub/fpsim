@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>t5_new_method – FPsim</title>
+<title>Adding a new method – FPsim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -71,7 +71,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../conduct.html" rel="next">
+<link href="../user-guide/index.html" rel="next">
 <link href="../tutorials/T4_intervention_eligibility.html" rel="prev">
 <link href="..//assets/favicon.ico" rel="icon">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -80,9 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -312,8 +312,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../tutorials.html"> 
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">Installation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../conduct.html"> 
@@ -342,7 +350,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/T1_intro.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T5_new_method.html">Adding a new method</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T5_new_method.html">Adding a new method</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -372,6 +380,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><strong>What’s new</strong></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Installation</strong></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
@@ -383,8 +397,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting started - Requirements</span></a>
+ <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -396,13 +416,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Interventions</span></a>
+ <span class="menu-text">Interventions and methods</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Select a specific subpopulation for an intervention</span></a>
+ <span class="menu-text">Intervention eligibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -411,6 +431,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Adding a new method</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>User guide</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Calibration</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Calibration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recalibrate a location</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Contraception</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contraception</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Add a new method</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Integrated modeling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Integrated modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model integrated postpartum care</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model birth spacing and fetal health</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -441,14 +553,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#adding-a-new-method" id="toc-adding-a-new-method" class="nav-link active" data-scroll-target="#adding-a-new-method">Adding a new method</a>
-  <ul>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#basic-introduction-new-method-market-share" id="toc-basic-introduction-new-method-market-share" class="nav-link" data-scroll-target="#basic-introduction-new-method-market-share">1. Basic introduction (new method + market share)</a></li>
   <li><a href="#quick-clone-copy-existing-method" id="toc-quick-clone-copy-existing-method" class="nav-link" data-scroll-target="#quick-clone-copy-existing-method">2. Quick clone (copy existing method)</a></li>
   <li><a href="#clone-override-with-improved-contraceptive-technology" id="toc-clone-override-with-improved-contraceptive-technology" class="nav-link" data-scroll-target="#clone-override-with-improved-contraceptive-technology">3. Clone + override with improved contraceptive technology</a></li>
   <li><a href="#market-splitting-split_shares" id="toc-market-splitting-split_shares" class="nav-link" data-scroll-target="#market-splitting-split_shares">4. Market splitting (<code>split_shares</code>)</a></li>
   <li><a href="#alternative-adding-methods-from-simulation-startthe-examples-above-use-the-add_method-intervention-to-introduce-methods-partway-through-a-simulation.-if-you-need-a-method-to-be-available-from-the-very-beginning-of-the-simulation-use-the-manual-method-creation-approach-below." id="toc-alternative-adding-methods-from-simulation-startthe-examples-above-use-the-add_method-intervention-to-introduce-methods-partway-through-a-simulation.-if-you-need-a-method-to-be-available-from-the-very-beginning-of-the-simulation-use-the-manual-method-creation-approach-below." class="nav-link" data-scroll-target="#alternative-adding-methods-from-simulation-startthe-examples-above-use-the-add_method-intervention-to-introduce-methods-partway-through-a-simulation.-if-you-need-a-method-to-be-available-from-the-very-beginning-of-the-simulation-use-the-manual-method-creation-approach-below.">Alternative: Adding methods from simulation startThe examples above use the <code>add_method</code> intervention to introduce methods partway through a simulation. If you need a method to be available from the very beginning of the simulation, use the manual method creation approach below.</a></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -456,9 +566,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/T1_intro.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T5_new_method.html">Adding a new method</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T5_new_method.html">Adding a new method</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">1. Basic introduction (new method + market share)</h1>
+<h1 class="title">Adding a new method</h1>
 </div>
 
 
@@ -475,11 +585,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="adding-a-new-method" class="level1">
-<h1>Adding a new method</h1>
 <p>This tutorial shows how to use the <strong><a href="../api/interventions.html#fpsim.interventions.add_method" title="0"><code>add_method</code></a></strong> intervention to introduce a new contraceptive method into an FPsim run at a specified year. You can use it in several ways:</p>
 <ul>
-<li><strong>Brand new method</strong>: Define a full <code>fp.Method</code> and add it, copying switching behavior from an existing method.</li>
+<li><strong>Brand new method</strong>: Define a full <a href="../api/methods.html#fpsim.methods.Method" title="0"><code>fp.Method</code></a> and add it, copying switching behavior from an existing method.</li>
 <li><strong>Quick clone</strong>: Clone an existing method (e.g.&nbsp;implants) with minimal config; useful for generic “copy” scenarios.</li>
 <li><strong>Clone + override</strong>: Clone a method and override specific attributes (name, efficacy, duration, etc.) via <code>method_pars</code>.</li>
 <li><strong>Market splitting</strong>: Introduce a new method that takes a fraction of another method’s market share using <code>split_shares</code>.</li>
@@ -488,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>Import FPsim, Starsim, and set common simulation parameters. We’ll use a small population and short run for quick demos.</p>
-<div id="07eefebb" class="cell" data-execution_count="1">
+<div id="aa775a76" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -504,8 +612,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>intro_year <span class="op">=</span> <span class="dv">2010</span>  <span class="co"># Year when new methods will be introduced</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The simplest use case: define a new method with <code>fp.Method</code>, introduce it at a given year, copy switching behavior from an existing method, and optionally take part of that method’s market share with <code>split_shares</code>.</p>
-<div id="378d64d0" class="cell" data-execution_count="2">
+</section>
+<section id="basic-introduction-new-method-market-share" class="level2">
+<h2 class="anchored" data-anchor-id="basic-introduction-new-method-market-share">1. Basic introduction (new method + market share)</h2>
+<p>The simplest use case: define a new method with <a href="../api/methods.html#fpsim.methods.Method" title="0"><code>fp.Method</code></a>, introduce it at a given year, copy switching behavior from an existing method, and optionally take part of that method’s market share with <code>split_shares</code>.</p>
+<div id="05ba7dbc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the new method</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>new_injectable <span class="op">=</span> fp.Method(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'new_inj'</span>,</span>
@@ -531,104 +642,134 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"With new method mCPR: </span><span class="sc">{</span>sim_basic<span class="sc">.</span>results<span class="sc">.</span>contraception<span class="sc">.</span>mcpr[<span class="op">-</span><span class="dv">1</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
+Applying calibration parameters for kenya...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
-Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
-Applying calibration parameters for kenya...
-Registered new method "new_inj" (idx=10), will activate in year 2010
-Activating new contraceptive method "new_inj" in year 2010.0
-add_method finalized: "new_inj" has 33 users (3.66% of method mix)
-Baseline mCPR: 49.9%
-With new method mCPR: 49.8%</code></pre>
+Registered new method "new_inj" (idx=10), will activate in year 2010</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Activating new contraceptive method "new_inj" in year 2010.0
+add_method finalized: "new_inj" has 30 users (3.02% of method mix)
+Baseline mCPR: 44.7%
+With new method mCPR: 46.5%</code></pre>
 </div>
 </div>
 </section>
 <section id="quick-clone-copy-existing-method" class="level2">
 <h2 class="anchored" data-anchor-id="quick-clone-copy-existing-method">2. Quick clone (copy existing method)</h2>
-<p>Add a <em>copy</em> of an existing method without defining a full <code>Method</code>: omit <code>method</code> and use <code>copy_from</code>. The new method is named <code>{source}_copy</code> unless you override it in <code>method_pars</code>.</p>
-<div id="1b7cbbc5" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>intv_clone <span class="op">=</span> fp.add_method(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'impl'</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>sim_clone <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_clone], label<span class="op">=</span><span class="st">'With Implant Clone'</span>).run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Add a <em>copy</em> of an existing method without defining a full <a href="../api/methods.html#fpsim.methods.Method" title="0"><code>Method</code></a>: omit <code>method</code> and use <code>copy_from</code>. The new method is named <code>{source}_copy</code> unless you override it in <code>method_pars</code>.</p>
+<div id="e9f42110" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>intv_clone <span class="op">=</span> fp.add_method(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'impl'</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>sim_clone <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_clone], label<span class="op">=</span><span class="st">'With Implant Clone'</span>).run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
-Registered new method "impl_copy" (idx=10), will activate in year 2010
-Activating new contraceptive method "impl_copy" in year 2010.0
-add_method finalized: "impl_copy" has 111 users (12.40% of method mix)</code></pre>
+Registered new method "impl_copy" (idx=10), will activate in year 2010</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Activating new contraceptive method "impl_copy" in year 2010.0
+add_method finalized: "impl_copy" has 96 users (10.02% of method mix)</code></pre>
 </div>
 </div>
 </section>
 <section id="clone-override-with-improved-contraceptive-technology" class="level2">
 <h2 class="anchored" data-anchor-id="clone-override-with-improved-contraceptive-technology">3. Clone + override with improved contraceptive technology</h2>
 <p>Clone an existing method and override specific attributes via <code>method_pars</code>. In this next example we introduce an improved injectable with higher efficacy and a 10% longer relative duration of use.</p>
-<div id="0c365547" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>intv_override <span class="op">=</span> fp.add_method(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'inj'</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    method_pars<span class="op">=</span>{</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'name'</span>: <span class="st">'inj_improved'</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'label'</span>: <span class="st">'Improved Injectable'</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'efficacy'</span>: <span class="fl">0.998</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'rel_dur_use'</span>: <span class="fl">1.1</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>sim_override <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_override], label<span class="op">=</span><span class="st">'With Improved Injectable'</span>).run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6bb39fbe" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>intv_override <span class="op">=</span> fp.add_method(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'inj'</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    method_pars<span class="op">=</span>{</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'name'</span>: <span class="st">'inj_improved'</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'label'</span>: <span class="st">'Improved Injectable'</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'efficacy'</span>: <span class="fl">0.998</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'rel_dur_use'</span>: <span class="fl">1.1</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>sim_override <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_override], label<span class="op">=</span><span class="st">'With Improved Injectable'</span>).run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
-Registered new method "inj_improved" (idx=10), will activate in year 2010
-Activating new contraceptive method "inj_improved" in year 2010.0
-add_method finalized: "inj_improved" has 39 users (4.14% of method mix)</code></pre>
+Registered new method "inj_improved" (idx=10), will activate in year 2010</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Activating new contraceptive method "inj_improved" in year 2010.0
+add_method finalized: "inj_improved" has 36 users (3.66% of method mix)</code></pre>
 </div>
 </div>
 </section>
 <section id="market-splitting-split_shares" class="level2">
 <h2 class="anchored" data-anchor-id="market-splitting-split_shares">4. Market splitting (<code>split_shares</code>)</h2>
 <p>Model a new product that takes a fixed fraction of an existing method’s users (e.g.&nbsp;self-injectable DMPA-SC taking share from clinic injectables). Use <code>split_shares</code> between 0 and 1; the new method gets that fraction of users who would have chosen <code>copy_from</code>.</p>
-<div id="946f7544" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dmpasc_pars <span class="op">=</span> <span class="bu">dict</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'dmpasc'</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">'DMPA-SC (Self-Injectable)'</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    efficacy<span class="op">=</span><span class="fl">0.997</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    dur_use<span class="op">=</span>ss.lognorm_ex(mean<span class="op">=</span><span class="fl">0.25</span>, std<span class="op">=</span><span class="fl">0.1</span>),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>intv_split <span class="op">=</span> fp.add_method(</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    method_pars<span class="op">=</span>dmpasc_pars,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'inj'</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    split_shares<span class="op">=</span><span class="fl">0.40</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>sim_split <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_split], label<span class="op">=</span><span class="st">'With DMPA-SC'</span>).run()</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Method-specific usage at end</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> sim_split.connectors.contraception</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>fp_mod <span class="op">=</span> sim_split.connectors.fp</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>inj_usage <span class="op">=</span> fp_mod.method_mix[cm.methods[<span class="st">'inj'</span>].idx, <span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>dmpasc_usage <span class="op">=</span> fp_mod.method_mix[cm.methods[<span class="st">'dmpasc'</span>].idx, <span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Injectable: </span><span class="sc">{</span>inj_usage<span class="sc">:.1f}</span><span class="ss">%  |  DMPA-SC: </span><span class="sc">{</span>dmpasc_usage<span class="sc">:.1f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="35db3f1c" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dmpasc_pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'dmpasc'</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">'DMPA-SC (Self-Injectable)'</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    efficacy<span class="op">=</span><span class="fl">0.997</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    dur_use<span class="op">=</span>ss.lognorm_ex(mean<span class="op">=</span><span class="fl">0.25</span>, std<span class="op">=</span><span class="fl">0.1</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>intv_split <span class="op">=</span> fp.add_method(</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span>intro_year,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    method_pars<span class="op">=</span>dmpasc_pars,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    copy_from<span class="op">=</span><span class="st">'inj'</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    split_shares<span class="op">=</span><span class="fl">0.40</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>sim_split <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, interventions<span class="op">=</span>[intv_split], label<span class="op">=</span><span class="st">'With DMPA-SC'</span>).run()</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Method-specific usage at end</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> sim_split.connectors.contraception</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>fp_mod <span class="op">=</span> sim_split.people.fp</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>inj_usage <span class="op">=</span> fp_mod.method_mix[cm.methods[<span class="st">'inj'</span>].idx, <span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>dmpasc_usage <span class="op">=</span> fp_mod.method_mix[cm.methods[<span class="st">'dmpasc'</span>].idx, <span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Injectable: </span><span class="sc">{</span>inj_usage<span class="sc">:.1f}</span><span class="ss">%  |  DMPA-SC: </span><span class="sc">{</span>dmpasc_usage<span class="sc">:.1f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/kenya/data... 
 Applying calibration parameters for kenya...
-Registered new method "dmpasc" (idx=10), will activate in year 2010
-Activating new contraceptive method "dmpasc" in year 2010.0
-add_method finalized: "dmpasc" has 25 users (2.60% of method mix)
-Injectable: 12.4%  |  DMPA-SC: 2.6%</code></pre>
+Registered new method "dmpasc" (idx=10), will activate in year 2010</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Activating new contraceptive method "dmpasc" in year 2010.0
+add_method finalized: "dmpasc" has 20 users (2.05% of method mix)
+Injectable: 11.0%  |  DMPA-SC: 2.0%</code></pre>
 </div>
 </div>
 <p>We can visualize how the market share evolved over time using the <a href="../api/analyzers.html#fpsim.analyzers.method_mix_over_time" title="0"><code>method_mix_over_time</code></a> analyzer. The plot below shows the share of injectables and DMPA-SC over time, highlighting how DMPA-SC captured a portion of the injectable market when it was introduced in 2010.</p>
-<div id="4c886760" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the method mix over time, focusing on injectables and DMPA-SC</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The plot shows share (%) and only the two methods involved in the market split</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sim_split.analyzers[<span class="dv">0</span>].plot(methods<span class="op">=</span>[<span class="st">'inj'</span>, <span class="st">'dmpasc'</span>], share<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="0663057a" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the method mix over time, focusing on injectables and DMPA-SC</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The plot shows share (%) and only the two methods involved in the market split</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sim_split.analyzers[<span class="dv">0</span>].plot(methods<span class="op">=</span>[<span class="st">'inj'</span>, <span class="st">'dmpasc'</span>], share<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -641,77 +782,85 @@ Injectable: 12.4%  |  DMPA-SC: 2.6%</code></pre>
 <section id="alternative-adding-methods-from-simulation-startthe-examples-above-use-the-add_method-intervention-to-introduce-methods-partway-through-a-simulation.-if-you-need-a-method-to-be-available-from-the-very-beginning-of-the-simulation-use-the-manual-method-creation-approach-below." class="level2">
 <h2 class="anchored" data-anchor-id="alternative-adding-methods-from-simulation-startthe-examples-above-use-the-add_method-intervention-to-introduce-methods-partway-through-a-simulation.-if-you-need-a-method-to-be-available-from-the-very-beginning-of-the-simulation-use-the-manual-method-creation-approach-below.">Alternative: Adding methods from simulation startThe examples above use the <a href="../api/interventions.html#fpsim.interventions.add_method" title="0"><code>add_method</code></a> intervention to introduce methods partway through a simulation. If you need a method to be available from the very beginning of the simulation, use the manual method creation approach below.</h2>
 <p>First, make a copy of the default list of contraceptive methods:</p>
-<div id="0af0b7d6" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>my_methods <span class="op">=</span> fp.make_methods()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="465081a5" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>my_methods <span class="op">=</span> fp.make_methods()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Define a new method with its attributes:1. A simple name (used inside the code)2. Efficacy (as a decimal)3. Whether it is a modern method4. Duration of use (in months or as a distribution)5. A label (used in plots)</p>
-<div id="f7431ee0" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>new_method <span class="op">=</span> fp.Method(name<span class="op">=</span><span class="st">'new'</span>, efficacy<span class="op">=</span><span class="fl">0.96</span>, modern<span class="op">=</span><span class="va">True</span>, dur_use<span class="op">=</span><span class="dv">15</span>, label<span class="op">=</span><span class="st">'New method'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1af6f1fc" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>new_method <span class="op">=</span> fp.Method(name<span class="op">=</span><span class="st">'new'</span>, efficacy<span class="op">=</span><span class="fl">0.96</span>, modern<span class="op">=</span><span class="va">True</span>, dur_use<span class="op">=</span><span class="dv">15</span>, label<span class="op">=</span><span class="st">'New method'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Add the method to the list:</p>
-<div id="cbf2b6f0" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>my_methods <span class="op">+=</span> new_method</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="2f405bfc" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>my_methods <span class="op">+=</span> new_method</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Create a method choice module that includes your new method:</p>
-<div id="18cd4b2f" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>method_choice <span class="op">=</span> fp.RandomChoice(methods<span class="op">=</span>my_methods)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="635d6d26" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>method_choice <span class="op">=</span> fp.RandomChoice(methods<span class="op">=</span>my_methods)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now run simulations comparing baseline (without the new method) to a scenario with the new method:</p>
-<div id="df049c68" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">10_000</span>,    </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    location   <span class="op">=</span> <span class="st">'senegal'</span>,    </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    start      <span class="op">=</span> <span class="dv">2000</span>,     </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    stop       <span class="op">=</span> <span class="dv">2012</span>,    </span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    exposure_factor <span class="op">=</span> <span class="fl">1.0</span>  <span class="co"># Overall scale factor on probability of becoming pregnant</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, label<span class="op">=</span><span class="st">'New Method'</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> ss.MultiSim(sims<span class="op">=</span>[s1, s2])</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>msim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="d1f10ffb" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">10_000</span>,    </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    location   <span class="op">=</span> <span class="st">'senegal'</span>,    </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    start      <span class="op">=</span> <span class="dv">2000</span>,     </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    stop       <span class="op">=</span> <span class="dv">2012</span>,    </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    exposure_factor <span class="op">=</span> <span class="fl">1.0</span>  <span class="co"># Overall scale factor on probability of becoming pregnant</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, contraception_module<span class="op">=</span>method_choice, label<span class="op">=</span><span class="st">'New Method'</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> ss.MultiSim(sims<span class="op">=</span>[s1, s2])</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>msim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/senegal/data... 
 Applying calibration parameters for senegal...
 Loading data from files in /home/runner/work/fpsim/fpsim/fpsim/locations/senegal/data... 
 Applying calibration parameters for senegal...
 Initializing sim "Baseline" with 10000 agents
-Initializing sim "New Method" with 10000 agents
-  Running "Baseline": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
+Initializing sim "New Method" with 10000 agents</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values
+/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Running "Baseline": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
   Running "New Method": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
-  Running "New Method": 2001 (12/145) (0.17 s)  •——————————————————— 9%
-  Running "Baseline": 2001 (12/145) (0.23 s)  •——————————————————— 9%
-  Running "New Method": 2002 (24/145) (0.39 s)  •••————————————————— 17%
+  Running "New Method": 2001 (12/145) (0.21 s)  •——————————————————— 9%
+  Running "Baseline": 2001 (12/145) (0.26 s)  •——————————————————— 9%
+  Running "New Method": 2002 (24/145) (0.43 s)  •••————————————————— 17%
   Running "Baseline": 2002 (24/145) (0.53 s)  •••————————————————— 17%
-  Running "New Method": 2003 (36/145) (0.60 s)  •••••——————————————— 26%
-  Running "Baseline": 2003 (36/145) (0.82 s)  •••••——————————————— 26%
-  Running "New Method": 2004 (48/145) (0.82 s)  ••••••—————————————— 34%
-  Running "New Method": 2005 (60/145) (1.04 s)  ••••••••———————————— 42%
-  Running "Baseline": 2004 (48/145) (1.13 s)  ••••••—————————————— 34%
-  Running "New Method": 2006 (72/145) (1.26 s)  ••••••••••—————————— 50%
-  Running "Baseline": 2005 (60/145) (1.45 s)  ••••••••———————————— 42%
-  Running "New Method": 2007 (84/145) (1.49 s)  •••••••••••————————— 59%
-  Running "New Method": 2008 (96/145) (1.71 s)  •••••••••••••——————— 67%
-  Running "Baseline": 2006 (72/145) (1.78 s)  ••••••••••—————————— 50%
-  Running "New Method": 2009 (108/145) (1.94 s)  •••••••••••••••————— 75%
-  Running "Baseline": 2007 (84/145) (2.11 s)  •••••••••••————————— 59%
-  Running "New Method": 2010 (120/145) (2.16 s)  ••••••••••••••••———— 83%
-  Running "New Method": 2011 (132/145) (2.39 s)  ••••••••••••••••••—— 92%
-  Running "Baseline": 2008 (96/145) (2.45 s)  •••••••••••••——————— 67%
-  Running "New Method": 2012 (144/145) (2.65 s)  •••••••••••••••••••• 100%
+  Running "New Method": 2003 (36/145) (0.66 s)  •••••——————————————— 26%
+  Running "Baseline": 2003 (36/145) (0.80 s)  •••••——————————————— 26%
+  Running "New Method": 2004 (48/145) (0.88 s)  ••••••—————————————— 34%
+  Running "Baseline": 2004 (48/145) (1.09 s)  ••••••—————————————— 34%
+  Running "New Method": 2005 (60/145) (1.15 s)  ••••••••———————————— 42%
+  Running "Baseline": 2005 (60/145) (1.38 s)  ••••••••———————————— 42%
+  Running "New Method": 2006 (72/145) (1.38 s)  ••••••••••—————————— 50%
+  Running "New Method": 2007 (84/145) (1.62 s)  •••••••••••————————— 59%
+  Running "Baseline": 2006 (72/145) (1.68 s)  ••••••••••—————————— 50%
+  Running "New Method": 2008 (96/145) (1.88 s)  •••••••••••••——————— 67%
+  Running "Baseline": 2007 (84/145) (2.00 s)  •••••••••••————————— 59%
+  Running "New Method": 2009 (108/145) (2.13 s)  •••••••••••••••————— 75%
+  Running "Baseline": 2008 (96/145) (2.32 s)  •••••••••••••——————— 67%
+  Running "New Method": 2010 (120/145) (2.38 s)  ••••••••••••••••———— 83%
+  Running "Baseline": 2009 (108/145) (2.64 s)  •••••••••••••••————— 75%
+  Running "New Method": 2011 (132/145) (2.64 s)  ••••••••••••••••••—— 92%
+  Running "New Method": 2012 (144/145) (2.90 s)  •••••••••••••••••••• 100%
 
-  Running "Baseline": 2009 (108/145) (2.81 s)  •••••••••••••••————— 75%
-  Running "Baseline": 2010 (120/145) (3.20 s)  ••••••••••••••••———— 83%
-  Running "Baseline": 2011 (132/145) (3.54 s)  ••••••••••••••••••—— 92%
-  Running "Baseline": 2012 (144/145) (3.90 s)  •••••••••••••••••••• 100%
+  Running "Baseline": 2010 (120/145) (2.97 s)  ••••••••••••••••———— 83%
+  Running "Baseline": 2011 (132/145) (3.35 s)  ••••••••••••••••••—— 92%
+  Running "Baseline": 2012 (144/145) (3.69 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-<pre><code>MultiSim("Baseline"; n_sims: 2; base: Sim(Baseline; n=10000; 2000—2012; demographics=deaths; connectors=contraception, edu, fp))</code></pre>
+<pre><code>MultiSim("Baseline"; n_sims: 2; base: Sim(Baseline; n=10000; 2000—2012; demographics=fp, deaths; connectors=contraception, edu))</code></pre>
 </div>
 </div>
 <p>Compare the contraceptive prevalence rate between the two scenarios:</p>
-<div id="7c2dac34" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>msim.plot(key<span class="op">=</span><span class="st">'cpr'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a802ef89" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>msim.plot(key<span class="op">=</span><span class="st">'cpr'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Figure(1536x960)</code></pre>
 </div>
@@ -732,7 +881,6 @@ Initializing sim "New Method" with 10000 agents
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1151,13 +1299,13 @@ Initializing sim "New Method" with 10000 agents
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/T4_intervention_eligibility.html" class="pagination-link" aria-label="Select a specific subpopulation for an intervention">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Select a specific subpopulation for an intervention</span>
+      <a href="../tutorials/T4_intervention_eligibility.html" class="pagination-link" aria-label="Intervention eligibility">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Intervention eligibility</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../conduct.html" class="pagination-link" aria-label="**Code of conduct**">
-        <span class="nav-page-text"><strong>Code of conduct</strong></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../user-guide/index.html" class="pagination-link" aria-label="User guide">
+        <span class="nav-page-text">User guide</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1168,7 +1316,7 @@ Initializing sim "New Method" with 10000 agents
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.5 (2026-10-03).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

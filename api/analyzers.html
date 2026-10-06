@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,9 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -312,8 +312,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../tutorials.html"> 
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">Installation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../conduct.html"> 
@@ -528,9 +536,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#fpsim.analyzers.lifeof_recorder.step" id="toc-fpsim.analyzers.lifeof_recorder.step" class="nav-link" data-scroll-target="#fpsim.analyzers.lifeof_recorder.step">step</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#fpsim.analyzers.method_mix_by_age" id="toc-fpsim.analyzers.method_mix_by_age" class="nav-link" data-scroll-target="#fpsim.analyzers.method_mix_by_age">method_mix_by_age</a></li>
+  <li><a href="#fpsim.analyzers.method_mix_by_age" id="toc-fpsim.analyzers.method_mix_by_age" class="nav-link" data-scroll-target="#fpsim.analyzers.method_mix_by_age">method_mix_by_age</a>
+  <ul class="collapse">
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  </ul></li>
   <li><a href="#fpsim.analyzers.method_mix_over_time" id="toc-fpsim.analyzers.method_mix_over_time" class="nav-link" data-scroll-target="#fpsim.analyzers.method_mix_over_time">method_mix_over_time</a>
   <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
   <li><a href="#methods-3" id="toc-methods-3" class="nav-link" data-scroll-target="#methods-3">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.analyzers.method_mix_over_time.plot" id="toc-fpsim.analyzers.method_mix_over_time.plot" class="nav-link" data-scroll-target="#fpsim.analyzers.method_mix_over_time.plot">plot</a></li>
@@ -538,7 +550,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#fpsim.analyzers.snapshot" id="toc-fpsim.analyzers.snapshot" class="nav-link" data-scroll-target="#fpsim.analyzers.snapshot">snapshot</a>
   <ul class="collapse">
-  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
   <li><a href="#methods-4" id="toc-methods-4" class="nav-link" data-scroll-target="#methods-4">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.analyzers.snapshot.step" id="toc-fpsim.analyzers.snapshot.step" class="nav-link" data-scroll-target="#fpsim.analyzers.snapshot.step">step</a></li>
@@ -546,6 +558,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#fpsim.analyzers.state_tracker" id="toc-fpsim.analyzers.state_tracker" class="nav-link" data-scroll-target="#fpsim.analyzers.state_tracker">state_tracker</a>
   <ul class="collapse">
+  <li><a href="#parameters-8" id="toc-parameters-8" class="nav-link" data-scroll-target="#parameters-8">Parameters</a></li>
   <li><a href="#methods-5" id="toc-methods-5" class="nav-link" data-scroll-target="#methods-5">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.analyzers.state_tracker.init_post" id="toc-fpsim.analyzers.state_tracker.init_post" class="nav-link" data-scroll-target="#fpsim.analyzers.state_tracker.init_post">init_post</a></li>
@@ -555,6 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#fpsim.analyzers.track_as" id="toc-fpsim.analyzers.track_as" class="nav-link" data-scroll-target="#fpsim.analyzers.track_as">track_as</a>
   <ul class="collapse">
+  <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
   <li><a href="#methods-6" id="toc-methods-6" class="nav-link" data-scroll-target="#methods-6">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.analyzers.track_as.log_age_split" id="toc-fpsim.analyzers.track_as.log_age_split" class="nav-link" data-scroll-target="#fpsim.analyzers.track_as.log_age_split">log_age_split</a></li>
@@ -605,11 +619,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td><a href="#fpsim.analyzers.method_mix_by_age">method_mix_by_age</a></td>
-<td>Analyzer that records the method mix by age at the end of the simulation.</td>
+<td>Record the method mix by age at the end of the simulation.</td>
 </tr>
 <tr class="even">
 <td><a href="#fpsim.analyzers.method_mix_over_time">method_mix_over_time</a></td>
-<td>Tracks the number of women on each method available</td>
+<td>Track the number of women on each method at every timestep.</td>
 </tr>
 <tr class="odd">
 <td><a href="#fpsim.analyzers.snapshot">snapshot</a></td>
@@ -617,11 +631,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><a href="#fpsim.analyzers.state_tracker">state_tracker</a></td>
-<td>Records the number of living women on a specific boolean state (eg, numbe of</td>
+<td>Record the number of living women in a given boolean state each timestep.</td>
 </tr>
 <tr class="odd">
 <td><a href="#fpsim.analyzers.track_as">track_as</a></td>
-<td>Analyzer for tracking age-specific results</td>
+<td>Record age-specific versions of the standard results.</td>
 </tr>
 </tbody>
 </table>
@@ -927,12 +941,72 @@ final_cpr = sim.analyzers.cpr_by_age.results['total'][-1]</code></pre>
 <section id="fpsim.analyzers.method_mix_by_age" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.analyzers.method_mix_by_age">method_mix_by_age</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>analyzers.method_mix_by_age(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Analyzer that records the method mix by age at the end of the simulation.</p>
+<p>Record the method mix by age at the end of the simulation.</p>
+<p>Produces a single end-of-run snapshot, so use it to compare method mix across age groups against survey data. For a time series instead, use <a href="../api/analyzers.html#fpsim.analyzers.method_mix_over_time">method_mix_over_time</a>.</p>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="https://docs.starsim.org/api/analyzers.html#starsim.analyzers.Analyzer" title="0"><code>ss.Analyzer</code></a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+
+sim = fp.Sim(location='kenya', analyzers=fp.method_mix_by_age())
+sim.run()
+mix = sim.analyzers[0]
+```</code></pre>
+</section>
 </section>
 <section id="fpsim.analyzers.method_mix_over_time" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.analyzers.method_mix_over_time">method_mix_over_time</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>analyzers.method_mix_over_time(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Tracks the number of women on each method available for each time step</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>analyzers.method_mix_over_time(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Track the number of women on each method at every timestep.</p>
+<p>Use this to see how method mix evolves, for example after introducing a new method with <a href="../api/interventions.html#fpsim.interventions.add_method">add_method</a>. For an end-of-run snapshot by age instead, use <a href="../api/analyzers.html#fpsim.analyzers.method_mix_by_age">method_mix_by_age</a>.</p>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="https://docs.starsim.org/api/analyzers.html#starsim.analyzers.Analyzer" title="0"><code>ss.Analyzer</code></a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+
+sim = fp.Sim(location='kenya', analyzers=fp.method_mix_over_time())
+sim.run()
+sim.analyzers[0].plot()
+```</code></pre>
+</section>
 <section id="methods-3" class="level4">
 <h4 class="anchored" data-anchor-id="methods-3">Methods</h4>
 <table class="caption-top table">
@@ -951,15 +1025,15 @@ final_cpr = sim.analyzers.cpr_by_age.results['total'][-1]</code></pre>
 </table>
 <section id="fpsim.analyzers.method_mix_over_time.plot" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.method_mix_over_time.plot">plot</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>analyzers.method_mix_over_time.plot(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    share<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    methods<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    stacked<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>analyzers.method_mix_over_time.plot(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    share<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    methods<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    stacked<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Plot method mix over time</p>
-<section id="parameters-4" class="level6 doc-section doc-section-parameters">
-<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h6>
+<section id="parameters-6" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h6>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1002,10 +1076,10 @@ final_cpr = sim.analyzers.cpr_by_age.results['total'][-1]</code></pre>
 </section>
 <section id="fpsim.analyzers.snapshot" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.analyzers.snapshot">snapshot</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>analyzers.snapshot(timesteps, <span class="op">*</span>args, die<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>analyzers.snapshot(timesteps, <span class="op">*</span>args, die<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Analyzer that takes a “snapshot” of the sim.people array at specified points in time, and saves them to itself.</p>
-<section id="parameters-5" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1066,21 +1140,75 @@ people = snapshot.snapshots[0]</code></pre>
 </table>
 <section id="fpsim.analyzers.snapshot.step" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.snapshot.step">step</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>analyzers.snapshot.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>analyzers.snapshot.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Apply snapshot at each timestep listed in timesteps and save result at snapshot[str(timestep)]</p>
 </section>
 </section>
 </section>
 <section id="fpsim.analyzers.state_tracker" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.analyzers.state_tracker">state_tracker</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker(</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    state_name<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    module_name<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    min_age<span class="op">=</span>fpd.min_age,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    max_age<span class="op">=</span>fpd.max_age,</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Records the number of living women on a specific boolean state (eg, numbe of living women who live in rural settings)</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    state_name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    module_name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    min_age<span class="op">=</span>fpd.min_age,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    max_age<span class="op">=</span>fpd.max_age,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Record the number of living women in a given boolean state each timestep.</p>
+<p>Use this to track any boolean state without writing a custom analyzer, for example how many women live in urban settings or are currently postpartum.</p>
+<section id="parameters-8" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>state_name</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>name of the boolean state to track, e.g.&nbsp;<code>'urban'</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>module_name</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>module the state belongs to, e.g.&nbsp;<code>'fp'</code>; omit for states on People</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>min_age</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#float">float</a></td>
+<td>youngest age to include</td>
+<td><code>fpd.min_age</code></td>
+</tr>
+<tr class="even">
+<td>max_age</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#float">float</a></td>
+<td>oldest age to include</td>
+<td><code>fpd.max_age</code></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="https://docs.starsim.org/api/analyzers.html#starsim.analyzers.Analyzer" title="0"><code>ss.Analyzer</code></a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+
+tracker = fp.state_tracker(state_name='urban')  # urban is a People state
+sim = fp.Sim(location='kenya', analyzers=tracker)
+sim.run()
+```</code></pre>
+</section>
 <section id="methods-5" class="level4">
 <h4 class="anchored" data-anchor-id="methods-5">Methods</h4>
 <table class="caption-top table">
@@ -1107,25 +1235,30 @@ people = snapshot.snapshots[0]</code></pre>
 </table>
 <section id="fpsim.analyzers.state_tracker.init_post" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.state_tracker.init_post">init_post</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.init_post()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.init_post()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Initializes bins and data with proper shapes</p>
 </section>
 <section id="fpsim.analyzers.state_tracker.plot" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.state_tracker.plot">plot</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.plot(style<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.plot(style<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Plots self.data as a line</p>
 </section>
 <section id="fpsim.analyzers.state_tracker.step" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.state_tracker.step">step</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>analyzers.state_tracker.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Records histogram of ages of all alive individuals at a timestep such that self.data[timestep] = list of proportions where index signifies age</p>
 </section>
 </section>
 </section>
 <section id="fpsim.analyzers.track_as" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.analyzers.track_as">track_as</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Analyzer for tracking age-specific results</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Record age-specific versions of the standard results.</p>
+<p>Adds age stratification to results that are otherwise reported for the whole population, such as fertility and contraceptive use.</p>
+<section id="note" class="level4 doc-section doc-section-note">
+<h4 class="doc-section doc-section-note anchored" data-anchor-id="note">Note</h4>
+<p>This analyzer assigns a plain dict to <code>self.results</code>, which Starsim 3.6.0 locks, so it currently raises <a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" title="1"><code>AttributeError</code></a> on init. It needs porting to <a href="https://docs.starsim.org/api/results.html#starsim.results.Results" title="0"><code>ss.Results</code></a>.</p>
+</section>
 <section id="methods-6" class="level4">
 <h4 class="anchored" data-anchor-id="methods-6">Methods</h4>
 <table class="caption-top table">
@@ -1148,17 +1281,17 @@ people = snapshot.snapshots[0]</code></pre>
 </table>
 <section id="fpsim.analyzers.track_as.log_age_split" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.track_as.log_age_split">log_age_split</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as.log_age_split(</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    binned_ages_t,</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    channel,</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    numerators,</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    denominators<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as.log_age_split(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    binned_ages_t,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    channel,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    numerators,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    denominators<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Method called if age-specific results are being tracked. Separates results by age.</p>
 </section>
 <section id="fpsim.analyzers.track_as.step" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.analyzers.track_as.step">step</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>analyzers.track_as.step()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Apply the analyzer Note: much of the logic won’t work because the sim doesn’t record the time at which events occur (!), so attributes like ppl.ti_pregnant won’t exist. These are all slated to be added as part of the V3 refactor. For now, this is a placeholder.</p>
 
 
@@ -1601,7 +1734,7 @@ people = snapshot.snapshots[0]</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.5 (2026-10-03).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

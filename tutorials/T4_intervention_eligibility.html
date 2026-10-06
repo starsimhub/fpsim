@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>t4_intervention_eligibility – FPsim</title>
+<title>Intervention eligibility – FPsim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,9 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -312,8 +312,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../tutorials.html"> 
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">Installation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../conduct.html"> 
@@ -342,7 +350,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/T1_intro.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T4_intervention_eligibility.html">Select a specific subpopulation for an intervention</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T4_intervention_eligibility.html">Intervention eligibility</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -372,6 +380,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><strong>What’s new</strong></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../installation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Installation</strong></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
@@ -383,8 +397,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting started - Requirements</span></a>
+ <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -396,13 +416,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Interventions</span></a>
+ <span class="menu-text">Interventions and methods</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Select a specific subpopulation for an intervention</span></a>
+ <span class="menu-text">Intervention eligibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -411,6 +431,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Adding a new method</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>User guide</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">User guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Calibration</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Calibration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Recalibrate a location</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Contraception</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Contraception</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Add a new method</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Integrated modeling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Integrated modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model integrated postpartum care</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model birth spacing and fetal health</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -441,30 +553,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#select-a-specific-subpopulation-for-an-intervention" id="toc-select-a-specific-subpopulation-for-an-intervention" class="nav-link active" data-scroll-target="#select-a-specific-subpopulation-for-an-intervention">Select a specific subpopulation for an intervention</a>
-  <ul>
-  <li><a href="#increase-the-number-of-women-who-have-education" id="toc-increase-the-number-of-women-who-have-education" class="nav-link" data-scroll-target="#increase-the-number-of-women-who-have-education">Increase the number of women who have education</a></li>
-  </ul></li>
+  <li><a href="#increase-the-number-of-women-who-have-education" id="toc-increase-the-number-of-women-who-have-education" class="nav-link active" data-scroll-target="#increase-the-number-of-women-who-have-education">Increase the number of women who have education</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/T1_intro.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T4_intervention_eligibility.html">Select a specific subpopulation for an intervention</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html"><strong>Tutorials</strong></a></li><li class="breadcrumb-item"><a href="../tutorials/T4_intervention_eligibility.html">Intervention eligibility</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Intervention eligibility</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="select-a-specific-subpopulation-for-an-intervention" class="level1">
-<h1>Select a specific subpopulation for an intervention</h1>
+</header>
+
+
 <p>At this point, you should now be able to run multiple simulations with distinct interventions, using default or custom parameters and plot the results. So far we’ve seen interventions that target a model parameter. Now we will see how we can we specify a function that tells FPsim who will receive the intervention. First, import the model and set your default settings.</p>
-<div id="6d244de3" class="cell" data-execution_count="1">
+<div id="3963ce53" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp      <span class="co"># Main FPsim module</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc     <span class="co"># For utilities</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss    <span class="co"># For running multiple sims in parallel</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt  <span class="co"># For plotting</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="bddd4522" class="cell" data-execution_count="2">
+<div id="b82e5613" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> <span class="st">'kenya'</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">1_000</span>,</span>
@@ -475,70 +598,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, we will modify a ‘state’ value of all eligible women. To see all the states you can select based on, run this code:</p>
-<div id="75790c95" class="cell" data-execution_count="3">
+<div id="cfd8681c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fpsim.defaults <span class="im">import</span> fpmod_states</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, state <span class="kw">in</span> <span class="bu">enumerate</span>(fpmod_states): <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>state<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>0: on_contra
 1: method
 2: ti_contra
-3: barrier
-4: ever_used_contra
-5: intent_to_use
-6: fertility_intent
-7: fertility_intent_cat
-8: rel_sus
-9: lam
-10: pregnant
-11: fertile
-12: sexually_active
-13: sexual_debut
-14: lactating
-15: postpartum
-16: sexual_debut_age
-17: fated_debut
-18: first_birth_age
-19: parity
-20: n_births
-21: n_stillbirths
-22: n_miscarriages
-23: n_abortions
-24: n_pregnancies
-25: months_inactive
-26: short_interval
-27: gestation
-28: remainder_months
-29: dur_pregnancy
-30: dur_postpartum
-31: dur_breastfeed
-32: dur_breastfeed_total
-33: ti_conceived
-34: ti_pregnant
-35: ti_delivery
-36: ti_last_delivery
-37: ti_live_birth
-38: ti_stillbirth
-39: ti_postpartum
-40: ti_miscarriage
-41: ti_abortion
-42: ti_stop_postpartum
-43: ti_stop_breastfeeding
-44: ti_debut
-45: ti_dead
-46: personal_fecundity
-47: birth_ages
-48: stillborn_ages
-49: miscarriage_ages
-50: abortion_ages
-51: partnered
-52: partnership_age</code></pre>
+3: ever_used_contra
+4: intent_to_use
+5: fertility_intent
+6: fertility_intent_cat
+7: lam
+8: sexually_active
+9: sexual_debut
+10: sexual_debut_age
+11: fated_debut
+12: first_birth_age
+13: n_births
+14: n_abortions
+15: n_twinbirths
+16: months_inactive
+17: twin_uid
+18: dur_breastfeed_total
+19: ti_last_delivery
+20: ti_live_birth
+21: ti_stillbirth
+22: ti_miscarriage
+23: ti_abortion
+24: personal_fecundity
+25: birth_ages
+26: stillborn_ages
+27: miscarriage_ages
+28: abortion_ages
+29: partnered
+30: partnership_age</code></pre>
 </div>
 </div>
 <section id="increase-the-number-of-women-who-have-education" class="level2">
 <h2 class="anchored" data-anchor-id="increase-the-number-of-women-who-have-education">Increase the number of women who have education</h2>
 <p>The <a href="../api/interventions.html#fpsim.interventions.change_people_state" title="0"><code>change_people_state</code></a> intervention can be used to change ‘states’ or attributes of women. The states you can change are the same list of target states from above. Let’s see what would hapen if we increase education. In FPsim, education is defined based on an education objective and education attainment. The education objective is given to each woman when she enters the model. During her school age years, she gains one year of educationl attainment each year until she reaches her objective. This trajectory can be interrupted if she experiences a pregnancy during those years.</p>
 <p>First, we will identify our eligible subpopulation for this intervention. In this case, we are selecting all women who have a goal to achieve at least one year of education.</p>
-<div id="0de33f82" class="cell" data-execution_count="4">
+<div id="e6fe35a4" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> select_undereducated(sim):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" Select women who have a goal to achieve at least 1 year of education """</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    is_eligible <span class="op">=</span> ((sim.people.female) <span class="op">&amp;</span></span>
@@ -547,7 +648,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> is_eligible</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, define a baseline simulation, s0, with no changes.</p>
-<div id="ee70d3c0" class="cell" data-execution_count="5">
+<div id="d4cb4781" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>edu <span class="op">=</span> fp.Education(location<span class="op">=</span>location)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>s0 <span class="op">=</span> fp.Sim(pars<span class="op">=</span>pars, education_module<span class="op">=</span>edu, label<span class="op">=</span><span class="st">'Baseline'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -556,7 +657,7 @@ Applying calibration parameters for kenya...</code></pre>
 </div>
 </div>
 <p>Next, we define our education change intervention. This intervention finds all of the eligible women (those with a goal of achieveing at least 1 year of education), and gives all of them 15 years of education, starting in the year 2010. We define a simulation, s1, with this educaiton intervention.</p>
-<div id="eb90cc65" class="cell" data-execution_count="6">
+<div id="39c65f35" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>change_education <span class="op">=</span> fp.change_people_state(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        <span class="st">'edu.attainment'</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                        eligibility<span class="op">=</span>select_undereducated,</span>
@@ -574,50 +675,56 @@ Applying calibration parameters for kenya...</code></pre>
 </div>
 </div>
 <p>Run a multile simulation run with msim to get the results of both of these simulations.</p>
-<div id="66f00785" class="cell" data-execution_count="7">
+<div id="6c16ce56" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> ss.MultiSim(sims<span class="op">=</span>[s0, s1])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>msim.run(parallel<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>s0, s1 <span class="op">=</span> msim.sims</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Initializing sim "Baseline" with 1000 agents
-  Running "Baseline": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
+<pre><code>Initializing sim "Baseline" with 1000 agents</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+  self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Running "Baseline": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
   Running "Baseline": 2001 (12/145) (0.14 s)  •——————————————————— 9%
-  Running "Baseline": 2002 (24/145) (0.34 s)  •••————————————————— 17%
-  Running "Baseline": 2003 (36/145) (0.55 s)  •••••——————————————— 26%
-  Running "Baseline": 2004 (48/145) (0.77 s)  ••••••—————————————— 34%
-  Running "Baseline": 2005 (60/145) (0.99 s)  ••••••••———————————— 42%
-  Running "Baseline": 2006 (72/145) (1.20 s)  ••••••••••—————————— 50%
-  Running "Baseline": 2007 (84/145) (1.42 s)  •••••••••••————————— 59%
-  Running "Baseline": 2008 (96/145) (1.65 s)  •••••••••••••——————— 67%
-  Running "Baseline": 2009 (108/145) (1.88 s)  •••••••••••••••————— 75%
-  Running "Baseline": 2010 (120/145) (2.11 s)  ••••••••••••••••———— 83%
-  Running "Baseline": 2011 (132/145) (2.33 s)  ••••••••••••••••••—— 92%
-  Running "Baseline": 2012 (144/145) (2.56 s)  •••••••••••••••••••• 100%
+  Running "Baseline": 2002 (24/145) (0.29 s)  •••————————————————— 17%
+  Running "Baseline": 2003 (36/145) (0.44 s)  •••••——————————————— 26%
+  Running "Baseline": 2004 (48/145) (0.59 s)  ••••••—————————————— 34%
+  Running "Baseline": 2005 (60/145) (0.74 s)  ••••••••———————————— 42%
+  Running "Baseline": 2006 (72/145) (0.90 s)  ••••••••••—————————— 50%
+  Running "Baseline": 2007 (84/145) (1.06 s)  •••••••••••————————— 59%
+  Running "Baseline": 2008 (96/145) (1.22 s)  •••••••••••••——————— 67%
+  Running "Baseline": 2009 (108/145) (1.38 s)  •••••••••••••••————— 75%
+  Running "Baseline": 2010 (120/145) (1.55 s)  ••••••••••••••••———— 83%
+  Running "Baseline": 2011 (132/145) (1.72 s)  ••••••••••••••••••—— 92%
+  Running "Baseline": 2012 (144/145) (1.89 s)  •••••••••••••••••••• 100%
 
 Initializing sim "Increased education" with 1000 agents
   Running "Increased education": 2000 ( 0/145) (0.00 s)  ———————————————————— 1%
   Running "Increased education": 2001 (12/145) (0.14 s)  •——————————————————— 9%
-  Running "Increased education": 2002 (24/145) (0.34 s)  •••————————————————— 17%
-  Running "Increased education": 2003 (36/145) (0.55 s)  •••••——————————————— 26%
-  Running "Increased education": 2004 (48/145) (0.77 s)  ••••••—————————————— 34%
-  Running "Increased education": 2005 (60/145) (0.99 s)  ••••••••———————————— 42%
-  Running "Increased education": 2006 (72/145) (1.21 s)  ••••••••••—————————— 50%
-  Running "Increased education": 2007 (84/145) (1.43 s)  •••••••••••————————— 59%
-  Running "Increased education": 2008 (96/145) (1.66 s)  •••••••••••••——————— 67%
-  Running "Increased education": 2009 (108/145) (1.89 s)  •••••••••••••••————— 75%
-  Running "Increased education": 2010 (120/145) (2.11 s)  ••••••••••••••••———— 83%
-  Running "Increased education": 2011 (132/145) (2.33 s)  ••••••••••••••••••—— 92%
-  Running "Increased education": 2012 (144/145) (2.57 s)  •••••••••••••••••••• 100%
+  Running "Increased education": 2002 (24/145) (0.28 s)  •••————————————————— 17%
+  Running "Increased education": 2003 (36/145) (0.43 s)  •••••——————————————— 26%
+  Running "Increased education": 2004 (48/145) (0.59 s)  ••••••—————————————— 34%
+  Running "Increased education": 2005 (60/145) (0.75 s)  ••••••••———————————— 42%
+  Running "Increased education": 2006 (72/145) (0.90 s)  ••••••••••—————————— 50%
+  Running "Increased education": 2007 (84/145) (1.06 s)  •••••••••••————————— 59%
+  Running "Increased education": 2008 (96/145) (1.23 s)  •••••••••••••——————— 67%
+  Running "Increased education": 2009 (108/145) (1.39 s)  •••••••••••••••————— 75%
+  Running "Increased education": 2010 (120/145) (1.56 s)  ••••••••••••••••———— 83%
+  Running "Increased education": 2011 (132/145) (1.73 s)  ••••••••••••••••••—— 92%
+  Running "Increased education": 2012 (144/145) (1.90 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 </div>
 <p>Plot the resulting education levels.</p>
-<div id="25c4d1de" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plt.plot(s0.results.timevec, s0.results.edu.mean_attainment, label<span class="op">=</span>s0.label)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.plot(s1.results.timevec, s1.results.edu.mean_attainment, label<span class="op">=</span>s1.label)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Average years of education among women'</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a3e93dc6" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plt.plot(s0.results.timevec, s0.results.edu.mean_attainment, label<span class="op">=</span>s0.label)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.plot(s1.results.timevec, s1.results.edu.mean_attainment, label<span class="op">=</span>s1.label)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Average years of education among women'</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -628,7 +735,6 @@ Initializing sim "Increased education" with 1000 agents
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1047,8 +1153,8 @@ Initializing sim "Increased education" with 1000 agents
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/T3_interventions_methods.html" class="pagination-link" aria-label="Interventions">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Interventions</span>
+      <a href="../tutorials/T3_interventions_methods.html" class="pagination-link" aria-label="Interventions and methods">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Interventions and methods</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
@@ -1064,7 +1170,7 @@ Initializing sim "Increased education" with 1000 agents
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.5 (2026-10-03).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

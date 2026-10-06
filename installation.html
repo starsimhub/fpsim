@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>conduct – FPsim</title>
+<title>Installation – FPsim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./contributing.html" rel="next">
-<link href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" rel="prev">
+<link href="./tutorials/index.html" rel="next">
+<link href="./whats-new.html" rel="prev">
 <link href=".//assets/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -315,7 +315,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./conduct.html"><strong>Code of conduct</strong></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./installation.html"><strong>Installation</strong></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -347,7 +347,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./installation.html" class="sidebar-item-text sidebar-link">
+  <a href="./installation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><strong>Installation</strong></span></a>
   </div>
 </li>
@@ -492,7 +492,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./conduct.html" class="sidebar-item-text sidebar-link active">
+  <a href="./conduct.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Code of conduct</strong></span></a>
   </div>
 </li>
@@ -518,71 +518,60 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link active" data-scroll-target="#code-of-conduct">Code of conduct</a>
-  <ul>
-  <li><a href="#our-pledge" id="toc-our-pledge" class="nav-link" data-scroll-target="#our-pledge">Our pledge</a></li>
-  <li><a href="#our-standards" id="toc-our-standards" class="nav-link" data-scroll-target="#our-standards">Our standards</a></li>
-  <li><a href="#our-responsibilities" id="toc-our-responsibilities" class="nav-link" data-scroll-target="#our-responsibilities">Our responsibilities</a></li>
-  <li><a href="#scope" id="toc-scope" class="nav-link" data-scroll-target="#scope">Scope</a></li>
-  <li><a href="#enforcement" id="toc-enforcement" class="nav-link" data-scroll-target="#enforcement">Enforcement</a></li>
-  <li><a href="#attribution" id="toc-attribution" class="nav-link" data-scroll-target="#attribution">Attribution</a></li>
-  </ul></li>
+  <li><a href="#install-from-pypi" id="toc-install-from-pypi" class="nav-link active" data-scroll-target="#install-from-pypi">Install from PyPI</a></li>
+  <li><a href="#install-from-source" id="toc-install-from-source" class="nav-link" data-scroll-target="#install-from-source">Install from source</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See also</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Installation</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="code-of-conduct" class="level1">
-<h1>Code of conduct</h1>
-<section id="our-pledge" class="level2">
-<h2 class="anchored" data-anchor-id="our-pledge">Our pledge</h2>
-<p>We believe that a diverse, equitable, and inclusive environment is essential for producing the best quality software. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in FPsim development and the FPsim community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.</p>
+</header>
+
+
+<p>FPsim requires a working Python environment (Python 3.10 or later).</p>
+<section id="install-from-pypi" class="level2">
+<h2 class="anchored" data-anchor-id="install-from-pypi">Install from PyPI</h2>
+<p>For most users, install the latest release with:</p>
+<pre><code>pip install fpsim</code></pre>
+<p>You should then be able to import FPsim:</p>
+<pre><code>python -c "import fpsim as fp; print(fp.__version__)"</code></pre>
 </section>
-<section id="our-standards" class="level2">
-<h2 class="anchored" data-anchor-id="our-standards">Our standards</h2>
-<p>Examples of behavior that contributes to creating a positive environment include:</p>
+<section id="install-from-source" class="level2">
+<h2 class="anchored" data-anchor-id="install-from-source">Install from source</h2>
+<p>To modify FPsim, or to work from the development version, clone the repository and install it in editable mode:</p>
+<pre><code>git clone https://github.com/fpsim/fpsim.git
+cd fpsim
+pip install -e .</code></pre>
+<p>To run the tests and build the documentation as well, install the development extras:</p>
+<pre><code>pip install -e .[dev]</code></pre>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See also</h2>
 <ul>
-<li>Using welcoming and inclusive language</li>
-<li>Being respectful of differing viewpoints and experiences</li>
-<li>Gracefully accepting constructive criticism</li>
-<li>Focusing on what is best for the community</li>
-<li>Showing empathy towards other community members</li>
+<li><a href="./tutorials/index.html">Tutorials</a> to get started with your first simulation</li>
+<li><a href="./contributing.html">Contributing</a> if you plan to make changes to FPsim</li>
 </ul>
-<p>Examples of unacceptable behavior by participants include:</p>
-<ul>
-<li>The use of sexualized language or imagery and unwelcome sexual attention or advances</li>
-<li>Trolling, insulting/derogatory comments, and personal or political attacks</li>
-<li>Public or private harassment</li>
-<li>Publishing others’ private information, such as a physical or electronic address, without explicit permission</li>
-<li>Other conduct which could reasonably be considered inappropriate in a professional setting</li>
-</ul>
-</section>
-<section id="our-responsibilities" class="level2">
-<h2 class="anchored" data-anchor-id="our-responsibilities">Our responsibilities</h2>
-<p>FPsim maintainers are responsible for clarifying the standards of acceptable behavior and will take appropriate and fair corrective action in response to any instances of unacceptable behavior.</p>
-<p>FPsim maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, or to ban temporarily or permanently any contributor for other behaviors that they deem inappropriate, threatening, offensive, or harmful.</p>
-</section>
-<section id="scope" class="level2">
-<h2 class="anchored" data-anchor-id="scope">Scope</h2>
-<p>This Code of Conduct applies both within project spaces and in public spaces when an individual is representing FPsim or its community. Examples of representing the FPsim project or community include using an official project e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.</p>
-</section>
-<section id="enforcement" class="level2">
-<h2 class="anchored" data-anchor-id="enforcement">Enforcement</h2>
-<p>Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at info@fpsim.org. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. The FPsim team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.</p>
-<p>FPsim maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of FPsim’s leadership.</p>
-</section>
-<section id="attribution" class="level2">
-<h2 class="anchored" data-anchor-id="attribution">Attribution</h2>
-<p>This Code of Conduct is adapted from the <a href="https://www.contributor-covenant.org">Contributor Covenant</a>, version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html.</p>
-<p>For answers to common questions about this code of conduct, see the <a href="https://www.contributor-covenant.org/faq">FAQ</a>.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1001,13 +990,13 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="pagination-link" aria-label="Model birth spacing and fetal health">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Model birth spacing and fetal health</span>
+      <a href="./whats-new.html" class="pagination-link" aria-label="**What's new**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><strong>What’s new</strong></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./contributing.html" class="pagination-link" aria-label="**Contributing**">
-        <span class="nav-page-text"><strong>Contributing</strong></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./tutorials/index.html" class="pagination-link" aria-label="Tutorials">
+        <span class="nav-page-text">Tutorials</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

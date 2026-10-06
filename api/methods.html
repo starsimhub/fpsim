@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,9 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -312,8 +312,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../tutorials.html"> 
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">Installation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../user-guide/index.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../conduct.html"> 
@@ -494,11 +502,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#idea" id="toc-idea" class="nav-link" data-scroll-target="#idea">Idea</a></li>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul>
-  <li><a href="#fpsim.methods.RandomChoice" id="toc-fpsim.methods.RandomChoice" class="nav-link" data-scroll-target="#fpsim.methods.RandomChoice">RandomChoice</a></li>
-  <li><a href="#fpsim.methods.SimpleChoice" id="toc-fpsim.methods.SimpleChoice" class="nav-link" data-scroll-target="#fpsim.methods.SimpleChoice">SimpleChoice</a>
+  <li><a href="#fpsim.methods.ContraceptiveChoice" id="toc-fpsim.methods.ContraceptiveChoice" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice">ContraceptiveChoice</a>
   <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#fpsim.methods.ContraceptiveChoice.add_method" id="toc-fpsim.methods.ContraceptiveChoice.add_method" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.add_method">add_method</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_from_method" id="toc-fpsim.methods.ContraceptiveChoice.copy_switching_from_method" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.copy_switching_from_method">copy_switching_from_method</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_probs" id="toc-fpsim.methods.ContraceptiveChoice.copy_switching_probs" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.copy_switching_probs">copy_switching_probs</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_to_method" id="toc-fpsim.methods.ContraceptiveChoice.copy_switching_to_method" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.copy_switching_to_method">copy_switching_to_method</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.extend_method_choice_pars" id="toc-fpsim.methods.ContraceptiveChoice.extend_method_choice_pars" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.extend_method_choice_pars">extend_method_choice_pars</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.get_contra_users" id="toc-fpsim.methods.ContraceptiveChoice.get_contra_users" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.get_contra_users">get_contra_users</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.get_method" id="toc-fpsim.methods.ContraceptiveChoice.get_method" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.get_method">get_method</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.get_method_by_label" id="toc-fpsim.methods.ContraceptiveChoice.get_method_by_label" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.get_method_by_label">get_method_by_label</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.get_switching_matrix" id="toc-fpsim.methods.ContraceptiveChoice.get_switching_matrix" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.get_switching_matrix">get_switching_matrix</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.get_switching_prob" id="toc-fpsim.methods.ContraceptiveChoice.get_switching_prob" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.get_switching_prob">get_switching_prob</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.init_contraception" id="toc-fpsim.methods.ContraceptiveChoice.init_contraception" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.init_contraception">init_contraception</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.init_post" id="toc-fpsim.methods.ContraceptiveChoice.init_post" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.init_post">init_post</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.init_results" id="toc-fpsim.methods.ContraceptiveChoice.init_results" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.init_results">init_results</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars" id="toc-fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars">make_empty_method_choice_pars</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars" id="toc-fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars">renormalize_method_choice_pars</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.set_init_dist" id="toc-fpsim.methods.ContraceptiveChoice.set_init_dist" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.set_init_dist">set_init_dist</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.set_method" id="toc-fpsim.methods.ContraceptiveChoice.set_method" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.set_method">set_method</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.set_switching_prob" id="toc-fpsim.methods.ContraceptiveChoice.set_switching_prob" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.set_switching_prob">set_switching_prob</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.start_contra" id="toc-fpsim.methods.ContraceptiveChoice.start_contra" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.start_contra">start_contra</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.update_contra" id="toc-fpsim.methods.ContraceptiveChoice.update_contra" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.update_contra">update_contra</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.update_intent_to_use" id="toc-fpsim.methods.ContraceptiveChoice.update_intent_to_use" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.update_intent_to_use">update_intent_to_use</a></li>
+  <li><a href="#fpsim.methods.ContraceptiveChoice.update_results" id="toc-fpsim.methods.ContraceptiveChoice.update_results" class="nav-link" data-scroll-target="#fpsim.methods.ContraceptiveChoice.update_results">update_results</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#fpsim.methods.Method" id="toc-fpsim.methods.Method" class="nav-link" data-scroll-target="#fpsim.methods.Method">Method</a>
+  <ul class="collapse">
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
+  <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
+  <ul class="collapse">
+  <li><a href="#fpsim.methods.Method.expon_scale_callback" id="toc-fpsim.methods.Method.expon_scale_callback" class="nav-link" data-scroll-target="#fpsim.methods.Method.expon_scale_callback">expon_scale_callback</a></li>
+  <li><a href="#fpsim.methods.Method.gamma_scale_callback" id="toc-fpsim.methods.Method.gamma_scale_callback" class="nav-link" data-scroll-target="#fpsim.methods.Method.gamma_scale_callback">gamma_scale_callback</a></li>
+  <li><a href="#fpsim.methods.Method.llogis_scale_callback" id="toc-fpsim.methods.Method.llogis_scale_callback" class="nav-link" data-scroll-target="#fpsim.methods.Method.llogis_scale_callback">llogis_scale_callback</a></li>
+  <li><a href="#fpsim.methods.Method.lognorm_mean_callback" id="toc-fpsim.methods.Method.lognorm_mean_callback" class="nav-link" data-scroll-target="#fpsim.methods.Method.lognorm_mean_callback">lognorm_mean_callback</a></li>
+  <li><a href="#fpsim.methods.Method.set_dur_use" id="toc-fpsim.methods.Method.set_dur_use" class="nav-link" data-scroll-target="#fpsim.methods.Method.set_dur_use">set_dur_use</a></li>
+  <li><a href="#fpsim.methods.Method.weibull_scale_callback" id="toc-fpsim.methods.Method.weibull_scale_callback" class="nav-link" data-scroll-target="#fpsim.methods.Method.weibull_scale_callback">weibull_scale_callback</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#fpsim.methods.RandomChoice" id="toc-fpsim.methods.RandomChoice" class="nav-link" data-scroll-target="#fpsim.methods.RandomChoice">RandomChoice</a>
+  <ul class="collapse">
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  </ul></li>
+  <li><a href="#fpsim.methods.SimpleChoice" id="toc-fpsim.methods.SimpleChoice" class="nav-link" data-scroll-target="#fpsim.methods.SimpleChoice">SimpleChoice</a>
+  <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a></li>
+  <li><a href="#methods-2" id="toc-methods-2" class="nav-link" data-scroll-target="#methods-2">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.methods.SimpleChoice.get_prob_use" id="toc-fpsim.methods.SimpleChoice.get_prob_use" class="nav-link" data-scroll-target="#fpsim.methods.SimpleChoice.get_prob_use">get_prob_use</a></li>
   <li><a href="#fpsim.methods.SimpleChoice.set_dur_method" id="toc-fpsim.methods.SimpleChoice.set_dur_method" class="nav-link" data-scroll-target="#fpsim.methods.SimpleChoice.set_dur_method">set_dur_method</a></li>
@@ -506,7 +562,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#fpsim.methods.StandardChoice" id="toc-fpsim.methods.StandardChoice" class="nav-link" data-scroll-target="#fpsim.methods.StandardChoice">StandardChoice</a>
   <ul class="collapse">
-  <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
+  <li><a href="#parameters-6" id="toc-parameters-6" class="nav-link" data-scroll-target="#parameters-6">Parameters</a></li>
+  <li><a href="#methods-3" id="toc-methods-3" class="nav-link" data-scroll-target="#methods-3">Methods</a>
   <ul class="collapse">
   <li><a href="#fpsim.methods.StandardChoice.get_prob_use" id="toc-fpsim.methods.StandardChoice.get_prob_use" class="nav-link" data-scroll-target="#fpsim.methods.StandardChoice.get_prob_use">get_prob_use</a></li>
   <li><a href="#fpsim.methods.StandardChoice.update_intent_to_use" id="toc-fpsim.methods.StandardChoice.update_intent_to_use" class="nav-link" data-scroll-target="#fpsim.methods.StandardChoice.update_intent_to_use">update_intent_to_use</a></li>
@@ -517,7 +574,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#fpsim.methods.make_contra_pars" id="toc-fpsim.methods.make_contra_pars" class="nav-link" data-scroll-target="#fpsim.methods.make_contra_pars">make_contra_pars</a></li>
   <li><a href="#fpsim.methods.make_method_list" id="toc-fpsim.methods.make_method_list" class="nav-link" data-scroll-target="#fpsim.methods.make_method_list">make_method_list</a></li>
-  <li><a href="#fpsim.methods.make_methods" id="toc-fpsim.methods.make_methods" class="nav-link" data-scroll-target="#fpsim.methods.make_methods">make_methods</a></li>
+  <li><a href="#fpsim.methods.make_methods" id="toc-fpsim.methods.make_methods" class="nav-link" data-scroll-target="#fpsim.methods.make_methods">make_methods</a>
+  <ul class="collapse">
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
+  <li><a href="#returns-2" id="toc-returns-2" class="nav-link" data-scroll-target="#returns-2">Returns</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -549,36 +610,695 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice">ContraceptiveChoice</a></td>
+<td>Base class for contraceptive choice modules.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.Method">Method</a></td>
+<td>A contraceptive method.</td>
+</tr>
+<tr class="odd">
 <td><a href="#fpsim.methods.RandomChoice">RandomChoice</a></td>
-<td>Randomly choose a method of contraception</td>
+<td>Choose a method uniformly at random.</td>
 </tr>
 <tr class="even">
 <td><a href="#fpsim.methods.SimpleChoice">SimpleChoice</a></td>
-<td>Simple choice model where method choice depends on age and previous method.</td>
+<td>Choose a method based on age and previous method.</td>
 </tr>
 <tr class="odd">
 <td><a href="#fpsim.methods.StandardChoice">StandardChoice</a></td>
-<td>Default contraceptive choice module.</td>
+<td>Choose a method based on age, education, wealth, parity and prior use.</td>
 </tr>
 </tbody>
 </table>
+<section id="fpsim.methods.ContraceptiveChoice" class="level3">
+<h3 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice">ContraceptiveChoice</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice(pars<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Base class for contraceptive choice modules.</p>
+<p>A choice module owns the list of available methods and decides, for each woman at each decision point, whether she uses contraception and which method. Subclasses differ only in how that probability is computed; see <a href="../api/methods.html#fpsim.methods.RandomChoice">RandomChoice</a>, <a href="../api/methods.html#fpsim.methods.SimpleChoice">SimpleChoice</a> and <a href="../api/methods.html#fpsim.methods.StandardChoice">StandardChoice</a>.</p>
+<p>The module is reached at <code>sim.connectors.contraception</code> during and after a run. Note this is distinct from the FP module itself, which lives at <code>sim.people.fp</code>.</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pars</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>parameters for the choice module</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="https://docs.starsim.org/api/connectors.html#starsim.connectors.Connector" title="0"><code>ss.Connector</code></a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes" class="level4">
+<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.n_options">n_options</a></td>
+<td>Number of contraceptive methods defined</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.add_method">add_method</a></td>
+<td>Add a new contraceptive method to the simulation.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_from_method">copy_switching_from_method</a></td>
+<td>Copy all switching probabilities FROM a method (entire row block).</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_probs">copy_switching_probs</a></td>
+<td>Copy switching probability from one method pair to another.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.copy_switching_to_method">copy_switching_to_method</a></td>
+<td>Copy all switching probabilities TO a method (entire column).</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.extend_method_choice_pars">extend_method_choice_pars</a></td>
+<td>Extend method_choice_pars to include a new method.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.get_contra_users">get_contra_users</a></td>
+<td>Select contraception users, return boolean array</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.get_method">get_method</a></td>
+<td>Get a method by name (first) or label (second).</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.get_method_by_label">get_method_by_label</a></td>
+<td>Extract method according to its label / long name</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.get_switching_matrix">get_switching_matrix</a></td>
+<td>Get switching matrix for a particular postpartum status across all age groups.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.get_switching_prob">get_switching_prob</a></td>
+<td>Get switching probability from one method to another.</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.init_contraception">init_contraception</a></td>
+<td>Used for all agents at the start of a sim and for newly active agents throughout</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.init_post">init_post</a></td>
+<td>Decide who will start using contraception, when, which contraception method and the</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.init_results">init_results</a></td>
+<td>Initialize results for this module</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars">make_empty_method_choice_pars</a></td>
+<td>Create an empty method_choice_pars structure with zero entries.</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars">renormalize_method_choice_pars</a></td>
+<td>Renormalize all probability arrays in method_choice_pars to sum to 1.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.set_init_dist">set_init_dist</a></td>
+<td>If no initial distribution has been provided, use the method_choice_pars to set one.</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.set_method">set_method</a></td>
+<td>Wrapper for choosing method and assigning duration of use</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.set_switching_prob">set_switching_prob</a></td>
+<td>Set switching probability from one method to another.</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.start_contra">start_contra</a></td>
+<td>Wrapper method to start contraception for a set of users</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.update_contra">update_contra</a></td>
+<td>Update contraceptive choices for a set of users.</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.ContraceptiveChoice.update_intent_to_use">update_intent_to_use</a></td>
+<td>Intent is optional, so pass if not implemented for a given ContraceptiveChoice</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.ContraceptiveChoice.update_results">update_results</a></td>
+<td>Note that we are not including LAM users in mCPR as this model counts</td>
+</tr>
+</tbody>
+</table>
+<section id="fpsim.methods.ContraceptiveChoice.add_method" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.add_method">add_method</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.add_method(method, copy_from<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Add a new contraceptive method to the simulation.</p>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>method</td>
+<td></td>
+<td>Method object to add (must have name, label, csv_name, efficacy, modern, dur_use)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>copy_from</td>
+<td></td>
+<td>Optional method name/label to copy switching probabilities from</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.copy_switching_from_method" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.copy_switching_from_method">copy_switching_from_method</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.copy_switching_from_method(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    source_from_method,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    dest_from_method,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    postpartum<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    age_grp<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    renormalize<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Copy all switching probabilities FROM a method (entire row block). Example: Copy all probabilities of switching from pill to other methods to be the probabilities of switching from implant to other methods. This makes implant users switch like pill users.</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.copy_switching_probs" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.copy_switching_probs">copy_switching_probs</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.copy_switching_probs(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    from_method_source,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    to_method_source,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    from_method_dest,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    to_method_dest,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    postpartum<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    age_grp<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    renormalize<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Copy switching probability from one method pair to another. Example: Copy the probability of switching from pill-&gt;iud to the probability of switching from condom-&gt;implant</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.copy_switching_to_method" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.copy_switching_to_method">copy_switching_to_method</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.copy_switching_to_method(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    source_to_method,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    dest_to_method,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    split_shares<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    postpartum<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    age_grp<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    renormalize<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Copy all switching probabilities TO a method (entire column). Example: Copy all probabilities of switching to IUD to be the probabilities of switching to implant.</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.extend_method_choice_pars" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.extend_method_choice_pars">extend_method_choice_pars</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.extend_method_choice_pars(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    new_method_name,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    copy_from_method<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Extend method_choice_pars to include a new method.</p>
+<section id="parameters-2" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>new_method_name</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>Name of the new method being added</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>copy_from_method</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> or None</td>
+<td>Name of existing method to copy probabilities from. If None, initialize with zeros.</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.get_contra_users" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.get_contra_users">get_contra_users</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.get_contra_users(uids, event<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Select contraception users, return boolean array</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.get_method" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.get_method">get_method</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.get_method(identifier)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Get a method by name (first) or label (second). Args: identifier (str): Method name (e.g., ‘impl’) or label (e.g., ‘Implants’) Returns: Method: The matching method object</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.get_method_by_label" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.get_method_by_label">get_method_by_label</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.get_method_by_label(method_label)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Extract method according to its label / long name</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.get_switching_matrix" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.get_switching_matrix">get_switching_matrix</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.get_switching_matrix(postpartum, from_method<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Get switching matrix for a particular postpartum status across all age groups. Args: postpartum (int): Postpartum state (0, 1, or 6) from_method (str or None): Method name for pp=0 or 6</p>
+<section id="returns" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 77%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dict</td>
+<td></td>
+<td>Dictionary keyed by age group with probability arrays</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.get_switching_prob" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.get_switching_prob">get_switching_prob</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.get_switching_prob(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    from_method,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    to_method,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    postpartum,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    age_grp,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Get switching probability from one method to another. Args: from_method (str): Method name to switch from to_method (str): Method name to switch to postpartum (int): Postpartum state (0, 1, or 6) age_grp (str): Age group</p>
+<section id="returns-1" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>float</td>
+<td></td>
+<td>Probability value</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.init_contraception" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.init_contraception">init_contraception</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.init_contraception(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Used for all agents at the start of a sim and for newly active agents throughout</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.init_post" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.init_post">init_post</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.init_post()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Decide who will start using contraception, when, which contraception method and the duration on that method. This method is called by the simulation to initialize the people object at the beginning of the simulation and new people born during the simulation.</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.init_results" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.init_results">init_results</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.init_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Initialize results for this module</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.make_empty_method_choice_pars">make_empty_method_choice_pars</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.make_empty_method_choice_pars()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create an empty method_choice_pars structure with zero entries. Useful for creating new simulations without location data.</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.renormalize_method_choice_pars">renormalize_method_choice_pars</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.renormalize_method_choice_pars()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Renormalize all probability arrays in method_choice_pars to sum to 1. Replaces Switching.renormalize_all()</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.set_init_dist" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.set_init_dist">set_init_dist</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.set_init_dist()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If no initial distribution has been provided, use the method_choice_pars to set one. The initial distribution will be the probabilities of switching from no method</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.set_method" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.set_method">set_method</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.set_method(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper for choosing method and assigning duration of use</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.set_switching_prob" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.set_switching_prob">set_switching_prob</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.set_switching_prob(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    from_method,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    to_method,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    value,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    postpartum<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    age_grp<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    renormalize<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Set switching probability from one method to another. Args: from_method (str): Method name to switch from to_method (str): Method name to switch to value (float): Probability value postpartum (int or list or None): Postpartum state(s) (0, 1, or 6). None = all. age_grp (str or list or None): Age group(s). None = all. renormalize (bool): Whether to renormalize after setting</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.start_contra" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.start_contra">start_contra</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.start_contra(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wrapper method to start contraception for a set of users</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.update_contra" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.update_contra">update_contra</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.update_contra(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Update contraceptive choices for a set of users.</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.update_intent_to_use" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.update_intent_to_use">update_intent_to_use</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.update_intent_to_use(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Intent is optional, so pass if not implemented for a given ContraceptiveChoice</p>
+</section>
+<section id="fpsim.methods.ContraceptiveChoice.update_results" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.ContraceptiveChoice.update_results">update_results</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>methods.ContraceptiveChoice.update_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Note that we are not including LAM users in mCPR as this model counts all women passively using LAM but DHS data records only women who self-report LAM which is much lower. Follows the DHS definition of mCPR.</p>
+</section>
+</section>
+</section>
+<section id="fpsim.methods.Method" class="level3">
+<h3 class="anchored" data-anchor-id="fpsim.methods.Method">Method</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>methods.Method(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    idx<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    efficacy<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    modern<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    dur_use<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    rel_dur_use<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    csv_name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    _source_dur<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A contraceptive method.</p>
+<p>Methods are held by a contraceptive choice module, which decides who uses which one. A woman re-chooses when her current method’s <code>dur_use</code> elapses, so <code>dur_use</code> shapes the long-run method mix as much as <code>efficacy</code> does.</p>
+<p>Note that <code>name</code> and <code>label</code> are not interchangeable: code indexes the method dictionary by <code>name</code> (<code>cm.methods['inj']</code>), while interventions that take method identifiers look them up by <code>label</code> (<code>'Injectables'</code>).</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>short identifier used in code, e.g.&nbsp;<code>'inj'</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>label</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>display name used in plots and interventions, e.g.&nbsp;<code>'Injectables'</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>idx</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#int">int</a></td>
+<td>position in the method list; set automatically when added to a module</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>efficacy</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#float">float</a></td>
+<td>proportional reduction in conception probability while using</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>modern</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></td>
+<td>whether this counts towards modern contraceptive prevalence (mCPR)</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>dur_use</td>
+<td><code>Dist</code></td>
+<td>distribution of duration of use before re-choosing</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>rel_dur_use</td>
+<td><a href="https://docs.python.org/3/builtins/functions.html#float">float</a></td>
+<td>multiplier on <code>dur_use</code>, for scaling a copied method</td>
+<td><code>1</code></td>
+</tr>
+<tr class="even">
+<td>csv_name</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>name used for this method in the input data files</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import starsim as ss
+import fpsim.methods as fpm
+
+dmpasc = fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
+                    dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+```</code></pre>
+</section>
+<section id="note" class="level4 doc-section doc-section-note">
+<h4 class="doc-section doc-section-note anchored" data-anchor-id="note">Note</h4>
+<p>To introduce a method partway through a simulation, use the <a href="../api/interventions.html#fpsim.interventions.add_method">add_method</a> intervention rather than building the method list by hand.</p>
+</section>
+<section id="methods-1" class="level4">
+<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#fpsim.methods.Method.expon_scale_callback">expon_scale_callback</a></td>
+<td>Sample from exponential distribution with age factors</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.Method.gamma_scale_callback">gamma_scale_callback</a></td>
+<td>Sample from gamma distribution with age factors</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.Method.llogis_scale_callback">llogis_scale_callback</a></td>
+<td>Sample from log-logistic distribution with age factors</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.Method.lognorm_mean_callback">lognorm_mean_callback</a></td>
+<td>Sample from lognormal distribution with age factors</td>
+</tr>
+<tr class="odd">
+<td><a href="#fpsim.methods.Method.set_dur_use">set_dur_use</a></td>
+<td>Set the duration of use for this method.</td>
+</tr>
+<tr class="even">
+<td><a href="#fpsim.methods.Method.weibull_scale_callback">weibull_scale_callback</a></td>
+<td>Sample from Weibull distribution with age factors</td>
+</tr>
+</tbody>
+</table>
+<section id="fpsim.methods.Method.expon_scale_callback" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.expon_scale_callback">expon_scale_callback</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>methods.Method.expon_scale_callback(sim, uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample from exponential distribution with age factors</p>
+</section>
+<section id="fpsim.methods.Method.gamma_scale_callback" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.gamma_scale_callback">gamma_scale_callback</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>methods.Method.gamma_scale_callback(sim, uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample from gamma distribution with age factors</p>
+</section>
+<section id="fpsim.methods.Method.llogis_scale_callback" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.llogis_scale_callback">llogis_scale_callback</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>methods.Method.llogis_scale_callback(sim, uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample from log-logistic distribution with age factors</p>
+</section>
+<section id="fpsim.methods.Method.lognorm_mean_callback" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.lognorm_mean_callback">lognorm_mean_callback</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>methods.Method.lognorm_mean_callback(sim, uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample from lognormal distribution with age factors</p>
+</section>
+<section id="fpsim.methods.Method.set_dur_use" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.set_dur_use">set_dur_use</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>methods.Method.set_dur_use(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    dist_type,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    par1<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    par2<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    age_factors<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Set the duration of use for this method. Args: dist_type: Type of distribution to use (e.g., ‘lognorm’, ‘gamma’, etc.) par1: First parameter for the distribution (e.g., mean for lognorm, shape for gamma) par2: Second parameter for the distribution (e.g., std for lognorm, scale for gamma) age_factors: Optional age factors to apply to the duration kwargs: Additional parameters for the distribution</p>
+</section>
+<section id="fpsim.methods.Method.weibull_scale_callback" class="level5">
+<h5 class="anchored" data-anchor-id="fpsim.methods.Method.weibull_scale_callback">weibull_scale_callback</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>methods.Method.weibull_scale_callback(sim, uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample from Weibull distribution with age factors</p>
+</section>
+</section>
+</section>
 <section id="fpsim.methods.RandomChoice" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.RandomChoice">RandomChoice</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>methods.RandomChoice(pars<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Randomly choose a method of contraception</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>methods.RandomChoice(pars<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose a method uniformly at random.</p>
+<p>Intended for testing model mechanics, not for producing realistic method mix. Because it needs no fitted data, it is the only choice module that accepts a method list containing methods with no per-method data – useful when checking that a new method behaves sensibly before wiring up its uptake.</p>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pars</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>parameters for the choice module</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="../api/methods.html#fpsim.methods.ContraceptiveChoice">ContraceptiveChoice</a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+import fpsim.methods as fpm
+
+methods = fpm.make_methods()
+methods += fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
+                      dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+sim = fp.Sim(location='kenya', contraception_module=fpm.RandomChoice(methods=methods))
+```</code></pre>
+</section>
 </section>
 <section id="fpsim.methods.SimpleChoice" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.SimpleChoice">SimpleChoice</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pars<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    contra_mod<span class="op">=</span><span class="st">'simple'</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Simple choice model where method choice depends on age and previous method. Uses location-specific data to set parameters, and needs to be initialized with either a location string or a data dictionary.</p>
-<section id="attributes" class="level4">
-<h4 class="anchored" data-anchor-id="attributes">Attributes</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    pars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    contra_mod<span class="op">=</span><span class="st">'simple'</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose a method based on age and previous method.</p>
+<p>Uses location-specific fitted data, so it must be initialized with either a location string or a data dictionary. Because the fit is per method, passing a method list that contains a method with no fitted duration data raises an <a href="https://docs.python.org/3/builtins/exceptions.html#IndexError" title="1"><code>IndexError</code></a>; to introduce a new method use the <a href="../api/interventions.html#fpsim.interventions.add_method">add_method</a> intervention with <code>copy_from</code>, which inherits an existing method’s behavior.</p>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pars</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>parameters for the choice module</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>location</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>location whose fitted coefficients to load, e.g.&nbsp;<code>'kenya'</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>data</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>pre-loaded data, used instead of loading from <code>location</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>contra_mod</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>which fitted coefficient set to use</td>
+<td><code>'simple'</code></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="../api/methods.html#fpsim.methods.RandomChoice">RandomChoice</a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+import fpsim.methods as fpm
+
+sim = fp.Sim(location='kenya', contraception_module=fpm.SimpleChoice(location='kenya'))
+```</code></pre>
+</section>
+<section id="attributes-1" class="level4">
+<h4 class="anchored" data-anchor-id="attributes-1">Attributes</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -594,8 +1314,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="methods" class="level4">
-<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<section id="methods-2" class="level4">
+<h4 class="anchored" data-anchor-id="methods-2">Methods</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -616,28 +1336,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="fpsim.methods.SimpleChoice.get_prob_use" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.methods.SimpleChoice.get_prob_use">get_prob_use</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice.get_prob_use(uids, event<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice.get_prob_use(uids, event<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Return an array of probabilities that each woman will use contraception.</p>
 </section>
 <section id="fpsim.methods.SimpleChoice.set_dur_method" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.methods.SimpleChoice.set_dur_method">set_dur_method</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice.set_dur_method(uids, method_used<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>methods.SimpleChoice.set_dur_method(uids, method_used<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Time on method depends on age and method</p>
 </section>
 </section>
 </section>
 <section id="fpsim.methods.StandardChoice" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.StandardChoice">StandardChoice</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pars<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    contra_mod<span class="op">=</span><span class="st">'mid'</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Default contraceptive choice module. Contraceptive choice is based on age, education, wealth, parity, and prior use.</p>
-<section id="methods-1" class="level4">
-<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    pars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    contra_mod<span class="op">=</span><span class="st">'mid'</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose a method based on age, education, wealth, parity and prior use.</p>
+<p>This is the default choice module, used when no <code>contraception_module</code> is passed to <a href="../api/sim.html#fpsim.sim.Sim">Sim</a>. It extends <a href="../api/methods.html#fpsim.methods.SimpleChoice">SimpleChoice</a> with education and wealth, and carries the same requirement for per-method fitted data.</p>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pars</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>parameters for the choice module</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>location</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>location whose fitted coefficients to load, e.g.&nbsp;<code>'kenya'</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>data</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>pre-loaded data, used instead of loading from <code>location</code></td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>contra_mod</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></td>
+<td>which fitted coefficient set to use</td>
+<td><code>'mid'</code></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a></td>
+<td>passed to <a href="../api/methods.html#fpsim.methods.SimpleChoice">SimpleChoice</a></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim as fp
+
+# Used automatically, so these are equivalent
+sim = fp.Sim(location='kenya')
+sim = fp.Sim(location='kenya',
+             contraception_module=fp.StandardChoice(location='kenya'))
+```</code></pre>
+</section>
+<section id="methods-3" class="level4">
+<h4 class="anchored" data-anchor-id="methods-3">Methods</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -658,12 +1433,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="fpsim.methods.StandardChoice.get_prob_use" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.methods.StandardChoice.get_prob_use">get_prob_use</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice.get_prob_use(uids, event<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice.get_prob_use(uids, event<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Return an array of probabilities that each woman will use contraception.</p>
 </section>
 <section id="fpsim.methods.StandardChoice.update_intent_to_use" class="level5">
 <h5 class="anchored" data-anchor-id="fpsim.methods.StandardChoice.update_intent_to_use">update_intent_to_use</h5>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice.update_intent_to_use(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>methods.StandardChoice.update_intent_to_use(uids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Update intent to use contraception based on regression coefficients</p>
 </section>
 </section>
@@ -689,26 +1464,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td><a href="#fpsim.methods.make_methods">make_methods</a></td>
-<td>Shortcut for making methods</td>
+<td>Build the default method list as an ndict keyed by method name.</td>
 </tr>
 </tbody>
 </table>
 <section id="fpsim.methods.make_contra_pars" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.make_contra_pars">make_contra_pars</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>methods.make_contra_pars()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>methods.make_contra_pars()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Shortcut for making a new instance of ContraPars</p>
 </section>
 <section id="fpsim.methods.make_method_list" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.make_method_list">make_method_list</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>methods.make_method_list(methods_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>methods.make_method_list(methods_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Create methods from a DataFrame. Args: methods_df: DataFrame with columns: name, label, csv_name, efficacy, modern, Returns: method_list: List of Method objects</p>
 </section>
 <section id="fpsim.methods.make_methods" class="level3">
 <h3 class="anchored" data-anchor-id="fpsim.methods.make_methods">make_methods</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>methods.make_methods(method_list<span class="op">=</span><span class="va">None</span>, method_df<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Shortcut for making methods</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>methods.make_methods(method_list<span class="op">=</span><span class="va">None</span>, method_df<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Build the default method list as an ndict keyed by method name.</p>
+<p>Call this when you want to start from the standard ten methods and add your own, rather than constructing the full list by hand.</p>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>method_list</td>
+<td><a href="https://docs.python.org/3/builtins/stdtypes.html#list">list</a></td>
+<td>explicit list of <a href="../api/methods.html#fpsim.methods.Method">Method</a> objects</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>method_df</td>
+<td><code>DataFrame</code></td>
+<td>method definitions to build from, instead of the defaults</td>
+<td><a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ndict</td>
+<td></td>
+<td>methods keyed by name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>:</p>
+<pre><code>```python
+import fpsim.methods as fpm
+
+methods = fpm.make_methods()
+print(list(methods.keys()))  # ['none', 'pill', 'iud', 'inj', ...]
+```</code></pre>
 
 
+</section>
 </section>
 </section>
 </section>
@@ -1146,7 +1975,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.5.5 (2026-10-03).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

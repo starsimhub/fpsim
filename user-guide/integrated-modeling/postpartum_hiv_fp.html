@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>conduct – FPsim</title>
+<title>Model integrated postpartum care – FPsim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,33 +26,68 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./contributing.html" rel="next">
-<link href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" rel="prev">
-<link href=".//assets/favicon.ico" rel="icon">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/integrated-modeling/postpartum_spacing_fetal.html" rel="next">
+<link href="../../user-guide/integrated-modeling/index.html" rel="prev">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,7 +116,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="../../assets/styles.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -253,9 +288,9 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/starsim-logo.png" alt="" class="navbar-logo light-content">
-    <img src="./assets/starsim-logo.png" alt="" class="navbar-logo dark-content">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/starsim-logo.png" alt="" class="navbar-logo light-content">
+    <img src="../../assets/starsim-logo.png" alt="" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -265,39 +300,39 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./overview.html"> 
+    <a class="nav-link" href="../../overview.html"> 
 <span class="menu-text">Overview</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./whats-new.html"> 
+    <a class="nav-link" href="../../whats-new.html"> 
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./installation.html"> 
+    <a class="nav-link" href="../../installation.html"> 
 <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./tutorials/index.html"> 
+    <a class="nav-link" href="../../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./user-guide/index.html"> 
+    <a class="nav-link" href="../../user-guide/index.html"> 
 <span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./conduct.html"> 
+    <a class="nav-link" href="../../conduct.html"> 
 <span class="menu-text">Code of conduct</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contributing.html"> 
+    <a class="nav-link" href="../../contributing.html"> 
 <span class="menu-text">Contributing</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./api/index.html"> 
+    <a class="nav-link" href="../../api/index.html"> 
 <span class="menu-text">API reference</span></a>
   </li>  
 </ul>
@@ -315,7 +350,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./conduct.html"><strong>Code of conduct</strong></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../user-guide/index.html"><strong>User guide</strong></a></li><li class="breadcrumb-item"><a href="../../user-guide/integrated-modeling/index.html">Integrated modeling</a></li><li class="breadcrumb-item"><a href="../../user-guide/integrated-modeling/postpartum_hiv_fp.html">Model integrated postpartum care</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -329,25 +364,25 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Home</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../../overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Overview</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./whats-new.html" class="sidebar-item-text sidebar-link">
+  <a href="../../whats-new.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>What’s new</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./installation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Installation</strong></span></a>
   </div>
 </li>
@@ -362,37 +397,37 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T2_intro_to_new_features.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T2_intro_to_new_features.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Understanding contraceptive use</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Interventions and methods</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Intervention eligibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T5_new_method.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T5_new_method.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Adding a new method</span></a>
   </div>
 </li>
@@ -409,7 +444,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User guide</span></a>
   </div>
 </li>
@@ -424,13 +459,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Calibration</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Recalibrate a location</span></a>
   </div>
 </li>
@@ -447,13 +482,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contraception</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Add a new method</span></a>
   </div>
 </li>
@@ -470,19 +505,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Integrated modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Model integrated postpartum care</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model birth spacing and fetal health</span></a>
   </div>
 </li>
@@ -492,19 +527,19 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./conduct.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../conduct.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Code of conduct</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./contributing.html" class="sidebar-item-text sidebar-link">
+  <a href="../../contributing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Contributing</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./api/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../api/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>API reference</strong></span></a>
   </div>
 </li>
@@ -518,71 +553,132 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link active" data-scroll-target="#code-of-conduct">Code of conduct</a>
-  <ul>
-  <li><a href="#our-pledge" id="toc-our-pledge" class="nav-link" data-scroll-target="#our-pledge">Our pledge</a></li>
-  <li><a href="#our-standards" id="toc-our-standards" class="nav-link" data-scroll-target="#our-standards">Our standards</a></li>
-  <li><a href="#our-responsibilities" id="toc-our-responsibilities" class="nav-link" data-scroll-target="#our-responsibilities">Our responsibilities</a></li>
-  <li><a href="#scope" id="toc-scope" class="nav-link" data-scroll-target="#scope">Scope</a></li>
-  <li><a href="#enforcement" id="toc-enforcement" class="nav-link" data-scroll-target="#enforcement">Enforcement</a></li>
-  <li><a href="#attribution" id="toc-attribution" class="nav-link" data-scroll-target="#attribution">Attribution</a></li>
-  </ul></li>
+  <li><a href="#sim-skeleton" id="toc-sim-skeleton" class="nav-link active" data-scroll-target="#sim-skeleton">Sim skeleton</a></li>
+  <li><a href="#the-intervention" id="toc-the-intervention" class="nav-link" data-scroll-target="#the-intervention">The intervention</a></li>
+  <li><a href="#what-to-look-at" id="toc-what-to-look-at" class="nav-link" data-scroll-target="#what-to-look-at">What to look at</a></li>
+  <li><a href="#gotchas" id="toc-gotchas" class="nav-link" data-scroll-target="#gotchas">Gotchas</a></li>
+  <li><a href="#full-reference-project" id="toc-full-reference-project" class="nav-link" data-scroll-target="#full-reference-project">Full reference project</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../user-guide/index.html"><strong>User guide</strong></a></li><li class="breadcrumb-item"><a href="../../user-guide/integrated-modeling/index.html">Integrated modeling</a></li><li class="breadcrumb-item"><a href="../../user-guide/integrated-modeling/postpartum_hiv_fp.html">Model integrated postpartum care</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Model integrated postpartum care</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="code-of-conduct" class="level1">
-<h1>Code of conduct</h1>
-<section id="our-pledge" class="level2">
-<h2 class="anchored" data-anchor-id="our-pledge">Our pledge</h2>
-<p>We believe that a diverse, equitable, and inclusive environment is essential for producing the best quality software. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in FPsim development and the FPsim community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.</p>
+</header>
+
+
+<p>Postpartum women in many settings face two concurrent needs: contraception to space or limit births, and HIV prevention during a period of elevated exposure. A single postnatal visit can offer both. This how-to shows how to model a co-delivery intervention – long-acting injectable contraception plus long-acting PrEP – at the same 2-month postpartum contact, using FPsim for the family planning side and STIsim’s HIV module for the PrEP side.</p>
+<p>You will need FPsim and <a href="https://github.com/starsimhub/stisim">STIsim</a> installed.</p>
+<section id="sim-skeleton" class="level2">
+<h2 class="anchored" data-anchor-id="sim-skeleton">Sim skeleton</h2>
+<p>FPmod exposes <code>ti_live_birth</code> on every woman, which is the timestep of her most recent live birth. That is the natural hook for a postpartum intervention: on any given timestep, the eligible cohort is the women whose <code>ti_live_birth</code> was exactly <code>visit_month</code> timesteps ago and who are not currently pregnant.</p>
+<p>Wire FPsim, STIsim HIV, a structured sexual network, and a maternal network into one sim, then hand the postpartum cohort to a small custom intervention:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> stisim <span class="im">as</span> sti</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_sim(seed):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    hiv <span class="op">=</span> sti.HIV(init_prev<span class="op">=</span><span class="fl">0.05</span>, beta_m2f<span class="op">=</span><span class="fl">0.012</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    intvs <span class="op">=</span> [sti.HIVTest(test_prob_data<span class="op">=</span><span class="fl">0.9</span>), sti.ART(coverage<span class="op">=</span><span class="fl">0.9</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>             PostnatalPackage(offer_fp<span class="op">=</span><span class="va">True</span>, offer_prep<span class="op">=</span><span class="va">True</span>)]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fp.Sim(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        location<span class="op">=</span><span class="st">'kenya'</span>, n_agents<span class="op">=</span><span class="dv">20_000</span>, start_year<span class="op">=</span><span class="dv">2000</span>, end_year<span class="op">=</span><span class="dv">2035</span>, rand_seed<span class="op">=</span>seed,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        diseases<span class="op">=</span>hiv,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        networks<span class="op">=</span>[sti.StructuredSexual(), ss.MaternalNet()],</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        interventions<span class="op">=</span>intvs,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="our-standards" class="level2">
-<h2 class="anchored" data-anchor-id="our-standards">Our standards</h2>
-<p>Examples of behavior that contributes to creating a positive environment include:</p>
+<section id="the-intervention" class="level2">
+<h2 class="anchored" data-anchor-id="the-intervention">The intervention</h2>
+<p><code>PostnatalPackage</code> is a small custom <a href="https://docs.starsim.org/api/interventions.html#starsim.interventions.Intervention" title="0"><code>ss.Intervention</code></a> that identifies women at <code>visit_month</code> timesteps postpartum, draws attendance, and offers the two services to the same attendees:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PostnatalPackage(ss.Intervention):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Offer long-acting injectable contraception and/or long-acting PrEP at a postnatal visit."""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, pars<span class="op">=</span><span class="va">None</span>, name<span class="op">=</span><span class="st">'pp_shop'</span>, offer_fp<span class="op">=</span><span class="va">True</span>, offer_prep<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs):</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(name<span class="op">=</span>name)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offer_fp <span class="op">=</span> offer_fp</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offer_prep <span class="op">=</span> offer_prep</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.define_pars(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            visit_month<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            start_year<span class="op">=</span><span class="dv">2027</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            p_attend<span class="op">=</span>ss.bernoulli(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            p_fp_uptake<span class="op">=</span>ss.bernoulli(p<span class="op">=</span><span class="fl">0.3</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            p_prep_uptake<span class="op">=</span>ss.bernoulli(p<span class="op">=</span><span class="fl">0.3</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            prep_eff<span class="op">=</span><span class="fl">0.95</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            dur_prep<span class="op">=</span>ss.normal(ss.months(<span class="dv">6</span>), ss.months(<span class="dv">1</span>)),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.update_pars(pars, <span class="op">**</span>kwargs)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> init_pre(<span class="va">self</span>, sim):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().init_pre(sim)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fp_mod <span class="op">=</span> sim.demographics.fp</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cm <span class="op">=</span> sim.connectors.contraception</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.inj_idx <span class="op">=</span> <span class="va">self</span>.cm.methods[<span class="st">'inj'</span>].idx</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.hiv <span class="op">=</span> sim.diseases.get(<span class="st">'hiv'</span>) <span class="cf">if</span> <span class="va">self</span>.offer_prep <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> step(<span class="va">self</span>):</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.sim.t.now(<span class="st">'year'</span>) <span class="op">&lt;</span> <span class="va">self</span>.pars.start_year:</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        fp_mod <span class="op">=</span> <span class="va">self</span>.fp_mod</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        target_ti <span class="op">=</span> <span class="va">self</span>.sim.ti <span class="op">-</span> <span class="va">self</span>.pars.visit_month</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        eligible <span class="op">=</span> ((fp_mod.ti_live_birth <span class="op">==</span> target_ti) <span class="op">&amp;</span> <span class="op">~</span>fp_mod.pregnant).uids</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        attendees <span class="op">=</span> <span class="va">self</span>.pars.p_attend.<span class="bu">filter</span>(eligible)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">len</span>(attendees):</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.offer_fp:</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            not_on_method <span class="op">=</span> attendees[<span class="op">~</span>fp_mod.on_contra[attendees]]</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            starters <span class="op">=</span> <span class="va">self</span>.pars.p_fp_uptake.<span class="bu">filter</span>(not_on_method)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            fp_mod.on_contra[starters] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>            fp_mod.method[starters] <span class="op">=</span> <span class="va">self</span>.inj_idx</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>            fp_mod.ti_contra[starters] <span class="op">=</span> <span class="va">self</span>.sim.ti <span class="op">+</span> <span class="va">self</span>.cm.set_dur_method(starters)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.offer_prep:</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>            hiv_neg <span class="op">=</span> attendees[<span class="op">~</span><span class="va">self</span>.hiv.infected[attendees] <span class="op">&amp;</span> <span class="op">~</span><span class="va">self</span>.hiv.on_prep[attendees]]</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>            starters <span class="op">=</span> <span class="va">self</span>.pars.p_prep_uptake.<span class="bu">filter</span>(hiv_neg)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>            dur <span class="op">=</span> ss.years(<span class="va">self</span>.pars.dur_prep.rvs(starters))</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.hiv.start_prep(starters, eff<span class="op">=</span><span class="va">self</span>.pars.prep_eff, dur<span class="op">=</span>dur, adh<span class="op">=</span><span class="fl">1.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Use <a href="https://docs.starsim.org/api/distributions.html#starsim.distributions.bernoulli" title="0"><code>ss.bernoulli</code></a> and <a href="https://docs.starsim.org/api/distributions.html#starsim.distributions.normal" title="0"><code>ss.normal</code></a> for the draws (not <a href="https://numpy.org/doc/stable/reference/random/index.html#module-numpy.random" title="1"><code>numpy.random</code></a>) so common-random- number pairing across scenarios stays intact.</p>
+</section>
+<section id="what-to-look-at" class="level2">
+<h2 class="anchored" data-anchor-id="what-to-look-at">What to look at</h2>
+<p>Run the sim once for each scenario you want to compare (typical grid: baseline, FP-only, PrEP-only, both) with several stochastic seeds, then extract:</p>
 <ul>
-<li>Using welcoming and inclusive language</li>
-<li>Being respectful of differing viewpoints and experiences</li>
-<li>Gracefully accepting constructive criticism</li>
-<li>Focusing on what is best for the community</li>
-<li>Showing empathy towards other community members</li>
+<li><code>sim.results.fp.short_intervals</code> – births at &lt;24 mo interpregnancy interval.</li>
+<li><code>sim.results.hiv.new_infections_f</code> – new HIV infections among women.</li>
 </ul>
-<p>Examples of unacceptable behavior by participants include:</p>
+<p>Both are annualized in the standard way (<code>.annualize()</code>) before you take differences against baseline.</p>
+</section>
+<section id="gotchas" class="level2">
+<h2 class="anchored" data-anchor-id="gotchas">Gotchas</h2>
 <ul>
-<li>The use of sexualized language or imagery and unwelcome sexual attention or advances</li>
-<li>Trolling, insulting/derogatory comments, and personal or political attacks</li>
-<li>Public or private harassment</li>
-<li>Publishing others’ private information, such as a physical or electronic address, without explicit permission</li>
-<li>Other conduct which could reasonably be considered inappropriate in a professional setting</li>
+<li><strong>Visit at month 2, not month 1.</strong> FPmod sets <code>ti_contra = ti + 1</code> at delivery, so the contraception connector re-chooses a method at month 1. If the intervention fires at month 1 the choice is overwritten immediately. Month 2 is safe.</li>
+<li><strong>FPsim sexual activity and the STIsim sexual network are independent.</strong> A woman can conceive without a current partner in <code>StructuredSexual</code>, and vice versa. Acceptable for an illustrative composition; call it out if you use the pattern for anything quantitative.</li>
+<li><strong>HIV calibration matters.</strong> <code>sti.HIV</code> needs realistic <code>init_prev</code> and <code>beta_m2f</code> for the setting, or the PrEP arm’s effect will be measured against an implausible baseline.</li>
 </ul>
 </section>
-<section id="our-responsibilities" class="level2">
-<h2 class="anchored" data-anchor-id="our-responsibilities">Our responsibilities</h2>
-<p>FPsim maintainers are responsible for clarifying the standards of acceptable behavior and will take appropriate and fair corrective action in response to any instances of unacceptable behavior.</p>
-<p>FPsim maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, or to ban temporarily or permanently any contributor for other behaviors that they deem inappropriate, threatening, offensive, or harmful.</p>
-</section>
-<section id="scope" class="level2">
-<h2 class="anchored" data-anchor-id="scope">Scope</h2>
-<p>This Code of Conduct applies both within project spaces and in public spaces when an individual is representing FPsim or its community. Examples of representing the FPsim project or community include using an official project e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.</p>
-</section>
-<section id="enforcement" class="level2">
-<h2 class="anchored" data-anchor-id="enforcement">Enforcement</h2>
-<p>Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at info@fpsim.org. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. The FPsim team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.</p>
-<p>FPsim maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of FPsim’s leadership.</p>
-</section>
-<section id="attribution" class="level2">
-<h2 class="anchored" data-anchor-id="attribution">Attribution</h2>
-<p>This Code of Conduct is adapted from the <a href="https://www.contributor-covenant.org">Contributor Covenant</a>, version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html.</p>
-<p>For answers to common questions about this code of conduct, see the <a href="https://www.contributor-covenant.org/faq">FAQ</a>.</p>
+<section id="full-reference-project" class="level2">
+<h2 class="anchored" data-anchor-id="full-reference-project">Full reference project</h2>
+<p>A calibrated Kenya version of this analysis lives at <a href="https://github.com/starsimhub/hiv_fp_kenya"><code>hiv_fp_kenya</code></a> – the intervention above is <code>demo.py:PostnatalPackage</code>, and the full 4-scenario grid, calibrated HIV parameters, Kenya scale factor, and two-panel figure are all in the repo.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1001,13 +1097,13 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="pagination-link" aria-label="Model birth spacing and fetal health">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Model birth spacing and fetal health</span>
+      <a href="../../user-guide/integrated-modeling/index.html" class="pagination-link" aria-label="Integrated modeling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Integrated modeling</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./contributing.html" class="pagination-link" aria-label="**Contributing**">
-        <span class="nav-page-text"><strong>Contributing</strong></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="pagination-link" aria-label="Model birth spacing and fetal health">
+        <span class="nav-page-text">Model birth spacing and fetal health</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

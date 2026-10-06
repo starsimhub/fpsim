@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>conduct – FPsim</title>
+<title>Add a new method – FPsim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,33 +26,68 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./contributing.html" rel="next">
-<link href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" rel="prev">
-<link href=".//assets/favicon.ico" rel="icon">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../user-guide/integrated-modeling/index.html" rel="next">
+<link href="../../user-guide/contraception/index.html" rel="prev">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,7 +116,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="../../assets/styles.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -253,9 +288,9 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/starsim-logo.png" alt="" class="navbar-logo light-content">
-    <img src="./assets/starsim-logo.png" alt="" class="navbar-logo dark-content">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/starsim-logo.png" alt="" class="navbar-logo light-content">
+    <img src="../../assets/starsim-logo.png" alt="" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -265,39 +300,39 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./overview.html"> 
+    <a class="nav-link" href="../../overview.html"> 
 <span class="menu-text">Overview</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./whats-new.html"> 
+    <a class="nav-link" href="../../whats-new.html"> 
 <span class="menu-text">What’s new</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./installation.html"> 
+    <a class="nav-link" href="../../installation.html"> 
 <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./tutorials/index.html"> 
+    <a class="nav-link" href="../../tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./user-guide/index.html"> 
+    <a class="nav-link" href="../../user-guide/index.html"> 
 <span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./conduct.html"> 
+    <a class="nav-link" href="../../conduct.html"> 
 <span class="menu-text">Code of conduct</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contributing.html"> 
+    <a class="nav-link" href="../../contributing.html"> 
 <span class="menu-text">Contributing</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./api/index.html"> 
+    <a class="nav-link" href="../../api/index.html"> 
 <span class="menu-text">API reference</span></a>
   </li>  
 </ul>
@@ -315,7 +350,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./conduct.html"><strong>Code of conduct</strong></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../user-guide/index.html"><strong>User guide</strong></a></li><li class="breadcrumb-item"><a href="../../user-guide/contraception/index.html">Contraception</a></li><li class="breadcrumb-item"><a href="../../user-guide/contraception/add-method.html">Add a new method</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -329,25 +364,25 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Home</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../../overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Overview</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./whats-new.html" class="sidebar-item-text sidebar-link">
+  <a href="../../whats-new.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>What’s new</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./installation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Installation</strong></span></a>
   </div>
 </li>
@@ -362,37 +397,37 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorials</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T1_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T2_intro_to_new_features.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T2_intro_to_new_features.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Understanding contraceptive use</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T3_interventions_methods.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Interventions and methods</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T4_intervention_eligibility.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Intervention eligibility</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorials/T5_new_method.html" class="sidebar-item-text sidebar-link">
+  <a href="../../tutorials/T5_new_method.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Adding a new method</span></a>
   </div>
 </li>
@@ -409,7 +444,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User guide</span></a>
   </div>
 </li>
@@ -424,13 +459,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/calibration/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Calibration</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/calibration/recalibrate.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Recalibrate a location</span></a>
   </div>
 </li>
@@ -447,13 +482,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/contraception/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Contraception</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/contraception/add-method.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Add a new method</span></a>
   </div>
 </li>
@@ -470,19 +505,19 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Integrated modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/postpartum_hiv_fp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model integrated postpartum care</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
+  <a href="../../user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model birth spacing and fetal health</span></a>
   </div>
 </li>
@@ -492,19 +527,19 @@ ul.task-list li input[type="checkbox"] {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./conduct.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../conduct.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Code of conduct</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./contributing.html" class="sidebar-item-text sidebar-link">
+  <a href="../../contributing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>Contributing</strong></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./api/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../api/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><strong>API reference</strong></span></a>
   </div>
 </li>
@@ -518,71 +553,111 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link active" data-scroll-target="#code-of-conduct">Code of conduct</a>
-  <ul>
-  <li><a href="#our-pledge" id="toc-our-pledge" class="nav-link" data-scroll-target="#our-pledge">Our pledge</a></li>
-  <li><a href="#our-standards" id="toc-our-standards" class="nav-link" data-scroll-target="#our-standards">Our standards</a></li>
-  <li><a href="#our-responsibilities" id="toc-our-responsibilities" class="nav-link" data-scroll-target="#our-responsibilities">Our responsibilities</a></li>
-  <li><a href="#scope" id="toc-scope" class="nav-link" data-scroll-target="#scope">Scope</a></li>
-  <li><a href="#enforcement" id="toc-enforcement" class="nav-link" data-scroll-target="#enforcement">Enforcement</a></li>
-  <li><a href="#attribution" id="toc-attribution" class="nav-link" data-scroll-target="#attribution">Attribution</a></li>
-  </ul></li>
+  <li><a href="#which-approach-to-use" id="toc-which-approach-to-use" class="nav-link active" data-scroll-target="#which-approach-to-use">Which approach to use</a></li>
+  <li><a href="#add-a-method-from-the-start-testing-only" id="toc-add-a-method-from-the-start-testing-only" class="nav-link" data-scroll-target="#add-a-method-from-the-start-testing-only">Add a method from the start (testing only)</a></li>
+  <li><a href="#introduce-a-method-partway-through-recommended" id="toc-introduce-a-method-partway-through-recommended" class="nav-link" data-scroll-target="#introduce-a-method-partway-through-recommended">Introduce a method partway through (recommended)</a></li>
+  <li><a href="#check-what-happened" id="toc-check-what-happened" class="nav-link" data-scroll-target="#check-what-happened">Check what happened</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See also</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../user-guide/index.html"><strong>User guide</strong></a></li><li class="breadcrumb-item"><a href="../../user-guide/contraception/index.html">Contraception</a></li><li class="breadcrumb-item"><a href="../../user-guide/contraception/add-method.html">Add a new method</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Add a new method</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-<section id="code-of-conduct" class="level1">
-<h1>Code of conduct</h1>
-<section id="our-pledge" class="level2">
-<h2 class="anchored" data-anchor-id="our-pledge">Our pledge</h2>
-<p>We believe that a diverse, equitable, and inclusive environment is essential for producing the best quality software. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in FPsim development and the FPsim community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.</p>
-</section>
-<section id="our-standards" class="level2">
-<h2 class="anchored" data-anchor-id="our-standards">Our standards</h2>
-<p>Examples of behavior that contributes to creating a positive environment include:</p>
+</header>
+
+
+<p>There are two situations: adding a method that exists from the start of the simulation, and introducing one partway through, for example to represent a product launch.</p>
+<section id="which-approach-to-use" class="level2">
+<h2 class="anchored" data-anchor-id="which-approach-to-use">Which approach to use</h2>
+<p>The choice module has to know how likely women are to pick the new method, and how long they stay on it. <a href="../../api/methods.html#fpsim.methods.SimpleChoice" title="0"><code>SimpleChoice</code></a> and <a href="../../api/methods.html#fpsim.methods.StandardChoice" title="0"><code>StandardChoice</code></a> read that from per-method fitted data, which a brand-new method does not have – passing them an unknown method raises an <a href="https://docs.python.org/3/builtins/exceptions.html#IndexError" title="1"><code>IndexError</code></a> while processing durations.</p>
+<p>So there are two workable routes:</p>
 <ul>
-<li>Using welcoming and inclusive language</li>
-<li>Being respectful of differing viewpoints and experiences</li>
-<li>Gracefully accepting constructive criticism</li>
-<li>Focusing on what is best for the community</li>
-<li>Showing empathy towards other community members</li>
+<li><strong><a href="../../api/interventions.html#fpsim.interventions.add_method" title="0"><code>fp.add_method</code></a> with <code>copy_from</code></strong>, which inherits an existing method’s behavior. This is the right choice for essentially all real analyses.</li>
+<li><strong>Building the method list directly</strong>, which only works with <a href="../../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> unless you also supply the fitted data. <a href="../../api/methods.html#fpsim.methods.RandomChoice" title="0"><code>RandomChoice</code></a> allocates methods uniformly at random, so it is for testing mechanics, not for producing realistic method mix.</li>
 </ul>
-<p>Examples of unacceptable behavior by participants include:</p>
+</section>
+<section id="add-a-method-from-the-start-testing-only" class="level2">
+<h2 class="anchored" data-anchor-id="add-a-method-from-the-start-testing-only">Add a method from the start (testing only)</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim.methods <span class="im">as</span> fpm</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> fpm.make_methods()  <span class="co"># Start from the default set</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>methods <span class="op">+=</span> fpm.Method(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    name     <span class="op">=</span> <span class="st">'dmpasc'</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    label    <span class="op">=</span> <span class="st">'DMPA-SC'</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    efficacy <span class="op">=</span> <span class="fl">0.983</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    modern   <span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    dur_use  <span class="op">=</span> ss.lognorm_ex(ss.years(<span class="dv">2</span>), ss.years(<span class="dv">1</span>)),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(location<span class="op">=</span><span class="st">'kenya'</span>, contraception_module<span class="op">=</span>fpm.RandomChoice(methods<span class="op">=</span>methods))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="introduce-a-method-partway-through-recommended" class="level2">
+<h2 class="anchored" data-anchor-id="introduce-a-method-partway-through-recommended">Introduce a method partway through (recommended)</h2>
+<p>The <a href="../../api/interventions.html#fpsim.interventions.add_method" title="0"><code>fp.add_method</code></a> intervention adds a method at a given year, copying the uptake behavior of an existing method. Pass the new method’s attributes in <code>method_pars</code> and name the method to copy switching behavior from in <code>copy_from</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> starsim <span class="im">as</span> ss</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>intv <span class="op">=</span> fp.add_method(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    year        <span class="op">=</span> <span class="dv">2010</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    copy_from   <span class="op">=</span> <span class="st">'inj'</span>,  <span class="co"># Inherit switching behavior from injectables</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    method_pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        name     <span class="op">=</span> <span class="st">'dmpasc'</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        label    <span class="op">=</span> <span class="st">'DMPA-SC'</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        efficacy <span class="op">=</span> <span class="fl">0.983</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        dur_use  <span class="op">=</span> ss.lognorm_ex(ss.years(<span class="dv">2</span>), ss.years(<span class="dv">1</span>)),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(location<span class="op">=</span><span class="st">'kenya'</span>, interventions<span class="op">=</span>intv)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>copy_from</code> takes the method’s <code>name</code>, not its label. You can also pass a fully-specified <a href="../../api/methods.html#fpsim.methods.Method" title="0"><code>fp.Method</code></a> object as <code>method=</code> instead of using <code>method_pars</code>.</p>
+<p>By default the new method adds to total use. To have it instead take share from the method it was copied from, use <code>split_shares</code>, which is the fraction of would-be <code>copy_from</code> users who choose the new method:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>intv <span class="op">=</span> fp.add_method(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    year         <span class="op">=</span> <span class="dv">2010</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    copy_from    <span class="op">=</span> <span class="st">'inj'</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    method_pars  <span class="op">=</span> <span class="bu">dict</span>(name<span class="op">=</span><span class="st">'dmpasc'</span>, label<span class="op">=</span><span class="st">'DMPA-SC'</span>, efficacy<span class="op">=</span><span class="fl">0.983</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    split_shares <span class="op">=</span> <span class="fl">0.40</span>,  <span class="co"># 40% of would-be injectable users switch</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="check-what-happened" class="level2">
+<h2 class="anchored" data-anchor-id="check-what-happened">Check what happened</h2>
+<p>Method usage is in <code>method_mix</code>, indexed by each method’s <code>idx</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> sim.connectors.contraception</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fp_mod <span class="op">=</span> sim.people.fp</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>share <span class="op">=</span> fp_mod.method_mix[cm.methods[<span class="st">'dmpasc'</span>].idx, <span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'DMPA-SC share at end: </span><span class="sc">{</span>share<span class="sc">:.1f}</span><span class="ss">%'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Note <code>sim.people.fp</code> for the FP module and <code>sim.connectors.contraception</code> for the choice module – these live in different places.</p>
+<p>For complete worked examples, see <code>examples/example_add_method.py</code> and <code>examples/example_dmpasc.py</code> in the repository.</p>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See also</h2>
 <ul>
-<li>The use of sexualized language or imagery and unwelcome sexual attention or advances</li>
-<li>Trolling, insulting/derogatory comments, and personal or political attacks</li>
-<li>Public or private harassment</li>
-<li>Publishing others’ private information, such as a physical or electronic address, without explicit permission</li>
-<li>Other conduct which could reasonably be considered inappropriate in a professional setting</li>
+<li><a href="../../user-guide/contraception/index.html">Contraception</a> for how methods and choice modules fit together</li>
+<li><a href="../../tutorials/T5_new_method.html">Adding a new method</a> tutorial</li>
 </ul>
-</section>
-<section id="our-responsibilities" class="level2">
-<h2 class="anchored" data-anchor-id="our-responsibilities">Our responsibilities</h2>
-<p>FPsim maintainers are responsible for clarifying the standards of acceptable behavior and will take appropriate and fair corrective action in response to any instances of unacceptable behavior.</p>
-<p>FPsim maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, or to ban temporarily or permanently any contributor for other behaviors that they deem inappropriate, threatening, offensive, or harmful.</p>
-</section>
-<section id="scope" class="level2">
-<h2 class="anchored" data-anchor-id="scope">Scope</h2>
-<p>This Code of Conduct applies both within project spaces and in public spaces when an individual is representing FPsim or its community. Examples of representing the FPsim project or community include using an official project e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.</p>
-</section>
-<section id="enforcement" class="level2">
-<h2 class="anchored" data-anchor-id="enforcement">Enforcement</h2>
-<p>Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at info@fpsim.org. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. The FPsim team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.</p>
-<p>FPsim maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of FPsim’s leadership.</p>
-</section>
-<section id="attribution" class="level2">
-<h2 class="anchored" data-anchor-id="attribution">Attribution</h2>
-<p>This Code of Conduct is adapted from the <a href="https://www.contributor-covenant.org">Contributor Covenant</a>, version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html.</p>
-<p>For answers to common questions about this code of conduct, see the <a href="https://www.contributor-covenant.org/faq">FAQ</a>.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1001,13 +1076,13 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./user-guide/integrated-modeling/postpartum_spacing_fetal.html" class="pagination-link" aria-label="Model birth spacing and fetal health">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Model birth spacing and fetal health</span>
+      <a href="../../user-guide/contraception/index.html" class="pagination-link" aria-label="Contraception">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Contraception</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./contributing.html" class="pagination-link" aria-label="**Contributing**">
-        <span class="nav-page-text"><strong>Contributing</strong></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../user-guide/integrated-modeling/index.html" class="pagination-link" aria-label="Integrated modeling">
+        <span class="nav-page-text">Integrated modeling</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
