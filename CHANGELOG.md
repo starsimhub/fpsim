@@ -8,7 +8,8 @@ All notable changes to the codebase are documented in this file. Changes that ma
 * **Regression information**
   * `FPmod` now inherits from `ss.Pregnancy` instead of `ss.Connector`. Pregnancy progression, gestation and delivery are handled by Starsim's `Pregnancy` module rather than by FPsim. The module is now reached at `sim.people.fp`, not `sim.connectors.fp`; update any code or analyzers that referenced the old path.
   * Gestation length is now drawn from Starsim's 32-42 week distribution (mean 40.1 weeks) instead of a fixed 9 months. With monthly timesteps this shifts most deliveries one timestep later relative to conception, and spreads a conception cohort's births over several timesteps. Any analysis assuming a fixed 9-month conception-to-birth offset needs revisiting.
-  * All 9 locations recalibrated against the refactored model. `tests/baseline.json` and `tests/benchmark.json` regenerated to match.
+  * All 9 locations recalibrated against the refactored model (on Starsim 3.6.1).
+  * Bumped the minimum Starsim version to 3.6.2, whose `ss.Pregnancy` fixes change results (e.g. mean mCPR in the baseline sim is ~7% lower). `tests/baseline.json` and `tests/benchmark.json` regenerated against Starsim 3.7.2.
 
 * **Calibration**
   * `calibrate_all.py`: `n_workers` now defaults to every available core instead of a hardcoded 10, with `--workers` to cap it on shared machines. Added `--trials`, `--agents` and `--force`.

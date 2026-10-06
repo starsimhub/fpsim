@@ -1,9 +1,9 @@
 {
   "time": {
     "initialize": 0.0,
-    "run": 1.381,
-    "postprocess": 0.151,
-    "total": 1.532
+    "run": 1.531,
+    "postprocess": 0.166,
+    "total": 1.697
   },
   "parameters": {
     "n": 10000,
@@ -11,5 +11,5 @@
     "end_year": 2005,
     "timestep": 0.08333333333333333
   },
-  "cpu_performance": 2.169558271455447
+  "cpu_performance": 2.265922323527075
 }

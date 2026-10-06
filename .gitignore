@@ -184,3 +184,7 @@ dropbox/.DS_Store
 # Optuna calibration databases
 fpsim_calib_*.db
 fpsim_calibration.db
+
+# Local regression snapshots
+tests/snapshot_*.json
+tests/par_snapshot_*.json

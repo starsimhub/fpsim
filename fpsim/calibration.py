@@ -65,8 +65,8 @@ class Calibration(sc.prettyobj):
 
     Note: running a calibration does not guarantee a good fit! You must ensure that
     you run for a sufficient number of iterations, have enough free parameters, and
-    that the parameters have wide enough bounds.
-    for more information.
+    that the parameters have wide enough bounds. See the calibration user guide
+    (https://docs.fpsim.org/user-guide/calibration/) for more information.
 
     Args:
         pars                (dict)  : simulation parameters, should include 'location' and 'n_agents'
