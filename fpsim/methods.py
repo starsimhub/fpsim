@@ -944,7 +944,7 @@ class ContraceptiveChoice(ss.Connector):
         fpppl = self.sim.people.fp
         
         # Get people who might use contraception
-        eligible_contra = fpppl.fecund & ~fpppl.pregnant & (fpppl.ti_contra == self.ti)
+        eligible_contra = fpppl.fecund & ~fpppl.P & (fpppl.ti_contra == self.ti)
         self.init_contraception(eligible_contra.uids)
 
         return
@@ -992,8 +992,8 @@ class ContraceptiveChoice(ss.Connector):
         # intervention started them during the postpartum window, or because a prior contra choice's
         # ti_contra happens to land inside pp1/pp6 -- and let those women flow into the pp0 (non-postpartum)
         # path, which handles on_contra state correctly. Symmetric filtering between pp1 and pp6.
-        is_pp1 = ((self.ti - fpppl.ti_delivery[uids]) == 1) & ~fpppl.on_contra[uids]  # Delivered last timestep
-        is_pp6 = ((self.ti - fpppl.ti_delivery[uids]) == 6) & ~fpppl.on_contra[uids]  # They may have decided to use contraception after 1m
+        is_pp1 = ((self.ti - fpppl.ti_delivered[uids]) == 1) & ~fpppl.on_contra[uids]  # Delivered last timestep
+        is_pp6 = ((self.ti - fpppl.ti_delivered[uids]) == 6) & ~fpppl.on_contra[uids]  # They may have decided to use contraception after 1m
         pp0 = uids[~(is_pp1 | is_pp6)]
         pp1 = uids[is_pp1]
         pp6 = uids[is_pp6]
@@ -1061,7 +1061,7 @@ class ContraceptiveChoice(ss.Connector):
                         fpppl.ti_contra[off_contra] = ti + 5
 
         # Set duration of use for everyone, and reset the time they'll next update
-        durs_fixed = ((self.ti - fpppl.ti_delivery[uids]) == 1) & (fpppl.method[uids] == 0)
+        durs_fixed = ((self.ti - fpppl.ti_delivered[uids]) == 1) & (fpppl.method[uids] == 0)
         update_durs = uids[~durs_fixed]
         dur_methods = self.set_dur_method(update_durs)
 
@@ -1125,7 +1125,7 @@ class ContraceptiveChoice(ss.Connector):
         # Track aCPR
         # Denominator of possible users excludes pregnant women and those not sexually active in the last 4 weeks
         # Used to compare new metrics of contraceptive prevalence and eventually unmet need to traditional mCPR definitions
-        denominator = method_age * fecund_age * ppl.female * ~ppl.fp.pregnant * ppl.fp.sexually_active
+        denominator = method_age * fecund_age * ppl.female * ~ppl.fp.P * ppl.fp.sexually_active
         numerator = ppl.fp.method != 0
         n_at_risk_non_users = np.sum((ppl.fp.method == 0) * denominator)
         n_at_risk_users = np.sum(numerator * denominator)
@@ -1550,7 +1550,7 @@ class StandardChoice(SimpleChoice):
         
         ppl = self.sim.people
 
-        pp1 = self.ti - ppl.fp.ti_delivery <= 1
+        pp1 = self.ti - ppl.fp.ti_delivered <= 1
         nonpp1 = ~pp1  # Delivered last timestep
         bday = (ppl.age - ppl.int_age()) <= self.t.dt_year
         

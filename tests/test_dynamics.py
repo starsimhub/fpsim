@@ -12,7 +12,7 @@ parallel   = 0 # Whether to run in parallel or serial (for debugging)
 
 
 def make_sim_parts(location='ethiopia', new_p_use_pars=False):
-    pars = dict(n_agents=500, start_year=2000, end_year=2020, seed=1, verbose=-1, location=location)
+    pars = dict(n_agents=500, start_year=2000, end_year=2020, seed=1, verbose=0, location=location)
     edu = fp.Education(location=location)
     choice = fp.StandardChoice(location=location)
     if new_p_use_pars:
@@ -178,7 +178,7 @@ def test_durations(location='senegal'):
 def test_fertility_rates():
     sc.heading('Testing that fertility rates are non-zero...')
 
-    sim = fp.Sim(n_agents=1000, location='senegal', start=2000, stop=2005, seed=1, verbose=-1)
+    sim = fp.Sim(n_agents=1000, location='senegal', start=2000, stop=2005, seed=1, verbose=0)
     sim.run()
 
     # Check that ASFR is non-zero

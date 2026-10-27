@@ -440,9 +440,8 @@ def plot_scenario_comparison(sim_baseline, sim_with_method, new_method_name, sce
     
     # Plot 3: Cumulative births
     ax = axes[2]
-    # cum_births was removed in v3.6.0; accumulate the per-timestep births result
-    births_baseline = np.cumsum(sim_baseline.results.fp.births)
-    births_new = np.cumsum(sim_with_method.results.fp.births)
+    births_baseline = sim_baseline.results.fp.birth.cum
+    births_new = sim_with_method.results.fp.birth.cum
     ax.plot(years, births_baseline, 'b-', linewidth=2, label='Baseline', alpha=0.8)
     ax.plot(years, births_new, 'r-', linewidth=2, label='With New Method', alpha=0.8)
     ax.axvline(x=INTRODUCTION_YEAR, color='green', linestyle='--', alpha=0.7)

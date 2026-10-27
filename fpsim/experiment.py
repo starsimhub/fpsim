@@ -86,8 +86,8 @@ class Experiment(sc.prettyobj):
 
     def extract_results(self):
         sres = self.sim.results
-        sim_df = sres.to_df(resample='year', use_years=True, sep='_')
-        fp_df = sres.fp.to_df(resample='year', use_years=True, sep='_')
+        sim_df = sres.to_df(resample='year', use_years=True, set_date_index=True)
+        fp_df = sres.fp.to_df(resample='year', use_years=True, set_date_index=True)
         if self.flags.popsize:  self.get_pop_size(sres)
         if self.flags.mcpr:     self.get_mcpr(sres)
         if self.flags.mmr:      self.get_mmr(fp_df)
@@ -104,9 +104,9 @@ class Experiment(sc.prettyobj):
 
     def get_pop_size(self, sres=None):
         # Model
-        df = sres.to_df(resample='year', use_years=True, sep='_')
-        model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
-        model_pop = df['n_alive'].values
+        df = sres.to_df(resample='year', use_years=True, set_date_index=True)
+        model_years = df.index.values  # Integer years
+        model_pop = df['alive'].values
 
         # Data
         pop_size = self.load_data('popsize')
@@ -136,8 +136,8 @@ class Experiment(sc.prettyobj):
 
     def get_mcpr(self, sres=None):
         # Model
-        df = sres.contraception.to_df(resample='year', use_years=True)
-        model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
+        df = sres.contraception.to_df(resample='year', use_years=True, set_date_index=True)
+        model_years = df.index.values  # Integer years
         model_mcpr = df['mcpr'].values
 
         # Data
@@ -160,13 +160,13 @@ class Experiment(sc.prettyobj):
     def get_mmr(self, df=None):
         dd = self.load_data('basic_wb')
         self.data['maternal_mortality_ratio'] = dd['maternal_mortality_ratio']
-        self.model['maternal_mortality_ratio'] = df['mmr'].values[-3:].sum()
+        self.model['maternal_mortality_ratio'] = df['mmr'].values[-3:].mean() # The mean of the last three years
         return
 
     def get_imr(self, df=None):
         dd = self.load_data('basic_wb')
         self.data['infant_mortality_rate'] = dd['infant_mortality_rate']
-        self.model['infant_mortality_rate'] = df['imr'].values[-3:].sum()
+        self.model['infant_mortality_rate'] = df['imr'].values[-3:].mean() # The mean of the last three years
         return
 
     def get_crude_death_rate(self, fp_df=None, sim_df=None):
@@ -174,25 +174,23 @@ class Experiment(sc.prettyobj):
         dd = self.load_data('basic_wb')
         self.data['crude_death_rate'] = dd['crude_death_rate']
 
-        total_deaths = sim_df['new_deaths'].values[-2] + \
-                       fp_df['infant_deaths'].values[-2] + \
-                       fp_df['maternal_deaths'].values[-2]
-        self.model['crude_death_rate'] = sc.safedivide(total_deaths, sim_df['n_alive'].values[-1]) * 1000
+        total_deaths = sim_df['new_deaths'].values[-1] # All deaths in the last year, including infant and maternal deaths
+        self.model['crude_death_rate'] = sc.safedivide(total_deaths, sim_df['alive'].values[-1]) * 1000
         return
 
     def get_crude_birth_rate(self, fp_df=None, sim_df=None):
         dd = self.load_data('basic_wb')
         self.data['crude_birth_rate'] = dd['crude_birth_rate']
-        births_last_year = fp_df['births'].values[-1]
-        self.model['crude_birth_rate'] = sc.safedivide(births_last_year, sim_df['n_alive'].values[-1]) * 1000
+        births_last_year = fp_df['birth'].values[-1]
+        self.model['crude_birth_rate'] = sc.safedivide(births_last_year, sim_df['alive'].values[-1]) * 1000
         return
 
     def get_tfr(self, fp_df=None):
         # Extract tfr over time in data - keep here to ignore dhs data if not using tfr for calibration
         tfr = self.load_data('tfr')
 
-        # Model — extract integer years from Timestamp index
-        model_years_int = np.array([t.year if hasattr(t, 'year') else int(t) for t in fp_df.index])
+        # Model
+        model_years_int = fp_df.index.values  # Integer years
         model_tfr = fp_df['tfr'].values
 
         # Data

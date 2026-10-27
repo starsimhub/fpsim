@@ -58,11 +58,11 @@ class SpacingFetalPenalty(ss.Connector):
         )
         self.update_pars(pars, **kwargs)
 
-    def init_pre(self, sim):
-        super().init_pre(sim)
-        self.fp = sim.get_module(ss.Pregnancy)
-        self.fh = sim.custom['fetal_health']
-        self.fh.add_conception_callback(self._on_conception)
+    def init_post(self):
+        super().init_post()
+        self.fp = self.sim.get_module(ss.Pregnancy)
+        self.fh = self.sim.custom['fetal_health']
+        self.fp.add_callback(self.fp.conception, self._on_conception) # After FetalHealth's own (registered in its init_pre()), which sets the baseline
 
     def _on_conception(self, uids):
         parous = uids[self.fp.ti_live_birth.notnan[uids]]

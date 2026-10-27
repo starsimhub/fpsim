@@ -129,17 +129,9 @@ class People(ss.People):
         return
 
     def update_results(self):
-        """Calculate and return the results for this specific time step"""
-        # TODO: this is commented out because the base class calculated deaths in a way that overwrites the
-        # FPsim way. In FPsim, deaths are removed at the beginning of the timestep not the end, so we can't
-        # calculate deaths using np.count_nonzero(self.ti_dead == ti)
-        # super().update_results()  # Updates n_alive and other base results
-        ti = self.sim.ti
-        res = self.sim.results
-        res.n_alive[ti] = np.count_nonzero(self.alive)
-        # res.new_deaths[ti] = np.count_nonzero(self.ti_dead == ti)
-        res.cum_deaths[ti] = np.sum(res.new_deaths[:ti]) # TODO: inefficient to compute the cumulative sum on every timestep!
-        self._step_results_wq()  # Updates wealth quintile results
+        """ Starsim's counts of people (alive, deaths), and the women in each wealth quintile """
+        super().update_results()
+        self._step_results_wq()
         return
 
     def _step_results_wq(self):
@@ -167,12 +159,10 @@ class People(ss.People):
         return np.minimum(self.int_age(uids), max)
 
     def update_post(self):
-        """ Final updates at the very end of the timestep """
-        sim = self.sim
-        if sim.pars.use_aging:
-            self.age[self.alive.uids] += sim.t.dt_year
-            # there is a max age for some of the stats, so if we exceed that, reset it
-            self.age[self.alive.uids] = np.minimum(self.age[self.alive.uids], self.sim.pars.fp['max_sim_age'])
+        """ Age the people (Starsim), up to the maximum age of the sim """
+        super().update_post()
+        alive = self.alive.uids
+        self.age[alive] = np.minimum(self.age[alive], self.sim.pars.fp['max_sim_age'])
         return
 
     def compute_method_usage(self):

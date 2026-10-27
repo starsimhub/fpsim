@@ -185,7 +185,7 @@ def test_birth_outcomes():
     # A twin pregnancy where one twin dies via p_loss counts as 1 pregnancy but 2 outcomes
     # (1 miscarriage + 1 live birth), so outcomes can exceed pregnancies by up to n_twinbirths
     fpmod = sim.people.fp
-    was_preg_bools = (fpmod.n_pregnancies > 0) & ~fpmod.pregnant
+    was_preg_bools = (fpmod.n_pregnancies > 0) & ~fpmod.P
     n_pregnancies = fpmod.n_pregnancies[was_preg_bools]
     n_outcomes = (
         fpmod.n_births[was_preg_bools] +

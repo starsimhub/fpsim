@@ -19,7 +19,7 @@ def run_t1():
 
     sim = fp.Sim(pars)
     sim.run()
-    sim.results.fp['pregnancies']
+    sim.results.fp['conception']
     sim.list_available_results()
     sim = fp.Sim(n_agents=10e3, location='kenya', start_year=2000, end_year=2020)
     sim.run()

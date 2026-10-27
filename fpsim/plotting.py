@@ -450,7 +450,7 @@ def plot_tfr(sim, ax=None, start_year=None, stop_year=2020, legend_kwargs={}):
     """
     # Load data
     res = sim.results
-    df = res.fp.to_df(resample='year', use_years=True)
+    df = res.fp.to_df(resample='year', use_years=True, set_date_index=True)
     data_tfr = Config.load_validation_data(sim.pars['location'], keys=['tfr'])['tfr']
 
     # Filter data to sim year range
@@ -461,7 +461,7 @@ def plot_tfr(sim, ax=None, start_year=None, stop_year=2020, legend_kwargs={}):
     # Align model and data years for RMSE calculation
     data_years = data_tfr['year']
     data_tfr_values = data_tfr['tfr']
-    model_years = np.array([t.year if hasattr(t, 'year') else int(t) for t in df.index])
+    model_years = df.index.values  # Integer years
     model_tfr_values = np.interp(data_years, model_years, df.tfr)  # Interpolate to match data years
 
     # Compute mean-normalized RMSE
@@ -471,9 +471,7 @@ def plot_tfr(sim, ax=None, start_year=None, stop_year=2020, legend_kwargs={}):
     if start_year is None:
         start_year = sim.pars['start']
     plot_data = data_tfr.loc[(data_tfr['year'] >= start_year) & (data_tfr['year'] <= stop_year)]
-    # Exclude last year — incomplete resampling makes TFR appear to cliff
-    last_year = df.index.year.max()
-    plot_model = df.loc[(df.index.year >= start_year) & (df.index.year <= stop_year) & (df.index.year < last_year)]
+    plot_model = df.loc[(model_years >= start_year) & (model_years <= stop_year)]
 
     # Determine axis setup
     save_individual = False
@@ -483,7 +481,7 @@ def plot_tfr(sim, ax=None, start_year=None, stop_year=2020, legend_kwargs={}):
 
     # Plot using integer years for both so they share the same x-axis
     ax.plot(plot_data['year'], plot_data['tfr'], label='World Bank', color='black')
-    ax.plot(plot_model.index.year, plot_model.tfr, label='FPsim', color='cornflowerblue')
+    ax.plot(plot_model.index, plot_model.tfr, label='FPsim', color='cornflowerblue')
     ax.set_xlabel('Year')
     ax.set_ylabel('Rate')
     ax.set_ylim(bottom=0)
@@ -511,7 +509,7 @@ def plot_pop_growth(sim, ax=None, legend_kwargs={}):
     data_population = data_popsize['population'].to_numpy(copy=True)
 
     # Extract from model
-    model_growth_rate = pop_growth_rate(res.timevec, res.n_alive)
+    model_growth_rate = pop_growth_rate(res.timevec, res.alive)
     data_growth_rate = pop_growth_rate(data_pop_years, data_population)
 
     # Determine axis setup

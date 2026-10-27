@@ -252,7 +252,7 @@ class Scenarios(sc.prettyobj):
             sim = fps.Sim(pars=pars, **kwargs)
 
             sim.scenlabel = scenlabel # Special label for scenarios objects
-            if sim.label is None:
+            if not sim.label:
                 sim.label = scenlabel # Include here if no other label
             sims += sim
         return sims
@@ -314,13 +314,8 @@ class Scenarios(sc.prettyobj):
         if not self.simslist:
             self.make_scens()
 
-        # Create msim
-        if self.repeats == 1:
-            # simslist holds one list of sims per scenario, so flatten before passing on
-            self.msim = ss.MultiSim(sims=[sim for sims in self.simslist for sim in sims])
-        else:
-            errormsg = 'Scenarios with repeats > 1 are not supported.'
-            raise ValueError(errormsg)
+        # Create msim: its results are summarized by scenario (each label of the sims), over the repeats
+        self.msim = ss.MultiSim(sims=[sim for sims in self.simslist for sim in sims])
 
         # Run
         self.msim.run(**kwargs)
@@ -341,7 +336,6 @@ class Scenarios(sc.prettyobj):
     def plot(self, key=None, **kwargs):
         ''' Plot the scenarios -- see ``ss.MultiSim.plot()`` for args '''
         self.check_run()
-        # There is only one multisim, since repeats > 1 is not supported
         return self.msim.plot(key=key, **kwargs)
 
 
@@ -377,11 +371,11 @@ class Scenarios(sc.prettyobj):
             for sim in sims:
                 results_df = sim.to_df()
                 raw['scenario'] += [key]      # Append scenario key
-                raw['births']   += [results_df['fp_births']] # Append births
+                raw['births']   += [results_df['fp_birth']] # Append births
                 raw['fails']    += [results_df['fp_method_failures']]  # Append failures
-                raw['popsize']  += [results_df['n_alive']]    # Append population size
+                raw['popsize']  += [results_df['alive']]    # Append population size
                 raw['tfr']      += [results_df['fp_tfr']]    # Append mean tfr rates
-                raw['infant_deaths'] += [results_df['fp_infant_deaths']]
+                raw['infant_deaths'] += [results_df['fp_infant_mortality']]
                 raw['maternal_deaths'] += [results_df['fp_maternal_deaths']]
                 raw['mcpr'] += [results_df['contraception_mcpr']]
 

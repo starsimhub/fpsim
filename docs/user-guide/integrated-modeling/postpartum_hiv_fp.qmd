@@ -75,7 +75,7 @@ class PostnatalPackage(ss.Intervention):
             return
         fp_mod = self.fp_mod
         target_ti = self.sim.ti - self.pars.visit_month
-        eligible = ((fp_mod.ti_live_birth == target_ti) & ~fp_mod.pregnant).uids
+        eligible = ((fp_mod.ti_live_birth == target_ti) & ~fp_mod.P).uids
         attendees = self.pars.p_attend.filter(eligible)
         if not len(attendees):
             return
@@ -105,7 +105,7 @@ PrEP-only, both) with several stochastic seeds, then extract:
 - `sim.results.fp.short_intervals` -- births at &lt;24 mo interpregnancy interval.
 - `sim.results.hiv.new_infections_f` -- new HIV infections among women.
 
-Both are annualized in the standard way (`.annualize()`) before you take differences
+Both are annualized in the standard way (`.resample('year')`) before you take differences
 against baseline.
 
 ## Gotchas

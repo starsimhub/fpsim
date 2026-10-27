@@ -4,7 +4,7 @@ title: Integrated modeling
 
 FPsim is designed to run in the same simulation as other Starsim modules. Because FPmod
 is a Pregnancy module, any Starsim module that reads or writes pregnancy state -- the
-postpartum window, delivery timing, `ti_live_birth`, `pregnant`, `ti_pregnant` -- can
+postpartum window, delivery timing, `ti_live_birth`, `P` (pregnant), `ti_P` -- can
 share a sim with FPsim and see all the same women, at the same timesteps, with the same
 histories.
 

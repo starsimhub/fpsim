@@ -92,8 +92,8 @@ def test_update_methods():
     ok('Parameters updated correctly')
 
     # Test that there are fewer births with the new method parameters
-    baseline_births = msim.sims[0].results.fp.births.sum()
-    scenario_births = msim.sims[1].results.fp.births.sum()
+    baseline_births = msim.sims[0].results.fp.birth.sum()
+    scenario_births = msim.sims[1].results.fp.birth.sum()
 
     msg = f'Expected more births with default methods but ({scenario_births} > {baseline_births})'
     assert baseline_births > scenario_births, msg

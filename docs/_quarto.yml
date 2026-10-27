@@ -113,7 +113,6 @@ website:
         - section: "**Modules**"
           contents:
             - api/analyzers.qmd
-            - api/arrays.qmd
             - api/calibration.qmd
             - api/defaults.qmd
             - api/demographics.qmd
@@ -182,7 +181,6 @@ quartodoc:
       desc: Full details on all FPsim classes and functions.
       contents:
         - analyzers
-        - arrays
         - calibration
         - defaults
         - demographics

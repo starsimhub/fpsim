@@ -89,7 +89,6 @@ class Sim(ss.Sim):
         analyzers (list):  list of analyzer modules (default None)
         connectors (list): list of connector modules (default None, can add empowerment or other examples)
         dataloader (Dataloader): data loader to use; defaults to the one associated with the location; see data_utils.py
-        copy_inputs (bool): whether to copy input dicts (default True, recommended)
         kwargs   (dict):   additional parameters belonging to any constituent module
 
     **Examples**::
@@ -101,7 +100,7 @@ class Sim(ss.Sim):
     def __init__(self, pars=None, sim_pars=None, people_pars=None, fp_pars=None, contra_pars=None, edu_pars=None, death_pars=None,
                  fp_module=None, contraception_module=None, education_module=None,
                  label=None, people=None, demographics=None, diseases=None, networks=None,
-                 interventions=None, analyzers=None, connectors=None, dataloader=None, copy_inputs=True, **kwargs):
+                 interventions=None, analyzers=None, connectors=None, dataloader=None, **kwargs):
 
         # Inputs and defaults
         self.contra_pars = None    # Parameters for the contraception module - processed later
@@ -122,7 +121,7 @@ class Sim(ss.Sim):
         # 1-2. kwargs == args (if multiple definitions, raise exception)
         # 3. pars
         # 4. default pars
-        # combine copies of them in this order if copy_inputs
+        # combine copies of them in this order
         # remap any as necessary
         # separate into sim and fp-specific pars
         sim_kwargs = dict(label=label, people=people, demographics=demographics, diseases=diseases, networks=networks,
@@ -246,21 +245,10 @@ class Sim(ss.Sim):
 
     def init(self, force=False):
         """ Fully initialize the Sim with modules, people and result storage"""
-
-        # Load age data and create people
-        people = fp.People(self.pars.n_agents, pars=self.people_pars)
-        self.pars['people'] = people
-
         if force or not self.initialized:
+            self.pars['people'] = fp.People(self.pars.n_agents, pars=self.people_pars) # Load age data and create people
             super().init(force=force)
-
         return self
-
-    def init_module_attrs(self, force=False):
-        super().init_module_attrs(force=force)
-        fp_mod = self.demographics.get('fp')
-        if fp_mod is not None and not hasattr(self.demographics, 'pregnancy'):
-            self.demographics.setattribute('pregnancy', fp_mod)
 
     def init_results(self):
         """
@@ -327,10 +315,10 @@ class Sim(ss.Sim):
                 if to_plot == 'default':
                     to_plot = {
                         'contraception.mcpr':   'Modern contraceptive prevalence rate (%)',
-                        'fp.cum_births':           'Live births',
-                        'fp.cum_stillbirths':      'Stillbirths',
-                        'fp.cum_maternal_deaths':  'Maternal deaths',
-                        'fp.cum_infant_deaths':    'Infant deaths',
+                        'fp.birth.cum':            'Live births',
+                        'fp.stillbirth.cum':       'Stillbirths',
+                        'fp.maternal_deaths.cum':  'Maternal deaths',
+                        'fp.infant_mortality.cum': 'Infant deaths',
                         'fp.imr':                  'Infant mortality rate',
                     }
                 elif to_plot == 'cpr':
@@ -341,17 +329,17 @@ class Sim(ss.Sim):
                     }
                 elif to_plot == 'mortality':
                     to_plot = {
-                        'contraception.mmr':                 'Maternal mortality ratio',
-                        'fp.cum_maternal_deaths': 'Maternal deaths',
-                        'fp.cum_infant_deaths':   'Infant deaths',
+                        'fp.mmr':                  'Maternal mortality ratio',
+                        'fp.maternal_deaths.cum':  'Maternal deaths',
+                        'fp.infant_mortality.cum': 'Infant deaths',
                         'fp.imr':                 'Infant mortality rate',
                         }
                 elif to_plot == 'apo':  #adverse pregnancy outcomes
                     to_plot = {
-                        'fp.cum_pregnancies':     'Pregnancies',
-                        'fp.cum_stillbirths':     'Stillbirths',
-                        'fp.cum_miscarriages':    'Miscarriages',
-                        'fp.cum_abortions':       'Abortions',
+                        'fp.conception.cum':      'Pregnancies',
+                        'fp.stillbirth.cum':      'Stillbirths',
+                        'fp.miscarriage.cum':     'Miscarriages',
+                        'fp.abortion.cum':        'Abortions',
                         }
                 elif to_plot == 'method':
                     to_plot = {
@@ -369,10 +357,13 @@ class Sim(ss.Sim):
                 rows, cols = 1, 3
             for p, key, reslabel in sc.odict(to_plot).enumitems():
                 ax = pl.subplot(rows, cols, p + 1)
-                if '.' in key:
-                    mod, rkey = key.split('.')
+                if '.' in key: # E.g. 'fp.imr', or 'fp.birth.cum' for the cumulative total
+                    mod, rkey, *cum = key.split('.')
                     this_res = res[mod][rkey]
+                    if cum:
+                        this_res = this_res.cum
                 else:
+                    rkey = key
                     this_res = res[key]
                 is_dist = hasattr(this_res, 'best')
                 if is_dist:
@@ -385,7 +376,7 @@ class Sim(ss.Sim):
 
                 percent_keys = ['mcpr', 'cpr', 'acpr', 'method_mix',
                                 'proportion_short_interval']
-                if key in percent_keys and key != 'method_mix':
+                if rkey in percent_keys and rkey != 'method_mix':
                     y = y * 100 # why doesn't *= syntax work here? Is it overloaded on Result objects?
                     if is_dist:
                         low *= 100
@@ -426,7 +417,7 @@ class Sim(ss.Sim):
 
                 # Handle annotations
                 fixaxis(useSI=fpd.useSI, set_lim=new_fig)  # If it's not a new fig, don't set the lim
-                if key in percent_keys:
+                if rkey in percent_keys:
                     pl.ylabel('Percentage')
                 elif 'mmr' in key:
                     pl.ylabel('Deaths per 100,000 live births')
@@ -434,7 +425,7 @@ class Sim(ss.Sim):
                     pl.ylabel('Deaths per 1,000 live births')
                 elif 'tfr' in key:
                     pl.ylabel('Fertility rate per 1,000 women')
-                elif 'stillbirths' in key:
+                elif 'stillbirth' in key:
                     pl.ylabel('Number of stillbirths')
                 else:
                     pl.ylabel('Count')

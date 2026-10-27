@@ -44,9 +44,18 @@ def make_sim_pars(**kwargs):
     return SimPars(**kwargs)
 
 
-class FPPars(ss.PregnancyPars):
+class FPPars(ss.Pars):
+    """
+    Parameters of the family planning module (fp.FPmod): FPsim's own, and those of Starsim's pregnancy that FPsim sets
+    (any other parameter of ss.Pregnancy can also be given to fp.FPmod)
+    """
     def __init__(self, location=None, **kwargs):
         super().__init__()
+
+        # Parameters of Starsim's pregnancy that FPsim sets
+        self.dur_breastfeed = ss.lognorm_ex(mean=ss.years(0.75), std=ss.years(0.5))  # Duration of breastfeeding, from data
+        self.burnin = True  # Whether women are pregnant at the start
+        self.trimesters = [ss.weeks(13), ss.weeks(26)]  # Ends of the first and second trimesters
 
         # Age limits (in years)
         self.method_age = 15

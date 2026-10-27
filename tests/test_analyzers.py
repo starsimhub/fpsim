@@ -201,7 +201,7 @@ def test_education_recorder():
     ok('Age values are non-negative')
 
     # Check that pregnant values are 0 or 1 where not NaN
-    preg_data = an.trajectories['pregnant']
+    preg_data = an.trajectories['P']
     valid_preg = preg_data[~np.isnan(preg_data)]
     assert np.all(np.isin(valid_preg, [0, 1])), 'Pregnant values should be 0 or 1'
     ok('Pregnant values are boolean')

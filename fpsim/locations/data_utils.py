@@ -221,11 +221,11 @@ class DataLoader:
 
     # %% Scalar pars
     def bf_stats(self):
-        """ Load breastfeeding stats """
+        """ Load breastfeeding stats: the duration of breastfeeding, in months """
         bf_data = self.read_data('bf_stats.csv')
         bf_mean = bf_data.loc[0]['value']  # Location parameter of truncated norm distribution. Requires children's recode DHS file, see data_processing/breastfeeding_stats.R
         bf_sd = bf_data.loc[1]['value']     # Location parameter of truncated norm distribution. Requires children's recode DHS file, see data_processing/breastfeeding_stats.R
-        return [bf_mean, bf_sd]
+        return ss.lognorm_ex(mean=ss.months(bf_mean), std=ss.months(bf_sd))
 
     def scalar_probs(self):
         """ Load abortion and twins probabilities """

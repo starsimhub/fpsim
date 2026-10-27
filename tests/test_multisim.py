@@ -26,11 +26,10 @@ def test_multisim(do_plot=do_plot):
     msim = ss.MultiSim(sims)
     msim.run(parallel=parallel)  # Run sims in parallel
 
-    msim.reduce()
     msim.summarize()
 
-    births = msim.results.fp_births
-    assert sum(births.low) < sum(births.high), 'Expecting the higher bound of births to be higher than the lower bound'
+    births = msim.results.fp.birth.sum(axis=1) # One total for each sim
+    assert births.min() < births.max(), 'Expecting the births of the sims to differ'
 
     if do_plot:
         msim.plot()

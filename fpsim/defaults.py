@@ -7,7 +7,6 @@ import warnings
 import numpy as np
 import sciris as sc
 import starsim as ss
-import fpsim.arrays as fpa
 
 
 #%% Global defaults
@@ -119,20 +118,15 @@ fpmod_states = [
     ss.FloatArr('fated_debut'),
     ss.FloatArr('first_birth_age'),
 
-    # Counts of events
+    # Counts of events (Starsim's pregnancy counts pregnancies, as n_pregnancies, and parity)
     ss.FloatArr('n_births', default=0),         # Number of live births
-    # n_stillbirths is defined by the parent Pregnancy class in starsim
+    ss.FloatArr('n_stillbirths', default=0),    # Number of stillbirths
+    ss.FloatArr('n_miscarriages', default=0),   # Number of miscarriages
     ss.FloatArr('n_abortions', default=0),      # Number of abortions
     ss.FloatArr('n_twinbirths', default=0),     # Number of twin births, included in n_births
-    ss.FloatArr('months_inactive', default=0),  # TODO, what does this store?
-    ss.FloatArr('twin_uid', label='UID of second twin, if applicable'),
+    ss.FloatArr('months_inactive', default=0),  # Months sexually inactive since debut
 
-    # Durations and counters
-    ss.FloatArr('dur_breastfeed_total', default=0),
-
-    # Timesteps of significant events
-    ss.FloatArr('ti_last_delivery'),
-    ss.FloatArr('ti_live_birth'),
+    # Timesteps of events (Starsim's pregnancy has those of conception, ti_P, the last delivery, ti_delivered, and the last live birth, ti_live_birth)
     ss.FloatArr('ti_stillbirth'),
     ss.FloatArr('ti_miscarriage'),
     ss.FloatArr('ti_abortion'),
@@ -140,16 +134,11 @@ fpmod_states = [
     # Fecundity
     ss.FloatArr('personal_fecundity', default=0),
 
-    # Add these states to the people object. They are not tracked by timestep in the way other states are, so they
-    # need to be added manually. Eventually these will become part of a separate module tracking pregnancies and
-    # pregnancy outcomes.
-    fpa.TwoDimensionalArr('birth_ages', ncols=max_parity),  # Ages at time of live births
-    fpa.TwoDimensionalArr('stillborn_ages', ncols=max_parity),  # Ages at time of stillbirths
-    fpa.TwoDimensionalArr('miscarriage_ages', ncols=max_parity),  # Ages at time of miscarriages
-    fpa.TwoDimensionalArr('abortion_ages', ncols=max_parity),  # Ages at time of abortions
-
-    ss.BoolState('partnered', default=False),  # Will remain at these values if use_partnership is False
-    ss.FloatArr('partnership_age', default=-1),  # Will remain at these values if use_partnership is False
+    # Ages at each event, one column for each (up to max_parity)
+    ss.FloatArr('birth_ages', columns=max_parity),  # Ages at time of live births
+    ss.FloatArr('stillborn_ages', columns=max_parity),  # Ages at time of stillbirths
+    ss.FloatArr('miscarriage_ages', columns=max_parity),  # Ages at time of miscarriages
+    ss.FloatArr('abortion_ages', columns=max_parity),  # Ages at time of abortions
 ]
 
 # Postpartum keys to months
@@ -207,32 +196,16 @@ method_youth_age_map = {
     '>25': [26, spline_max_age+1]
 }
 
-# Counts - we compute number of new events each timestep, plus number of cumulative events
+# Counts of FPsim's own events each timestep (Starsim's pregnancy has the flows conception, abortion, miscarriage,
+# stillbirth, birth, and infant_mortality, and maternal_deaths); the cumulative total of any of them is e.g. res.fp.birth.cum
 event_counts = sc.autolist(
-    # NB: stillbirths and miscarriages are defined by the parent Pregnancy class in starsim
-    'abortions',
     'short_intervals',
     'total_births',
-    'infant_deaths',
     'method_failures',
 )
 
-# Results owned by the parent Pregnancy class. We don't define these, but we do want
-# cumulative versions of them, which the parent does not provide.
-inherited_counts = sc.autolist(
-    'births',
-    'stillbirths',
-    'miscarriages',
-    'pregnancies',
-    'maternal_deaths',
-)
-
 people_counts = sc.autolist(
-    'contra_access',
-    'new_users',
-    'ever_used_contra',
     'switchers',
-    'nonpostpartum',
 )
 
 sim_results = sc.autolist(

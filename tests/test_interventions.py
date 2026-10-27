@@ -57,9 +57,9 @@ def test_change_par():
     s0, s1, s2 = m.sims[:] # Replace with run versions
 
     # Test exposure factor change
-    base_births = s0.results.fp.births.sum()
-    cp1_births   = s1.results.fp.births.sum()
-    cp2_births  = s2.results.fp.births.sum()
+    base_births = s0.results.fp.birth.sum()
+    cp1_births   = s1.results.fp.birth.sum()
+    cp2_births  = s2.results.fp.birth.sum()
     assert s1.pars.fp.exposure_factor == ec, f'change_pars() did not change exposure factor to {ec}'
     assert cp1_births < base_births, f'Reducing exposure factor should reduce births, but {cp1_births} is not less than the baseline of {base_births}'
 
@@ -86,12 +86,12 @@ def test_change_people_state():
     """ Testing that change_people_state() modifies sim results in expected ways """
     sc.heading('Testing change_people_state()...')
 
-    pars = dict(n_agents=500, start=2000, stop=2010, rand_seed=1, verbose=-1, location='kenya')
+    pars = dict(n_agents=500, start=2000, stop=2010, rand_seed=1, verbose=0, location='kenya')
     ms = fp.SimpleChoice(location='kenya')
 
     # Change ever user
     prior_use_lift = fp.change_people_state('fp.ever_used_contra', years=2009, new_val=True, eligibility=np.arange(500), prop=1, annual=False)
-    prior_use_gone = fp.change_people_state('fp.ever_used_contra', years=2010, new_val=False, eligibility=np.arange(500), prop=1, annual=False)
+    prior_use_gone = fp.change_people_state('fp.ever_used_contra', years=2010 - 1/12, new_val=False, eligibility=np.arange(500), prop=1, annual=False)
 
     # Make and run sim
     s0 = fp.Sim(pars=pars, contraception_module=sc.dcp(ms), label="Baseline")
@@ -292,13 +292,13 @@ def test_add_method_split_shares_boundaries(split, expected_source_frac, expecte
     return sim
 
 
-@pytest.mark.parametrize('year_offset', [0, 2])
+@pytest.mark.parametrize('year_offset', [0, 2 - 1/12])
 def test_add_method_year_boundaries(year_offset):
-    """Boundary analysis: year at sim start and sim stop should activate without error."""
+    """Boundary analysis: a year at the sim's start, or at the start of its last step (a month before its stop), should activate without error."""
     sc.heading('Testing add_method() year boundary behavior...')
 
     pars = dict(n_agents=200, start=2000, stop=2002, verbose=0, location='kenya')
-    year = pars['start'] + year_offset  # 2000 or 2002
+    year = pars['start'] + year_offset  # 2000, or the last step
     new_name = f'year_boundary_{year}'
     intv = fp.add_method(
         year=year,

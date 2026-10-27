@@ -1,6 +1,6 @@
 """
-Defines the FPmod class. This class inherits from the Starsim Pregnancy module, but has its own
-logic for how pregnancies are conceived.
+Defines the FPmod class, FPsim's pregnancy: Starsim's declared pregnancy, with FPsim's own conception, losses, infant
+mortality, sexual activity, and records.
 """
 
 # %% Imports
@@ -17,10 +17,11 @@ __all__ = ['FPmod']
 # %% Define classes
 class FPmod(ss.Pregnancy):
     """
-    Class for storing and updating FP-related events. Inherits from Starsim's Pregnancy module.
-
-    Methods are organized in the order they are called during the simulation lifecycle:
-    initialization → pre-step updates → pregnancy progression → delivery → conception → results.
+    FPsim's pregnancy module. Starsim's declared pregnancy (`ss.Pregnancy`) does conception, abortion, miscarriage,
+    stillbirth, delivery, twins, breastfeeding, maternal deaths, and infant deaths; this module gives the rates of
+    conception (`conception_rate()`), of losses (`get_loss_rate()`), and of infant deaths (`get_infant_rate()`), and
+    adds sexual activity, the timing of contraceptive choices, lactational amenorrhea (LAM), and FPsim's records of
+    each event (with `add_callback()`).
     """
 
     # %% Initialization
@@ -29,42 +30,35 @@ class FPmod(ss.Pregnancy):
         """
         Initialize FPmod with parameters, data, and distributions.
 
-        Sets up FP-specific parameters, states, and probability distributions for
-        conception, mortality, sexual activity, and contraception. Also processes
-        exposure calibration data into interpolation functions.
-
         Args:
-            pars (dict): FP parameters to override defaults
+            pars (dict): FP parameters to override defaults (FPsim's, in fp.FPPars, or Starsim's pregnancy's)
             location (str): location name for loading data (e.g. 'senegal')
             data (dict): pre-loaded FP data; if None, loaded from location
             name (str): module name (default 'fp')
-            **kwargs: additional parameters passed to update_pars
+            **kwargs: additional parameters
         """
-        super().__init__(name=name)
-
-        # Define parameters
-        default_pars = fp.FPPars()
-        self.define_pars(**default_pars)
-        self.update_pars(pars, **kwargs)
-        self.define_states(*fp.fpmod_states)
-
-        # Get data parameters if not provided
+        fp_pars = fp.FPPars()
+        fp_pars.update(pars, **kwargs)
         if data is None and location is not None:
             dataloader = fp.get_dataloader(location)
             data = dataloader.load_fp_data(return_data=True)
-        self.update_pars(data)
+        fp_pars.update(data)
 
-        # Binary distributions specific to FPmod, used for calculating p_conceive
-        self._p_inf_mort = ss.bernoulli(p=0)  # Probability of infant mortality
-        self._p_abortion = ss.bernoulli(p=0)  # Probability of abortion
+        # Starsim's pregnancy takes its own parameters; FPsim's are defined after
+        preg_keys = ss.Pregnancy().pars.keys()
+        preg_pars = {k:v for k,v in fp_pars.items() if k in preg_keys}
+        twins = fp_pars.twins_prob or 0
+        super().__init__(name=name, p_abortion=fp_pars.abortion_prob or 0, embryos_per_pregnancy=ss.choice(a=[1, 2], p=[1-twins, twins]), **preg_pars)
+        self.define_pars(**{k:v for k,v in fp_pars.items() if k not in preg_keys})
+        self.pars.update(loss_rate=self.get_loss_rate, infant_rate=self.get_infant_rate)
+        self.define_states(*fp.fpmod_states)
+
+        # Distributions specific to FPmod
         self._p_lam = ss.bernoulli(p=0)  # Probability of LAM
         self._p_active = ss.bernoulli(p=0)
         def age_adjusted_non_pp_active(self, sim, uids):
             return self.pars['sexual_activity'][sim.people.int_age(uids)]
         self._p_non_pp_active = ss.bernoulli(p=age_adjusted_non_pp_active)  # Probability of being sexually active if not postpartum
-        self.pars.embryos_per_pregnancy.set(p=[1-self.pars.twins_prob,self.pars.twins_prob])
-
-        # All other distributions
         self._fated_debut = ss.choice(a=self.pars['debut_age']['ages'], p=self.pars['debut_age']['probs'])
 
         # Deal with exposure parameters
@@ -79,33 +73,29 @@ class FPmod(ss.Pregnancy):
         self.pars['exposure_age'] = fp.data2interp(ea, fpd.spline_preg_ages)
         self.pars['exposure_parity'] = fp.data2interp(ep, fpd.spline_parities)
 
+        # FPsim's records of the pregnancy's events
+        self.add_callback(self.conception, self.on_conception)
+        self.add_callback(self.abortion, self.on_abortion)
+        self.add_callback(self.miscarriage, self.on_miscarriage)
+        self.add_callback(self.stillbirth, self.on_stillbirth)
+        self.add_callback(self.birth, self.on_birth)
+        self.add_callback(self.infant_death, self.on_infant_death)
+
         # Non-standard results - consider moving to the contraception module
         self.method_mix = None
-
-        return
-
-    def init_pre(self, sim):
-        super().init_pre(sim)
-        if not hasattr(sim.people, 'pregnancy'):
-            sim.people.pregnancy = self
         return
 
     def init_post(self):
-        """ Initialize population states, then set fertility/contraception intent for all fecund women """
+        """ Initialize FPsim's values for everyone, before women are made pregnant at the start (burnin) """
         super().init_post()
-        fecund_uids = (self.fecund & ~self.pregnant).uids
-        self.init_intent_states(fecund_uids)
+        self.update_fp(uids=self._female_uids())
+        self.init_intent_states((self.fecund & ~self.P).uids)
         return
 
     def init_results(self):
         """
-        Initialize result storage.
-
-        Adds FP-specific results on top of the parent Pregnancy results:
-        - Event counts (pregnancies, births, stillbirths, etc.) with cumulative versions
-        - People counts (n_fecund, n_on_contra, etc.)
-        - Rates (IMR, proportion of short-interval births)
-        - Method mix array (stored separately as a 2D array, not a Result)
+        Initialize results. Starsim's pregnancy has the flows (conception, birth, stillbirth, miscarriage, abortion,
+        infant_mortality) and maternal deaths; FPsim adds its own counts and rates.
         """
         super().init_results()
         scaling_kw = dict(dtype=int, scale=True)
@@ -113,19 +103,16 @@ class FPmod(ss.Pregnancy):
         results = sc.autolist()
 
         # Add event counts - these are all integers, and are scaled by the number of agents
-        # We compute new results for each event type, and also cumulative results
         for key in fpd.event_counts:
-            results += ss.Result(key, label=key, **scaling_kw, summarize_by='sum')
-            results += ss.Result(f'cum_{key}', label=key, dtype=int, scale=False, summarize_by='last')
+            results += ss.Result(key, label=key, kind='flow', **scaling_kw, summarize_by='sum')
 
         # Add people counts - these are all integers, and are scaled by the number of agents
-        # However, for these we do not include cumulative totals
         for key in fpd.people_counts:
             results += ss.Result(key, label=key, **scaling_kw, summarize_by='sum')
 
         # Add infant mortality and short interval births - these are proportions, not scaled
-        results += ss.Result('imr', label='Infant mortality rate', **nonscaling_kw, summarize_by='mean')
-        results += ss.Result('p_short_interval', label='Proportion of short interval births', **nonscaling_kw, summarize_by='mean')
+        results += ss.Result('imr', label='Infant mortality rate', kind='ratio', **nonscaling_kw, summarize_by='mean')
+        results += ss.Result('p_short_interval', label='Proportion of short interval births', kind='ratio', **nonscaling_kw, summarize_by='mean')
 
         # Store results
         self.define_results(*results)
@@ -215,114 +202,65 @@ class FPmod(ss.Pregnancy):
     # %% Properties
 
     @property
-    def postpartum(self):
-        """
-        Boolean mask of women within the postpartum window (defined by dur_postpartum par).
-
-        This does not directly affect any other functionality within this module, but is
-        provided for convenience for modules that need to know which women are X timesteps
-        postpartum.
-        """
-        timesteps_since_birth = self.ti - self.ti_delivery
-        pp_timesteps = int(self.pars.dur_postpartum/self.t.dt)
-        pp_bools = ~self.pregnant & (timesteps_since_birth >= 0) & (timesteps_since_birth <= pp_timesteps)
-        return pp_bools
+    def fecund(self):
+        """ Women of childbearing age """
+        ppl = self.sim.people
+        return (ppl.age >= self.pars.min_age) & (ppl.age <= self.pars.max_age) & ppl.female
 
     @property
-    def susceptible(self):
+    def postpartum(self):
         """
-        Sexually-active fertile women of childbearing age who are not pregnant.
+        Women within dur_postpartum of a delivery who are not pregnant. This does not directly affect any other
+        functionality within this module, but is provided for modules that need to know who is postpartum.
+        """
+        steps_since_delivery = self.ti - self.ti_delivered
+        pp_steps = int(self.pars.dur_postpartum/self.t.dt)
+        return ~self.P & (steps_since_delivery >= 0) & (steps_since_delivery <= pp_steps)
 
-        Overrides the parent definition to add sexually_active as an additional requirement.
-        """
-        return self.fertile & self.sexually_active & ~self.pregnant
+    def _end_tri_uids(self, end):
+        """ Pregnant women in the last step of a trimester ending at gestational age `end` """
+        uids = self.P.uids
+        ga = (self.ti - self.ti_P[uids])*self.t.dt # The gestational age at the start of the step
+        return uids[(ga <= end) & (ga + self.t.dt > end)]
 
     @property
     def end_tri1_uids(self):
         """ Return UIDs of those in the final timestep of their first trimester """
-        end = (self.dur_gestation <= self.pars.trimesters[0]) & ((self.dur_gestation + self.dt) > self.pars.trimesters[0])
-        return self.pregnant.uids[end]
+        return self._end_tri_uids(self.pars.trimesters[0])
 
     @property
     def end_tri2_uids(self):
         """ Return UIDs of those in the final timestep of their second trimester """
-        end = (self.dur_gestation <= self.pars.trimesters[1]) & ((self.dur_gestation + self.dt) > self.pars.trimesters[1])
-        return self.pregnant.uids[end]
+        return self._end_tri_uids(self.pars.trimesters[1])
 
     # %% Utilities
 
-    def _get_uids(self, upper_age=None, female_only=True):
-        """
-        Get UIDs filtered by age and optionally by sex.
-
-        Args:
-            upper_age (float): maximum age to include (default: no limit)
-            female_only (bool): if True, only return female UIDs (default: True)
-
-        Returns:
-            ss.uids: filtered UIDs
-        """
+    def _female_uids(self, upper_age=None):
+        """ Females, optionally at or below an age """
         people = self.sim.people
         if upper_age is None: upper_age = 1000
-        within_age = people.age <= upper_age
-        if female_only:
-            f_uids = (within_age & people.female).uids
-            return f_uids
-        else:
-            uids = within_age.uids
-            return uids
+        return ((people.age <= upper_age) & people.female).uids
 
-    def bfilter(self, dist, uids, probs):
+    # %% Updates at the start of each step
+
+    def step(self):
+        """ FPsim's updates (sexual activity, contraception), then Starsim's pregnancy, which calls FPsim's records of its events """
+        self.update_fp(uids=self._female_uids(upper_age=self.t.dt_year))
+        super().step()
+        return
+
+    def update_fp(self, uids):
         """
-        Shortcut for probability-based filtering: set dist probability and return matching UIDs.
-
-        Args:
-            dist: a Bernoulli distribution object
-            uids: UIDs to filter
-            probs: probability values to set on the distribution
-
-        Returns:
-            ss.uids: UIDs that passed the filter
-        """
-        dist.set(p=probs)
-        return dist.filter(uids)
-
-    def bsplit(self, dist, uids, probs):
-        """
-        Shortcut for probability-based splitting: set dist probability and split UIDs into two groups.
-
-        Args:
-            dist: a Bernoulli distribution object
-            uids: UIDs to split
-            probs: probability values to set on the distribution
-
-        Returns:
-            tuple: (true_uids, false_uids) — UIDs that matched and those that didn't
-        """
-        dist.set(p=probs)
-        return dist.split(uids)
-
-    # %% Pre-step updates
-
-    def updates_pre(self, uids=None, upper_age=None):
-        """
-        Pre-step state updates, run at the beginning of each timestep.
-
-        This runs prior to calculating pregnancy exposure, advancing pregnancies,
-        adding new pregnancies, or determining delivery outcomes. Steps performed:
-            1. Update fecundity and mortality rates for the current year
-            2. Set sexual activity status (postpartum and non-postpartum)
+        Updates at the start of each step, before conception. Steps performed:
+            1. Set fecundity and fated debut for new agents, and update mortality rates for the current year
+            2. Set sexual activity status (postpartum and non-postpartum), and lactational amenorrhea
             3. Initialize contraception timing for new agents
             4. Initialize fertility intent for women entering the 15-49 age range
             5. Update contraceptive intent and method choices
 
         Args:
-            uids: UIDs to update (default: all female agents up to upper_age)
-            upper_age (float): maximum age for filtering UIDs
+            uids: UIDs of the new agents to initialize
         """
-        if uids is None: uids = self._get_uids(upper_age=upper_age)
-        super().updates_pre(uids=uids)
-
         # Update fecundity and mortality
         self.personal_fecundity[uids] = self.pars.fecundity.rvs(uids)
         self.update_mortality()
@@ -330,13 +268,13 @@ class FPmod(ss.Pregnancy):
         # Sexual activity
         # Default initialization for fated_debut; subnational debut initialized in subnational.py otherwise
         self.fated_debut[uids] = self._fated_debut.rvs(uids)
-        nonpreg_fecund = (self.fecund & ~self.pregnant).uids
-        self.check_sexually_active(nonpreg_fecund)  # Match old behavior: non-pregnant fecund only
+        nonpreg = (self.fecund & ~self.P).uids
+        self.check_sexually_active(nonpreg)  # Non-pregnant fecund women only
+        self.update_lam()
         self.update_time_to_choose(uids)
 
         # Initialize fertility intent for women who just turned 15 (entered the 15-49 age range this timestep)
         ppl = self.sim.people
-        nonpreg = (self.fecund & ~self.pregnant).uids
         just_15 = nonpreg[(ppl.age[nonpreg] > fpd.min_age) & (ppl.age[nonpreg] <= fpd.min_age + self.t.dt_year)]
         if len(just_15) > 0:
             self.init_intent_states(just_15)
@@ -345,7 +283,7 @@ class FPmod(ss.Pregnancy):
         self.sim.connectors.contraception.update_intent_to_use(nonpreg)
 
         # Update methods for those who are eligible
-        method_updaters = ((self.ti_contra <= self.ti) & self.fecund & ~self.pregnant).uids
+        method_updaters = ((self.ti_contra <= self.ti) & self.fecund & ~self.P).uids
         if len(method_updaters):
             self.sim.connectors.contraception.update_contra(method_updaters)
             self.results['switchers'][self.ti] = len(method_updaters)  # How many people switch methods (incl on/off)
@@ -353,8 +291,7 @@ class FPmod(ss.Pregnancy):
         if not methods_ok:
             errormsg = 'Agents not using contraception are not the same as agents who are using None method'
             raise ValueError(errormsg)
-
-        return uids
+        return
 
     def update_mortality(self):
         """
@@ -364,7 +301,6 @@ class FPmod(ss.Pregnancy):
         self.mortality_probs (for infant and stillbirth) and updates the maternal
         death distribution directly.
         """
-
         mapping = {
             'infant_mortality': 'infant',
             'maternal_mortality': 'maternal',
@@ -421,7 +357,6 @@ class FPmod(ss.Pregnancy):
 
         # Update inactivity counters
         self._update_inactive(uids)
-
         return
 
     def _set_parous_active(self, uids):
@@ -458,6 +393,7 @@ class FPmod(ss.Pregnancy):
         adjusted_probs = base_probs * sp_weights
         self._p_active.set(p=adjusted_probs)
         self.sexually_active[uids] = self._p_active.rvs(uids)
+        return
 
     def _set_non_parous_active(self, uids):
         """
@@ -478,6 +414,7 @@ class FPmod(ss.Pregnancy):
         first_debut = uids[now_active & never_sex]
         self.sexual_debut[first_debut] = True
         self.sexual_debut_age[first_debut] = ppl.age[first_debut]
+        return
 
     def _update_inactive(self, uids):
         """
@@ -495,6 +432,7 @@ class FPmod(ss.Pregnancy):
         inactive = uids[(~active_sex & debuted)]
         self.months_inactive[active] = 0
         self.months_inactive[inactive] += 1
+        return
 
     def update_time_to_choose(self, uids=None):
         """
@@ -524,7 +462,67 @@ class FPmod(ss.Pregnancy):
             raise ValueError(errormsg)
         return
 
-    # %% Pregnancy progression
+    # %% Rates of conception, losses, and infant deaths, which Starsim's pregnancy reads
+
+    def conception_rate(self, sim, uids):
+        """
+        FPsim's annual probability of conception for each woman, as a rate: her fecundity by age, personal fecundity,
+        nulliparity, and exposure, reduced by contraception and LAM; 0 unless fertile, sexually active, and not pregnant
+
+        Args:
+            uids: the women Starsim's pregnancy asks about (those not pregnant)
+        """
+        ppl = sim.people
+        pars = self.pars
+        probs = np.zeros(len(uids))
+        susceptible = self.fecund[uids] & ~self.infertile[uids] & self.sexually_active[uids] & ~self.P[uids]
+        sus = uids[susceptible]
+        iage = ppl.int_age_clip(sus)
+        p = pars['age_fecundity'][iage] * self.personal_fecundity[sus] * (1 - self.contra_eff(sus)) * (1 - pars['LAM_efficacy']*self.lam[sus])
+        nullip = self.parity[sus] == 0
+        p[nullip] *= pars['fecundity_ratio_nullip'][iage[nullip]]
+        p *= pars['exposure_factor'] * pars['exposure_age'][iage]
+        p *= pars['exposure_parity'][np.minimum(self.parity[sus], fpd.max_parity).astype(int)]
+        probs[susceptible] = np.minimum(p, 1.0) # A probability of 1 is certain within the step
+        return ss.probperyear(probs)
+
+    def contra_eff(self, uids):
+        """ The efficacy of each woman's contraceptive method """
+        cm = self.sim.connectors.contraception
+        eff_array = np.array([m.efficacy for m in cm.methods.values()])
+        return eff_array[self.method[uids]]
+
+    def update_lam(self):
+        """
+        Lactational amenorrhea (LAM): drawn each step for susceptible women who are breastfeeding within the
+        data-defined postpartum window, and switched off for anyone not breastfeeding or over the maximum LAM duration
+        """
+        since = self.ti - self.ti_delivered
+        lam_data_max = int(max(self.pars['lactational_amenorrhea']['month']))
+        candidates = (self.fecund & ~self.infertile & self.sexually_active & ~self.P & self.lactating & (since <= lam_data_max)).uids
+        if len(candidates):
+            self._p_lam.set(p=self.pars['lactational_amenorrhea']['rate'][since[candidates].astype(int)])
+            self.lam[candidates] = self._p_lam.rvs(candidates)
+        self.lam[~(since <= self.pars['max_lam_dur']) | ~self.lactating] = False
+        return
+
+    def get_loss_rate(self, sim, uids):
+        """
+        The hazard of a pregnancy loss (Starsim's pregnancy makes it a miscarriage before 20 weeks, a stillbirth after):
+        the first-trimester miscarriage risk by age, spread over the first trimester, and the stillbirth risk by year
+        and age, spread over the rest of a 40-week pregnancy
+
+        Args:
+            uids: the women Starsim's pregnancy asks about (those pregnant)
+        """
+        tri1 = self.pars.trimesters[0]
+        rest = ss.weeks(40) - tri1
+        early = self.P.time[uids] < tri1 # The gestational age
+        ages = sim.people.int_age_clip(uids)
+        rate = np.zeros(len(uids))
+        rate[early] = -np.log1p(-self.pars.miscarriage_rates[ages[early]])/tri1.years
+        rate[~early] = -np.log1p(-self._get_stillbirth_prob(uids[~early]))/rest.years
+        return ss.peryear(rate)
 
     def _get_stillbirth_prob(self, uids):
         """
@@ -549,517 +547,133 @@ class FPmod(ss.Pregnancy):
         age_ind[prev_idx_is_less] -= 1
         return still_prob * pars['stillbirth_rate']['age_probs'][age_ind]
 
-    def progress_pregnancies(self):
+    def get_infant_rate(self, sim, uids):
         """
-        Advance ongoing pregnancies with gestational-age-dependent loss via p_loss.
+        The hazard of death before the age of 1 (Starsim's pregnancy applies it to children aged 0 to 1): the infant
+        mortality of the year by the mother's age, as a probability over the first year
 
-        Sets p_loss dynamically before calling the parent:
-        - First trimester: per-timestep probability derived from age-specific miscarriage rates
-        - Second/third trimester: per-timestep probability derived from year- and age-adjusted stillbirth rates
-
-        The parent applies p_loss to all ongoing (non-delivering) pregnancies and
-        request_death's unborn children. Classification (miscarriage vs stillbirth)
-        happens later in process_prenatal_deaths based on gestational age.
+        Args:
+            uids: the children aged 0 to 1 (Starsim's pregnancy calls it only for them)
         """
-        if not self.pregnant.any():
-            return
+        ppl = sim.people
+        probs = np.zeros(len(uids))
+        infant = ppl.parent[uids] != ppl.parent.nan # Those with a mother in the sim
+        kids = uids[infant]
+        if len(kids):
+            moms = ss.uids(ppl.parent[kids])
+            ages = self.pars['infant_mortality']['ages']
+            mom_age = ppl.age.raw[moms] - ppl.age.raw[kids] # The mother's age at the birth
+            nearest = np.argmin(np.abs(np.subtract.outer(mom_age, ages)), axis=1)
+            probs[infant] = self.mortality_probs['infant'] * self.pars['infant_mortality']['age_probs'][nearest]
+        return ss.probperyear(probs)
 
-        will_deliver = self.pregnant & (self.ti_delivery <= self.ti)
-        ongoing = self.pregnant & ~will_deliver
+    # %% FPsim's records of the pregnancy's events
 
-        if ongoing.any():
-            ppl = self.sim.people
-            uids = ongoing.uids
-            ages = ppl.int_age_clip(uids)
-
-            # Use post-update GA (parent advances clock before applying p_loss)
-            ga = self.gestation[uids] + self.dt.weeks
-            tri1_weeks = self.pars.trimesters[0].weeks  # 13 weeks
-
-            # Compute actual discrete step counts to match the spreading formula
-            n_steps_tri1 = round(tri1_weeks / self.dt.weeks)
-            tri1_end = n_steps_tri1 * self.dt.weeks  # Aligned boundary
-            n_steps_later = round((40 - tri1_weeks) / self.dt.weeks)
-
-            probs = np.zeros(len(uids))
-
-            # First trimester: spread miscarriage risk across tri1 timesteps
-            in_tri1 = ga <= tri1_end
-            if np.any(in_tri1):
-                mc_total = self.pars.miscarriage_rates[ages[in_tri1]]
-                probs[in_tri1] = 1 - (1 - mc_total) ** (1 / n_steps_tri1)
-
-            # Later trimesters: spread stillbirth risk across tri2+tri3 timesteps
-            in_later = ~in_tri1
-            if np.any(in_later):
-                sb_total = self._get_stillbirth_prob(uids[in_later])
-                probs[in_later] = 1 - (1 - sb_total) ** (1 / n_steps_later)
-
-            self.pars.p_loss.set(p=probs)
-
-        # Call parent to advance gestational clock and apply p_loss
-        super().progress_pregnancies()
+    def on_conception(self, uids):
+        """
+        Contraception stops for women who conceive (and don't have an abortion at once); those on a method count as
+        method failures. Sexual activity is not updated during a pregnancy (see check_sexually_active()), so it is
+        unset until the step after the pregnancy ends, when it is drawn again (postpartum, after a delivery)
+        """
+        preg = uids[self.P[uids]]
+        if len(preg):
+            self.results['method_failures'][self.ti] += np.count_nonzero(self.method[preg] != 0)
+            self.on_contra[preg] = False  # Not using contraception during pregnancy
+            self.method[preg] = 0  # Method zero due to non-use
+            self.sexually_active[preg] = False
         return
 
-    # %% Delivery
+    def record_loss(self, uids, n_key, ages_key, ti_key):
+        """ Record a pregnancy outcome other than a birth: its count, time, and the woman's age """
+        getattr(self, ti_key)[uids] = self.ti
+        idx = getattr(self, n_key)[uids].astype(int)
+        keep = idx < fpd.max_parity
+        getattr(self, ages_key).raw[uids[keep], idx[keep]] = self.sim.people.age[uids[keep]]
+        getattr(self, n_key)[uids] += 1
+        return
 
-    def process_delivery(self, mother_uids, newborn_uids):
-        """
-        Save twin status before the parent resets it, then proceed with delivery.
+    def handle_loss(self, uids):
+        """ After a miscarriage, stillbirth, or infant death: contraceptive choices are updated in the next step, and breastfeeding stops """
+        self.ti_contra[uids] = self.ti + 1
+        self.lactating[uids] = False
+        return
 
-        The parent's process_delivery sets carrying_multiple to False before calling
-        _post_delivery, so we capture the twin status here for use in _do_stillbirths.
+    def on_abortion(self, uids):
+        self.record_loss(uids, 'n_abortions', 'abortion_ages', 'ti_abortion')
+        return
 
-        Args:
-            mother_uids: UIDs of mothers delivering
-            newborn_uids: UIDs of newborn agents
-        """
-        self._twins_at_delivery = mother_uids & self.carrying_multiple.uids
-        super().process_delivery(mother_uids, newborn_uids)
+    def on_miscarriage(self, uids):
+        self.record_loss(uids, 'n_miscarriages', 'miscarriage_ages', 'ti_miscarriage')
+        self.handle_loss(uids)
+        return
 
-    def _post_delivery(self, mother_uids, newborn_uids):
-        """
-        FP-specific post-delivery processing.
+    def on_stillbirth(self, uids):
+        self.record_loss(uids, 'n_stillbirths', 'stillborn_ages', 'ti_stillbirth')
+        self.parity[uids] += 1 # A stillbirth counts in parity, as a live birth does
+        self.handle_loss(uids)
+        return
 
-        All deliveries are live births (stillbirths are now handled earlier via p_loss).
-        Orchestrates: birth counting → neonatal mortality → contraception timing.
+    def on_birth(self, newborns):
+        """ After a live birth: twins, records, short intervals, and the timing of the mother's next contraceptive choice """
+        mothers, counts = np.unique(self.sim.people.parent[newborns], return_counts=True)
+        mothers = ss.uids(mothers)
+        twins = mothers[counts > 1]
+        single = mothers[counts == 1]
 
-        Args:
-            mother_uids: UIDs of all mothers who delivered
-            newborn_uids: UIDs of all newborn agents
-        """
-        # All delivering mothers have live births — classify twins vs singletons
-        twins = mother_uids & self._twins_at_delivery
-        single = mother_uids - twins
-
-        # Update counts: parity extra +1 for twins (parent already gave +1 for all)
+        # Update counts: parity extra +1 for twins (Starsim's pregnancy gives +1 for each delivery)
         self.parity[twins] += 1
-        self.n_births[mother_uids] += 1
+        self.n_births[mothers] += 1
         self.n_twinbirths[twins] += 1
+        self.record_ages(single, twins)
 
-        # Record ages and compute short intervals (no stillborns at delivery)
-        self.record_ages(ss.uids(), single, twins)
-        self.ti_live_birth[mother_uids] = self.ti
-
-        # Handle infant mortality
-        mothers_of_nnds, nnds = self.check_infant_mortality(mother_uids)
-        self.handle_loss(mothers_of_nnds)
-        self.results['infant_deaths'][self.ti] += len(nnds)
-
-        # Set contraception timing for mothers with surviving babies
-        mothers_of_live = mother_uids - mothers_of_nnds
-        self._set_contra_timing(mothers_of_live)
-
-        for cb in self._delivery_callbacks:
-            cb(mother_uids, newborn_uids)
-
+        # Contraception timing: the step after the birth
+        self.ti_contra[mothers] = self.ti + 1
         return
 
-    def record_ages(self, stillborn, single, twin):
+    def on_infant_death(self, mothers):
+        """ After a child dies before the age of 1 (Starsim's pregnancy stops breastfeeding) """
+        self.ti_contra[mothers] = self.ti + 1
+        return
+
+    def record_ages(self, single, twin):
         """
-        Record maternal ages at birth/stillbirth events and compute short birth intervals.
+        Record maternal ages at live births and compute short birth intervals.
 
         Args:
-            stillborn: UIDs of mothers with stillbirths
             single: UIDs of mothers with singleton live births
             twin: UIDs of mothers with twin live births
         """
-        ppl = self.sim.people
+        age = self.sim.people.age
+        birth_ages = self.birth_ages.raw
+        for uids, n in [(single, 1), (twin, 2)]: # Twins take two columns
+            idx = self.n_births[uids].astype(int) + self.n_twinbirths[uids].astype(int) - 1 # The column of the last birth
+            for k in range(n):
+                keep = (idx - k >= 0) & (idx - k < fpd.max_parity)
+                birth_ages[uids[keep], (idx - k)[keep]] = age[uids[keep]]
+        first = self.n_births[single] + self.n_twinbirths[single] == 1
+        self.first_birth_age[single[first]] = age[single[first]]
+        first = self.n_births[twin] + self.n_twinbirths[twin] == 2
+        self.first_birth_age[twin[first]] = age[twin[first]]
 
-        # Record ages of agents when live births / stillbirths occur
-        for parity in np.unique(self.n_births[single]):
-            single_uids = single[self.n_births[single] == parity]
-            self.birth_ages[ss.uids(single_uids), int(parity-1)] = ppl.age[ss.uids(single_uids)]
-            if parity == 1: self.first_birth_age[single_uids] = ppl.age[single_uids]
-        for parity in np.unique(self.n_births[twin]):
-            twin_uids = twin[self.n_births[twin] == parity]
-            self.birth_ages[twin_uids, int(parity-1)] = ppl.age[twin_uids]
-            self.birth_ages[twin_uids, int(parity)-2] = ppl.age[twin_uids]
-            if parity == 2: self.first_birth_age[twin_uids] = ppl.age[twin_uids]
-        for parity in np.unique(self.n_stillbirths[stillborn]):
-            uids = stillborn[self.n_stillbirths[stillborn] == parity]
-            self.stillborn_ages[uids, int(parity)] = ppl.age[uids]
-
-        # Calculate short intervals
-        prev_birth_single = single[self.n_births[single] > 1]
-        prev_birth_twins = twin[self.n_births[twin] > 2]
-        if len(prev_birth_single):
-            pidx = (self.n_births[prev_birth_single] - 1).astype(int)
-            all_ints = [self.birth_ages[r, pidx] - self.birth_ages[r, pidx-1] for r in prev_birth_single]
-            latest_ints = np.array([r[~np.isnan(r)][-1] for r in all_ints])
-            short_ints = np.count_nonzero(latest_ints < (self.pars['short_int'].years))
-            self.results['short_intervals'][self.ti] += short_ints
-        if len(prev_birth_twins):
-            pidx = (self.n_births[prev_birth_twins] - 2).astype(int)
-            all_ints = [self.birth_ages[r, pidx] - self.birth_ages[r, pidx-1] for r in prev_birth_twins]
-            latest_ints = np.array([r[~np.isnan(r)][-1] for r in all_ints])
-            short_ints = np.count_nonzero(latest_ints < (self.pars['short_int'].years))
-            self.results['short_intervals'][self.ti] += short_ints
+        # Short intervals: the time since the woman's previous live birth
+        mothers = single | twin
+        last = (self.n_births[mothers] + self.n_twinbirths[mothers]).astype(int) - 1
+        prev = last - np.where(np.isin(mothers, twin), 2, 1)
+        has_prev = (prev >= 0) & (last < fpd.max_parity)
+        intervals = age[mothers[has_prev]] - birth_ages[mothers[has_prev], prev[has_prev]]
+        short_ints = np.count_nonzero(intervals < self.pars['short_int'].years)
+        self.results['short_intervals'][self.ti] += short_ints
 
         # Compute proportion of short interval births among all live births this timestep
-        n_live = len(single) + len(twin)
-        if n_live > 0:
-            self.results['p_short_interval'][self.ti] = self.results['short_intervals'][self.ti] / n_live
-
+        if len(mothers):
+            self.results['p_short_interval'][self.ti] = self.results['short_intervals'][self.ti] / len(mothers)
         return
-
-    def check_infant_mortality(self, uids):
-        """
-        Check for probability of neonatal death (< 1 year of age).
-
-        Uses age-adjusted mortality rates to determine which newborns die.
-
-        Args:
-            uids: UIDs of mothers with live births
-
-        Returns:
-            tuple: (mothers_of_nnd, nnds) — mother UIDs and newborn UIDs that died
-        """
-        death_prob = (self.mortality_probs['infant'])
-        if len(uids) > 0:
-            age_inds = sc.findnearest(self.pars['infant_mortality']['ages'], self.sim.people.age[uids])
-            death_prob = death_prob * (self.pars['infant_mortality']['age_probs'][age_inds])
-        mothers_of_nnd = self.bfilter(self._p_inf_mort, uids, death_prob)
-        nnds = self.find_unborn_children(mothers_of_nnd)  # Technically the children have been born, but age < dt
-        return mothers_of_nnd, nnds
-
-    def _set_contra_timing(self, uids):
-        """
-        Schedule contraception choice for the next timestep after delivery.
-
-        Args:
-            uids: UIDs of mothers with live births
-        """
-        self.ti_contra[uids] = self.ti + 1
-
-    def handle_loss(self, uids):
-        """
-        Shared handler for pregnancy losses (miscarriage, stillbirth, abortion, neonatal death).
-
-        Triggers three actions:
-            1. Schedule contraceptive method update for the next timestep
-            2. Schedule breastfeeding to stop next timestep
-            3. Request death for unborn/newborn children
-
-        Args:
-            uids: UIDs of mothers who experienced a loss
-        """
-        # Trigger update to contraceptive choices
-        self.ti_contra[uids] = self.ti + 1
-
-        # Stop breastfeeding
-        self.ti_stop_breastfeed[uids] = self.ti + 1  # Stop breastfeeding next month
-
-        # Track death of unborn child/ren
-        child_uids = self.find_unborn_children(uids)
-        self.sim.people.request_death(child_uids)
-
-        return
-
-    def update_breastfeeding(self, uids):
-        """
-        Extend parent breastfeeding update to track cumulative duration.
-
-        When women stop breastfeeding, adds their current breastfeeding duration
-        to dur_breastfeed_total (lifetime cumulative).
-
-        Args:
-            uids: UIDs of breastfeeding women to check
-        """
-        stopping = super().update_breastfeeding(uids)
-        if len(stopping):
-            self.dur_breastfeed_total[stopping] += self.dur_breastfeed[stopping]
-        return
-
-    # %% Conception
-
-    def set_rel_sus(self):
-        """
-        Set relative susceptibility to pregnancy.
-
-        Formula: rel_sus = (1 - method_eff) * (1 - lam_eff) for susceptible women, 0 otherwise.
-        This combines contraceptive efficacy and lactational amenorrhea effects.
-        """
-        lam_eff = self.get_lam_eff()
-        method_eff = self.get_contra_eff()
-        self.rel_sus[~self.susceptible] = 0  # Reset all to zero
-        self.rel_sus[self.susceptible] = 1  # Reset relative susceptibility
-        self.rel_sus[:] *= 1 - method_eff
-        self.rel_sus[:] *= 1 - lam_eff
-        return
-
-    def get_contra_eff(self):
-        """
-        Build an efficacy array from each agent's current contraceptive method.
-
-        Returns:
-            np.ndarray: per-agent contraceptive efficacy (0 to 1)
-        """
-        cm = self.sim.connectors.contraception
-        eff_array = np.array([m.efficacy for m in cm.methods.values()])
-        contra_eff = eff_array[self.method]
-        return contra_eff
-
-    def get_lam_eff(self):
-        """
-        Compute lactational amenorrhea (LAM) efficacy adjustment.
-
-        LAM candidates are breastfeeding, susceptible women within the data-defined
-        postpartum window. LAM is switched off for anyone not breastfeeding or over
-        the maximum LAM duration.
-
-        Returns:
-            np.ndarray: per-agent LAM efficacy (0 or LAM_efficacy parameter)
-        """
-        lam_data_max = int(max(self.pars['lactational_amenorrhea']['month']))
-        lam_candidates = self.breastfeeding & self.susceptible & ((self.ti - self.ti_delivery) <= lam_data_max)
-        if lam_candidates.any():
-            timesteps_since_birth = (self.ti - self.ti_delivery[lam_candidates]).astype(int)
-            probs = self.pars['lactational_amenorrhea']['rate'][timesteps_since_birth]
-            self._p_lam.set(p=probs)
-            self.lam[lam_candidates] = self._p_lam.rvs(lam_candidates)
-
-        # Switch LAM off for anyone not breastfeeding or over max_lam_dur postpartum
-        max_lam_dur = self.pars['max_lam_dur']
-        over_max = (self.ti - self.ti_delivery) > max_lam_dur
-        not_breastfeeding = ~self.breastfeeding
-        not_lam = over_max | not_breastfeeding
-        self.lam[not_lam] = False
-
-        lam_eff = self.pars['LAM_efficacy'] * self.lam
-        return lam_eff
-
-    def make_p_conceive(self, filter_uids=None):
-        """
-        Calculate per-agent conception probability with FP-specific factors.
-
-        Steps:
-            1. Get individual exposure risk via rel_sus (contraception and LAM applied)
-            2. Apply individual fecundity variation and age-specific fecundity
-            3. Adjust for nulliparity
-            4. Apply exposure factors from calibration (overall, by parity, by age)
-
-        Args:
-            filter_uids: optional UIDs to restrict to (intersected with susceptible)
-
-        Returns:
-            np.ndarray: per-agent conception probability for this timestep
-        """
-        uids = self.susceptible
-        if filter_uids is not None: uids = filter_uids & uids
-
-        # Apply fecundity, nulliparous adjustment, and exposure factors
-        raw_probs = self._adj_fecundity(uids, None)
-        raw_probs = self._adj_nullip(uids, raw_probs)
-        raw_probs = self._adj_exposure(uids, raw_probs)
-
-        # Convert to probability
-        raw_probs = np.minimum(raw_probs, 1.0)
-        preg_probs = ss.probperyear(raw_probs).to_prob(self.t.dt)
-
-        return preg_probs
-
-    def _adj_fecundity(self, uids, base_probs):
-        """
-        Apply age-specific fecundity and individual fecundity variation.
-
-        Multiplies age_fecundity by personal_fecundity (individual random variation)
-        and by rel_sus (which encodes contraceptive and LAM effects).
-
-        Args:
-            uids: UIDs of susceptible women
-            base_probs: unused (kept for API consistency with other _adj methods)
-
-        Returns:
-            np.ndarray: fecundity-adjusted probabilities
-        """
-        ppl = self.sim.people
-        fecundity = self.pars['age_fecundity'][ppl.int_age_clip(uids)] * self.personal_fecundity[uids]
-        return fecundity * self.rel_sus[uids]
-
-    def _adj_nullip(self, uids, probs):
-        """
-        Adjust conception probability for nulliparous women (parity == 0).
-
-        Nulliparous women have a lower likelihood of conception, scaled by
-        the age-specific fecundity_ratio_nullip parameter.
-
-        Args:
-            uids: UIDs of susceptible women
-            probs: current conception probabilities (modified in place)
-
-        Returns:
-            np.ndarray: adjusted probabilities
-        """
-        ppl = self.sim.people
-        nullip = self.parity[uids] == 0
-        nullip_uids = uids[nullip]
-        probs[nullip] *= self.pars['fecundity_ratio_nullip'][ppl.int_age_clip(nullip_uids)]
-        return probs
-
-    def _adj_exposure(self, uids, probs):
-        """
-        Apply calibration-derived exposure factor adjustments.
-
-        Three multiplicative factors:
-            1. Overall exposure_factor
-            2. Age-specific exposure_age (interpolated spline)
-            3. Parity-specific exposure_parity (interpolated spline)
-
-        Args:
-            uids: UIDs of susceptible women
-            probs: current conception probabilities (modified in place)
-
-        Returns:
-            np.ndarray: adjusted probabilities
-        """
-        ppl = self.sim.people
-        probs *= self.pars['exposure_factor']
-        probs *= self.pars['exposure_age'][ppl.int_age_clip(uids)]
-        probs *= self.pars['exposure_parity'][np.minimum(self.parity[uids], fpd.max_parity).astype(int)]
-        return probs
-
-    def select_conceivers(self, uids=None):
-        """
-        Select women who conceive, then apply abortion logic.
-
-        Calls the parent to determine initial conceivers based on conception
-        probability, then splits them into abortions and continuing pregnancies.
-        Tracks method failures (women who conceived while on contraception).
-
-        Args:
-            uids: UIDs to consider (default: susceptible women)
-
-        Returns:
-            ss.uids: UIDs of women with continuing pregnancies (after abortions removed)
-        """
-        # Call parent to get initial conceivers
-        if uids is None: uids = self.susceptible.uids
-        conceived = super().select_conceivers(uids=uids)
-
-        if len(conceived) == 0:
-            return ss.uids()
-
-        # Check for abortion
-        abort_uids, preg_uids = self.bsplit(self._p_abortion, conceived, self.pars.abortion_prob)
-        if len(abort_uids):
-            self.handle_abortion(abort_uids)
-            self._counts.pregnancies += len(abort_uids)  # Parent only counts returning preg_uids; add abortions
-
-        # Track method failures for continuing pregnancies
-        if hasattr(self.sim.connectors, 'contraception') and len(preg_uids):
-            on_method = self.method[preg_uids] != 0
-            self.results['method_failures'][self.ti] += on_method.sum()
-
-        return preg_uids
-
-    def handle_abortion(self, uids):
-        """
-        Process abortion outcomes.
-
-        Called prior to make_embryos/make_pregnancies, so no pregnancy state
-        reset is needed. Increments abortion and pregnancy counters, records
-        the age at abortion, and updates results.
-
-        Args:
-            uids: UIDs of women who aborted
-        """
-        ppl = self.sim.people
-        n_abortions = len(uids)
-        self.n_abortions[uids] += 1
-        self.n_pregnancies[uids] += 1  # Still count in total pregnancies
-        self.ti_abortion[uids] = self.ti
-
-        # Track ages
-        for uid in uids:
-            age_idx = np.where(np.isnan(self.abortion_ages[uid]))[0]
-            if len(age_idx):
-                self.abortion_ages[uid, age_idx[0]] = ppl.age[uid]
-
-        # Update results
-        self.results['abortions'][self.ti] = n_abortions
-
-        return
-
-    def make_pregnancies(self, uids):
-        """
-        Create new pregnancies and disable contraception during pregnancy.
-
-        Calls the parent to set pregnancy states, then resets contraception
-        (on_contra = False, method = 0) for the newly pregnant women.
-
-        Args:
-            uids: UIDs of women who conceived
-
-        Returns:
-            np.ndarray: embryo counts per mother (from parent)
-        """
-        embryo_counts = super().make_pregnancies(uids)
-        self.on_contra[uids] = False  # Not using contraception during pregnancy
-        self.method[uids] = 0  # Method zero due to non-use
-        return embryo_counts
-
-    def process_prenatal_deaths(self, death_uids):
-        """
-        Extend parent's prenatal death classification with FPsim-specific tracking.
-
-        The parent classifies deaths by gestational age (miscarriage vs stillbirth)
-        and updates results. We additionally record ages, update timing states,
-        and trigger handle_loss for contraception/breastfeeding updates.
-        """
-        # Identify prenatal deaths and save gestation BEFORE super clears it via step_die
-        is_prenatal = self.sim.people.age[death_uids] < 0
-        prenatal_death_uids = death_uids[is_prenatal]
-        if not len(prenatal_death_uids):
-            return
-
-        ppl = self.sim.people
-        mother_uids = ppl.parent[prenatal_death_uids]
-        ga = np.array(self.gestation[mother_uids])  # Copy before super clears it
-        threshold = self.pars.loss_threshold.weeks
-        is_mc = ga < threshold
-
-        # Let parent classify and count miscarriages/stillbirths (calls step_die)
-        super().process_prenatal_deaths(death_uids)
-        mc_mothers = mother_uids[is_mc]
-        sb_mothers = mother_uids[~is_mc]
-
-        # Record miscarriage ages and timing
-        for uid in mc_mothers:
-            age_idx = np.where(np.isnan(self.miscarriage_ages[uid]))[0]
-            if len(age_idx):
-                self.miscarriage_ages[uid, age_idx[0]] = ppl.age[uid]
-        if len(mc_mothers):
-            self.ti_miscarriage[mc_mothers] = self.ti
-
-        # Record stillbirth ages and timing
-        for uid in sb_mothers:
-            parity_idx = int(self.n_stillbirths[uid]) - 1
-            if 0 <= parity_idx < self.stillborn_ages.shape[1]:
-                self.stillborn_ages[uid, parity_idx] = ppl.age[uid]
-        if len(sb_mothers):
-            self.ti_stillbirth[sb_mothers] = self.ti
-            self.parity[sb_mothers] += 1
-
-        # Handle loss for all affected mothers (contraception, breastfeeding)
-        singletons = mother_uids[~self.carrying_multiple[mother_uids]]
-        self.handle_loss(singletons)
 
     # %% Results and finalization
 
     def update_results(self):
-        """
-        Per-step result recording.
-
-        Extends the parent to add:
-        - Total births (live births plus stillbirths)
-        - Infant mortality rate (IMR) = infant_deaths / births * 1000
-        - Method mix via compute_method_usage
-        """
+        """ Per-step results, and the method mix """
         super().update_results()
-        ti = self.ti
-        self.results['total_births'][ti] = self.results['births'][ti] + self.results['stillbirths'][ti]
-        self.results['imr'][ti] = sc.safedivide(self.results['infant_deaths'][ti], self.results['births'][ti]) * 1e3
         self.compute_method_usage()
         return
 
@@ -1076,22 +690,15 @@ class FPmod(ss.Pregnancy):
         bool_list_uids = ppl.female & (ppl.age >= min_age) * (ppl.age <= max_age)
         filtered_methods = self.method[bool_list_uids]
         # Use explicit bin edges to ensure each method index gets its own bin
-        # bins=n creates n evenly-spaced bins from min to max, which doesn't align with method indices
         n_options = self.sim.connectors.contraception.n_options
         m_counts, _ = np.histogram(filtered_methods, bins=np.arange(n_options + 1))
         self.method_mix[:, self.ti] = m_counts / np.sum(m_counts) if np.sum(m_counts) > 0 else 0
         return
 
     def finalize_results(self):
-        """
-        Compute cumulative event counts after the simulation completes.
-
-        Adds cum_{key} results for each event type in fpd.event_counts, and for the
-        parent Pregnancy results in fpd.inherited_counts (cum_births, cum_stillbirths,
-        cum_miscarriages, cum_pregnancies, cum_maternal_deaths), which the parent
-        does not accumulate itself.
-        """
+        """ Total births (live births plus stillbirths) and the infant mortality rate (infant deaths per 1,000 live births) """
         super().finalize_results()
-        for res in fpd.event_counts + fpd.inherited_counts:
-            self.results[f'cum_{res}'] = np.cumsum(self.results[res])
+        res = self.results
+        res['total_births'][:] = res['birth'][:] + res['stillbirth'][:]
+        res['imr'][:] = sc.safedivide(res['infant_mortality'][:], res['birth'][:], default=0) * 1e3
         return

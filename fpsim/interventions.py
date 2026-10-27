@@ -718,7 +718,7 @@ class change_initiation(ss.Intervention):
         eligible = (ppl.female & ppl.alive &                        # living women
                     (ppl.age < self.sim.pars.fp['age_limit_fecundity']) &  # who are fecund
                     ppl.fp.sexual_debut &                           # who already had their sexual debut
-                    (~ppl.fp.pregnant) &                            # who are not currently pregnant
+                    (~ppl.fp.P) &                                   # who are not currently pregnant
                     (~ppl.fp.postpartum) &                          # who are not in postpartum
                     (~ppl.fp.on_contra)                             # who are not already on contra
                     )

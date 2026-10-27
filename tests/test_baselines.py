@@ -143,7 +143,7 @@ def test_benchmark(do_save=do_save, repeats=1):
                 'n':          exp.sim.pars['n_agents'],
                 'start_year': exp.sim.pars['start'],
                 'end_year':   exp.sim.pars['stop'],
-                'timestep':   exp.sim.pars['dt'],
+                'timestep':   exp.sim.t.dt_year,
                 },
             'cpu_performance': ratio,
             }

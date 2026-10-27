@@ -166,7 +166,7 @@ class education_recorder(ss.Analyzer):
             self.snapshots = sc.odict()  # Store the actual snapshots
             self.edu_keys = ['objective', 'attainment', 'completed',
                          'dropped', 'interrupted']
-            self.fp_keys = ['pregnant']
+            self.fp_keys = ['P'] # Pregnant
             self.ppl_keys = ['alive', 'age']
             self.max_agents = 0     # maximum number of agents this analyzer tracks
             self.time = []
@@ -220,7 +220,7 @@ class education_recorder(ss.Analyzer):
 
             fig = pl.figure(**fig_args)
             keys2 = ['completed', 'interrupted', 'dropped']
-            keys3 = ['pregnant', 'alive']
+            keys3 = ['P', 'alive']
 
             k = 0
             pl.subplot(rows, cols, k + 1)
@@ -248,8 +248,8 @@ class education_recorder(ss.Analyzer):
                         pl.step(self.time, 3*data[:, index], color="black", label=f"{state}", ls=":", where='mid', **pl_args)
                     else:
                         pl.step(self.time, 3*data[:, index], color="#2ca25f", label=f"{state}", where='mid', **pl_args)
-                elif state  == 'pregnant':
-                    pl.step(self.time, data[:, index], color="#dd1c77", label=f"{state}", where='mid', **pl_args)
+                elif state  == 'P':
+                    pl.step(self.time, data[:, index], color="#dd1c77", label="pregnant", where='mid', **pl_args)
                 elif state == 'alive':
                     plt.step(self.time, 4*data[:, index],  color="black", ls="--", label=f"{state}", where='mid', **pl_args)
                 pl.title(f"Education trajectories - Start age: {int(age_data[0, index])}; final age {int(age_data[-1, index])}.")
@@ -362,7 +362,7 @@ class lifeof_recorder(ss.Analyzer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)  # Initialize the Analyzer object
         self.snapshots = sc.odict()  # Store the actual snapshots
-        self.keys = ['fp.method', 'fp.pregnant', 'fp.lam', 'fp.postpartum', 'fp.sexually_active',
+        self.keys = ['fp.method', 'fp.P', 'fp.lam', 'fp.postpartum', 'fp.sexually_active',
                      'fp.n_abortions', 'fp.n_stillbirths', 'fp.parity',
                      'fp.n_miscarriages', 'age', 'fp.on_contra', 'alive']
         self.max_agents = 0  # maximum number of agents this analyzer tracks
@@ -490,7 +490,7 @@ class lifeof_recorder(ss.Analyzer):
                 bbox=bbox)
 
         # Pregnant
-        state = "fp.pregnant"
+        state = "fp.P"
         temp = self._state_intervals(state, index)
         pr_bar = pl.broken_barh(self._transform_to_age(temp, index),
                        (2, 1), facecolors="deeppink", label=f"{state}")
@@ -953,7 +953,7 @@ class track_postpartum(ss.Analyzer):
     def step(self):
         """ Histogram of postpartum status """
         fpmod = self.sim.demographics.fp
-        timesteps_since_birth = fpmod.ti - fpmod.ti_delivery
+        timesteps_since_birth = fpmod.ti - fpmod.ti_delivered
         self.results[self.ti, :], _ = np.histogram(timesteps_since_birth[fpmod.postpartum], bins=self.pp_bins)
         return
 
@@ -1109,7 +1109,7 @@ class track_as(ss.Analyzer):
         ppl_uids = ppl.alive.uids
 
         # Pregnancies
-        preg_uids = (ppl.fp.ti_pregnant == self.sim.ti).uids
+        preg_uids = (ppl.fp.ti_P == self.sim.ti).uids
         pregnant_boolean = np.full(len(ppl), False)
         pregnant_boolean[np.searchsorted(ppl_uids, preg_uids)] = True
         pregnant_age_split = self.log_age_split(binned_ages_t=[self.age_by_group], channel='pregnancies',
@@ -1157,7 +1157,7 @@ class track_as(ss.Analyzer):
 
         # ACPR
         denominator = ((sim.pars.fp['method_age'] <= ppl.age) * (ppl.age < sim.pars.fp['age_limit_fecundity']) * (
-                ppl.female) * (ppl.fp.pregnant == 0) * (ppl.fp.sexually_active == 1) * ppl.alive)
+                ppl.female) * (ppl.fp.P == 0) * (ppl.fp.sexually_active == 1) * ppl.alive)
         numerator = ppl.fp.method != 0
 
         as_result_dict = self.log_age_split(binned_ages_t=[self.age_by_group], channel='acpr',

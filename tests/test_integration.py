@@ -38,11 +38,11 @@ class BirthOutcomes(ss.Analyzer):
     Gestation is drawn from starsim's 32-42 week distribution, so a conception cohort's
     deliveries are spread over several timesteps and any fixed birth window also catches
     later conceptions. Recording each outcome as it happens avoids both problems, and is
-    immune to ti_pregnant being overwritten by a subsequent pregnancy.
+    immune to ti_P being overwritten by a subsequent pregnancy.
     """
-    def __init__(self, max_ti=2):
+    def __init__(self, max_ti=3):
         super().__init__()
-        self.max_ti = max_ti  # Last timestep on which conceptions join the cohort
+        self.max_ti = max_ti  # Last timestep on which conceptions join the cohort (the first three months)
         self.cohort = set()
         self.resolved = set()
         self.counts = dict(live_birth=0, stillbirth=0, miscarriage=0, abortion=0)
@@ -52,8 +52,8 @@ class BirthOutcomes(ss.Analyzer):
         mod = self.sim.people.fp
         ti = self.sim.ti
         if ti <= self.max_ti:
-            # Abortions clear ti_pregnant in the same step they conceive, so count them separately
-            self.cohort.update((mod.ti_pregnant == ti).uids.tolist() + (mod.ti_abortion == ti).uids.tolist())
+            # Abortions end the pregnancy in the same step they conceive, so count them separately
+            self.cohort.update((mod.ti_P == ti).uids.tolist() + (mod.ti_abortion == ti).uids.tolist())
 
         pending = self.cohort - self.resolved
         if pending:
@@ -61,9 +61,9 @@ class BirthOutcomes(ss.Analyzer):
             outcomes = [('live_birth', mod.ti_live_birth), ('stillbirth', mod.ti_stillbirth),
                         ('miscarriage', mod.ti_miscarriage), ('abortion', mod.ti_abortion)]
             for key, state in outcomes:
-                hit = uids[state[uids] == ti]
+                hit = uids[(state[uids] == ti) & ~np.isin(uids, list(self.resolved))]  # Only count each woman's first outcome (e.g. not a new pregnancy's abortion in the step of her delivery)
                 self.counts[key] += len(hit)
-                self.resolved.update(np.asarray(hit).tolist())  # Only count each woman's first outcome
+                self.resolved.update(np.asarray(hit).tolist())
         return
 
 
@@ -91,7 +91,7 @@ def test_pregnant_women():
 
     custom_pars = {
         'start_year': 2000,
-        'end_year': 2002,  # Long enough for the months 0-2 conception cohort to fully resolve
+        'end_year': 2002,  # Long enough for the conception cohort of the first three months to fully resolve
         'n_agents': 1000,
         'test': True,
         'age_pyramid': f24_age_pyramid,
@@ -119,10 +119,10 @@ def test_pregnant_women():
     # expected number of pregnancies, stillborns, living infants, and miscarriages/abortions
     # pregnancy rate: 11.2% per month or approx 80% per year
     print(f'Checking pregnancy and birth outcomes from {n_agents} women... ')
-    assert (fecundity24*1.1) * n_agents > sim.results.fp.pregnancies[0:12].sum() > (fecundity24*0.9) * n_agents, "Expected number of pregnancies not met"
-    print(f'✓ ({sim.results.fp.pregnancies[0:12].sum()} pregnancies, as expected)')
+    assert (fecundity24*1.1) * n_agents > sim.results.fp.conception[1:13].sum() > (fecundity24*0.9) * n_agents, "Expected number of pregnancies not met"
+    print(f'✓ ({sim.results.fp.conception[1:13].sum()} pregnancies, as expected)')
 
-    # Outcomes are checked against the cohort who conceived in months 0-2, followed to the
+    # Outcomes are checked against the cohort who conceived in the first three months, followed to the
     # resolution of that pregnancy, rather than against fixed result windows
     outcomes = sim.analyzers[0]
     cohort = len(outcomes.cohort)
@@ -197,11 +197,11 @@ def test_contraception():
     sim.run(verbose=1/12)
 
     print(f'Checking pregnancy and birth outcomes from {sim.pars.n_agents} women... ')
-    assert sim.results.fp.pregnancies[0:12].sum() == 0, "Expected no pregnancies"
-    assert sim.results.fp.pregnancies[12:].sum() > 0, "Expected pregnancies after contraception switch"
+    assert sim.results.fp.conception[1:13].sum() == 0, "Expected no pregnancies"
+    assert sim.results.fp.conception[13:].sum() > 0, "Expected pregnancies after contraception switch"
     print(f'✓ (no pregnancies with 100% effective contraception)')
 
-    pp1 = (sim.people.fp.ti_delivery == sim.t.ti).uids
+    pp1 = (sim.people.fp.ti_delivered == sim.t.ti).uids
     assert sim.people.fp.on_contra[pp1].sum() == 0, "Expected no contraception use immediately postpartum"
     print(f'✓ (no contraception use postpartum)')
     assert (sim.people.fp.on_contra == True).sum() < sim.pars['n_agents'], "Expected some agents to be off of birth control at any given time"
@@ -269,16 +269,14 @@ def test_education_preg():
     sc.heading('Testing that lower fertility rate leads to more education...')
 
     def make_sim(pregnant=False):
-        pars = dict(start=2000, stop=2001, n_agents=1000, test=True, burnin=False)
+        pars = dict(start=2000, stop=2002, n_agents=1000, test=True, burnin=False) # Two years, so mothers have time to drop out
         sim = fp.Sim(pars=pars)
         sim.init()
         sim.people.age[:] = 15
         sim.people.female[:] = True
         uids = sim.people.female.uids
         if pregnant:
-            embryo_counts = np.ones(len(uids))
-            sim.demographics.fp.make_pregnancies(uids)
-            sim.demographics.fp.make_embryos(uids, embryo_counts)
+            sim.demographics.fp.move(uids, 'P')
         return sim
 
     sim_base = make_sim()
@@ -289,8 +287,8 @@ def test_education_preg():
     # Check that education has increased
     base_edu = sim_base.results.edu.mean_attainment[-1]
     preg_edu = sim_preg.results.edu.mean_attainment[-1]
-    base_births = sum(sim_base.results.fp.births)
-    preg_births = sum(sim_preg.results.fp.births)
+    base_births = sum(sim_base.results.fp.birth)
+    preg_births = sum(sim_preg.results.fp.birth)
     assert base_births < preg_births, f'With more pregnancy there should be more births, but {preg_births}<{base_births}'
     assert preg_edu < base_edu, f'With more pregnancy there should be lower education levels, but {preg_edu}>{base_edu}'
     print(f"✓ (Higher teen pregnancy ({preg_births:.0f} vs {base_births:.0f}) -> less education ({preg_edu:.2f} < {base_edu:.2f}))")

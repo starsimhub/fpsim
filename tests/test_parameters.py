@@ -39,7 +39,7 @@ def test_null(do_plot=do_plot):
     sim.run()
 
     # Tests
-    n = sim.results.fp.births.sum()
+    n = sim.results.fp.birth.sum()
     assert n == 0, f'Expecting 0 births, not {n}'
     n = sim.results.new_deaths.sum()
     assert n == 0, f'Expecting 0 deaths, not {n}'
@@ -106,7 +106,7 @@ def test_method_changes():
     choice = fp.RandomChoice(pars=dict(p_use=1), methods=methods)
     s3 = fp.Sim(test=True, contraception_module=choice)
     s3.run()
-    assert s3.results.fp.births.sum() == 0, f'Expecting births to be 0, not {n}'
+    assert s3.results.fp.birth.sum() == 0, f'Expecting births to be 0, not {n}'
     ok(f'No births with completely effective contraception, as expected')
 
 
@@ -133,22 +133,19 @@ known_unused = {
 # attribute-style access (self.pars.key) or code paths that only trigger with
 # sufficient parous/pregnant women in a short test sim
 tracking_blind_spots = {
-    'abortion_prob',       # Accessed via self.pars.abortion_prob in select_conceivers
-    'miscarriage_rates',   # Accessed in progress_pregnancies (needs pregnant women)
+    'abortion_prob',       # Consumed as p_abortion of Starsim's pregnancy in __init__
+    'miscarriage_rates',   # Accessed via self.pars.miscarriage_rates in get_loss_rate()
     'sexual_activity_pp',  # Accessed in _set_parous_active (needs parous PP women)
     'short_int',           # Accessed in record_ages (needs women with 2+ births)
     'spacing_pref',        # Accessed in _set_parous_active (needs parous women)
+    'dur_postpartum',      # Accessed via self.pars.dur_postpartum in postpartum
+    'trimesters',          # Accessed via self.pars.trimesters in get_loss_rate() and end_tri1_uids
+    'fecundity',           # Accessed via self.pars.fecundity in update_fp()
 }
 
-# Parameters inherited from PregnancyPars used by the parent Pregnancy class
-inherited_pars = {
-    'fertility_rate', 'rel_fertility', 'rate_units', 'dur_pregnancy',
-    'dur_breastfeed', 'p_breastfeed', 'embryos_per_pregnancy', 'rr_ptb',
-    'rr_ptb_age', 'p_maternal_death', 'p_survive_maternal_death', 'p_loss',
-    'loss_threshold', 'sex_ratio', 'slot_scale', 'min_slots',
-    'preterm_threshold', 'very_preterm_threshold', 'burnin', 'trimesters',
-    'p_infertile', 'min_age', 'max_age', 'fecundity',
-}
+# Parameters of Starsim's pregnancy (ss.Pregnancy), which it reads itself
+inherited_pars = set(ss.Pregnancy().pars.keys())
+
 
 # Expected mappings from data files to parameter keys
 expected_data_mappings = {

@@ -59,10 +59,10 @@ sim.run()
 
 # Inspecting results
 
-Running the simulation will generate a results [dictionary] `sim.results`. A dictionary is simply collection of items, and you can access the values of results using different 'key' words. Almost all of the results relevant for FPsim are stored under the key 'fp'; for example, the number of pregnancies over time can be found using `sim.results.fp['pregnancies']`. Execute the code below:
+Running the simulation will generate a results [dictionary] `sim.results`. A dictionary is simply collection of items, and you can access the values of results using different 'key' words. Almost all of the results relevant for FPsim are stored under the key 'fp'; for example, the number of pregnancies over time can be found using `sim.results.fp['conception']`. Execute the code below:
 
 ```{python}
-sim.results.fp['pregnancies']
+sim.results.fp['conception']
 ```
 
 If you want to see all the 'keys' that are available in the results dictionary you can use
