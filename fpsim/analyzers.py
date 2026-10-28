@@ -1109,7 +1109,7 @@ class track_as(ss.Analyzer):
         ppl_uids = ppl.alive.uids
 
         # Pregnancies
-        preg_uids = (ppl.fp.ti_P == self.sim.ti).uids
+        preg_uids = ppl.fp.ti_P.isclose(self.sim.ti).uids
         pregnant_boolean = np.full(len(ppl), False)
         pregnant_boolean[np.searchsorted(ppl_uids, preg_uids)] = True
         pregnant_age_split = self.log_age_split(binned_ages_t=[self.age_by_group], channel='pregnancies',

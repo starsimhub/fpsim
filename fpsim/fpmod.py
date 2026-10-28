@@ -104,15 +104,15 @@ class FPmod(ss.Pregnancy):
 
         # Add event counts - these are all integers, and are scaled by the number of agents
         for key in fpd.event_counts:
-            results += ss.Result(key, label=key, kind='flow', **scaling_kw, summarize_by='sum')
+            results += ss.Result(key, label=key, kind='flow', **scaling_kw)
 
         # Add people counts - these are all integers, and are scaled by the number of agents
         for key in fpd.people_counts:
-            results += ss.Result(key, label=key, **scaling_kw, summarize_by='sum')
+            results += ss.Result(key, label=key, kind='flow', **scaling_kw)
 
         # Add infant mortality and short interval births - these are proportions, not scaled
-        results += ss.Result('imr', label='Infant mortality rate', kind='ratio', **nonscaling_kw, summarize_by='mean')
-        results += ss.Result('p_short_interval', label='Proportion of short interval births', kind='ratio', **nonscaling_kw, summarize_by='mean')
+        results += ss.Result('imr', label='Infant mortality rate', kind='ratio', **nonscaling_kw)
+        results += ss.Result('p_short_interval', label='Proportion of short interval births', kind='ratio', **nonscaling_kw)
 
         # Store results
         self.define_results(*results)
@@ -508,20 +508,24 @@ class FPmod(ss.Pregnancy):
 
     def get_loss_rate(self, sim, uids):
         """
-        The hazard of a pregnancy loss (Starsim's pregnancy makes it a miscarriage before 20 weeks, a stillbirth after):
-        the first-trimester miscarriage risk by age, spread over the first trimester, and the stillbirth risk by year
-        and age, spread over the rest of a 40-week pregnancy
+        The hazard of a pregnancy loss (Starsim's pregnancy makes it a miscarriage before loss_threshold, 20 weeks, and a
+        stillbirth after): the first-trimester miscarriage risk by age, spread over the first trimester, and the
+        stillbirth risk by year and age, spread from loss_threshold to 40 weeks, so that all of it counts as stillbirths.
+        Between the end of the first trimester and loss_threshold there is no loss.
 
         Args:
             uids: the women Starsim's pregnancy asks about (those pregnant)
         """
         tri1 = self.pars.trimesters[0]
-        rest = ss.weeks(40) - tri1
-        early = self.P.time[uids] < tri1 # The gestational age
+        threshold = self.pars.loss_threshold.raw # The duration itself (arithmetic on the parameter gives a bare number, in years)
+        rest = ss.weeks(40) - threshold
+        ga = self.P.time[uids] # The gestational age
+        early = ga < tri1
+        late = ga >= threshold
         ages = sim.people.int_age_clip(uids)
         rate = np.zeros(len(uids))
         rate[early] = -np.log1p(-self.pars.miscarriage_rates[ages[early]])/tri1.years
-        rate[~early] = -np.log1p(-self._get_stillbirth_prob(uids[~early]))/rest.years
+        rate[late] = -np.log1p(-self._get_stillbirth_prob(uids[late]))/rest.years
         return ss.peryear(rate)
 
     def _get_stillbirth_prob(self, uids):

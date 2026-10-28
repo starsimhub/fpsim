@@ -53,7 +53,7 @@ class BirthOutcomes(ss.Analyzer):
         ti = self.sim.ti
         if ti <= self.max_ti:
             # Abortions end the pregnancy in the same step they conceive, so count them separately
-            self.cohort.update((mod.ti_P == ti).uids.tolist() + (mod.ti_abortion == ti).uids.tolist())
+            self.cohort.update(mod.ti_P.isclose(ti).uids.tolist() + (mod.ti_abortion == ti).uids.tolist())
 
         pending = self.cohort - self.resolved
         if pending:
@@ -92,7 +92,7 @@ def test_pregnant_women():
     custom_pars = {
         'start_year': 2000,
         'end_year': 2002,  # Long enough for the conception cohort of the first three months to fully resolve
-        'n_agents': 1000,
+        'n_agents': 10000,  # A cohort of about 3000, so that the bounds on the rarer outcomes (e.g. stillbirths) hold across seeds
         'test': True,
         'age_pyramid': f24_age_pyramid,
         'debut_age': debut_age,
@@ -131,7 +131,7 @@ def test_pregnant_women():
     assert unresolved == 0, f"{unresolved} of {cohort} cohort pregnancies never resolved"
     print(f'✓ (all {cohort} cohort pregnancies resolved)')
 
-    # stillbirth rate: 2.5% of all pregnancies
+    # stillbirth rate: about 2.2% of all pregnancies (a risk of 2.5% for those that reach week 20, spread over weeks 20-40)
     assert 0.06 * cohort > counts['stillbirth'] > 0.01 * cohort, "Expected number of stillbirths not met"
     print(f'✓ ({counts["stillbirth"]} stillbirths, as expected)')
 

@@ -317,6 +317,22 @@ def test_add_method_year_boundaries(year_offset):
     return sim
 
 
+class recorded_initiation(fp.change_initiation):
+    """ change_initiation that records the age of each woman it starts on a method, when it starts her """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.start_ages = []
+        return
+
+    def step(self):
+        fpppl = self.sim.people.fp
+        before = fpppl.method.raw.copy()
+        super().step()
+        started = ss.uids(np.flatnonzero(fpppl.method.raw != before))
+        self.start_ages += self.sim.people.age[started].tolist()
+        return
+
+
 def test_age_restricted_initiation_basic():
     """Test that age-restricted initiation correctly filters by age using enhanced change_initiation."""
     sc.heading('Testing age-restricted initiation (via change_initiation) basic functionality...')
@@ -344,7 +360,7 @@ def test_age_restricted_initiation_basic():
     )
 
     # Age-restricted initiation using enhanced change_initiation
-    init_intv = fp.change_initiation(
+    init_intv = recorded_initiation(
         years=[2005, 2010],
         age_range=(15, 30),  # Broader range so enough eligible women for robust test
         perc=0.12,
@@ -365,12 +381,12 @@ def test_age_restricted_initiation_basic():
 
     assert users.sum() > 0, 'No users of test method found'
 
-    # Check that users are in the target age range (or were when initiated)
-    # This is approximate since people age during simulation
-    user_ages = sim.people.age[users]
-    # Allow some buffer since people aged during sim (age_range is 15-30)
-    assert user_ages.min() >= 14, f'Found user younger than expected: {user_ages.min()}'
-    assert user_ages.max() <= 32, f'Found user older than expected: {user_ages.max()}'
+    # Check that the women the intervention started were in the target age range when it started them (age_range is
+    # 15-30); by 2010 they are older, and others can also switch to the method (copied from the pill) at any age
+    start_ages = np.array(sim.interventions.init_test_method.start_ages)
+    assert len(start_ages) > 0, 'The intervention started no one on the test method'
+    assert start_ages.min() >= 15, f'Found a woman started younger than expected: {start_ages.min()}'
+    assert start_ages.max() < 30, f'Found a woman started older than expected: {start_ages.max()}'
 
     print(f'✓ Age-restricted initiation created {users.sum()} users in target age range')
     return sim
