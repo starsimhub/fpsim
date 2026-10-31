@@ -258,6 +258,21 @@ class Sim(ss.Sim):
         scaling_kw = dict(shape=self.t.npts, timevec=self.t.timevec, dtype=int, scale=True)
         for key in fpd.sim_results:
             self.results += ss.Result(key, label=key, **scaling_kw)
+        if 'died' in self.results: # Keep the sim's deaths and emigrants under their FPsim names (see finalize_results())
+            kw = dict(module='People', shape=self.t.npts, timevec=self.t.timevec, dtype=float, scale=False, auto_plot=False)
+            self.results += [ss.Result('new_deaths', label='Deaths', kind='flow', **kw),
+                             ss.Result('new_emigrants', label='Emigrants', kind='flow', **kw),
+                             ss.Result('cum_deaths', label='Cumulative deaths', kind='stock', **kw)]
+        return
+
+    def finalize_results(self):
+        """ Copy Starsim's died and emigrated to the names kept in `init_results()`, once they are scaled """
+        super().finalize_results()
+        res = self.results
+        if 'died' in res:
+            res.new_deaths[:] = res.died
+            res.new_emigrants[:] = res.emigrated
+            res.cum_deaths[:] = np.cumsum(res.died)
         return
 
     # Function to scale all y-axes in fig based on input channel
