@@ -197,7 +197,7 @@ method_youth_age_map = {
 }
 
 # Counts of FPsim's own events each timestep (Starsim's pregnancy has the flows conception, abortion, miscarriage,
-# stillbirth, birth, and infant_mortality, and maternal_deaths); the cumulative total of any of them is e.g. res.fp.birth.cum
+# stillbirth, birth, infant_mortality, and maternal_death); the cumulative total of any of them is e.g. res.fp.birth.cum
 event_counts = sc.autolist(
     'short_intervals',
     'total_births',

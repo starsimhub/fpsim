@@ -376,7 +376,7 @@ class Scenarios(sc.prettyobj):
                 raw['popsize']  += [results_df['alive']]    # Append population size
                 raw['tfr']      += [results_df['fp_tfr']]    # Append mean tfr rates
                 raw['infant_deaths'] += [results_df['fp_infant_mortality']]
-                raw['maternal_deaths'] += [results_df['fp_maternal_deaths']]
+                raw['maternal_deaths'] += [results_df['fp_maternal_death']]
                 raw['mcpr'] += [results_df['contraception_mcpr']]
 
         # Calculate basic stats

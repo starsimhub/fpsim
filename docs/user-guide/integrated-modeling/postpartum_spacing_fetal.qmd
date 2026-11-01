@@ -91,9 +91,9 @@ not tuned to any specific setting.
 ## What to look at
 
 - `sim.results.fp.short_intervals` -- births at &lt;24 mo interval.
-- `sim.results.fp.n_preterm` -- preterm births (from the base `ss.Pregnancy`).
-- `sim.results.fetal_health.n_lbw` -- low birth weight births.
-- `sim.results.fetal_health.n_svn` -- small vulnerable newborns
+- `sim.results.fp.preterm` -- preterm births (from the base `ss.Pregnancy`).
+- `sim.results.fetal_health.lbw` -- low birth weight births.
+- `sim.results.fetal_health.svn` -- small vulnerable newborns
   (`preterm | lbw | sga`).
 
 Compare the intervention arm against baseline scenario by scenario, seed by seed.

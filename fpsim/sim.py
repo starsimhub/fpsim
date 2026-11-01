@@ -332,7 +332,7 @@ class Sim(ss.Sim):
                         'contraception.mcpr':   'Modern contraceptive prevalence rate (%)',
                         'fp.birth.cum':            'Live births',
                         'fp.stillbirth.cum':       'Stillbirths',
-                        'fp.maternal_deaths.cum':  'Maternal deaths',
+                        'fp.maternal_death.cum':  'Maternal deaths',
                         'fp.infant_mortality.cum': 'Infant deaths',
                         'fp.imr':                  'Infant mortality rate',
                     }
@@ -345,7 +345,7 @@ class Sim(ss.Sim):
                 elif to_plot == 'mortality':
                     to_plot = {
                         'fp.mmr':                  'Maternal mortality ratio',
-                        'fp.maternal_deaths.cum':  'Maternal deaths',
+                        'fp.maternal_death.cum':  'Maternal deaths',
                         'fp.infant_mortality.cum': 'Infant deaths',
                         'fp.imr':                 'Infant mortality rate',
                         }
