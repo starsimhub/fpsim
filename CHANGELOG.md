@@ -3,7 +3,9 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.6.0 (2026-10-06)
+## Version 3.6.0 (2026-11-01)
+
+* Require Starsim below 4 (`starsim<4`), since this version does not run on Starsim 4.
 
 * **Regression information**
   * `FPmod` now inherits from `ss.Pregnancy` instead of `ss.Connector`. Pregnancy progression, gestation and delivery are handled by Starsim's `Pregnancy` module rather than by FPsim. The module is now reached at `sim.people.fp`, not `sim.connectors.fp`; update any code or analyzers that referenced the old path.
@@ -22,6 +24,7 @@ All notable changes to the codebase are documented in this file. Changes that ma
 
 * **Tests**
   * `test_pregnant_women` now follows the cohort that conceives in the first three months through to each pregnancy's outcome, instead of comparing fixed result windows. The old form assumed a fixed 9-month gestation and mis-attributed roughly 17% of the cohort once gestation became a distribution.
+  * `test_defined_pars_are_used` now also tracks attribute access (`pars.key`), which no longer goes through `__getitem__` as of Sciris 3.5, so `dur_postpartum` was falsely reported as unused.
 
 
 ## Version 3.5.5 (2026-10-03)
