@@ -3,7 +3,9 @@
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
 
-## Version 3.6.0 (2026-10-06)
+## Version 3.6.0 (2026-11-01)
+
+* Require Starsim below 4 (`starsim<4`), since this version does not run on Starsim 4.
 
 * **Regression information**
   * `FPmod` now inherits from `ss.Pregnancy` instead of `ss.Connector`. Pregnancy progression, gestation and delivery are handled by Starsim's `Pregnancy` module rather than by FPsim. The module is now reached at `sim.people.fp`, not `sim.connectors.fp`; update any code or analyzers that referenced the old path.
