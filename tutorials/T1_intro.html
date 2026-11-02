@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-886db9e93cfe07519e2d441ee1da90e2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-3cefdafd2ba0457161a97bf338b82094.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-886db9e93cfe07519e2d441ee1da90e2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -593,7 +593,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>This tutorial walks you through how to define parameters and run the simulation. The next tutorial will show you how to plot the results of a simulation.</p>
 <p>To create, run, and plot a sim with default options is just:</p>
-<div id="23dd1de8" class="cell" data-execution_count="1">
+<div id="25df8a30" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fpsim <span class="im">as</span> fp</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(location<span class="op">=</span><span class="st">'kenya'</span>)</span>
@@ -605,31 +605,31 @@ Applying calibration parameters for kenya...
 Initializing sim with 1000 agents</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+<pre><code>/opt/hostedtoolcache/Python/3.13.17/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
   self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001 (12/241) (0.14 s)  •——————————————————— 5%
-  Running 2002 (24/241) (0.28 s)  ••—————————————————— 10%
-  Running 2003 (36/241) (0.43 s)  •••————————————————— 15%
-  Running 2004 (48/241) (0.58 s)  ••••———————————————— 20%
-  Running 2005 (60/241) (0.74 s)  •••••——————————————— 25%
-  Running 2006 (72/241) (0.89 s)  ••••••—————————————— 30%
-  Running 2007 (84/241) (1.06 s)  •••••••————————————— 35%
-  Running 2008 (96/241) (1.22 s)  ••••••••———————————— 40%
-  Running 2009 (108/241) (1.39 s)  •••••••••——————————— 45%
-  Running 2010 (120/241) (1.55 s)  ••••••••••—————————— 50%
-  Running 2011 (132/241) (1.72 s)  •••••••••••————————— 55%
-  Running 2012 (144/241) (1.89 s)  ••••••••••••———————— 60%
-  Running 2013 (156/241) (2.06 s)  •••••••••••••——————— 65%
-  Running 2014 (168/241) (2.24 s)  ••••••••••••••—————— 70%
-  Running 2015 (180/241) (2.42 s)  •••••••••••••••————— 75%
-  Running 2016 (192/241) (2.59 s)  ••••••••••••••••———— 80%
-  Running 2017 (204/241) (2.77 s)  •••••••••••••••••——— 85%
-  Running 2018 (216/241) (2.96 s)  ••••••••••••••••••—— 90%
-  Running 2019 (228/241) (3.15 s)  •••••••••••••••••••— 95%
-  Running 2020 (240/241) (3.33 s)  •••••••••••••••••••• 100%
+  Running 2001 (12/241) (0.20 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.39 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (0.59 s)  •••————————————————— 15%
+  Running 2004 (48/241) (0.79 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (1.00 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (1.22 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (1.44 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (1.66 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (1.88 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (2.11 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (2.35 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (2.58 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (2.82 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (3.06 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (3.30 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (3.55 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (3.79 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (4.04 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (4.30 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (4.55 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -654,7 +654,7 @@ Initializing sim with 1000 agents</code></pre>
 <li>Education <br></li>
 </ul>
 <p>The most common category of parameters to change in FPsim is the basic category, which includes the geographic location (i.e.&nbsp;Kenya, Senegal, northern India), the starting population, the starting year, and the initial number of agents. We can define these as:</p>
-<div id="7f8173f5" class="cell" data-execution_count="2">
+<div id="81bcdcc0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    n_agents   <span class="op">=</span> <span class="dv">10_000</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    location   <span class="op">=</span> <span class="st">'kenya'</span>,</span>
@@ -666,7 +666,7 @@ Initializing sim with 1000 agents</code></pre>
 <section id="running-simulations" class="level1">
 <h1>Running simulations</h1>
 <p>Running a simulation is pretty easy. In fact, running a sim with the parameters we defined above is just:</p>
-<div id="dba04005" class="cell" data-execution_count="3">
+<div id="3844562a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -675,31 +675,31 @@ Applying calibration parameters for kenya...
 Initializing sim with 10000 agents</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+<pre><code>/opt/hostedtoolcache/Python/3.13.17/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
   self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001 (12/241) (0.25 s)  •——————————————————— 5%
-  Running 2002 (24/241) (0.51 s)  ••—————————————————— 10%
-  Running 2003 (36/241) (0.78 s)  •••————————————————— 15%
-  Running 2004 (48/241) (1.06 s)  ••••———————————————— 20%
-  Running 2005 (60/241) (1.35 s)  •••••——————————————— 25%
-  Running 2006 (72/241) (1.66 s)  ••••••—————————————— 30%
-  Running 2007 (84/241) (1.97 s)  •••••••————————————— 35%
-  Running 2008 (96/241) (2.29 s)  ••••••••———————————— 40%
-  Running 2009 (108/241) (2.62 s)  •••••••••——————————— 45%
-  Running 2010 (120/241) (2.95 s)  ••••••••••—————————— 50%
-  Running 2011 (132/241) (3.30 s)  •••••••••••————————— 55%
-  Running 2012 (144/241) (3.66 s)  ••••••••••••———————— 60%
-  Running 2013 (156/241) (4.02 s)  •••••••••••••——————— 65%
-  Running 2014 (168/241) (4.39 s)  ••••••••••••••—————— 70%
-  Running 2015 (180/241) (4.77 s)  •••••••••••••••————— 75%
-  Running 2016 (192/241) (5.16 s)  ••••••••••••••••———— 80%
-  Running 2017 (204/241) (5.55 s)  •••••••••••••••••——— 85%
-  Running 2018 (216/241) (5.95 s)  ••••••••••••••••••—— 90%
-  Running 2019 (228/241) (6.36 s)  •••••••••••••••••••— 95%
-  Running 2020 (240/241) (6.77 s)  •••••••••••••••••••• 100%
+  Running 2001 (12/241) (0.33 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.68 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (1.04 s)  •••————————————————— 15%
+  Running 2004 (48/241) (1.41 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (1.80 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (2.21 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (2.64 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (3.07 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (3.52 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (3.98 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (4.44 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (4.91 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (5.40 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (5.90 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (6.40 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (6.92 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (7.44 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (7.97 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (8.51 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (9.06 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -710,7 +710,7 @@ Initializing sim with 10000 agents</code></pre>
 <section id="inspecting-results" class="level1">
 <h1>Inspecting results</h1>
 <p>Running the simulation will generate a results [dictionary] <code>sim.results</code>. A dictionary is simply collection of items, and you can access the values of results using different ‘key’ words. Almost all of the results relevant for FPsim are stored under the key ‘fp’; for example, the number of pregnancies over time can be found using <code>sim.results.fp['pregnancies']</code>. Execute the code below:</p>
-<div id="227a246d" class="cell" data-execution_count="4">
+<div id="49d106fe" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sim.results.fp[<span class="st">'pregnancies'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Result(fp.pregnancies):
@@ -735,7 +735,7 @@ array([ 47.  51.  82.  90.  84.  98.  94.  81.  75.  68.  61.  71.  67.  58.
 </div>
 </div>
 <p>If you want to see all the ‘keys’ that are available in the results dictionary you can use</p>
-<div id="242edcc1" class="cell" data-execution_count="5">
+<div id="726d2499" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sim.list_available_results()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -894,7 +894,7 @@ array([ 47.  51.  82.  90.  84.  98.  94.  81.  75.  68.  61.  71.  67.  58.
 <section id="slightly-different-way-of-defining-parameters" class="level1">
 <h1>Slightly different way of defining parameters</h1>
 <p>You can also specify different parameters by specifyuing them directly as arguments in the simulation object:</p>
-<div id="1f8a33d2" class="cell" data-execution_count="6">
+<div id="9b384210" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(n_agents<span class="op">=</span><span class="fl">10e3</span>, location<span class="op">=</span><span class="st">'kenya'</span>, start_year<span class="op">=</span><span class="dv">2000</span>, end_year<span class="op">=</span><span class="dv">2020</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -903,31 +903,31 @@ Applying calibration parameters for kenya...
 Initializing sim with 10000 agents</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+<pre><code>/opt/hostedtoolcache/Python/3.13.17/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
   self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001 (12/241) (0.24 s)  •——————————————————— 5%
-  Running 2002 (24/241) (0.50 s)  ••—————————————————— 10%
-  Running 2003 (36/241) (0.77 s)  •••————————————————— 15%
-  Running 2004 (48/241) (1.04 s)  ••••———————————————— 20%
-  Running 2005 (60/241) (1.34 s)  •••••——————————————— 25%
-  Running 2006 (72/241) (1.64 s)  ••••••—————————————— 30%
-  Running 2007 (84/241) (1.95 s)  •••••••————————————— 35%
-  Running 2008 (96/241) (2.27 s)  ••••••••———————————— 40%
-  Running 2009 (108/241) (2.59 s)  •••••••••——————————— 45%
-  Running 2010 (120/241) (2.93 s)  ••••••••••—————————— 50%
-  Running 2011 (132/241) (3.27 s)  •••••••••••————————— 55%
-  Running 2012 (144/241) (3.63 s)  ••••••••••••———————— 60%
-  Running 2013 (156/241) (4.00 s)  •••••••••••••——————— 65%
-  Running 2014 (168/241) (4.36 s)  ••••••••••••••—————— 70%
-  Running 2015 (180/241) (4.74 s)  •••••••••••••••————— 75%
-  Running 2016 (192/241) (5.12 s)  ••••••••••••••••———— 80%
-  Running 2017 (204/241) (5.51 s)  •••••••••••••••••——— 85%
-  Running 2018 (216/241) (5.91 s)  ••••••••••••••••••—— 90%
-  Running 2019 (228/241) (6.32 s)  •••••••••••••••••••— 95%
-  Running 2020 (240/241) (6.73 s)  •••••••••••••••••••• 100%
+  Running 2001 (12/241) (0.33 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.67 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (1.03 s)  •••————————————————— 15%
+  Running 2004 (48/241) (1.40 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (1.79 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (2.19 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (2.61 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (3.03 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (3.46 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (3.91 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (4.36 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (4.84 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (5.33 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (5.82 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (6.33 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (6.85 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (7.37 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (7.90 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (8.44 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (8.99 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -935,7 +935,7 @@ Initializing sim with 10000 agents</code></pre>
 </div>
 </div>
 <p>You can mix and match too – pass in the parameter dictionary (<code>pars</code> defined above) with some default options, and then include other parameters as arguments to the sim. Doing this overrides the equally named parameters in <code>pars</code> because (keyword) arguments take precedence). For example:</p>
-<div id="958e76aa" class="cell" data-execution_count="7">
+<div id="3edb3698" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> fp.Sim(pars, n_agents<span class="op">=</span><span class="dv">100</span>) <span class="co"># Use parameters defined above, but overrides the value `n_agents` in pars, and uses instead 100 agents, not 10,000</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -944,31 +944,31 @@ Applying calibration parameters for kenya...
 Initializing sim with 100 agents</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
+<pre><code>/opt/hostedtoolcache/Python/3.13.17/x64/lib/python3.13/site-packages/starsim/time.py:1961: RuntimeWarning: divide by zero encountered in log1p
   self._rate = -np.log1p(-v) # Will raise a NumPy warning if it's an array with 1.0 values</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Running 2000 ( 0/241) (0.00 s)  ———————————————————— 0%
-  Running 2001 (12/241) (0.11 s)  •——————————————————— 5%
-  Running 2002 (24/241) (0.22 s)  ••—————————————————— 10%
-  Running 2003 (36/241) (0.32 s)  •••————————————————— 15%
-  Running 2004 (48/241) (0.43 s)  ••••———————————————— 20%
-  Running 2005 (60/241) (0.54 s)  •••••——————————————— 25%
-  Running 2006 (72/241) (0.64 s)  ••••••—————————————— 30%
-  Running 2007 (84/241) (0.75 s)  •••••••————————————— 35%
-  Running 2008 (96/241) (0.85 s)  ••••••••———————————— 40%
-  Running 2009 (108/241) (0.95 s)  •••••••••——————————— 45%
-  Running 2010 (120/241) (1.05 s)  ••••••••••—————————— 50%
-  Running 2011 (132/241) (1.15 s)  •••••••••••————————— 55%
-  Running 2012 (144/241) (1.26 s)  ••••••••••••———————— 60%
-  Running 2013 (156/241) (1.36 s)  •••••••••••••——————— 65%
-  Running 2014 (168/241) (1.47 s)  ••••••••••••••—————— 70%
-  Running 2015 (180/241) (1.57 s)  •••••••••••••••————— 75%
-  Running 2016 (192/241) (1.83 s)  ••••••••••••••••———— 80%
-  Running 2017 (204/241) (1.93 s)  •••••••••••••••••——— 85%
-  Running 2018 (216/241) (2.02 s)  ••••••••••••••••••—— 90%
-  Running 2019 (228/241) (2.13 s)  •••••••••••••••••••— 95%
-  Running 2020 (240/241) (2.25 s)  •••••••••••••••••••• 100%
+  Running 2001 (12/241) (0.15 s)  •——————————————————— 5%
+  Running 2002 (24/241) (0.30 s)  ••—————————————————— 10%
+  Running 2003 (36/241) (0.45 s)  •••————————————————— 15%
+  Running 2004 (48/241) (0.60 s)  ••••———————————————— 20%
+  Running 2005 (60/241) (0.75 s)  •••••——————————————— 25%
+  Running 2006 (72/241) (0.90 s)  ••••••—————————————— 30%
+  Running 2007 (84/241) (1.05 s)  •••••••————————————— 35%
+  Running 2008 (96/241) (1.20 s)  ••••••••———————————— 40%
+  Running 2009 (108/241) (1.34 s)  •••••••••——————————— 45%
+  Running 2010 (120/241) (1.48 s)  ••••••••••—————————— 50%
+  Running 2011 (132/241) (1.62 s)  •••••••••••————————— 55%
+  Running 2012 (144/241) (1.77 s)  ••••••••••••———————— 60%
+  Running 2013 (156/241) (1.92 s)  •••••••••••••——————— 65%
+  Running 2014 (168/241) (2.08 s)  ••••••••••••••—————— 70%
+  Running 2015 (180/241) (2.22 s)  •••••••••••••••————— 75%
+  Running 2016 (192/241) (2.36 s)  ••••••••••••••••———— 80%
+  Running 2017 (204/241) (2.50 s)  •••••••••••••••••——— 85%
+  Running 2018 (216/241) (2.63 s)  ••••••••••••••••••—— 90%
+  Running 2019 (228/241) (2.78 s)  •••••••••••••••••••— 95%
+  Running 2020 (240/241) (2.95 s)  •••••••••••••••••••• 100%
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -989,7 +989,7 @@ Initializing sim with 100 agents</code></pre>
 <li><i>‘mortality’</i> will plot mortality-related outcomes <br></li>
 <li><i>‘method’</i> plots the method mix over time <br></li>
 </ul>
-<div id="b6b74720" class="cell" data-execution_count="8">
+<div id="13700652" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sim.plot() <span class="co"># the default</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>sim.plot(<span class="st">'cpr'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
@@ -1452,7 +1452,7 @@ Initializing sim with 100 agents</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-11-01).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

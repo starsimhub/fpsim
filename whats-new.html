@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -45,14 +45,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-837abe679984866d09e53df072521bf1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-8d3dc3241d1778444fe3cb6040eac35b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-886db9e93cfe07519e2d441ee1da90e2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-3cefdafd2ba0457161a97bf338b82094.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-886db9e93cfe07519e2d441ee1da90e2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -520,7 +520,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#whats-new" id="toc-whats-new" class="nav-link active" data-scroll-target="#whats-new">What’s new</a>
   <ul>
-  <li><a href="#version-3.6.0-2026-10-06" id="toc-version-3.6.0-2026-10-06" class="nav-link" data-scroll-target="#version-3.6.0-2026-10-06">Version 3.6.0 (2026-10-06)</a></li>
+  <li><a href="#version-3.6.0-2026-11-01" id="toc-version-3.6.0-2026-11-01" class="nav-link" data-scroll-target="#version-3.6.0-2026-11-01">Version 3.6.0 (2026-11-01)</a></li>
   <li><a href="#version-3.5.5-2026-10-03" id="toc-version-3.5.5-2026-10-03" class="nav-link" data-scroll-target="#version-3.5.5-2026-10-03">Version 3.5.5 (2026-10-03)</a></li>
   <li><a href="#version-3.5.4-2026-08-27" id="toc-version-3.5.4-2026-08-27" class="nav-link" data-scroll-target="#version-3.5.4-2026-08-27">Version 3.5.4 (2026-08-27)</a></li>
   <li><a href="#version-3.5.3-2026-03-18" id="toc-version-3.5.3-2026-03-18" class="nav-link" data-scroll-target="#version-3.5.3-2026-03-18">Version 3.5.3 (2026-03-18)</a></li>
@@ -642,30 +642,32 @@ ul.task-list li input[type="checkbox"] {
 <section id="whats-new" class="level1">
 <h1>What’s new</h1>
 <p>All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term “Regression information”.</p>
-<section id="version-3.6.0-2026-10-06" class="level2">
-<h2 class="anchored" data-anchor-id="version-3.6.0-2026-10-06">Version 3.6.0 (2026-10-06)</h2>
+<section id="version-3.6.0-2026-11-01" class="level2">
+<h2 class="anchored" data-anchor-id="version-3.6.0-2026-11-01">Version 3.6.0 (2026-11-01)</h2>
 <ul>
-<li><strong>Regression information</strong>
+<li><p>Require Starsim below 4 (<code>starsim&lt;4</code>), since this version does not run on Starsim 4.</p></li>
+<li><p><strong>Regression information</strong></p>
 <ul>
 <li><a href="./api/fpmod.html#fpsim.fpmod.FPmod" title="0"><code>FPmod</code></a> now inherits from <a href="https://docs.starsim.org/api/demographics.html#starsim.demographics.Pregnancy" title="0"><code>ss.Pregnancy</code></a> instead of <a href="https://docs.starsim.org/api/connectors.html#starsim.connectors.Connector" title="0"><code>ss.Connector</code></a>. Pregnancy progression, gestation and delivery are handled by Starsim’s <code>Pregnancy</code> module rather than by FPsim. The module is now reached at <code>sim.people.fp</code>, not <code>sim.connectors.fp</code>; update any code or analyzers that referenced the old path.</li>
 <li>Gestation length is now drawn from Starsim’s 32-42 week distribution (mean 40.1 weeks) instead of a fixed 9 months. With monthly timesteps this shifts most deliveries one timestep later relative to conception, and spreads a conception cohort’s births over several timesteps. Any analysis assuming a fixed 9-month conception-to-birth offset needs revisiting.</li>
 <li>All 9 locations recalibrated against the refactored model (on Starsim 3.6.1).</li>
 <li>Bumped the minimum Starsim version to 3.6.2, whose <a href="https://docs.starsim.org/api/demographics.html#starsim.demographics.Pregnancy" title="0"><code>ss.Pregnancy</code></a> fixes change results (e.g.&nbsp;mean mCPR in the baseline sim is ~7% lower). <code>tests/baseline.json</code> and <code>tests/benchmark.json</code> regenerated against Starsim 3.7.2.</li>
 </ul></li>
-<li><strong>Calibration</strong>
+<li><p><strong>Calibration</strong></p>
 <ul>
 <li><code>calibrate_all.py</code>: <code>n_workers</code> now defaults to every available core instead of a hardcoded 10, with <code>--workers</code> to cap it on shared machines. Added <code>--trials</code>, <code>--agents</code> and <code>--force</code>.</li>
 <li><code>calibrate_all.py</code>: switched from SQLite to Optuna <code>JournalStorage</code>. SQLite’s global write lock produced <code>StorageInternalError</code> storms past ~32 concurrent workers, corrupting study state badly enough that <code>best_pars</code> could not be retrieved; a 160-worker run lost all 9 locations this way despite each study completing hundreds of trials.</li>
 <li><code>calibrate_all.py --update</code>: location files are regenerated from calibration results, but parameters the generator cannot emit (<code>method_weights</code>, <code>dur_postpartum</code>) are now carried over verbatim. Each rewritten file is reloaded and compared against what it defined before; if anything is missing the original is restored and the location skipped. Previously these hand-tuned parameters were silently dropped.</li>
 <li><a href="./api/calibration.html#fpsim.calibration.Calibration" title="0"><code>Calibration</code></a>: the number of <code>spacing_pref</code> bins is read from the location data rather than assumed. 7 of 9 locations use 19 bins, not the default 17, so calibration previously built preference arrays of the wrong length for most locations.</li>
 </ul></li>
-<li><strong>Fixes</strong>
+<li><p><strong>Fixes</strong></p>
 <ul>
 <li><a href="./api/interventions.html#fpsim.interventions.method_switching" title="0"><code>method_switching</code></a>: the <code>annual</code> argument was accepted but ignored, so <code>annual=True</code> silently had no effect. Annual probabilities are converted to per-timestep values again.</li>
 </ul></li>
-<li><strong>Tests</strong>
+<li><p><strong>Tests</strong></p>
 <ul>
 <li><code>test_pregnant_women</code> now follows the cohort that conceives in the first three months through to each pregnancy’s outcome, instead of comparing fixed result windows. The old form assumed a fixed 9-month gestation and mis-attributed roughly 17% of the cohort once gestation became a distribution.</li>
+<li><code>test_defined_pars_are_used</code> now also tracks attribute access (<code>pars.key</code>), which no longer goes through <code>__getitem__</code> as of Sciris 3.5, so <code>dur_postpartum</code> was falsely reported as unused.</li>
 </ul></li>
 </ul>
 </section>
@@ -2089,7 +2091,7 @@ sim4 = fp.Sim(start=2000, contraception_module = fp.SimpleChoice(prob_use_trend_
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for FPsim v3.6.0 (2026-10-06).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+<p>Docs built for FPsim v3.6.0 (2026-11-01).<br>© 2025, Gates Foundation. All rights reserved. <a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a> | <a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/fpsim/fpsim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
