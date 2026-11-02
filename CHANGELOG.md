@@ -24,6 +24,7 @@ All notable changes to the codebase are documented in this file. Changes that ma
 
 * **Tests**
   * `test_pregnant_women` now follows the cohort that conceives in the first three months through to each pregnancy's outcome, instead of comparing fixed result windows. The old form assumed a fixed 9-month gestation and mis-attributed roughly 17% of the cohort once gestation became a distribution.
+  * `test_defined_pars_are_used` now also tracks attribute access (`pars.key`), which no longer goes through `__getitem__` as of Sciris 3.5, so `dur_postpartum` was falsely reported as unused.
 
 
 ## Version 3.5.5 (2026-10-03)

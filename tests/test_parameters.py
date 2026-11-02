@@ -129,11 +129,10 @@ known_unused = {
     'maternal_mortality_factor',  # Defined for calibration but not used in model
 }
 
-# Parameters that are used but may not be detected by the access tracker due to
-# attribute-style access (self.pars.key) or code paths that only trigger with
-# sufficient parous/pregnant women in a short test sim
+# Parameters that are used but may not be detected by the access tracker, due to
+# code paths that only trigger with sufficient parous/pregnant women in a short test sim
 tracking_blind_spots = {
-    'abortion_prob',       # Accessed via self.pars.abortion_prob in select_conceivers
+    'abortion_prob',       # Accessed in select_conceivers (needs conceptions)
     'miscarriage_rates',   # Accessed in progress_pregnancies (needs pregnant women)
     'sexual_activity_pp',  # Accessed in _set_parous_active (needs parous PP women)
     'short_int',           # Accessed in record_ages (needs women with 2+ births)
@@ -185,18 +184,27 @@ def _get_accessed_pars(location):
 
     accessed = set()
     pars = sim.people.fp.pars
-    original_getitem = type(pars).__getitem__
+    cls = type(pars)
+    original_getitem = cls.__getitem__
+    original_getattribute = cls.__getattribute__
 
     def tracking_getitem(self, key, *args, **kwargs):
         if isinstance(key, str):
             accessed.add(key)
         return original_getitem(self, key, *args, **kwargs)
 
-    type(pars).__getitem__ = tracking_getitem
+    def tracking_getattribute(self, attr):  # Since Sciris 3.5, pars.key does not go via __getitem__
+        if dict.__contains__(self, attr):
+            accessed.add(attr)
+        return original_getattribute(self, attr)
+
+    cls.__getitem__ = tracking_getitem
+    cls.__getattribute__ = tracking_getattribute
     try:
         sim.run()
     finally:
-        type(pars).__getitem__ = original_getitem
+        cls.__getitem__ = original_getitem
+        cls.__getattribute__ = original_getattribute
 
     return accessed
 
