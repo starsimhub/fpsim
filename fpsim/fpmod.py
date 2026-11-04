@@ -78,7 +78,6 @@ class FPmod(ss.Pregnancy):
         self.add_callback(self.abortion, self.on_abortion)
         self.add_callback(self.miscarriage, self.on_miscarriage)
         self.add_callback(self.stillbirth, self.on_stillbirth)
-        self.add_callback(self.birth, self.on_birth)
         self.add_callback(self.infant_death, self.on_infant_death)
 
         # Non-standard results - consider moving to the contraception module
@@ -617,7 +616,7 @@ class FPmod(ss.Pregnancy):
         self.handle_loss(uids)
         return
 
-    def on_birth(self, newborns):
+    def on_birth(self, parents, newborns):
         """ After a live birth: twins, records, short intervals, and the timing of the mother's next contraceptive choice """
         mothers, counts = np.unique(self.sim.people.parent[newborns], return_counts=True)
         mothers = ss.uids(mothers)
