@@ -71,8 +71,8 @@ def test_pregnant_women():
     sc.heading('Test pregnancy and birth outcomes... ')
 
     # start out 24f, no contra, no pregnancy, active, fertile, has_intent
-    def ln(): return ss.lognorm_ex(ss.years(2), ss.years(1))
-    methods = ss.ndict([
+    def ln(): return ss.lognormal(ss.years(2), ss.years(1))
+    methods = ss.utils.ndict([
         fpm.Method(name='none', efficacy=0, modern=False, dur_use=ln(), label='None'),
         fpm.Method(name='test', efficacy=0.0, modern=True,  dur_use=ln(), label='Test'),
     ])
@@ -157,7 +157,7 @@ def test_contraception():
     # test 1: Assume contraception 100% effective, 100% uptake -> no pregnancies.
     # test 2: contraception use restarts after postpartum period
 
-    methods = ss.ndict([
+    methods = ss.utils.ndict([
         fpm.Method(name='none', efficacy=0, modern=False, dur_use=1/12, label='None'),
         fpm.Method(name='test', efficacy=1.0, modern=True,  dur_use=1/12, label='Test'),
     ])

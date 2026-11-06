@@ -147,7 +147,7 @@ class add_method(ss.Intervention):
 
         # Using a Method object directly
         new_method = fp.Method(name='new_impl', label='New Implant', efficacy=0.999,
-                               dur_use=ss.lognorm_ex(ss.years(3), ss.years(0.5)), modern=True)
+                               dur_use=ss.lognormal(ss.years(3), ss.years(0.5)), modern=True)
         intv = fp.add_method(year=2010, method=new_method, copy_from='impl')
 
         # Copying from source method (method=None, method_pars=None)

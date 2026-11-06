@@ -50,7 +50,7 @@ class FPmod(ss.Pregnancy):
         twins = fp_pars.twins_prob or 0
         super().__init__(name=name, p_abortion=fp_pars.abortion_prob or 0, embryos_per_pregnancy=ss.choice(a=[1, 2], p=[1-twins, twins]), **preg_pars)
         self.define_pars(**{k:v for k,v in fp_pars.items() if k not in preg_keys})
-        self.pars.update(loss_rate=self.get_loss_rate, infant_rate=self.get_infant_rate)
+        self.pars.update(loss_rate=self.get_loss_rate, infant_death_rate=self.get_infant_rate)
         self.define_states(*fp.fpmod_states)
 
         # Distributions specific to FPmod
@@ -518,7 +518,7 @@ class FPmod(ss.Pregnancy):
         tri1 = self.pars.trimesters[0]
         threshold = self.pars.loss_threshold.raw # The duration itself (arithmetic on the parameter gives a bare number, in years)
         rest = ss.weeks(40) - threshold
-        ga = self.P.time[uids] # The gestational age
+        ga = self.P.time_in[uids] # The gestational age
         early = ga < tri1
         late = ga >= threshold
         ages = sim.people.int_age_clip(uids)
@@ -674,9 +674,9 @@ class FPmod(ss.Pregnancy):
 
     # %% Results and finalization
 
-    def update_results(self):
+    def record_stocks(self):
         """ Per-step results, and the method mix """
-        super().update_results()
+        super().record_stocks()
         self.compute_method_usage()
         return
 

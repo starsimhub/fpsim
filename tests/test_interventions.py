@@ -351,7 +351,7 @@ def test_age_restricted_initiation_basic():
             'label': 'Test Method',
             'efficacy': 0.95,
             'modern': True,
-            'dur_use': ss.lognorm_ex(mean=2, std=1)
+            'dur_use': ss.lognormal(mean=2, std=1)
         },
         copy_from='pill',
         split_shares=0,
@@ -408,7 +408,7 @@ def test_age_restricted_initiation_time_varying():
             'label': 'Test Method 2',
             'efficacy': 0.95,
             'modern': True,
-            'dur_use': ss.lognorm_ex(mean=2, std=1)
+            'dur_use': ss.lognormal(mean=2, std=1)
         },
         copy_from='pill',
         split_shares=0,
@@ -488,7 +488,7 @@ def test_method_switching_basic():
             'label': 'Target Method',
             'efficacy': 0.96,
             'modern': True,
-            'dur_use': ss.lognorm_ex(mean=2, std=1)
+            'dur_use': ss.lognormal(mean=2, std=1)
         },
         copy_from='pill',
         split_shares=0,
@@ -546,7 +546,7 @@ def test_method_switching_multiple_sources():
             'label': 'Target Method',
             'efficacy': 0.97,
             'modern': True,
-            'dur_use': ss.lognorm_ex(mean=2, std=1)
+            'dur_use': ss.lognormal(mean=2, std=1)
         },
         copy_from='pill',
         verbose=False,
@@ -626,7 +626,7 @@ def test_dmpasc_scenario_integration():
         label='DMPA-SC',
         efficacy=0.983,
         modern=True,
-        dur_use=ss.lognorm_ex(mean=2, std=1),  # Base duration
+        dur_use=ss.lognormal(mean=2, std=1),  # Base duration
         rel_dur_use=2.0,  # 2x scaling factor
     )
     add_dmpasc = fp.add_method(year=2020, method=dmpasc, copy_from='inj', split_shares=0, verbose=False, name='add_dmpasc')

@@ -30,7 +30,7 @@ class SimPars(ss.SimPars):
         self.unit = 'year'   # The unit of time for the simulation
         self.rand_seed = 1      # Random seed
         self.verbose = 1/12   # Verbosity level
-        self.use_aging = True   # Whether to age the population
+        self.aging = True   # Whether to age the population
         self.location = None  # Default location
         self.test = False
 
@@ -53,7 +53,7 @@ class FPPars(ss.Pars):
         super().__init__()
 
         # Parameters of Starsim's pregnancy that FPsim sets
-        self.dur_breastfeed = ss.lognorm_ex(mean=ss.years(0.75), std=ss.years(0.5))  # Duration of breastfeeding, from data
+        self.dur_breastfeed = ss.lognormal(mean=ss.years(0.75), std=ss.years(0.5))  # Duration of breastfeeding, from data
         self.burnin = True  # Whether women are pregnant at the start
         self.trimesters = [ss.weeks(13), ss.weeks(26)]  # Ends of the first and second trimesters
 

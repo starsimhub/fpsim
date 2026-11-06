@@ -287,9 +287,9 @@ class Education(ss.Connector):
         self.completed[completed.uids] = True
         return
 
-    def update_results(self):
-        """ Update results for education module """
-        super().update_results()
+    def record_stocks(self):
+        """ Record the education results at the start of the step """
+        super().record_stocks()
         ppl = self.sim.people
         f = ppl.female & (ppl.age >= 15)
         self.results.mean_attainment[self.ti] = np.mean(self.attainment[f])

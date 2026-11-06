@@ -45,7 +45,7 @@ new_injectable = fp.Method(
     label='New Injectable',
     efficacy=0.995,
     modern=True,
-    dur_use=ss.lognorm_ex(mean=3, std=1.5),
+    dur_use=ss.lognormal(mean=3, std=1.5),
 )
 
 # Intervention: introduce in intro_year, copy from injectables, take 50% of their share
@@ -106,7 +106,7 @@ dmpasc_pars = dict(
     name='dmpasc',
     label='DMPA-SC (Self-Injectable)',
     efficacy=0.997,
-    dur_use=ss.lognorm_ex(mean=0.25, std=0.1),
+    dur_use=ss.lognormal(mean=0.25, std=0.1),
 )
 
 intv_split = fp.add_method(

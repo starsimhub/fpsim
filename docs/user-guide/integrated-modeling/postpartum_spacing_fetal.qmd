@@ -53,8 +53,8 @@ class SpacingFetalPenalty(ss.Connector):
             medium_cutoff_mo=24.0,
             growth_penalty_short=0.10,
             growth_penalty_medium=0.05,
-            timing_shift_short=ss.lognorm_ex(mean=ss.weeks(2.0), std=ss.weeks(0.5)),
-            timing_shift_medium=ss.lognorm_ex(mean=ss.weeks(1.0), std=ss.weeks(0.5)),
+            timing_shift_short=ss.lognormal(mean=ss.weeks(2.0), std=ss.weeks(0.5)),
+            timing_shift_medium=ss.lognormal(mean=ss.weeks(1.0), std=ss.weeks(0.5)),
         )
         self.update_pars(pars, **kwargs)
 

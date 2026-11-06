@@ -33,7 +33,7 @@ methods += fpm.Method(
     label    = 'DMPA-SC',
     efficacy = 0.983,
     modern   = True,
-    dur_use  = ss.lognorm_ex(ss.years(2), ss.years(1)),
+    dur_use  = ss.lognormal(ss.years(2), ss.years(1)),
 )
 
 sim = fp.Sim(location='kenya', contraception_module=fpm.RandomChoice(methods=methods))
@@ -57,7 +57,7 @@ intv = fp.add_method(
         name     = 'dmpasc',
         label    = 'DMPA-SC',
         efficacy = 0.983,
-        dur_use  = ss.lognorm_ex(ss.years(2), ss.years(1)),
+        dur_use  = ss.lognormal(ss.years(2), ss.years(1)),
     ),
 )
 

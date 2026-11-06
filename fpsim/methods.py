@@ -50,7 +50,7 @@ class Method:
         import fpsim.methods as fpm
 
         dmpasc = fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
-                            dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+                            dur_use=ss.lognormal(ss.years(2), ss.years(1)))
         ```
 
     Note:
@@ -135,7 +135,7 @@ class Method:
 
         if dist_type == 'lognorm':
             # Lognormal distribution
-            self.dur_use = ss.lognorm_ex(mean=self.lognorm_mean_callback, std=np.exp(par2))
+            self.dur_use = ss.lognormal(mean=self.lognorm_mean_callback, std=np.exp(par2))
             self.dur_use.base_mean = par1
             self.dur_use.base_std = par2
 
@@ -266,7 +266,7 @@ def make_methods(method_list=None, method_df=None):
             cpars = make_contra_pars()
             method_df = cpars.methods_df
         method_list = make_method_list(method_df)
-    return ss.ndict(method_list, type=Method)
+    return ss.utils.ndict(method_list, type=Method)
 
 
 # %% Define classes to contain information about the way women choose contraception
@@ -488,7 +488,7 @@ class ContraceptiveChoice(ss.Connector):
 
         # Add to methods
         method_list = list(self.methods.values()) + [method]
-        self.methods = ss.ndict(method_list, type=Method)
+        self.methods = ss.utils.ndict(method_list, type=Method)
 
         # Extend method_choice_pars
         if self.pars.method_choice_pars is not None:
@@ -1094,13 +1094,13 @@ class ContraceptiveChoice(ss.Connector):
         # TODO, could move all update logic to here...
         pass
 
-    def update_results(self):
+    def record_stocks(self):
         """
         Note that we are not including LAM users in mCPR as this model counts
         all women passively using LAM but DHS data records only women who self-report
         LAM which is much lower. Follows the DHS definition of mCPR.
         """
-        super().update_results()
+        super().record_stocks()
         ppl = self.sim.people
         method_age = self.sim.pars.fp['method_age'] <= ppl.age
         fecund_age = ppl.age < self.sim.pars.fp['age_limit_fecundity']
@@ -1161,7 +1161,7 @@ class RandomChoice(ContraceptiveChoice):
 
         methods = fpm.make_methods()
         methods += fpm.Method(name='dmpasc', label='DMPA-SC', efficacy=0.983, modern=True,
-                              dur_use=ss.lognorm_ex(ss.years(2), ss.years(1)))
+                              dur_use=ss.lognormal(ss.years(2), ss.years(1)))
         sim = fp.Sim(location='kenya', contraception_module=fpm.RandomChoice(methods=methods))
         ```
     """
@@ -1171,7 +1171,7 @@ class RandomChoice(ContraceptiveChoice):
 
         # Set durations
         for method in self.methods.values():
-            method.dur_use = ss.lognorm_ex(mean=ss.years(1), std=ss.years(1))
+            method.dur_use = ss.lognormal(mean=ss.years(1), std=ss.years(1))
         return
 
     def init_method_dist(self, uids):

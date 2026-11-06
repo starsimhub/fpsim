@@ -244,7 +244,7 @@ def make_scenario_1_sim(pars):
         method_pars={
             'name': 'dmpasc3',
             'label': 'DMPA-SC 3-month',
-            'dur_use': ss.lognorm_ex(mean=2, std=1),
+            'dur_use': ss.lognormal(mean=2, std=1),
             'rel_dur_use': 2.0,  # Placeholder: 2x duration vs injectables
         },
         copy_from='inj',
@@ -290,7 +290,7 @@ def make_scenario_2_sim(pars):
     add_3month_intv = fp.add_method(
         year=2025,
         method_pars={'name': 'dmpasc3', 'label': 'DMPA-SC 3-month', 
-                     'dur_use': ss.lognorm_ex(mean=2, std=1), 'rel_dur_use': 2.0},
+                     'dur_use': ss.lognormal(mean=2, std=1), 'rel_dur_use': 2.0},
         copy_from='inj',
         verbose=False,
         name='add_dmpasc3_s2'
@@ -299,7 +299,7 @@ def make_scenario_2_sim(pars):
     add_6month_intv = fp.add_method(
         year=2030,
         method_pars={'name': 'dmpasc6', 'label': 'DMPA-SC 6-month',
-                     'dur_use': ss.lognorm_ex(mean=2, std=1), 'rel_dur_use': 2.5},
+                     'dur_use': ss.lognormal(mean=2, std=1), 'rel_dur_use': 2.5},
         copy_from='inj',
         verbose=False,
         name='add_dmpasc6_s2'

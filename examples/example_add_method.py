@@ -57,7 +57,7 @@ def scenario_basic_introduction():
         label='New Injectable',
         efficacy=0.995,
         modern=True,
-        dur_use=ss.lognorm_ex(mean=3, std=1.5),
+        dur_use=ss.lognormal(mean=3, std=1.5),
     )
     
     # Step 2: Create the intervention
@@ -112,7 +112,7 @@ def scenario_brand_new_method():
         csv_name='Hormonal Ring',
         efficacy=0.991,  # 99.1% effective
         modern=True,
-        dur_use=ss.lognorm_ex(mean=1, std=0.5),  # ~1 year average use
+        dur_use=ss.lognormal(mean=1, std=0.5),  # ~1 year average use
     )
     
     # Create intervention - copies switching behavior from IUD
@@ -170,7 +170,7 @@ def scenario_quick_clone():
         year=INTRODUCTION_YEAR,
         copy_from='impl',  # Clone implants
         method_pars={
-            'dur_use': ss.lognorm_ex(mean=3, std=1),  # Fresh distribution (~3 years)
+            'dur_use': ss.lognormal(mean=3, std=1),  # Fresh distribution (~3 years)
         },
         verbose=True,
     )
@@ -222,7 +222,7 @@ def scenario_clone_override():
             'name': 'inj_improved',
             'label': 'Improved Injectable',
             'efficacy': 0.998,  # Improved from ~0.97 to 0.998
-            'dur_use': ss.lognorm_ex(mean=0.5, std=0.2),  # ~6 months average use
+            'dur_use': ss.lognormal(mean=0.5, std=0.2),  # ~6 months average use
         },
         verbose=True,
     )
@@ -271,7 +271,7 @@ def scenario_market_splitting():
         csv_name='DMPA-SC',
         efficacy=0.997,
         modern=True,
-        dur_use=ss.lognorm_ex(mean=0.25, std=0.1),  # 3-month cycle
+        dur_use=ss.lognormal(mean=0.25, std=0.1),  # 3-month cycle
     )
     
     intv = fp.add_method(
@@ -343,7 +343,7 @@ def scenario_custom_duration():
         'Lognormal': {
             'name': 'impl_lognorm',
             'label': 'Implant (Lognormal)',
-            'dur_use': ss.lognorm_ex(mean=3, std=1.5),
+            'dur_use': ss.lognormal(mean=3, std=1.5),
         },
         'Gamma': {
             'name': 'impl_gamma',
