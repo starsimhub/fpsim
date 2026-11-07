@@ -1,3 +1,5 @@
+# Last verified on: Starsim 4.0.0rc3 (84f1803ee)
+
 from .version import __version__, __versiondate__
 from .settings import *
 from .utils import *
