@@ -87,8 +87,8 @@ class cpr_by_age(ss.Analyzer):
 
         # Define results for each age group based on the method_age_map
         for k in fpd.method_age_map.keys():
-            self.define_results(ss.Result(name=k, dtype=float, scale=False))
-        self.define_results(ss.Result(name='total', dtype=float, scale=False))
+            self.define_results(ss.Result(name=k, dtype=float, kind='ratio'))
+        self.define_results(ss.Result(name='total', dtype=float, kind='ratio'))
         return
 
     def step(self):

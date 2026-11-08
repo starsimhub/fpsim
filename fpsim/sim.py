@@ -147,7 +147,6 @@ class Sim(ss.Sim):
 
         # Metadata and settings
         fpu.set_metadata(self)  # Set version, date, and git info
-        self.summary = None
 
         return
 

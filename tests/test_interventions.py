@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import fpsim as fp  # noqa: E402
 
-parallel   = 1 # Whether to run in serial (for debugging)
+workers    = None # The number of worker processes (None for one per CPU; 1 runs in serial, for debugging)
 do_plot  = 1 # Whether to do plotting in interactive mode
 # sc.options(backend='agg') # Turn off interactive plots
 
@@ -53,7 +53,7 @@ def test_change_par():
     s2 = make_sim(interventions=[sc.dcp(cp1), cp2], label='Low exposure, reset')
 
     # Run
-    m = ss.parallel(s0, s1, s2, parallel=parallel)
+    m = ss.parallel(s0, s1, s2, workers=workers)
     s0, s1, s2 = m.sims[:] # Replace with run versions
 
     # Test exposure factor change

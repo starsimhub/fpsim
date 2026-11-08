@@ -94,7 +94,7 @@ def run_t3():
                 label='Different mix')
     simlist = sc.autolist([s1, s2, s3, s4])
     msim = ss.MultiSim(sims=simlist)
-    msim.run(parallel=False)
+    msim.run(workers=1)
     msim.plot(key='cpr')
 
 
@@ -140,7 +140,7 @@ def run_t4():
                 label='Increased education')
 
     msim = ss.MultiSim(sims=[s0, s1])
-    msim.run(parallel=False)
+    msim.run(workers=1)
     s0, s1 = msim.sims
 
     plt.plot(s0.results.timevec, s0.results.edu.mean_attainment, label=s0.label)
@@ -171,7 +171,7 @@ def run_t5():
     s2 = fp.Sim(pars=pars, contraception_module=method_choice, label='New Method')
     simlist = sc.autolist([s1, s2])
     msim = ss.MultiSim(sims=simlist)
-    msim.run(parallel=False)
+    msim.run(workers=1)
 
     msim.plot(key='cpr')
 

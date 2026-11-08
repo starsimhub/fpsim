@@ -73,7 +73,7 @@ Run a multile simulation run with msim to get the results of both of these simul
 
 ```{python}
 msim = ss.MultiSim(sims=[s0, s1])
-msim.run(parallel=False)
+msim.run(workers=1)
 s0, s1 = msim.sims
 ```
 

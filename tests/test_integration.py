@@ -13,7 +13,7 @@ import numpy as np
 import pylab as pl
 import starsim as ss
 
-parallel = 0  # For testing purposes
+workers = 1  # The number of worker processes (1 runs in serial, for testing purposes)
 
 f24_age_pyramid = np.ndarray(shape=(3, 3), dtype=float)
 f24_age_pyramid[0, :] = [0, 0, 0]
@@ -281,7 +281,7 @@ def test_education_preg():
 
     sim_base = make_sim()
     sim_preg = make_sim(pregnant=True)
-    m = ss.parallel([sim_base, sim_preg], parallel=parallel)
+    m = ss.parallel([sim_base, sim_preg], workers=workers)
     sim_base, sim_preg = m.sims[:]  # Replace with run versions
 
     # Check that education has increased

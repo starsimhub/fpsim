@@ -8,7 +8,7 @@ import fpsim as fp
 import matplotlib.pyplot as plt
 import numpy as np
 
-parallel   = 0 # Whether to run in parallel or serial (for debugging)
+workers    = 1 # The number of worker processes (None for one per CPU; 1 runs in serial, for debugging)
 
 
 def make_sim_parts(location='ethiopia', new_p_use_pars=False):
@@ -94,7 +94,7 @@ def test_mcpr(location='senegal', do_plot=False):
         sims += make_sim(intvs=make_zeros()+[change_state], location=location, label=f'Increased {covar.pplattr}')
 
     # Run
-    m = ss.parallel(*sims, parallel=parallel)
+    m = ss.parallel(*sims, workers=workers)
     sims = m.sims[:]  # Replace with run versions
 
     # Firstly, check that changing the people attributes has registered in the relevant results metrics as expected
@@ -162,7 +162,7 @@ def test_durations(location='senegal'):
         label='Short durations')
 
     # Run sims
-    m = ss.parallel([sim_base, sim_short], parallel=parallel)
+    m = ss.parallel([sim_base, sim_short], workers=workers)
     sim_base, sim_short = m.sims[:]  # Replace with run versions
 
     # Shorter durations should mean more switching

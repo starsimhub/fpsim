@@ -11,7 +11,7 @@ from fpsim import defaults as fpd
 
 # Global settings
 int_year = 2002 # Year to start the interventions
-parallel   = 1 # Whether to run in serial (for debugging)
+workers    = None # The number of worker processes (None for one per CPU; 1 runs in serial, for debugging)
 do_plot  = 0 # Whether to do plotting in interactive mode
 do_plot_as = 0 # Whether or not to plot all age-specific channels
 default_ages = list(fpd.method_age_map.keys())
@@ -48,7 +48,7 @@ def test_update_methods_eff():
 
     simlist = make_sims([um1, um2])
     msim = ss.MultiSim(sims=simlist)
-    msim.run(parallel=parallel)
+    msim.run(workers=workers)
 
     low_eff_post_sim = msim.sims[0].connectors.contraception.methods[method].efficacy
     high_eff_post_sim = msim.sims[1].connectors.contraception.methods[method].efficacy
@@ -83,7 +83,7 @@ def test_update_methods():
     # Make and run sims
     simlist = make_sims([no_contra, hi_contr], contraception_module=fp.RandomChoice())
     msim = ss.MultiSim(sims=simlist)
-    msim.run(parallel=parallel)
+    msim.run(workers=workers)
 
     # Test that all the parameters were correctly updated
     assert msim.sims[1].connectors.contraception.pars['p_use'].pars.p == p_use
@@ -106,7 +106,7 @@ def test_update_methods():
 #     def run_scenario(scen, plot=do_plot, plot_as=do_plot_as):
 #         '''Runs simple scenario and returns Scenarios object'''
 #         scens = fp.Scenarios(location='test', scens=scen, start=int_year)
-#         scens.run(parallel=parallel)
+#         scens.run(workers=workers)
 #         if plot:
 #             scens.plot()
 #             scens.plot(to_plot='method')
@@ -125,7 +125,7 @@ def test_update_methods():
 #     high_inj_eff = 0.99
 #     scen = fp.make_scen(label='More effective pill', year=int_year, eff={'Pill': high_inj_eff})
 #     scens_repeat = fp.Scenarios(location='test', repeats=2, scens=scen, start_year=int_year)
-#     scens_repeat.run(parallel=parallel)
+#     scens_repeat.run(workers=workers)
 #     assert len(scens_repeat.msim.sims) == 2, f"Should be {2} sims in scens object but found {len(scens_repeat.msim.sims)}"
 #     ok('Scenarios repeated as expected')
 #

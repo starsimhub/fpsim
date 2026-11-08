@@ -348,17 +348,17 @@ def scenario_custom_duration():
         'Gamma': {
             'name': 'impl_gamma',
             'label': 'Implant (Gamma)',
-            'dur_use': ss.gamma(a=4, scale=0.75),  # mean=3
+            'dur_use': ss.gamma(shape=4, scale=0.75),  # mean=3
         },
         'Weibull': {
             'name': 'impl_weibull',
             'label': 'Implant (Weibull)',
-            'dur_use': ss.weibull(c=2.5, scale=3.4),  # ~mean 3
+            'dur_use': ss.weibull(shape=2.5, scale=3.4),  # ~mean 3
         },
         'Exponential': {
             'name': 'impl_exp',
             'label': 'Implant (Exponential)',
-            'dur_use': ss.expon(scale=3),  # mean=3
+            'dur_use': ss.expon(mean=3),  # mean=3
         },
     }
     

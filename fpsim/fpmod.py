@@ -48,7 +48,7 @@ class FPmod(ss.Pregnancy):
         preg_keys = ss.Pregnancy().pars.keys()
         preg_pars = {k:v for k,v in fp_pars.items() if k in preg_keys}
         twins = fp_pars.twins_prob or 0
-        super().__init__(name=name, p_abortion=fp_pars.abortion_prob or 0, embryos_per_pregnancy=ss.choice(a=[1, 2], p=[1-twins, twins]), **preg_pars)
+        super().__init__(name=name, p_abortion=fp_pars.abortion_prob or 0, children=ss.choice(a=[1, 2], p=[1-twins, twins]), **preg_pars)
         self.define_pars(**{k:v for k,v in fp_pars.items() if k not in preg_keys})
         self.pars.update(loss_rate=self.get_loss_rate, infant_death_rate=self.get_infant_rate)
         self.define_states(*fp.fpmod_states)

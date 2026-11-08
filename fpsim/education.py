@@ -83,11 +83,11 @@ class Education(ss.Connector):
         """ Initialize results """
         super().init_results()
         results = [
-            ss.Result('mean_attainment', label='Mean education attainment', scale=False),
-            ss.Result('mean_objective', label='Mean education objective', scale=False),
-            ss.Result('prop_completed', label='Proportion completed education', scale=False),
-            ss.Result('prop_in_school', label='Proportion in school', scale=False),
-            ss.Result('prop_dropped', label='Proportion dropped', scale=False),
+            ss.Result('mean_attainment', label='Mean education attainment', kind='ratio'),
+            ss.Result('mean_objective', label='Mean education objective', kind='ratio'),
+            ss.Result('prop_completed', label='Proportion completed education', kind='ratio'),
+            ss.Result('prop_in_school', label='Proportion in school', kind='ratio'),
+            ss.Result('prop_dropped', label='Proportion dropped', kind='ratio'),
         ]
         self.define_results(*results)
         return

@@ -55,14 +55,14 @@ def make_baseline_inj_growth(pars, *, name):
     )
 
 
-def main(do_save=True, do_show=True, parallel=True):
+def main(do_save=True, do_show=True, workers=None):
     """
     Run all DMPA-SC scenarios and generate comparison plots.
     
     Args:
         do_save (bool): Save dashboard PNG to dmpasc_dashboard.png
         do_show (bool): Display plots interactively (blocks on plt.show())
-        parallel (bool): Run simulations in parallel (default True)
+        workers (int): The number of worker processes (default None, one per CPU; 1 runs them sequentially)
     """
     
     pars = dict(
@@ -86,8 +86,8 @@ def main(do_save=True, do_show=True, parallel=True):
     ]
     
     # Run in parallel
-    print(f"\nRunning {len(sims)} simulations {'in parallel' if parallel else 'sequentially'}...")
-    msim = ss.parallel(*sims, parallel=parallel)
+    print(f"\nRunning {len(sims)} simulations {'sequentially' if workers == 1 else 'in parallel'}...")
+    msim = ss.parallel(*sims, workers=workers)
     
     # Map results to scenario labels
     scenario_labels = [

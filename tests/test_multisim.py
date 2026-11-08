@@ -6,7 +6,7 @@ import sciris as sc
 import fpsim as fp
 import starsim as ss
 
-parallel  = True
+workers   = None # The number of worker processes (None for one per CPU)
 do_plot = 0
 sc.options(backend='agg') # Turn off interactive plots
 
@@ -24,7 +24,7 @@ def test_multisim(do_plot=do_plot):
         sims.append(sim)
 
     msim = ss.MultiSim(sims)
-    msim.run(parallel=parallel)  # Run sims in parallel
+    msim.run(workers=workers)  # Run sims in parallel
 
     msim.summarize()
 

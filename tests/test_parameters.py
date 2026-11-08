@@ -55,9 +55,9 @@ def test_scale():
     scale = 2
 
     # Make and run sims
-    pars = dict(test=True)
+    pars = dict(test=True, n_agents=500)
     s1 = fp.Sim(pars=pars)
-    s2 = fp.Sim(pars=pars, pop_scale=scale)
+    s2 = fp.Sim(pars=pars, total_pop=scale*pars['n_agents'])
     msim = ss.parallel([s1, s2], shrink=False)
     s1, s2 = msim.sims
 
@@ -117,7 +117,7 @@ consumed_at_init = {
     'fecundity_low',    # Combined into pars.fecundity (ss.uniform)
     'fecundity_high',   # Combined into pars.fecundity (ss.uniform)
     'debut_age',        # Consumed by _fated_debut distribution in __init__
-    'twins_prob',       # Consumed by embryos_per_pregnancy in __init__
+    'twins_prob',       # Consumed by children in __init__
 }
 
 # Parameters that may be None for some locations (optional)

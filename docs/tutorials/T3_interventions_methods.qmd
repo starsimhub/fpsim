@@ -97,7 +97,7 @@ To run all of these simulations together, create a list of all the simulations y
 ```{python}
 simlist = sc.autolist([s1, s2, s3, s4])
 msim = ss.MultiSim(sims=simlist)
-msim.run(parallel=False)
+msim.run(workers=1)
 ```
 
 Plot contraceptive use for all of the simulations you just ran. 

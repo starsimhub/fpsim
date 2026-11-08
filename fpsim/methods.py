@@ -79,7 +79,7 @@ class Method:
             scale = 1 / np.exp(self.dur_use.base_scale)
         return scale
 
-    def expon_scale_callback(self, sim, uids):
+    def expon_mean_callback(self, sim, uids):
         """ Sample from exponential distribution with age factors """
         ppl = sim.people
         if sim.connectors.contraception.age_bins is not None:
@@ -141,8 +141,8 @@ class Method:
 
         elif dist_type == 'gamma':
             # Gamma distribution
-            self.dur_use = ss.gamma(a=np.exp(par1), scale=self.gamma_scale_callback)
-            self.dur_use.base_a = par1
+            self.dur_use = ss.gamma(shape=np.exp(par1), scale=self.gamma_scale_callback)
+            self.dur_use.base_shape = par1
             self.dur_use.base_scale = par2
 
         elif dist_type == 'llogis':
@@ -153,14 +153,14 @@ class Method:
 
         elif dist_type == 'weibull':
 
-            self.dur_use = ss.weibull(c=par1, scale=self.weibull_scale_callback)
-            self.dur_use.base_c = par1
+            self.dur_use = ss.weibull(shape=par1, scale=self.weibull_scale_callback)
+            self.dur_use.base_shape = par1
             self.dur_use.base_scale = par2  # This is the scale parameter for the Weibull distribution
 
         elif dist_type == 'exponential':
             # Exponential distribution
 
-            self.dur_use = ss.expon(scale=self.expon_scale_callback)
+            self.dur_use = ss.expon(mean=self.expon_mean_callback)
             self.dur_use.base_scale = par1
 
         if age_factors is not None:
@@ -318,7 +318,7 @@ class ContraceptiveChoice(ss.Connector):
 
         # Initialize choice distributions for method selection
         self._method_choice_dist = ss.choice(a=self.n_methods, p=np.ones(self.n_methods)/self.n_methods)
-        self._jitter_dist = ss.normal(loc=0, scale=1e-4)
+        self._jitter_dist = ss.normal(mean=0, std=1e-4)
 
         return
 
@@ -923,14 +923,14 @@ class ContraceptiveChoice(ss.Connector):
         super().init_results()
 
         self.define_results(
-            ss.Result('n_at_risk_non_users', scale=True, label="Number of non-users at risk of pregnancy (aCPR)"),
-            ss.Result('n_at_risk_users', scale=True, label="Number of users at risk of pregnancy (aCPR)"),
-            ss.Result('n_non_users', scale=True, label="Number of non-users (CPR)"),
-            ss.Result('n_mod_users', scale=True, label="Number of modern contraceptive users (mCPR)"),
-            ss.Result('n_users', scale=True, label="Number of contraceptive users (CPR)"),
-            ss.Result('mcpr', scale=False, label="Modern contraceptive prevalence rate (mCPR)"),
-            ss.Result('cpr', scale=False, label="Contraceptive prevalence rate (CPR)"),
-            ss.Result('acpr', scale=False, label="Active contraceptive prevalence rate (aCPR)"),
+            ss.Result('n_at_risk_non_users', label="Number of non-users at risk of pregnancy (aCPR)"),
+            ss.Result('n_at_risk_users', label="Number of users at risk of pregnancy (aCPR)"),
+            ss.Result('n_non_users', label="Number of non-users (CPR)"),
+            ss.Result('n_mod_users', label="Number of modern contraceptive users (mCPR)"),
+            ss.Result('n_users', label="Number of contraceptive users (CPR)"),
+            ss.Result('mcpr', kind='ratio', label="Modern contraceptive prevalence rate (mCPR)"),
+            ss.Result('cpr', kind='ratio', label="Contraceptive prevalence rate (CPR)"),
+            ss.Result('acpr', kind='ratio', label="Active contraceptive prevalence rate (aCPR)"),
         )
         return
 
@@ -1430,7 +1430,7 @@ class SimpleChoice(RandomChoice):
                             except:
                                 errormsg = f'Cannot find {key} in method switch for {mname}!'
                                 raise ValueError(errormsg)
-                            self._jitter_dist.set(scale=jitter)
+                            self._jitter_dist.set(std=jitter)
                             these_probs = [p if p > 0 else p+abs(self._jitter_dist.rvs(1)[0]) for p in these_probs]  # No 0s
                             these_probs = np.array(these_probs) * self.pars['method_weights']  # Scale by weights
                             these_probs = these_probs/sum(these_probs)  # Renormalize
@@ -1454,7 +1454,7 @@ class SimpleChoice(RandomChoice):
 
             if len(switch_iinds):
                 these_probs = mcp[key]
-                self._jitter_dist.set(scale=jitter)
+                self._jitter_dist.set(std=jitter)
                 these_probs = [p if p > 0 else p+abs(self._jitter_dist.rvs(1)[0]) for p in these_probs]  # No 0s
                 these_probs = np.array(these_probs) * self.pars['method_weights']  # Scale by weights
                 these_probs = these_probs/sum(these_probs)  # Renormalize
