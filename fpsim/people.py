@@ -128,9 +128,9 @@ class People(ss.People):
 
         return
 
-    def record_stocks(self):
+    def record_states(self):
         """ Starsim's counts of people (alive, deaths), and the women in each wealth quintile """
-        super().record_stocks()
+        super().record_states()
         self._step_results_wq()
         return
 

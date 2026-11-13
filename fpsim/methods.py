@@ -1094,13 +1094,13 @@ class ContraceptiveChoice(ss.Connector):
         # TODO, could move all update logic to here...
         pass
 
-    def record_stocks(self):
+    def record_states(self):
         """
         Note that we are not including LAM users in mCPR as this model counts
         all women passively using LAM but DHS data records only women who self-report
         LAM which is much lower. Follows the DHS definition of mCPR.
         """
-        super().record_stocks()
+        super().record_states()
         ppl = self.sim.people
         method_age = self.sim.pars.fp['method_age'] <= ppl.age
         fecund_age = ppl.age < self.sim.pars.fp['age_limit_fecundity']

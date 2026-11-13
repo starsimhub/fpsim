@@ -674,9 +674,9 @@ class FPmod(ss.Pregnancy):
 
     # %% Results and finalization
 
-    def record_stocks(self):
+    def record_states(self):
         """ Per-step results, and the method mix """
-        super().record_stocks()
+        super().record_states()
         self.compute_method_usage()
         return
 
